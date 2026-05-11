@@ -20,17 +20,8 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
 
   return (
     <div aria-labelledby={summaryId} className={className}>
-      <h4 id={summaryId}>Totals</h4>
-      <dl role="group" className="cart-subtotal">
-        <dt>Subtotal</dt>
-        <dd>
-          {cart?.cost?.subtotalAmount?.amount ? (
-            <Money data={cart?.cost?.subtotalAmount} />
-          ) : (
-            '-'
-          )}
-        </dd>
-      </dl>
+      <h2 id={summaryId} className="sr-only">Order summary</h2>
+
       <CartDiscounts
         discountCodes={cart?.discountCodes}
         discountsHeadingId={discountsHeadingId}
@@ -41,6 +32,19 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
         giftCardHeadingId={giftCardHeadingId}
         giftCardInputId={giftCardInputId}
       />
+
+      <div className="cart-subtotal-row">
+        <span className="cart-subtotal-label">Subtotal</span>
+        <span className="cart-subtotal-amount">
+          {cart?.cost?.subtotalAmount?.amount ? (
+            <Money data={cart.cost.subtotalAmount} />
+          ) : (
+            '—'
+          )}
+        </span>
+      </div>
+      <p className="cart-subtotal-note">Shipping calculated at checkout</p>
+
       <CartCheckoutActions checkoutUrl={cart?.checkoutUrl} />
     </div>
   );
@@ -50,12 +54,10 @@ function CartCheckoutActions({checkoutUrl}: {checkoutUrl?: string}) {
   if (!checkoutUrl) return null;
 
   return (
-    <div>
-      <a href={checkoutUrl} target="_self">
-        <p>Continue to Checkout &rarr;</p>
-      </a>
-      <br />
-    </div>
+    <a href={checkoutUrl} target="_self" className="cart-checkout-btn">
+      Proceed to checkout
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </a>
   );
 }
 
@@ -74,45 +76,37 @@ function CartDiscounts({
       ?.map(({code}) => code) || [];
 
   return (
-    <section aria-label="Discounts">
-      {/* Have existing discount, display it with a remove option */}
-      <dl hidden={!codes.length}>
-        <div>
-          <dt id={discountsHeadingId}>Discounts</dt>
-          <UpdateDiscountForm>
-            <div
-              className="cart-discount"
-              role="group"
-              aria-labelledby={discountsHeadingId}
-            >
-              <code>{codes?.join(', ')}</code>
-              &nbsp;
-              <button type="submit" aria-label="Remove discount">
-                Remove
-              </button>
-            </div>
-          </UpdateDiscountForm>
-        </div>
-      </dl>
+    <section aria-label="Discounts" className="cart-discount-section">
+      {codes.length > 0 && (
+        <UpdateDiscountForm>
+          <div className="cart-discount" role="group" aria-labelledby={discountsHeadingId}>
+            <span id={discountsHeadingId}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+              {codes.join(', ')}
+            </span>
+            <button type="submit" aria-label="Remove discount">Remove</button>
+          </div>
+        </UpdateDiscountForm>
+      )}
 
-      {/* Show an input to apply a discount */}
-      <UpdateDiscountForm discountCodes={codes}>
-        <div>
-          <label htmlFor={discountCodeInputId} className="sr-only">
-            Discount code
-          </label>
-          <input
-            id={discountCodeInputId}
-            type="text"
-            name="discountCode"
-            placeholder="Discount code"
-          />
-          &nbsp;
-          <button type="submit" aria-label="Apply discount code">
-            Apply
-          </button>
-        </div>
-      </UpdateDiscountForm>
+      <details className="cart-discount-section">
+        <summary>Have a promo code?</summary>
+        <UpdateDiscountForm discountCodes={codes}>
+          <div className="cart-discount-input-row">
+            <label htmlFor={discountCodeInputId} className="sr-only">Discount code</label>
+            <input
+              id={discountCodeInputId}
+              className="cart-discount-input"
+              type="text"
+              name="discountCode"
+              placeholder="Enter code"
+            />
+            <button type="submit" className="cart-discount-apply" aria-label="Apply discount code">
+              Apply
+            </button>
+          </div>
+        </UpdateDiscountForm>
+      </details>
     </section>
   );
 }
