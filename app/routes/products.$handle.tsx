@@ -51,18 +51,22 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
       variables: {handle, selectedOptions: getSelectedProductOptions(request)},
       cache: storefront.CacheNone(),
     }),
-    // Add other queries here, so that they are loaded in parallel
   ]);
 
   if (!product?.id) {
     throw new Response(null, {status: 404});
   }
 
-  // The API handle might be localized, so redirect to the localized handle
   redirectIfHandleIsLocalized(request, {handle, data: product});
+
+  const {productRecommendations} = await storefront.query(PRODUCT_RECOMMENDATIONS_QUERY, {
+    variables: {productId: product.id},
+    cache: storefront.CacheShort(),
+  });
 
   return {
     product,
+    recommendations: productRecommendations?.slice(0, 4) ?? [],
   };
 }
 
@@ -79,7 +83,7 @@ function loadDeferredData({context, params}: Route.LoaderArgs) {
 }
 
 export default function Product() {
-  const {product} = useLoaderData<typeof loader>();
+  const {product, recommendations} = useLoaderData<typeof loader>();
 
   // Optimistically selects a variant with given available variant information
   const selectedVariant = useOptimisticVariant(
@@ -339,17 +343,37 @@ export default function Product() {
           </div>
 
           {/* Related */}
-          <div className="pdp-related">
-            <div className="related-head">
-              <div>
-                <div className="ey">Pairs well with</div>
-                <h2>From the same bench.</h2>
+          {recommendations.length > 0 && (
+            <div className="pdp-related">
+              <div className="related-head">
+                <div>
+                  <div className="ey">Pairs well with</div>
+                  <h2>From the same bench.</h2>
+                </div>
+                <Link to="/collections/all">
+                  Browse all pieces <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </Link>
               </div>
-              <Link to="/collections/all">
-                Browse all pieces <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-              </Link>
+              <div className="pgrid">
+                {recommendations.map((rec) => (
+                  <Link key={rec.id} to={`/products/${rec.handle}`} className="pcard">
+                    <div className="pcard-img">
+                      {rec.images.nodes[0] && (
+                        <img src={rec.images.nodes[0].url} alt={rec.images.nodes[0].altText || rec.title} width={rec.images.nodes[0].width || 400} height={rec.images.nodes[0].height || 400} loading="lazy" />
+                      )}
+                    </div>
+                    <div className="pcard-body">
+                      <div className="pname">{rec.title}</div>
+                      <div className="pdp-price-big" style={{fontSize: 18, marginTop: 6}}>
+                        {rec.priceRange.minVariantPrice.currencyCode === 'EUR' ? '€' : rec.priceRange.minVariantPrice.currencyCode}
+                        {parseFloat(rec.priceRange.minVariantPrice.amount).toLocaleString('en-US', {minimumFractionDigits: 2})}
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </section>
 
@@ -458,6 +482,23 @@ const PRODUCT_FRAGMENT = `#graphql
     }
   }
   ${PRODUCT_VARIANT_FRAGMENT}
+` as const;
+
+const PRODUCT_RECOMMENDATIONS_QUERY = `#graphql
+  query ProductRecommendations($productId: ID!, $country: CountryCode, $language: LanguageCode)
+  @inContext(country: $country, language: $language) {
+    productRecommendations(productId: $productId) {
+      id
+      title
+      handle
+      priceRange {
+        minVariantPrice { amount currencyCode }
+      }
+      images(first: 1) {
+        nodes { url altText width height }
+      }
+    }
+  }
 ` as const;
 
 const PRODUCT_QUERY = `#graphql
