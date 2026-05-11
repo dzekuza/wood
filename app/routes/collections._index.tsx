@@ -3,6 +3,7 @@ import type {Route} from './+types/collections._index';
 import {getPaginationVariables, Image} from '@shopify/hydrogen';
 import type {CollectionFragment} from 'storefrontapi.generated';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
+import {shouldHideCollection} from '~/lib/site';
 
 export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte
@@ -30,7 +31,18 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
     // Add other queries here, so that they are loaded in parallel
   ]);
 
-  return {collections};
+  return {
+    collections: {
+      ...collections,
+      nodes: collections.nodes.filter(
+        (collection) =>
+          !shouldHideCollection({
+            handle: collection.handle,
+            title: collection.title,
+          }),
+      ),
+    },
+  };
 }
 
 /**

@@ -23,7 +23,9 @@ function readStorage(): FavouriteProduct[] {
 function writeStorage(items: FavouriteProduct[]): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  } catch {}
+  } catch {
+    return;
+  }
 }
 
 export function useFavourites() {

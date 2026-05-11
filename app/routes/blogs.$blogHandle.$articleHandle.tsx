@@ -2,9 +2,10 @@ import {useLoaderData} from 'react-router';
 import type {Route} from './+types/blogs.$blogHandle.$articleHandle';
 import {Image} from '@shopify/hydrogen';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
+import {SITE_NAME} from '~/lib/site';
 
 export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `Hydrogen | ${data?.article.title ?? ''} article`}];
+  return [{title: `${data?.article.title ?? 'Journal'} | ${SITE_NAME}`}];
 };
 
 export async function loader(args: Route.LoaderArgs) {
@@ -76,21 +77,33 @@ export default function Article() {
   }).format(new Date(article.publishedAt));
 
   return (
-    <div className="article">
-      <h1>
-        {title}
-        <div>
-          <time dateTime={article.publishedAt}>{publishedDate}</time> &middot;{' '}
-          <address>{author?.name}</address>
+    <>
+      <div className="page-header">
+        <div className="cwf-wrap">
+          <div className="page-breadcrumb">
+            <span>Journal</span>
+            <span>/</span>
+            <span>{title}</span>
+          </div>
+          <div className="page-header-inner">
+            <div>
+              <span className="eyebrow">Workshop journal</span>
+              <h1>{title}</h1>
+              <p className="blurb">{publishedDate}{author?.name ? ` · ${author.name}` : ''}</p>
+            </div>
+          </div>
         </div>
-      </h1>
-
-      {image && <Image data={image} sizes="90vw" loading="eager" />}
-      <div
-        dangerouslySetInnerHTML={{__html: contentHtml}}
-        className="article"
-      />
-    </div>
+      </div>
+      <article className="article-page">
+        <div className="cwf-wrap">
+          {image && <Image data={image} sizes="90vw" loading="eager" className="article-page-image" />}
+          <div
+            dangerouslySetInnerHTML={{__html: contentHtml}}
+            className="cms-page-body article-body"
+          />
+        </div>
+      </article>
+    </>
   );
 }
 

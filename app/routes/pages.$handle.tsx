@@ -1,9 +1,16 @@
 import {useLoaderData} from 'react-router';
 import type {Route} from './+types/pages.$handle';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
+import {getFlagshipPagePath, SITE_NAME} from '~/lib/site';
 
 export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `Hydrogen | ${data?.page.title ?? ''}`}];
+  const title = data?.page.seo?.title || data?.page.title;
+  const description = data?.page.seo?.description;
+
+  return [
+    {title: title ? `${title} | ${SITE_NAME}` : SITE_NAME},
+    ...(description ? [{name: 'description', content: description}] : []),
+  ];
 };
 
 export async function loader(args: Route.LoaderArgs) {
@@ -23,6 +30,16 @@ export async function loader(args: Route.LoaderArgs) {
 async function loadCriticalData({context, request, params}: Route.LoaderArgs) {
   if (!params.handle) {
     throw new Error('Missing page handle');
+  }
+
+  const flagshipPath = getFlagshipPagePath(params.handle);
+  if (flagshipPath) {
+    throw new Response(null, {
+      status: 302,
+      headers: {
+        Location: flagshipPath,
+      },
+    });
   }
 
   const [{page}] = await Promise.all([
@@ -58,12 +75,29 @@ export default function Page() {
   const {page} = useLoaderData<typeof loader>();
 
   return (
-    <div className="page">
-      <header>
-        <h1>{page.title}</h1>
-      </header>
-      <main dangerouslySetInnerHTML={{__html: page.body}} />
-    </div>
+    <>
+      <div className="page-header">
+        <div className="cwf-wrap">
+          <div className="page-breadcrumb">
+            <span>Pages</span>
+            <span>/</span>
+            <span>{page.title}</span>
+          </div>
+          <div className="page-header-inner">
+            <div>
+              <span className="eyebrow">From the workshop</span>
+              <h1>{page.title}</h1>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <section className="section-linen">
+        <div className="cwf-wrap">
+          <article className="cms-page-body" dangerouslySetInnerHTML={{__html: page.body}} />
+        </div>
+      </section>
+    </>
   );
 }
 

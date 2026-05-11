@@ -1,10 +1,5 @@
 import {useState, useEffect, useRef} from 'react';
-import gsap from 'gsap';
-import {ScrollTrigger} from 'gsap/ScrollTrigger';
-import {useGSAP} from '@gsap/react';
-
-gsap.registerPlugin(ScrollTrigger, useGSAP);
-import {redirect, useLoaderData, Link} from 'react-router';
+import {useLoaderData, Link} from 'react-router';
 import type {Route} from './+types/products.$handle';
 import {
   getSelectedProductOptions,
@@ -20,16 +15,25 @@ import {ProductForm} from '~/components/ProductForm';
 import {AddToCartButton} from '~/components/AddToCartButton';
 import {useAside} from '~/components/Aside';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
+import {SITE_NAME} from '~/lib/site';
 
 export const meta: Route.MetaFunction = ({data}) => {
   return [
-    {title: `Hydrogen | ${data?.product.title ?? ''}`},
+    {title: `${data?.product.title ?? 'Product'} | ${SITE_NAME}`},
     {
       rel: 'canonical',
       href: `/products/${data?.product.handle}`,
     },
   ];
 };
+
+const REVIEW_BREAKDOWN = [
+  {label: '5 stars', barClassName: 'review-fill-92', count: 118},
+  {label: '4 stars', barClassName: 'review-fill-6', count: 8},
+  {label: '3 stars', barClassName: 'review-fill-2', count: 2},
+  {label: '2 stars', barClassName: 'review-fill-0', count: 0},
+  {label: '1 star', barClassName: 'review-fill-0', count: 0},
+] as const;
 
 export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte
@@ -108,7 +112,7 @@ export default function Product() {
     selectedOrFirstAvailableVariant: selectedVariant,
   });
 
-  const {title, descriptionHtml, vendor} = product;
+  const {title, descriptionHtml} = product;
 
   const productImages = product.images?.nodes ?? [];
   const allImages = [
@@ -121,26 +125,12 @@ export default function Product() {
   const [showSticky, setShowSticky] = useState(false);
   const [viewingCount, setViewingCount] = useState<number | null>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
-  const pdpRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
   const {open} = useAside();
 
-  useGSAP(() => {
-    const mm = gsap.matchMedia();
-    mm.add('(prefers-reduced-motion: no-preference)', () => {
-      const tl = gsap.timeline({defaults: {ease: 'power2.out'}});
-      tl.from('.pdp-gallery, .pdp-carousel', {autoAlpha: 0, x: -20, duration: 0.8})
-        .from('.pdp-info > *', {y: 22, autoAlpha: 0, stagger: 0.09, duration: 0.65}, '-=0.5');
-
-      gsap.from('.pdp-assure-item', {y: 16, autoAlpha: 0, stagger: 0.07, duration: 0.5, ease: 'power2.out', scrollTrigger: {trigger: '.pdp-assure', start: 'top 90%'}});
-      gsap.from('.pdp-spec-card', {y: 20, autoAlpha: 0, scale: 0.97, stagger: 0.06, duration: 0.5, ease: 'power2.out', scrollTrigger: {trigger: '.pdp-specs', start: 'top 88%'}});
-      gsap.from('.rev-card', {y: 24, autoAlpha: 0, stagger: 0.08, duration: 0.55, ease: 'power2.out', scrollTrigger: {trigger: '.rev-list', start: 'top 88%'}});
-    });
-  }, {scope: pdpRef});
-
   useEffect(() => {
     if (selectedVariant?.image) setActiveImage(selectedVariant.image);
-  }, [selectedVariant?.id]);
+  }, [selectedVariant?.id, selectedVariant?.image]);
 
   useEffect(() => {
     setViewingCount(Math.floor(Math.random() * 14) + 8);
@@ -184,7 +174,7 @@ export default function Product() {
 
       {/* PDP */}
       <section className="pdp">
-        <div className="pdp-wrap" ref={pdpRef}>
+        <div className="pdp-wrap">
           <div className="pdp-grid">
             {/* Gallery slider */}
             <div className="pdp-carousel">
@@ -243,10 +233,7 @@ export default function Product() {
                   <button
                     key={img.id}
                     className={`pdp-thumb${activeImage?.id === img.id ? ' active' : ''}`}
-                    onClick={() => {
-                      gsap.fromTo('.pdp-main-img', {autoAlpha: 0.3}, {autoAlpha: 1, duration: 0.3, ease: 'power2.out'});
-                      setActiveImage(img);
-                    }}
+                    onClick={() => setActiveImage(img)}
                   >
                     <ProductImage image={img} />
                   </button>
@@ -262,14 +249,14 @@ export default function Product() {
 
             {/* Info */}
             <div className="pdp-info">
-              <div style={{display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6, fontSize: 13, color: 'rgba(74,47,31,.65)', flexWrap: 'wrap'}}>
-                <span style={{color: 'var(--cwf-accent)', fontSize: 14, letterSpacing: 2}}>★★★★★</span>
+              <div className="pdp-rating-row">
+                <span className="pdp-rating-stars">★★★★★</span>
                 <span>4.9 / 5</span>
-                <span style={{color: 'rgba(74,47,31,.3)'}}>·</span>
-                <a href="#reviews" style={{color: 'var(--cwf-accent-deep)', fontWeight: 600, borderBottom: '1px solid var(--cwf-accent)', paddingBottom: 2}}>128 reviews</a>
+                <span className="pdp-rating-sep">·</span>
+                <a href="#reviews" className="pdp-rating-link">128 reviews</a>
                 {viewingCount !== null && (
                   <>
-                    <span style={{color: 'rgba(74,47,31,.3)'}}>·</span>
+                    <span className="pdp-rating-sep">·</span>
                     <span className="pdp-viewing">
                       <span className="pdp-viewing-dot" />
                       {viewingCount} viewing now
@@ -371,7 +358,7 @@ export default function Product() {
                     Care &amp; Warranty <svg className="pdp-acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                   </summary>
                   <div className="pdp-acc-body">
-                    Wipe with a soft cloth; re-oil every 18 months. 25-year guarantee on joinery and frame. We'll re-cover any piece for cost of materials only, for life.
+                    Wipe with a soft cloth; re-oil every 18 months. 25-year guarantee on joinery and frame. We&rsquo;ll re-cover any piece for cost of materials only, for life.
                   </div>
                 </details>
               </div>
@@ -399,13 +386,13 @@ export default function Product() {
           </div>
 
           {/* Specs */}
-          <div className="pdp-specs">
-            <div className="pdp-specs-head">
-              <div>
-                <div className="ey eyebrow">By the numbers</div>
-                <h2 style={{marginTop: 10}}>The honest specifications.</h2>
+            <div className="pdp-specs">
+              <div className="pdp-specs-head">
+                <div>
+                  <div className="ey eyebrow">By the numbers</div>
+                  <h2 className="pdp-specs-title">The honest specifications.</h2>
+                </div>
               </div>
-            </div>
             <div className="pdp-specs-grid">
               <div className="pdp-spec-card">
                 <svg className="pdp-spec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22V12"/><path d="M17 8l-5-6-5 6h3l-3 4h4l-3 4h8l-3-4h4l-3-4z"/></svg>
@@ -448,11 +435,11 @@ export default function Product() {
                   <div className="count">Based on 128 verified reviews</div>
                 </div>
                 <div className="rev-bars">
-                  {[['5 stars', 92], ['4 stars', 6], ['3 stars', 1.5], ['2 stars', 0], ['1 star', 0]].map(([lab, pct]) => (
-                    <div key={String(lab)} className="rev-bar">
-                      <span className="lab">{lab}</span>
-                      <span className="track"><span className="fill" style={{width: `${pct}%`}} /></span>
-                      <span>{Math.round(Number(pct) * 1.28)}</span>
+                  {REVIEW_BREAKDOWN.map((review) => (
+                    <div key={review.label} className="rev-bar">
+                      <span className="lab">{review.label}</span>
+                      <span className="track"><span className={`fill ${review.barClassName}`} /></span>
+                      <span>{review.count}</span>
                     </div>
                   ))}
                 </div>
@@ -500,7 +487,7 @@ export default function Product() {
                     </div>
                     <div className="pcard-body">
                       <div className="pname">{rec.title}</div>
-                      <div className="pdp-price-big" style={{fontSize: 18, marginTop: 6}}>
+                      <div className="pdp-price-big pdp-related-price">
                         {rec.priceRange.minVariantPrice.currencyCode === 'EUR' ? '€' : rec.priceRange.minVariantPrice.currencyCode}
                         {parseFloat(rec.priceRange.minVariantPrice.amount).toLocaleString('en-US', {minimumFractionDigits: 2})}
                       </div>

@@ -1,6 +1,7 @@
 import {Link, useLoaderData} from 'react-router';
 import type {Route} from './+types/policies.$handle';
 import {type Shop} from '@shopify/hydrogen/storefront-api-types';
+import {SITE_NAME} from '~/lib/site';
 
 type SelectedPolicies = keyof Pick<
   Shop,
@@ -8,7 +9,7 @@ type SelectedPolicies = keyof Pick<
 >;
 
 export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `Hydrogen | ${data?.policy.title ?? ''}`}];
+  return [{title: `${data?.policy.title ?? 'Policy'} | ${SITE_NAME}`}];
 };
 
 export async function loader({params, context}: Route.LoaderArgs) {
@@ -45,16 +46,31 @@ export default function Policy() {
   const {policy} = useLoaderData<typeof loader>();
 
   return (
-    <div className="policy">
-      <br />
-      <br />
-      <div>
-        <Link to="/policies">← Back to Policies</Link>
+    <>
+      <div className="page-header">
+        <div className="cwf-wrap">
+          <div className="page-breadcrumb">
+            <Link to="/">Home</Link>
+            <span>/</span>
+            <Link to="/policies">Policies</Link>
+            <span>/</span>
+            <span>{policy.title}</span>
+          </div>
+          <div className="page-header-inner">
+            <div>
+              <span className="eyebrow">Policy</span>
+              <h1>{policy.title}</h1>
+            </div>
+          </div>
+        </div>
       </div>
-      <br />
-      <h1>{policy.title}</h1>
-      <div dangerouslySetInnerHTML={{__html: policy.body}} />
-    </div>
+      <section className="cms-page-shell">
+        <div className="cwf-wrap">
+          <Link to="/policies" className="btn btn-line policy-back-link">Back to policies</Link>
+          <article className="cms-page-body" dangerouslySetInnerHTML={{__html: policy.body}} />
+        </div>
+      </section>
+    </>
   );
 }
 

@@ -6,7 +6,7 @@ import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 
 export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `Hydrogen | ${data?.blog.title ?? ''} blog`}];
+  return [{title: `${data?.blog.title ?? 'Journal'} | CraftWoodFurniture`}];
 };
 
 export async function loader(args: Route.LoaderArgs) {
@@ -65,18 +65,32 @@ export default function Blog() {
   const {articles} = blog;
 
   return (
-    <div className="blog">
-      <h1>{blog.title}</h1>
-      <div className="blog-grid">
-        <PaginatedResourceSection<ArticleItemFragment> connection={articles}>
-          {({node: article, index}) => (
-            <ArticleItem
-              article={article}
-              key={article.id}
-              loading={index < 2 ? 'eager' : 'lazy'}
-            />
-          )}
-        </PaginatedResourceSection>
+    <div>
+      <div className="page-header">
+        <div className="cwf-wrap">
+          <div className="page-breadcrumb">
+            <Link to="/">Home</Link>
+            <span>/</span>
+            <Link to="/blogs">Journal</Link>
+            <span>/</span>
+            <span>{blog.title}</span>
+          </div>
+          <div className="eyebrow">The Journal</div>
+          <h1>{blog.title}</h1>
+        </div>
+      </div>
+      <div className="cwf-wrap blog-index-section">
+        <div className="blog-articles-grid">
+          <PaginatedResourceSection<ArticleItemFragment> connection={articles}>
+            {({node: article, index}) => (
+              <ArticleItem
+                article={article}
+                key={article.id}
+                loading={index < 3 ? 'eager' : 'lazy'}
+              />
+            )}
+          </PaginatedResourceSection>
+        </div>
       </div>
     </div>
   );
@@ -89,29 +103,34 @@ function ArticleItem({
   article: ArticleItemFragment;
   loading?: HTMLImageElement['loading'];
 }) {
-  const publishedAt = new Intl.DateTimeFormat('en-US', {
+  const publishedAt = new Intl.DateTimeFormat('en-GB', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   }).format(new Date(article.publishedAt!));
   return (
-    <div className="blog-article" key={article.id}>
-      <Link to={`/blogs/${article.blog.handle}/${article.handle}`}>
-        {article.image && (
-          <div className="blog-article-image">
-            <Image
-              alt={article.image.altText || article.title}
-              aspectRatio="3/2"
-              data={article.image}
-              loading={loading}
-              sizes="(min-width: 768px) 50vw, 100vw"
-            />
-          </div>
-        )}
-        <h3>{article.title}</h3>
-        <small>{publishedAt}</small>
-      </Link>
-    </div>
+    <Link
+      className="art-card"
+      to={`/blogs/${article.blog.handle}/${article.handle}`}
+      prefetch="intent"
+    >
+      {article.image && (
+        <div className="art-card-img">
+          <Image
+            alt={article.image.altText || article.title}
+            aspectRatio="16/9"
+            data={article.image}
+            loading={loading}
+            sizes="(min-width: 768px) 33vw, 100vw"
+          />
+        </div>
+      )}
+      <div className="art-card-body">
+        <div className="art-card-date">{publishedAt}</div>
+        <h3 className="art-card-title">{article.title}</h3>
+        <span className="art-card-cta">Read more <i className="ti ti-arrow-right" /></span>
+      </div>
+    </Link>
   );
 }
 
@@ -157,6 +176,7 @@ const BLOGS_QUERY = `#graphql
       name
     }
     contentHtml
+    excerpt
     handle
     id
     image {

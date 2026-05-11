@@ -3,11 +3,12 @@ import type {Route} from './+types/blogs._index';
 import {getPaginationVariables} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import type {BlogsQuery} from 'storefrontapi.generated';
+import {SITE_NAME} from '~/lib/site';
 
 type BlogNode = BlogsQuery['blogs']['nodes'][0];
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: `Hydrogen | Blogs`}];
+  return [{title: `Journal | ${SITE_NAME}`}];
 };
 
 export async function loader(args: Route.LoaderArgs) {
@@ -54,23 +55,39 @@ export default function Blogs() {
   const {blogs} = useLoaderData<typeof loader>();
 
   return (
-    <div className="blogs">
-      <h1>Blogs</h1>
-      <div className="blogs-grid">
-        <PaginatedResourceSection<BlogNode> connection={blogs}>
-          {({node: blog}) => (
-            <Link
-              className="blog"
-              key={blog.handle}
-              prefetch="intent"
-              to={`/blogs/${blog.handle}`}
-            >
-              <h2>{blog.title}</h2>
-            </Link>
-          )}
-        </PaginatedResourceSection>
+    <>
+      <div className="page-header">
+        <div className="cwf-wrap">
+          <div className="page-header-inner">
+            <div>
+              <span className="eyebrow">Journal</span>
+              <h1>Stories from the bench.</h1>
+              <p className="blurb">Finish notes, workshop process, and interiors that are meant to age well.</p>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+      <section className="collections-index-shell">
+        <div className="cwf-wrap">
+          <div className="blog-index-grid">
+            <PaginatedResourceSection<BlogNode> connection={blogs}>
+              {({node: blog}) => (
+                <Link
+                  className="blog-index-card"
+                  key={blog.handle}
+                  prefetch="intent"
+                  to={`/blogs/${blog.handle}`}
+                >
+                  <span className="eyebrow">Editorial series</span>
+                  <h2>{blog.title}</h2>
+                  <span className="blog-index-cta">Open journal <i className="ti ti-arrow-right" /></span>
+                </Link>
+              )}
+            </PaginatedResourceSection>
+          </div>
+        </div>
+      </section>
+    </>
   );
 }
 

@@ -1,0 +1,10 @@
+[mcp_servers.shopify-storefront]
+args = [
+    "-y",
+    "@shopify/storefront-mcp",
+    "--storefront-token",
+    "63ffd4fea36dc5a1d84b1b7b868518c2",
+    "--store-url",
+    "https://wood-123252.myshopify.com",
+]
+command = "npx"

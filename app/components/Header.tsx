@@ -8,6 +8,7 @@ import {
 import type {HeaderQuery, CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
 import {useFavourites} from '~/hooks/useFavourites';
+import {FLAGSHIP_PAGE_ROUTES, shouldHideCollection} from '~/lib/site';
 
 interface HeaderProps {
   header: HeaderQuery;
@@ -21,7 +22,13 @@ type Viewport = 'desktop' | 'mobile';
 
 export function Header({header, isLoggedIn, cart, publicStoreDomain}: HeaderProps) {
   const {shop, menu, collections} = header;
-  const categories = collections?.nodes ?? [];
+  const categories = (collections?.nodes ?? []).filter(
+    (collection) =>
+      !shouldHideCollection({
+        handle: collection.handle,
+        title: collection.title,
+      }),
+  );
   return (
     <header className="header">
       <div className="header-inner">
@@ -79,7 +86,8 @@ export function HeaderMenu({
             {c.title}
           </NavLink>
         ))}
-        <NavLink onClick={close} prefetch="intent" to="/pages/contact" className={({isActive}) => `header-menu-item${isActive ? ' active' : ''}`}>Contact</NavLink>
+        <NavLink onClick={close} prefetch="intent" to={FLAGSHIP_PAGE_ROUTES.contact} className={({isActive}) => `header-menu-item${isActive ? ' active' : ''}`}>Contact</NavLink>
+        <NavLink onClick={close} prefetch="intent" to="/blogs" className={({isActive}) => `header-menu-item${isActive ? ' active' : ''}`}>Journal</NavLink>
       </nav>
     );
   }
@@ -103,7 +111,10 @@ export function HeaderMenu({
           </div>
         </div>
       )}
-      <NavLink prefetch="intent" to="/pages/contact" className={({isActive}) => `header-menu-item${isActive ? ' active' : ''}`}>
+      <NavLink prefetch="intent" to="/blogs" className={({isActive}) => `header-menu-item${isActive ? ' active' : ''}`}>
+        Journal
+      </NavLink>
+      <NavLink prefetch="intent" to={FLAGSHIP_PAGE_ROUTES.contact} className={({isActive}) => `header-menu-item${isActive ? ' active' : ''}`}>
         Contact
       </NavLink>
     </nav>
@@ -114,24 +125,23 @@ function FavouritesLink() {
   const {favourites} = useFavourites();
   const count = favourites.length;
   return (
-    <NavLink prefetch="intent" to="/pages/favourites" aria-label={`Favourites (${count})`} style={{display: 'flex', alignItems: 'center', position: 'relative'}}>
+    <NavLink
+      prefetch="intent"
+      to="/pages/favourites"
+      aria-label={`Favourites (${count})`}
+      className="header-icon-link"
+    >
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(243,239,234,0.7)" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
       </svg>
-      {count > 0 && (
-        <span style={{
-          position: 'absolute', top: -4, right: -4,
-          width: 8, height: 8, borderRadius: '50%',
-          background: '#e07b39', display: 'block',
-        }} />
-      )}
+      {count > 0 && <span className="header-icon-badge" />}
     </NavLink>
   );
 }
 
 function AccountLink({isLoggedIn}: Pick<HeaderProps, 'isLoggedIn'>) {
   return (
-    <NavLink prefetch="intent" to="/account" aria-label="Account" style={{display: 'flex', alignItems: 'center'}}>
+    <NavLink prefetch="intent" to="/account" aria-label="Account" className="header-icon-link">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(243,239,234,0.7)" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="8" r="4" />
         <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
@@ -156,7 +166,7 @@ function HeaderMenuMobileToggle() {
 function SearchToggle() {
   const {open} = useAside();
   return (
-    <button className="reset" onClick={() => open('search')} aria-label="Search" style={{display: 'flex', alignItems: 'center'}}>
+    <button className="reset header-icon-link" onClick={() => open('search')} aria-label="Search">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(243,239,234,0.7)" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="11" cy="11" r="8" />
         <line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -178,20 +188,14 @@ function CartBadge({count}: {count: number}) {
         publish('cart_viewed', {cart, prevCart, shop, url: window.location.href || ''} as CartViewPayload);
       }}
       aria-label={`Cart (${count} items)`}
-      style={{display: 'flex', alignItems: 'center', position: 'relative'}}
+      className="header-icon-link"
     >
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(243,239,234,0.7)" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
         <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
         <line x1="3" y1="6" x2="21" y2="6" />
         <path d="M16 10a4 4 0 01-8 0" />
       </svg>
-      {count > 0 && (
-        <span style={{
-          position: 'absolute', top: -4, right: -4,
-          width: 8, height: 8, borderRadius: '50%',
-          background: '#e07b39', display: 'block',
-        }} />
-      )}
+      {count > 0 && <span className="header-icon-badge" />}
     </a>
   );
 }

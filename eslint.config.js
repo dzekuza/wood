@@ -32,6 +32,7 @@ export default [
       '**/*.generated.d.ts',
       '**/.react-router/',
       '**/packages/hydrogen/dist/',
+      'workers/**/*.ts',
     ],
   },
   ...fixupConfigRules(
@@ -220,6 +221,12 @@ export default [
       globals: {
         ...globals.node,
       },
+    },
+  },
+  {
+    files: ['scripts/**/*.{js,mjs,cjs}'],
+    rules: {
+      'no-console': 'off',
     },
   },
   ...compat.extends('plugin:jest/recommended').map((config) => ({

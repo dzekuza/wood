@@ -1,6 +1,7 @@
-import {Await, useLoaderData, Link} from 'react-router';
+import {Await, useFetcher, useLoaderData, Link, data} from 'react-router';
 import type {Route} from './+types/_index';
-import {Suspense, useRef} from 'react';
+import {Suspense} from 'react';
+import {Image} from '@shopify/hydrogen';
 import type {
   FeaturedProductsQuery,
   FeaturedProductFragment,
@@ -8,16 +9,75 @@ import type {
 } from 'storefrontapi.generated';
 import {MockShopNotice} from '~/components/MockShopNotice';
 import {ProductItem} from '~/components/ProductItem';
-import gsap from 'gsap';
-import {ScrollTrigger} from 'gsap/ScrollTrigger';
-import {useGSAP} from '@gsap/react';
-
-gsap.registerPlugin(ScrollTrigger, useGSAP);
+import {
+  isValidNewsletterEmail,
+  normalizeNewsletterEmail,
+  subscribeEmailToNewsletter,
+} from '~/lib/newsletter.server';
+import {SITE_NAME} from '~/lib/site';
 
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: 'Craft Wood Furniture | Handcrafted Pieces'}];
+  return [
+    {title: `${SITE_NAME} | Handcrafted solid timber furniture`},
+    {
+      name: 'description',
+      content:
+        'Solid timber furniture, made by hand in a small Cotswolds workshop. No flat-pack, no veneers, just patient joinery and pieces built to last.',
+    },
+  ];
 };
+
+export async function action({request, context}: Route.ActionArgs) {
+  const formData = await request.formData();
+  const intent = formData.get('intent');
+  const rawEmail = String(formData.get('email') ?? '');
+  const email = normalizeNewsletterEmail(rawEmail);
+  const env = context.env as unknown as Record<string, string | undefined>;
+
+  if (intent !== 'newsletter-subscribe') {
+    return data(
+      {
+        status: 'error' as const,
+        message: 'We could not understand that request.',
+      },
+      {status: 400},
+    );
+  }
+
+  if (!isValidNewsletterEmail(email)) {
+    return data(
+      {
+        status: 'error' as const,
+        message: 'Enter a valid email address to join the newsletter.',
+      },
+      {status: 400},
+    );
+  }
+
+  try {
+    const result = await subscribeEmailToNewsletter({
+      adminToken: env.SHOPIFY_ADMIN_TOKEN,
+      email,
+      storeDomain: env.PUBLIC_STORE_DOMAIN,
+    });
+
+    return data(result, {
+      status: result.status === 'error' ? 500 : 200,
+    });
+  } catch (error) {
+    return data(
+      {
+        status: 'error' as const,
+        message:
+          error instanceof Error
+            ? error.message
+            : 'We could not save your subscription right now. Please try again shortly.',
+      },
+      {status: 500},
+    );
+  }
+}
 
 export async function loader(args: Route.LoaderArgs) {
   const deferredData = loadDeferredData(args);
@@ -26,10 +86,15 @@ export async function loader(args: Route.LoaderArgs) {
 }
 
 async function loadCriticalData({context}: Route.LoaderArgs) {
-  const {collections} = await context.storefront.query(FEATURED_COLLECTIONS_QUERY);
+  const [{collections}, {blogs}] = await Promise.all([
+    context.storefront.query(FEATURED_COLLECTIONS_QUERY),
+    context.storefront.query(FEATURED_ARTICLES_QUERY),
+  ]);
+  const articles = blogs.nodes[0]?.articles.nodes ?? [];
   return {
     isShopLinked: Boolean(context.env.PUBLIC_STORE_DOMAIN),
     featuredCollections: collections.nodes,
+    featuredArticles: articles,
   };
 }
 
@@ -55,6 +120,7 @@ export default function Homepage() {
       <CraftSection />
       <FeaturesBar />
       <TestimonialsSection />
+      <ArticlesSection articles={data.featuredArticles} />
       <NewsletterSection />
     </div>
   );
@@ -62,28 +128,8 @@ export default function Homepage() {
 
 /* ─── Hero ─────────────────────────────────────────────────────────────────── */
 function HeroSection() {
-  const ref = useRef<HTMLElement>(null);
-
-  useGSAP(() => {
-    const mm = gsap.matchMedia();
-    mm.add('(prefers-reduced-motion: no-preference)', () => {
-      const targets = ['h1', '.lede', '.hero-cta a', '.hero-image', '.hero-floater', '.hero-badge'];
-      gsap.set(targets, {autoAlpha: 0, y: 20});
-      gsap.set('h1', {y: 44});
-      gsap.set('.hero-image', {y: 36, scale: 1.03});
-
-      const tl = gsap.timeline({defaults: {ease: 'power3.out'}});
-      tl.to('h1', {y: 0, autoAlpha: 1, duration: 0.9})
-        .to('.lede', {y: 0, autoAlpha: 1, duration: 0.7}, '-=0.55')
-        .to('.hero-cta a', {y: 0, autoAlpha: 1, stagger: 0.12, duration: 0.6}, '-=0.45')
-        .to('.hero-image', {y: 0, autoAlpha: 1, scale: 1, duration: 1.0, ease: 'power2.out'}, '-=0.5')
-        .to('.hero-floater', {y: 0, autoAlpha: 1, duration: 0.5}, '-=0.35')
-        .to('.hero-badge', {y: 0, autoAlpha: 1, duration: 0.5}, '-=0.45');
-    });
-  }, {scope: ref});
-
   return (
-    <section className="hero" ref={ref}>
+    <section className="hero">
       <div className="hero-grid">
         {/* Copy + image */}
         <div className="hero-copy">
@@ -94,10 +140,10 @@ function HeroSection() {
             Solid timber furniture, joined and finished by a small workshop in the Cotswolds. No flat-pack, no veneers — just timber, traditional joinery, and patience pressed into every piece.
           </p>
           <div className="hero-cta">
-            <Link to="/collections/all" className="btn btn-primary">
+            <Link to="/collections/all" className="btn btn-dark">
               Shop the collection <i className="ti ti-arrow-right" />
             </Link>
-            <Link to="/pages/about" className="btn btn-ghost">
+            <Link to="/about" className="btn btn-line">
               <i className="ti ti-player-play" /> Our story
             </Link>
           </div>
@@ -141,7 +187,7 @@ function MarqueeStrip() {
     <div className="marquee-strip">
       <div className="marquee-row">
         {MARQUEE_DOUBLED.map((item, i) => (
-          <span key={i}>
+          <span key={`${item.icon}-${item.text}-${i < MARQUEE_ITEMS.length ? 'a' : 'b'}`}>
             <i className={`ti ${item.icon}`} />
             {item.text}
           </span>
@@ -165,17 +211,8 @@ function CollectionsSection({
 }: {
   collections: FeaturedCollectionsQuery['collections']['nodes'];
 }) {
-  const ref = useRef<HTMLElement>(null);
-  useGSAP(() => {
-    const mm = gsap.matchMedia();
-    mm.add('(prefers-reduced-motion: no-preference)', () => {
-      gsap.from('.shead', {y: 28, autoAlpha: 0, duration: 0.7, ease: 'power2.out', scrollTrigger: {trigger: '.shead', start: 'top 88%'}});
-      gsap.from('.cell', {y: 32, autoAlpha: 0, duration: 0.65, stagger: 0.07, ease: 'power2.out', scrollTrigger: {trigger: '.bento', start: 'top 88%'}});
-    });
-  }, {scope: ref});
-
   return (
-    <section className="section-linen" ref={ref}>
+    <section className="section-linen">
       <div className="cwf-wrap">
         <div className="shead">
           <div>
@@ -194,7 +231,7 @@ function CollectionsSection({
             const col = collections[i];
             return (
               <Link
-                key={i}
+                key={col?.id ?? cell.title}
                 to={col ? `/collections/${col.handle}` : '/collections'}
                 className={`cell ${cell.cls}`}
               >
@@ -235,16 +272,8 @@ function ProductsSection({
 }: {
   products: Promise<FeaturedProductsQuery | null>;
 }) {
-  const ref = useRef<HTMLElement>(null);
-  useGSAP(() => {
-    const mm = gsap.matchMedia();
-    mm.add('(prefers-reduced-motion: no-preference)', () => {
-      gsap.from('.pcard', {y: 28, autoAlpha: 0, duration: 0.6, stagger: 0.08, ease: 'power2.out', scrollTrigger: {trigger: ref.current, start: 'top 88%'}});
-    });
-  }, {scope: ref});
-
   return (
-    <section className="section-linen-cont" ref={ref}>
+    <section className="section-linen-cont">
       <div className="cwf-wrap">
         <div className="shead">
           <div>
@@ -288,24 +317,8 @@ function ProductsSection({
 
 /* ─── Craft section ─────────────────────────────────────────────────────────── */
 function CraftSection() {
-  const ref = useRef<HTMLElement>(null);
-  useGSAP(() => {
-    const mm = gsap.matchMedia();
-    mm.add('(prefers-reduced-motion: no-preference)', () => {
-      gsap.from('.craft-visual', {x: -40, autoAlpha: 0, duration: 0.9, ease: 'power3.out', scrollTrigger: {trigger: ref.current, start: 'top 82%'}});
-      gsap.from('.craft-copy .eyebrow, .craft-copy .title, .craft-copy p, .craft-signoff', {
-        y: 24, autoAlpha: 0, duration: 0.65, stagger: 0.1, ease: 'power2.out',
-        scrollTrigger: {trigger: '.craft-copy', start: 'top 85%'},
-      });
-      gsap.from('.craft-stats > div', {
-        y: 20, autoAlpha: 0, duration: 0.5, stagger: 0.08, ease: 'power2.out',
-        scrollTrigger: {trigger: '.craft-stats', start: 'top 88%'},
-      });
-    });
-  }, {scope: ref});
-
   return (
-    <section className="craft" ref={ref}>
+    <section className="craft">
       <div className="cwf-wrap">
         <div className="craft-visual">
           <img src="/images/craft.jpg" alt="Craftsman at work" />
@@ -326,7 +339,7 @@ function CraftSection() {
             We make slowly, on purpose. A single dining table passes through every joiner in the workshop before it leaves us — rough-cut by Will, drawn by Tom, jointed by Iris, oiled by Sam. No two pieces look alike because no two trees do.
           </p>
           <p>
-            If you ever damage a joint, we'll repair it. For twenty-five years. By the same hands that made it.
+            If you ever damage a joint, we&rsquo;ll repair it. For twenty-five years. By the same hands that made it.
           </p>
 
           <div className="craft-stats">
@@ -349,7 +362,7 @@ function CraftSection() {
           </div>
 
           <div className="craft-signoff">
-            <Link to="/pages/about" className="btn btn-accent">
+            <Link to="/about" className="btn btn-primary">
               Visit the workshop <i className="ti ti-arrow-right" />
             </Link>
             <span className="craft-appt">Saturdays · by appointment</span>
@@ -371,16 +384,8 @@ const FEATURES = [
 ];
 
 function FeaturesBar() {
-  const ref = useRef<HTMLElement>(null);
-  useGSAP(() => {
-    const mm = gsap.matchMedia();
-    mm.add('(prefers-reduced-motion: no-preference)', () => {
-      gsap.from('.f', {y: 20, autoAlpha: 0, duration: 0.55, stagger: 0.09, ease: 'power2.out', scrollTrigger: {trigger: ref.current, start: 'top 88%'}});
-    });
-  }, {scope: ref});
-
   return (
-    <section className="section-linen-cont" ref={ref}>
+    <section className="section-linen-cont">
       <div className="cwf-wrap">
         <div className="features">
           {FEATURES.map((f) => (
@@ -419,16 +424,8 @@ const TESTIMONIALS = [
 ];
 
 function TestimonialsSection() {
-  const ref = useRef<HTMLElement>(null);
-  useGSAP(() => {
-    const mm = gsap.matchMedia();
-    mm.add('(prefers-reduced-motion: no-preference)', () => {
-      gsap.from('.tcard', {y: 24, autoAlpha: 0, duration: 0.6, stagger: 0.1, ease: 'power2.out', scrollTrigger: {trigger: ref.current, start: 'top 88%'}});
-    });
-  }, {scope: ref});
-
   return (
-    <section className="section-linen-cont" ref={ref}>
+    <section className="section-linen-cont">
       <div className="cwf-wrap">
         <div className="shead">
           <div>
@@ -462,17 +459,78 @@ function TestimonialsSection() {
   );
 }
 
+/* ─── Articles ──────────────────────────────────────────────────────────────── */
+type ArticleNode = {
+  title: string;
+  handle: string;
+  excerpt?: string | null;
+  publishedAt: string;
+  image?: {url: string; altText?: string | null; width?: number | null; height?: number | null} | null;
+  blog: {handle: string};
+};
+
+function ArticlesSection({articles}: {articles: ArticleNode[]}) {
+  if (!articles.length) return null;
+
+  return (
+    <section className="section-linen art-section">
+      <div className="cwf-wrap">
+        <div className="shead">
+          <div>
+            <div className="eyebrow">From the Journal</div>
+            <h2 className="title">Thoughts from the bench</h2>
+          </div>
+          <Link to="/blogs/journal" className="btn btn-line">
+            All articles <i className="ti ti-arrow-right" />
+          </Link>
+        </div>
+        <div className="art-grid">
+          {articles.map((a) => (
+            <Link
+              key={a.handle}
+              to={`/blogs/${a.blog.handle}/${a.handle}`}
+              prefetch="intent"
+              className="art-card"
+            >
+              {a.image && (
+                <div className="art-card-img">
+                  <Image
+                    data={a.image}
+                    aspectRatio="16/9"
+                    sizes="(max-width: 767px) 100vw, 400px"
+                  />
+                </div>
+              )}
+              <div className="art-card-body">
+                <div className="art-card-date">
+                  {new Intl.DateTimeFormat('en-GB', {day: 'numeric', month: 'long', year: 'numeric'}).format(new Date(a.publishedAt))}
+                </div>
+                <h3 className="art-card-title">{a.title}</h3>
+                {a.excerpt && <p className="art-card-excerpt">{a.excerpt}</p>}
+                <span className="art-card-cta">Read more <i className="ti ti-arrow-right" /></span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ─── Newsletter ────────────────────────────────────────────────────────────── */
 function NewsletterSection() {
+  const newsletter = useFetcher<typeof action>();
+  const message = newsletter.data;
+
   return (
     <section className="section-linen-cont">
       <div className="cwf-wrap">
         <div className="news">
           <svg className="bg-mark" width="320" height="320" viewBox="0 0 192 192" aria-hidden>
-            <path d="M173.985 182.506L165.126 191.365L111.969 138.209L104.542 145.635L141.413 182.506L132.554 191.365L95.6826 154.494L58.8125 191.365L49.9531 182.506L86.8232 145.635L79.3965 138.208L26.2393 191.365L17.3799 182.506L79.3965 120.489L95.6826 136.775L111.969 120.489L173.985 182.506Z" fill="#C9A27A"/>
-            <path d="M70.876 79.3965L54.5889 95.6826L70.876 111.969L62.0166 120.829L8.85938 173.985L0 165.126L53.1562 111.969L45.7295 104.542L8.85938 141.413L0 132.554L36.8701 95.6826L0 58.8125L8.85938 49.9531L45.7295 86.8232L53.1572 79.3965L0 26.2393L8.85938 17.3799L70.876 79.3965Z" fill="#C9A27A"/>
-            <path d="M191.365 26.2393L138.208 79.3965L145.635 86.8232L182.506 49.9531L191.365 58.8125L154.494 95.6826L191.365 132.554L182.506 141.413L145.635 104.542L138.209 111.969L191.365 165.126L182.506 173.985L120.489 111.97L136.775 95.6826L120.489 79.3965L182.506 17.3799L191.365 26.2393Z" fill="#C9A27A"/>
-            <path d="M173.985 8.85938L120.828 62.0156L111.97 70.876L95.6826 54.5889L79.3965 70.876L17.3799 8.85938L26.2393 0L79.3965 53.1572L86.8232 45.7295L49.9531 8.85938L58.8125 0L95.6826 36.8701L132.554 0L141.413 8.85938L104.542 45.7295L111.969 53.1562L165.126 0L173.985 8.85938Z" fill="#C9A27A"/>
+            <path d="M173.985 182.506L165.126 191.365L111.969 138.209L104.542 145.635L141.413 182.506L132.554 191.365L95.6826 154.494L58.8125 191.365L49.9531 182.506L86.8232 145.635L79.3965 138.208L26.2393 191.365L17.3799 182.506L79.3965 120.489L95.6826 136.775L111.969 120.489L173.985 182.506Z" fill="currentColor"/>
+            <path d="M70.876 79.3965L54.5889 95.6826L70.876 111.969L62.0166 120.829L8.85938 173.985L0 165.126L53.1562 111.969L45.7295 104.542L8.85938 141.413L0 132.554L36.8701 95.6826L0 58.8125L8.85938 49.9531L45.7295 86.8232L53.1572 79.3965L0 26.2393L8.85938 17.3799L70.876 79.3965Z" fill="currentColor"/>
+            <path d="M191.365 26.2393L138.208 79.3965L145.635 86.8232L182.506 49.9531L191.365 58.8125L154.494 95.6826L191.365 132.554L182.506 141.413L145.635 104.542L138.209 111.969L191.365 165.126L182.506 173.985L120.489 111.97L136.775 95.6826L120.489 79.3965L182.506 17.3799L191.365 26.2393Z" fill="currentColor"/>
+            <path d="M173.985 8.85938L120.828 62.0156L111.97 70.876L95.6826 54.5889L79.3965 70.876L17.3799 8.85938L26.2393 0L79.3965 53.1572L86.8232 45.7295L49.9531 8.85938L58.8125 0L95.6826 36.8701L132.554 0L141.413 8.85938L104.542 45.7295L111.969 53.1562L165.126 0L173.985 8.85938Z" fill="currentColor"/>
           </svg>
           <div className="news-content">
             <div className="eyebrow">The Journal</div>
@@ -484,10 +542,18 @@ function NewsletterSection() {
             </p>
           </div>
           <div className="news-form-wrap">
-            <form className="news-form" onSubmit={(e) => e.preventDefault()}>
-              <input type="email" placeholder="your@address.com" required />
-              <button type="submit">Subscribe</button>
-            </form>
+            <newsletter.Form className="news-form" method="post">
+              <input type="hidden" name="intent" value="newsletter-subscribe" />
+              <input type="email" name="email" placeholder="your@address.com" required />
+              <button type="submit" disabled={newsletter.state !== 'idle'}>
+                {newsletter.state === 'submitting' ? 'Subscribing...' : 'Subscribe'}
+              </button>
+            </newsletter.Form>
+            {message?.message ? (
+              <p className={`news-status news-status-${message.status}`} role="status">
+                {message.message}
+              </p>
+            ) : null}
             <div className="tinyterms">~ 11 letters a year · unsubscribe in one click.</div>
           </div>
         </div>
@@ -510,6 +576,34 @@ const FEATURED_COLLECTIONS_QUERY = `#graphql
           altText
           width
           height
+        }
+      }
+    }
+  }
+` as const;
+
+const FEATURED_ARTICLES_QUERY = `#graphql
+  query FeaturedArticles($country: CountryCode, $language: LanguageCode)
+    @inContext(country: $country, language: $language) {
+    blogs(first: 1, sortKey: HANDLE) {
+      nodes {
+        handle
+        articles(first: 3, sortKey: PUBLISHED_AT, reverse: true) {
+          nodes {
+            title
+            handle
+            excerpt
+            publishedAt
+            image {
+              url
+              altText
+              width
+              height
+            }
+            blog {
+              handle
+            }
+          }
         }
       }
     }

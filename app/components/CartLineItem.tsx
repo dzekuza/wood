@@ -114,7 +114,7 @@ function CartLineQuantity({line}: {line: CartLine}) {
   const nextQuantity = Number((quantity + 1).toFixed(0));
 
   return (
-    <div style={{display: 'flex', alignItems: 'center', gap: 8}}>
+    <div className="cart-line-actions">
       <div className="cart-line-quantity">
         <CartLineUpdateButton lines={[{id: lineId, quantity: prevQuantity}]}>
           <button

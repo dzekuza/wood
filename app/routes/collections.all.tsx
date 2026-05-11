@@ -5,9 +5,10 @@ import {getPaginationVariables} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {ProductItem} from '~/components/ProductItem';
 import type {CollectionItemFragment} from 'storefrontapi.generated';
+import {SITE_NAME} from '~/lib/site';
 
 export const meta: Route.MetaFunction = () => [
-  {title: 'All Products — CraftWoodFurniture'},
+  {title: `All Products | ${SITE_NAME}`},
 ];
 
 export async function loader(args: Route.LoaderArgs) {
@@ -83,11 +84,11 @@ const CATEGORIES = [['Seating', 31], ['Tables', 18], ['Storage', 14], ['Beds', 1
 const WOODS     = [['English Oak', 31], ['European Walnut', 18], ['Ash', 14], ['Reclaimed Beam', 12]] as const;
 const LEAD_TIMES = [['In stock', 12], ['4–6 weeks', 38], ['8–12 weeks', 24], ['Bespoke', 10]] as const;
 const FINISHES = [
-  {label: 'Oak',         color: '#c9a27a'},
-  {label: 'Walnut',      color: '#7a5a3a'},
-  {label: 'Dark Walnut', color: '#4a2f1f'},
-  {label: 'Whitewash',   color: '#e8dfd1'},
-  {label: 'Ebonised',    color: '#2a2a2a'},
+  {label: 'Oak', className: 'finish-swatch-oak'},
+  {label: 'Walnut', className: 'finish-swatch-walnut'},
+  {label: 'Dark Walnut', className: 'finish-swatch-dark-walnut'},
+  {label: 'Whitewash', className: 'finish-swatch-whitewash'},
+  {label: 'Ebonised', className: 'finish-swatch-ebonised'},
 ];
 
 function CheckList({
@@ -141,7 +142,11 @@ export default function AllProducts() {
 
   function toggle(set: Set<string>, setFn: (s: Set<string>) => void, val: string) {
     const next = new Set(set);
-    next.has(val) ? next.delete(val) : next.add(val);
+    if (next.has(val)) {
+      next.delete(val);
+    } else {
+      next.add(val);
+    }
     setFn(next);
   }
 
@@ -157,7 +162,11 @@ export default function AllProducts() {
 
   function handleCategoryToggle(val: string) {
     const next = new Set(categories);
-    next.has(val) ? next.delete(val) : next.add(val);
+    if (next.has(val)) {
+      next.delete(val);
+    } else {
+      next.add(val);
+    }
     setCategories(next);
     // Update chip to reflect checkbox state
     if (next.size === 1) {
@@ -255,11 +264,10 @@ export default function AllProducts() {
               <div className="fblock">
                 <h4>Finish</h4>
                 <div className="swatch-row">
-                  {FINISHES.map(({label, color}) => (
+                  {FINISHES.map(({label, className}) => (
                     <button
                       key={label}
-                      className={`sw${finishes.has(label) ? ' on' : ''}`}
-                      style={{background: color}}
+                      className={`sw ${className}${finishes.has(label) ? ' on' : ''}`}
                       title={label}
                       onClick={() => toggle(finishes, setFinishes, label)}
                       aria-pressed={finishes.has(label)}
@@ -282,8 +290,8 @@ export default function AllProducts() {
             </aside>
 
             {/* Product grid — filtered */}
-            <div style={{minWidth: 0}}>
-              <span className="filter-bar-count" style={{display: 'block', marginBottom: 16}}>{filtered.length} pieces</span>
+            <div className="filter-main">
+              <span className="filter-bar-count filter-bar-count-block">{filtered.length} pieces</span>
               {filtered.length === 0 ? (
                 <div className="filter-empty">
                   <p>No pieces match your filters.</p>
@@ -307,10 +315,21 @@ export default function AllProducts() {
 
       {/* Mobile filter drawer */}
       {mobileFiltersOpen && (
-        <div className="mob-filter-overlay" onClick={() => setMobileFiltersOpen(false)}>
-          <aside className="mob-filter-drawer" onClick={(e) => e.stopPropagation()}>
+        <div className="mob-filter-overlay" role="presentation">
+          <button
+            type="button"
+            className="mob-filter-backdrop"
+            aria-label="Close filters"
+            onClick={() => setMobileFiltersOpen(false)}
+          />
+          <aside
+            className="mob-filter-drawer"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="mobile-filter-title"
+          >
             <div className="mob-filter-header">
-              <span className="eyebrow">Filters</span>
+              <span className="eyebrow" id="mobile-filter-title">Filters</span>
               <button className="mob-filter-close" onClick={() => setMobileFiltersOpen(false)} aria-label="Close filters">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>

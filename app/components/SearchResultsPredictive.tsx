@@ -7,6 +7,7 @@ import {
   type PredictiveSearchReturn,
 } from '~/lib/search';
 import {useAside} from './Aside';
+import {getPagePath} from '~/lib/site';
 
 type PredictiveSearchItems = PredictiveSearchReturn['result']['items'];
 
@@ -175,7 +176,7 @@ function SearchResultsPredictivePages({
       <ul>
         {pages.map((page) => {
           const pageUrl = urlWithTrackingParams({
-            baseUrl: `/pages/${page.handle}`,
+            baseUrl: getPagePath(page.handle),
             trackingParams: page.trackingParameters,
             term: term.current,
           });

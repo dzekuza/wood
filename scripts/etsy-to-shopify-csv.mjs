@@ -1,5 +1,4 @@
 import { readFileSync, writeFileSync } from 'fs';
-import path from 'path';
 
 const products = JSON.parse(readFileSync('scripts/etsy-data/products.json', 'utf-8'));
 
@@ -101,7 +100,7 @@ function esc(val) {
 
 const rows = [headers.join(',')];
 
-products.forEach((p, i) => {
+products.forEach((p) => {
   const type = getType(p.title);
   const handle = uniqueHandle(toHandle(p.title));
   const sku = `CWF-${p.listing_id}`;

@@ -1,6 +1,7 @@
 import {Suspense} from 'react';
 import {Await, NavLink} from 'react-router';
 import type {FooterQuery, HeaderQuery} from 'storefrontapi.generated';
+import {CONTACT_EMAIL, FLAGSHIP_PAGE_ROUTES} from '~/lib/site';
 
 interface FooterProps {
   footer: Promise<FooterQuery | null>;
@@ -12,9 +13,6 @@ const FOOTER_COLS = [
   {
     heading: 'Shop',
     links: [
-      {title: 'Dining', url: '/collections/dining-room'},
-      {title: 'Living', url: '/collections/living-room'},
-      {title: 'Bedroom', url: '/collections/bedroom'},
       {title: 'Study', url: '/collections/study'},
       {title: 'Storage', url: '/collections/storage'},
       {title: 'Gift card', url: '/products/gift-card'},
@@ -23,12 +21,12 @@ const FOOTER_COLS = [
   {
     heading: 'Workshop',
     links: [
-      {title: 'Our makers', url: '/pages/makers'},
+      {title: 'Our makers', url: FLAGSHIP_PAGE_ROUTES.about},
       {title: 'Materials', url: '/pages/materials'},
       {title: 'Process', url: '/pages/process'},
       {title: 'Bespoke commissions', url: '/pages/bespoke'},
       {title: 'Visit us', url: '/pages/showroom'},
-      {title: 'Journal', url: '/blogs/journal'},
+      {title: 'Journal', url: '/blogs'},
     ],
   },
   {
@@ -39,7 +37,7 @@ const FOOTER_COLS = [
       {title: 'At-home trial', url: '/pages/trial'},
       {title: 'Care guides', url: '/pages/care'},
       {title: 'Repairs', url: '/pages/repairs'},
-      {title: 'Contact', url: '/pages/contact'},
+      {title: 'Contact', url: FLAGSHIP_PAGE_ROUTES.contact},
     ],
   },
 ];
@@ -78,7 +76,7 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}: Foote
                       <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor" stroke="none"/>
                     </svg>
                   </a>
-                  <a href="mailto:hello@craftwoodfurniture.co.uk" aria-label="Email" className="footer-social-btn">
+                  <a href={`mailto:${CONTACT_EMAIL}`} aria-label="Email" className="footer-social-btn">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                       <polyline points="22,6 12,13 2,6"/>

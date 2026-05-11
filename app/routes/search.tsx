@@ -8,13 +8,14 @@ import {
   type PredictiveSearchReturn,
   getEmptyPredictiveSearchResult,
 } from '~/lib/search';
+import {SITE_NAME} from '~/lib/site';
 import type {
   RegularSearchQuery,
   PredictiveSearchQuery,
 } from 'storefrontapi.generated';
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: `Hydrogen | Search`}];
+  return [{title: `Search | ${SITE_NAME}`}];
 };
 
 export async function loader({request, context}: Route.LoaderArgs) {
@@ -41,39 +42,55 @@ export default function SearchPage() {
   if (type === 'predictive') return null;
 
   return (
-    <div className="search">
-      <h1>Search</h1>
-      <SearchForm>
-        {({inputRef}) => (
-          <>
-            <input
-              defaultValue={term}
-              name="q"
-              placeholder="Search…"
-              ref={inputRef}
-              type="search"
-            />
-            &nbsp;
-            <button type="submit">Search</button>
-          </>
-        )}
-      </SearchForm>
-      {error && <p style={{color: 'red'}}>{error}</p>}
-      {!term || !result?.total ? (
-        <SearchResults.Empty />
-      ) : (
-        <SearchResults result={result} term={term}>
-          {({articles, pages, products, term}) => (
+    <>
+      <div className="page-header">
+        <div className="cwf-wrap">
+          <div className="page-breadcrumb">
+            <span>Search</span>
+          </div>
+          <div className="page-header-inner">
             <div>
-              <SearchResults.Products products={products} term={term} />
-              <SearchResults.Pages pages={pages} term={term} />
-              <SearchResults.Articles articles={articles} term={term} />
+              <span className="eyebrow">Store search</span>
+              <h1>Find the right piece.</h1>
+              <p className="blurb">Search products, journal entries, and workshop pages in one place.</p>
             </div>
+          </div>
+        </div>
+      </div>
+      <section className="search-page">
+        <div className="cwf-wrap">
+          <SearchForm className="search-page-form">
+            {({inputRef}) => (
+              <>
+                <input
+                  defaultValue={term}
+                  name="q"
+                  placeholder="Search chairs, journal, oak…"
+                  ref={inputRef}
+                  type="search"
+                />
+                <button type="submit" className="btn btn-dark">Search</button>
+              </>
+            )}
+          </SearchForm>
+          {error && <p className="search-error">{error}</p>}
+          {!term || !result?.total ? (
+            <SearchResults.Empty />
+          ) : (
+            <SearchResults result={result} term={term}>
+              {({articles, pages, products, term}) => (
+                <div className="search-page-results">
+                  <SearchResults.Products products={products} term={term} />
+                  <SearchResults.Pages pages={pages} term={term} />
+                  <SearchResults.Articles articles={articles} term={term} />
+                </div>
+              )}
+            </SearchResults>
           )}
-        </SearchResults>
-      )}
-      <Analytics.SearchView data={{searchTerm: term, searchResults: result}} />
-    </div>
+          <Analytics.SearchView data={{searchTerm: term, searchResults: result}} />
+        </div>
+      </section>
+    </>
   );
 }
 

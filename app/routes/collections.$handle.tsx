@@ -5,9 +5,10 @@ import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {ProductItem} from '~/components/ProductItem';
 import type {ProductItemFragment} from 'storefrontapi.generated';
+import {SITE_NAME} from '~/lib/site';
 
 export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `Hydrogen | ${data?.collection.title ?? ''} Collection`}];
+  return [{title: `${data?.collection.title ?? 'Collection'} | ${SITE_NAME}`}];
 };
 
 export async function loader(args: Route.LoaderArgs) {
@@ -66,6 +67,15 @@ function loadDeferredData({context}: Route.LoaderArgs) {
 }
 
 const FILTER_CHIPS = ['All', 'Seating', 'Tables', 'Storage', 'Beds', 'Lighting'];
+const WOOD_FILTERS = [['English Oak', 31], ['European Walnut', 18], ['Ash', 14], ['Reclaimed Beam', 12]] as const;
+const LEAD_TIME_FILTERS = [['In stock', 12], ['4–6 weeks', 38], ['8–12 weeks', 24], ['Bespoke', 10]] as const;
+const FINISH_SWATCHES = [
+  {label: 'Oak', className: 'finish-swatch-oak'},
+  {label: 'Walnut', className: 'finish-swatch-walnut'},
+  {label: 'Dark Walnut', className: 'finish-swatch-dark-walnut'},
+  {label: 'Whitewash', className: 'finish-swatch-whitewash'},
+  {label: 'Ebonised', className: 'finish-swatch-ebonised'},
+];
 
 export default function Collection() {
   const {collection} = useLoaderData<typeof loader>();
@@ -106,11 +116,11 @@ export default function Collection() {
               </button>
             ))}
           </div>
-          <div style={{display: 'flex', alignItems: 'center', gap: 18, fontSize: 13, color: 'var(--cwf-accent-deep)'}}>
-            <span style={{color: 'rgba(74,47,31,.6)'}}>
+          <div className="filter-bar-meta">
+            <span className="filter-bar-count">
               {collection.products.nodes.length} pieces
             </span>
-            <button style={{display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 14px', border: '.5px solid var(--cwf-line)', borderRadius: 99, background: '#fff', cursor: 'pointer', fontWeight: 600, color: 'var(--cwf-primary)', fontFamily: 'Plus Jakarta Sans, sans-serif', fontSize: 13}}>
+            <button type="button" className="sort-btn">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--cwf-accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l4-4 4 4"/><path d="M7 5v14"/><path d="M21 15l-4 4-4-4"/><path d="M17 19V5"/></svg> Newest first
             </button>
           </div>
@@ -126,15 +136,15 @@ export default function Collection() {
             <div className="fblock">
               <h4>Wood</h4>
               <ul>
-                {[['English Oak', 31], ['European Walnut', 18], ['Ash', 14], ['Reclaimed Beam', 12]].map(([name, ct]) => (
+                {WOOD_FILTERS.map(([name, ct]) => (
                   <li key={String(name)}>
-                    <label>
-                      <span style={{display: 'flex', alignItems: 'center'}}>
+                    <button type="button" className="filter-check-btn" aria-pressed="false">
+                      <span className="check-row">
                         <span className="check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
-                        {name}
+                        <span className="filter-check-label">{name}</span>
                       </span>
                       <span className="ct">{ct}</span>
-                    </label>
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -142,11 +152,15 @@ export default function Collection() {
             <div className="fblock">
               <h4>Finish</h4>
               <div className="swatch-row">
-                <span className="sw on" style={{background: '#c9a27a'}} title="Oak" />
-                <span className="sw" style={{background: '#7a5a3a'}} title="Walnut" />
-                <span className="sw" style={{background: '#4a2f1f'}} title="Dark Walnut" />
-                <span className="sw" style={{background: '#e8dfd1'}} title="Whitewash" />
-                <span className="sw" style={{background: '#2a2a2a'}} title="Ebonised" />
+                {FINISH_SWATCHES.map(({label, className}, index) => (
+                  <button
+                    key={label}
+                    type="button"
+                    className={`sw ${className}${index === 0 ? ' on' : ''}`}
+                    title={label}
+                    aria-pressed={index === 0}
+                  />
+                ))}
               </div>
             </div>
             <div className="fblock">
@@ -160,15 +174,15 @@ export default function Collection() {
             <div className="fblock">
               <h4>Lead time</h4>
               <ul>
-                {[['In stock', 12], ['4–6 weeks', 38], ['8–12 weeks', 24], ['Bespoke', 10]].map(([name, ct]) => (
+                {LEAD_TIME_FILTERS.map(([name, ct]) => (
                   <li key={String(name)}>
-                    <label>
-                      <span style={{display: 'flex', alignItems: 'center'}}>
+                    <button type="button" className="filter-check-btn" aria-pressed="false">
+                      <span className="check-row">
                         <span className="check" />
-                        {name}
+                        <span className="filter-check-label">{name}</span>
                       </span>
                       <span className="ct">{ct}</span>
-                    </label>
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -176,7 +190,7 @@ export default function Collection() {
           </aside>
 
           {/* Product grid */}
-          <div style={{minWidth: 0}}>
+          <div className="filter-main">
             <PaginatedResourceSection<ProductItemFragment>
               connection={collection.products}
               resourcesClassName="pgrid"

@@ -65,18 +65,7 @@ function CartAside({cart}: {cart: PageLayoutProps['cart']}) {
             <>
               YOUR BAG
               {count > 0 && (
-                <span style={{
-                  background: 'var(--cwf-accent)',
-                  color: 'var(--cwf-primary)',
-                  borderRadius: '99px',
-                  fontSize: '10px',
-                  fontWeight: 700,
-                  padding: '2px 7px',
-                  lineHeight: '16px',
-                  letterSpacing: '.02em',
-                }}>
-                  {count}
-                </span>
+                <span className="cart-heading-count">{count}</span>
               )}
             </>
           );

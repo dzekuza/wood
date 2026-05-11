@@ -44,45 +44,51 @@ export default function AccountLayout() {
     : 'Account Details';
 
   return (
-    <div className="account">
-      <h1>{heading}</h1>
-      <br />
-      <AccountMenu />
-      <br />
-      <br />
-      <Outlet context={{customer}} />
+    <div className="account-page">
+      <div className="page-header">
+        <div className="cwf-wrap">
+          <div className="page-header-inner">
+            <div>
+              <span className="eyebrow">Customer account</span>
+              <h1>{heading}</h1>
+            </div>
+          </div>
+        </div>
+      </div>
+      <section className="account-shell">
+        <div className="cwf-wrap">
+          <AccountMenu />
+          <div className="account-content">
+            <Outlet context={{customer}} />
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
 
 function AccountMenu() {
-  function isActiveStyle({
+  function getAccountNavClass({
     isActive,
     isPending,
   }: {
     isActive: boolean;
     isPending: boolean;
   }) {
-    return {
-      fontWeight: isActive ? 'bold' : undefined,
-      color: isPending ? 'grey' : 'black',
-    };
+    return `account-menu-link${isActive ? ' active' : ''}${isPending ? ' pending' : ''}`;
   }
 
   return (
-    <nav role="navigation">
-      <NavLink to="/account/orders" style={isActiveStyle}>
-        Orders &nbsp;
+    <nav role="navigation" className="account-menu">
+      <NavLink to="/account/orders" className={getAccountNavClass}>
+        Orders
       </NavLink>
-      &nbsp;|&nbsp;
-      <NavLink to="/account/profile" style={isActiveStyle}>
-        &nbsp; Profile &nbsp;
+      <NavLink to="/account/profile" className={getAccountNavClass}>
+        Profile
       </NavLink>
-      &nbsp;|&nbsp;
-      <NavLink to="/account/addresses" style={isActiveStyle}>
-        &nbsp; Addresses &nbsp;
+      <NavLink to="/account/addresses" className={getAccountNavClass}>
+        Addresses
       </NavLink>
-      &nbsp;|&nbsp;
       <Logout />
     </nav>
   );
@@ -91,7 +97,9 @@ function AccountMenu() {
 function Logout() {
   return (
     <Form className="account-logout" method="POST" action="/account/logout">
-      &nbsp;<button type="submit">Sign out</button>
+      <button type="submit" className="account-menu-link">
+        Sign out
+      </button>
     </Form>
   );
 }

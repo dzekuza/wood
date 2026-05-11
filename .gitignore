@@ -10,4 +10,3 @@ node_modules
 .react-router
 .playwright-mcp
 tsconfig.tsbuildinfo
-package-lock.json
