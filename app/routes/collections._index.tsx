@@ -46,21 +46,49 @@ export default function Collections() {
   const {collections} = useLoaderData<typeof loader>();
 
   return (
-    <div className="collections">
-      <h1>Collections</h1>
-      <PaginatedResourceSection<CollectionFragment>
-        connection={collections}
-        resourcesClassName="collections-grid"
-      >
-        {({node: collection, index}) => (
-          <CollectionItem
-            key={collection.id}
-            collection={collection}
-            index={index}
-          />
-        )}
-      </PaginatedResourceSection>
-    </div>
+    <>
+      {/* Page header */}
+      <div className="page-header">
+        <div className="cwf-wrap">
+          <div className="page-breadcrumb">
+            <Link to="/">Home</Link>
+            <span>/</span>
+            <span>Collections</span>
+          </div>
+          <div className="page-header-inner">
+            <div>
+              <div className="eyebrow" style={{color: 'var(--cwf-accent)'}}>
+                All rooms
+              </div>
+              <h1>
+                Browse <em>Collections</em>
+              </h1>
+              <div className="blurb" style={{color: 'rgba(243,239,234,.68)'}}>
+                Every piece of furniture, sorted by room. All solid wood, all made in our workshop.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Grid */}
+      <div className="collections-index-shell">
+        <div className="cwf-wrap">
+          <PaginatedResourceSection<CollectionFragment>
+            connection={collections}
+            resourcesClassName="collections-grid-new"
+          >
+            {({node: collection, index}) => (
+              <CollectionItem
+                key={collection.id}
+                collection={collection}
+                index={index}
+              />
+            )}
+          </PaginatedResourceSection>
+        </div>
+      </div>
+    </>
   );
 }
 
@@ -73,7 +101,7 @@ function CollectionItem({
 }) {
   return (
     <Link
-      className="collection-item"
+      className="collection-card-new"
       key={collection.id}
       to={`/collections/${collection.handle}`}
       prefetch="intent"
@@ -81,13 +109,16 @@ function CollectionItem({
       {collection?.image && (
         <Image
           alt={collection.image.altText || collection.title}
-          aspectRatio="1/1"
+          aspectRatio="3/4"
           data={collection.image}
           loading={index < 3 ? 'eager' : undefined}
           sizes="(min-width: 45em) 400px, 100vw"
         />
       )}
-      <h5>{collection.title}</h5>
+      <div className="collection-card-overlay-new">
+        <div className="collection-card-title-new">{collection.title}</div>
+        <div className="collection-card-cta-new">Browse →</div>
+      </div>
     </Link>
   );
 }

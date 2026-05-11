@@ -17,25 +17,41 @@ interface HeaderProps {
 
 type Viewport = 'desktop' | 'mobile';
 
-export function Header({
-  header,
-  isLoggedIn,
-  cart,
-  publicStoreDomain,
-}: HeaderProps) {
+const NAV_ITEMS = [
+  {title: 'Collections', url: '/collections'},
+  {title: 'Workshop', url: '/pages/workshop'},
+  {title: 'Materials', url: '/pages/materials'},
+  {title: 'Journal', url: '/blogs/journal'},
+  {title: 'Showroom', url: '/pages/showroom'},
+  {title: 'Contact', url: '/pages/contact'},
+];
+
+export function Header({header, isLoggedIn, cart, publicStoreDomain}: HeaderProps) {
   const {shop, menu} = header;
   return (
     <header className="header">
+      <div className="header-inner">
+      {/* Logo */}
       <NavLink prefetch="intent" to="/" className="header-logo" end>
         <img src="/logo.svg" alt={shop.name} />
       </NavLink>
+
+      {/* Centered nav */}
       <HeaderMenu
         menu={menu}
         viewport="desktop"
         primaryDomainUrl={header.shop.primaryDomain.url}
         publicStoreDomain={publicStoreDomain}
       />
-      <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
+
+      {/* Right CTAs */}
+      <div className="header-ctas">
+        <HeaderMenuMobileToggle />
+        <SearchToggle />
+        <AccountLink isLoggedIn={isLoggedIn} />
+        <CartToggle cart={cart} />
+      </div>
+      </div>
     </header>
   );
 }
@@ -51,88 +67,61 @@ export function HeaderMenu({
   viewport: Viewport;
   publicStoreDomain: HeaderProps['publicStoreDomain'];
 }) {
-  const className = `header-menu-${viewport}`;
   const {close} = useAside();
 
-  return (
-    <nav className={className} role="navigation">
-      {viewport === 'mobile' && (
-        <NavLink
-          end
-          onClick={close}
-          prefetch="intent"
-          to="/"
-          className="header-menu-item"
-        >
+  if (viewport === 'mobile') {
+    return (
+      <nav className="header-menu-mobile" role="navigation">
+        <NavLink end onClick={close} prefetch="intent" to="/" className="header-menu-item">
           Home
         </NavLink>
-      )}
-      {(menu || FALLBACK_HEADER_MENU).items.map((item) => {
-        if (!item.url) return null;
-
-        const url =
-          item.url.includes('myshopify.com') ||
-          item.url.includes(publicStoreDomain) ||
-          item.url.includes(primaryDomainUrl)
-            ? new URL(item.url).pathname
-            : item.url;
-
-        return (
+        {NAV_ITEMS.map((item) => (
           <NavLink
-            className={({isActive}) =>
-              `header-menu-item${isActive ? ' active' : ''}`
-            }
-            end
-            key={item.id}
+            key={item.url}
+            className={({isActive}) => `header-menu-item${isActive ? ' active' : ''}`}
             onClick={close}
             prefetch="intent"
-            to={url}
+            to={item.url}
           >
             {item.title}
           </NavLink>
-        );
-      })}
+        ))}
+      </nav>
+    );
+  }
+
+  return (
+    <nav className="header-menu-desktop" role="navigation">
+      {NAV_ITEMS.map((item) => (
+        <NavLink
+          key={item.url}
+          className={({isActive}) => `header-menu-item${isActive ? ' active' : ''}`}
+          prefetch="intent"
+          to={item.url}
+        >
+          {item.title}
+        </NavLink>
+      ))}
     </nav>
   );
 }
 
-function HeaderCtas({
-  isLoggedIn,
-  cart,
-}: Pick<HeaderProps, 'isLoggedIn' | 'cart'>) {
+function AccountLink({isLoggedIn}: Pick<HeaderProps, 'isLoggedIn'>) {
   return (
-    <nav className="header-ctas" role="navigation">
-      <HeaderMenuMobileToggle />
-      <NavLink prefetch="intent" to="/account">
-        <Suspense fallback="Sign in">
-          <Await resolve={isLoggedIn} errorElement="Sign in">
-            {(isLoggedIn) => (isLoggedIn ? 'Account' : 'Sign in')}
-          </Await>
-        </Suspense>
-      </NavLink>
-      <SearchToggle />
-      <CartToggle cart={cart} />
-    </nav>
+    <NavLink prefetch="intent" to="/account" aria-label="Account" style={{display: 'flex', alignItems: 'center'}}>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(243,239,234,0.7)" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="8" r="4" />
+        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+      </svg>
+    </NavLink>
   );
 }
 
 function HeaderMenuMobileToggle() {
   const {open} = useAside();
   return (
-    <button
-      className="header-menu-mobile-toggle reset"
-      onClick={() => open('mobile')}
-      aria-label="Open menu"
-    >
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="rgba(243,239,234,0.7)"
-        strokeWidth="2"
-        strokeLinecap="round"
-      >
+    <button className="header-menu-mobile-toggle reset" onClick={() => open('mobile')} aria-label="Open menu">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(243,239,234,0.7)" strokeWidth="2" strokeLinecap="round">
         <line x1="3" y1="6" x2="21" y2="6" />
         <line x1="3" y1="12" x2="21" y2="12" />
         <line x1="3" y1="18" x2="21" y2="18" />
@@ -144,17 +133,8 @@ function HeaderMenuMobileToggle() {
 function SearchToggle() {
   const {open} = useAside();
   return (
-    <button className="reset" onClick={() => open('search')} aria-label="Search">
-      <svg
-        width="18"
-        height="18"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="rgba(243,239,234,0.7)"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
+    <button className="reset" onClick={() => open('search')} aria-label="Search" style={{display: 'flex', alignItems: 'center'}}>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(243,239,234,0.7)" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="11" cy="11" r="8" />
         <line x1="21" y1="21" x2="16.65" y2="16.65" />
       </svg>
@@ -172,32 +152,22 @@ function CartBadge({count}: {count: number}) {
       onClick={(e) => {
         e.preventDefault();
         open('cart');
-        publish('cart_viewed', {
-          cart,
-          prevCart,
-          shop,
-          url: window.location.href || '',
-        } as CartViewPayload);
+        publish('cart_viewed', {cart, prevCart, shop, url: window.location.href || ''} as CartViewPayload);
       }}
       aria-label={`Cart (${count} items)`}
-      style={{display: 'flex', alignItems: 'center', gap: '4px'}}
+      style={{display: 'flex', alignItems: 'center', position: 'relative'}}
     >
-      <svg
-        width="18"
-        height="18"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="rgba(243,239,234,0.7)"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(243,239,234,0.7)" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
         <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
         <line x1="3" y1="6" x2="21" y2="6" />
         <path d="M16 10a4 4 0 01-8 0" />
       </svg>
       {count > 0 && (
-        <span className="cart-count-bubble">{count}</span>
+        <span style={{
+          position: 'absolute', top: -4, right: -4,
+          width: 8, height: 8, borderRadius: '50%',
+          background: '#e07b39', display: 'block',
+        }} />
       )}
     </a>
   );
@@ -218,45 +188,3 @@ function CartBanner() {
   const cart = useOptimisticCart(originalCart);
   return <CartBadge count={cart?.totalQuantity ?? 0} />;
 }
-
-const FALLBACK_HEADER_MENU = {
-  id: 'gid://shopify/Menu/199655587896',
-  items: [
-    {
-      id: 'gid://shopify/MenuItem/461609500728',
-      resourceId: null,
-      tags: [],
-      title: 'Collections',
-      type: 'HTTP',
-      url: '/collections',
-      items: [],
-    },
-    {
-      id: 'gid://shopify/MenuItem/461609533496',
-      resourceId: null,
-      tags: [],
-      title: 'Blog',
-      type: 'HTTP',
-      url: '/blogs/journal',
-      items: [],
-    },
-    {
-      id: 'gid://shopify/MenuItem/461609566264',
-      resourceId: null,
-      tags: [],
-      title: 'Policies',
-      type: 'HTTP',
-      url: '/policies',
-      items: [],
-    },
-    {
-      id: 'gid://shopify/MenuItem/461609599032',
-      resourceId: 'gid://shopify/Page/92591030328',
-      tags: [],
-      title: 'About',
-      type: 'PAGE',
-      url: '/pages/about',
-      items: [],
-    },
-  ],
-};

@@ -23,10 +23,17 @@ export function ProductForm({
         // If there is only a single value in the option values, don't display the option
         if (option.optionValues.length === 1) return null;
 
+        const selectedValue = option.optionValues.find((v) => v.selected);
+
         return (
-          <div className="product-options" key={option.name}>
-            <h5>{option.name}</h5>
-            <div className="product-options-grid">
+          <div className="product-opts" key={option.name}>
+            <div className="product-opt-label">
+              {option.name}
+              {selectedValue && (
+                <span className="product-opt-picked">{selectedValue.name}</span>
+              )}
+            </div>
+            <div className="product-opt-row">
               {option.optionValues.map((value) => {
                 const {
                   name,
@@ -40,47 +47,28 @@ export function ProductForm({
                 } = value;
 
                 if (isDifferentProduct) {
-                  // SEO
-                  // When the variant is a combined listing child product
-                  // that leads to a different url, we need to render it
-                  // as an anchor tag
                   return (
                     <Link
-                      className="product-options-item"
+                      className="product-optn"
                       key={option.name + name}
                       prefetch="intent"
                       preventScrollReset
                       replace
                       to={`/products/${handle}?${variantUriQuery}`}
-                      style={{
-                        border: selected
-                          ? '1px solid black'
-                          : '1px solid transparent',
-                        opacity: available ? 1 : 0.3,
-                      }}
+                      data-selected={selected ? 'true' : 'false'}
+                      style={{opacity: available ? 1 : 0.4}}
                     >
                       <ProductOptionSwatch swatch={swatch} name={name} />
                     </Link>
                   );
                 } else {
-                  // SEO
-                  // When the variant is an update to the search param,
-                  // render it as a button with javascript navigating to
-                  // the variant so that SEO bots do not index these as
-                  // duplicated links
                   return (
                     <button
                       type="button"
-                      className={`product-options-item${
-                        exists && !selected ? ' link' : ''
-                      }`}
+                      className="product-optn"
                       key={option.name + name}
-                      style={{
-                        border: selected
-                          ? '1px solid black'
-                          : '1px solid transparent',
-                        opacity: available ? 1 : 0.3,
-                      }}
+                      data-selected={selected ? 'true' : 'false'}
+                      style={{opacity: available ? 1 : 0.4}}
                       disabled={!exists}
                       onClick={() => {
                         if (!selected) {
@@ -97,29 +85,35 @@ export function ProductForm({
                 }
               })}
             </div>
-            <br />
           </div>
         );
       })}
-      <AddToCartButton
-        disabled={!selectedVariant || !selectedVariant.availableForSale}
-        onClick={() => {
-          open('cart');
-        }}
-        lines={
-          selectedVariant
-            ? [
-                {
-                  merchandiseId: selectedVariant.id,
-                  quantity: 1,
-                  selectedVariant,
-                },
-              ]
-            : []
-        }
-      >
-        {selectedVariant?.availableForSale ? 'Add to cart' : 'Sold out'}
-      </AddToCartButton>
+      <div className="pdp-cta-row">
+        <div className="pdp-atc-wrap">
+          <AddToCartButton
+            disabled={!selectedVariant || !selectedVariant.availableForSale}
+            onClick={() => {
+              open('cart');
+            }}
+            lines={
+              selectedVariant
+                ? [
+                    {
+                      merchandiseId: selectedVariant.id,
+                      quantity: 1,
+                      selectedVariant,
+                    },
+                  ]
+                : []
+            }
+          >
+            {selectedVariant?.availableForSale ? 'Add to cart' : 'Sold out'}
+          </AddToCartButton>
+        </div>
+        <button className="pdp-wish-btn" aria-label="Save">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+      </div>
     </div>
   );
 }
@@ -134,17 +128,20 @@ function ProductOptionSwatch({
   const image = swatch?.image?.previewImage?.url;
   const color = swatch?.color;
 
-  if (!image && !color) return name;
+  if (!image && !color) return <>{name}</>;
 
   return (
-    <div
-      aria-label={name}
-      className="product-option-label-swatch"
-      style={{
-        backgroundColor: color || 'transparent',
-      }}
-    >
-      {!!image && <img src={image} alt={name} />}
-    </div>
+    <>
+      <span
+        aria-label={name}
+        className="product-swatch"
+        style={{
+          backgroundColor: color || 'transparent',
+        }}
+      >
+        {!!image && <img src={image} alt={name} />}
+      </span>
+      {name}
+    </>
   );
 }

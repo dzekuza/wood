@@ -1,4 +1,4 @@
-import {redirect, useLoaderData} from 'react-router';
+import {redirect, useLoaderData, Link} from 'react-router';
 import type {Route} from './+types/collections.$handle';
 import {getPaginationVariables, Analytics} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
@@ -65,25 +65,140 @@ function loadDeferredData({context}: Route.LoaderArgs) {
   return {};
 }
 
+const FILTER_CHIPS = ['All', 'Seating', 'Tables', 'Storage', 'Beds', 'Lighting'];
+
 export default function Collection() {
   const {collection} = useLoaderData<typeof loader>();
 
   return (
-    <div className="collection">
-      <h1>{collection.title}</h1>
-      <p className="collection-description">{collection.description}</p>
-      <PaginatedResourceSection<ProductItemFragment>
-        connection={collection.products}
-        resourcesClassName="products-grid"
-      >
-        {({node: product, index}) => (
-          <ProductItem
-            key={product.id}
-            product={product}
-            loading={index < 8 ? 'eager' : undefined}
-          />
-        )}
-      </PaginatedResourceSection>
+    <>
+      {/* Dark page header */}
+      <div className="page-header">
+        <div className="cwf-wrap">
+          <div className="page-breadcrumb">
+            <Link to="/">Home</Link>
+            <span>/</span>
+            <Link to="/collections">Collections</Link>
+            <span>/</span>
+            <span>{collection.title}</span>
+          </div>
+          <div className="page-header-inner">
+            <div>
+              <div className="eyebrow">
+                {collection.handle} · {collection.products.nodes.length} pieces
+              </div>
+              <h1>
+                Pieces for the rooms<br />you actually <em>live in</em>.
+              </h1>
+              {collection.description && (
+                <div className="blurb">{collection.description}</div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Filter bar */}
+      <div className="filter-bar">
+        <div className="filter-bar-row">
+          <div className="filter-chips">
+            {FILTER_CHIPS.map((chip) => (
+              <button
+                key={chip}
+                className={`filter-chip${chip === 'All' ? ' active' : ''}`}
+              >
+                {chip}
+              </button>
+            ))}
+          </div>
+          <div style={{display: 'flex', alignItems: 'center', gap: 18, fontSize: 13, color: 'var(--cwf-accent-deep)'}}>
+            <span style={{color: 'rgba(74,47,31,.6)'}}>
+              {collection.products.nodes.length} pieces
+            </span>
+            <button style={{display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 14px', border: '.5px solid var(--cwf-line)', borderRadius: 99, background: '#fff', cursor: 'pointer', fontWeight: 600, color: 'var(--cwf-primary)', fontFamily: 'Plus Jakarta Sans, sans-serif', fontSize: 13}}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--cwf-accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l4-4 4 4"/><path d="M7 5v14"/><path d="M21 15l-4 4-4-4"/><path d="M17 19V5"/></svg> Newest first
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Shell: sidebar + grid */}
+      <div className="shop-shell">
+        <div className="cwf-wrap">
+          <div className="shop-inner">
+          {/* Sidebar */}
+          <aside className="shop-sidebar">
+            <div className="fblock">
+              <h4>Wood</h4>
+              <ul>
+                {[['English Oak', 31], ['European Walnut', 18], ['Ash', 14], ['Reclaimed Beam', 12]].map(([name, ct]) => (
+                  <li key={String(name)}>
+                    <label>
+                      <span style={{display: 'flex', alignItems: 'center'}}>
+                        <span className="check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                        {name}
+                      </span>
+                      <span className="ct">{ct}</span>
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="fblock">
+              <h4>Finish</h4>
+              <div className="swatch-row">
+                <span className="sw on" style={{background: '#c9a27a'}} title="Oak" />
+                <span className="sw" style={{background: '#7a5a3a'}} title="Walnut" />
+                <span className="sw" style={{background: '#4a2f1f'}} title="Dark Walnut" />
+                <span className="sw" style={{background: '#e8dfd1'}} title="Whitewash" />
+                <span className="sw" style={{background: '#2a2a2a'}} title="Ebonised" />
+              </div>
+            </div>
+            <div className="fblock">
+              <h4>Price · €</h4>
+              <div className="price-range">
+                <input type="text" defaultValue="240" readOnly />
+                <span>—</span>
+                <input type="text" defaultValue="4,800" readOnly />
+              </div>
+            </div>
+            <div className="fblock">
+              <h4>Lead time</h4>
+              <ul>
+                {[['In stock', 12], ['4–6 weeks', 38], ['8–12 weeks', 24], ['Bespoke', 10]].map(([name, ct]) => (
+                  <li key={String(name)}>
+                    <label>
+                      <span style={{display: 'flex', alignItems: 'center'}}>
+                        <span className="check" />
+                        {name}
+                      </span>
+                      <span className="ct">{ct}</span>
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </aside>
+
+          {/* Product grid */}
+          <div style={{minWidth: 0}}>
+            <PaginatedResourceSection<ProductItemFragment>
+              connection={collection.products}
+              resourcesClassName="pgrid"
+            >
+              {({node: product, index}) => (
+                <ProductItem
+                  key={product.id}
+                  product={product}
+                  loading={index < 8 ? 'eager' : undefined}
+                />
+              )}
+            </PaginatedResourceSection>
+          </div>
+          </div>
+        </div>
+      </div>
+
       <Analytics.CollectionView
         data={{
           collection: {
@@ -92,7 +207,7 @@ export default function Collection() {
           },
         }}
       />
-    </div>
+    </>
   );
 }
 

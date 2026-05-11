@@ -2,11 +2,14 @@ import {defineConfig} from 'vite';
 import {hydrogen} from '@shopify/hydrogen/vite';
 import {oxygen} from '@shopify/mini-oxygen/vite';
 import {reactRouter} from '@react-router/dev/vite';
+import path from 'path';
 
 export default defineConfig({
   plugins: [hydrogen(), oxygen(), reactRouter()],
   resolve: {
-    tsconfigPaths: true,
+    alias: {
+      '~': path.resolve(__dirname, 'app'),
+    },
   },
   build: {
     // Allow a strict Content-Security-Policy
