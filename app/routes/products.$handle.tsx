@@ -1,4 +1,9 @@
 import {useState, useEffect, useRef} from 'react';
+import gsap from 'gsap';
+import {ScrollTrigger} from 'gsap/ScrollTrigger';
+import {useGSAP} from '@gsap/react';
+
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 import {redirect, useLoaderData, Link} from 'react-router';
 import type {Route} from './+types/products.$handle';
 import {
@@ -112,6 +117,20 @@ export default function Product() {
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [descExpanded, setDescExpanded] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
+  const pdpRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    const mm = gsap.matchMedia();
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      const tl = gsap.timeline({defaults: {ease: 'power2.out'}});
+      tl.from('.pdp-gallery, .pdp-carousel', {autoAlpha: 0, x: -20, duration: 0.8})
+        .from('.pdp-info > *', {y: 22, autoAlpha: 0, stagger: 0.09, duration: 0.65}, '-=0.5');
+
+      gsap.from('.pdp-assure-item', {y: 16, autoAlpha: 0, stagger: 0.07, duration: 0.5, ease: 'power2.out', scrollTrigger: {trigger: '.pdp-assure', start: 'top 90%'}});
+      gsap.from('.pdp-spec-card', {y: 20, autoAlpha: 0, scale: 0.97, stagger: 0.06, duration: 0.5, ease: 'power2.out', scrollTrigger: {trigger: '.pdp-specs', start: 'top 88%'}});
+      gsap.from('.rev-card', {y: 24, autoAlpha: 0, stagger: 0.08, duration: 0.55, ease: 'power2.out', scrollTrigger: {trigger: '.rev-list', start: 'top 88%'}});
+    });
+  }, {scope: pdpRef});
 
   useEffect(() => {
     if (selectedVariant?.image) setActiveImage(selectedVariant.image);
@@ -147,7 +166,7 @@ export default function Product() {
 
       {/* PDP */}
       <section className="pdp">
-        <div className="pdp-wrap">
+        <div className="pdp-wrap" ref={pdpRef}>
           <div className="pdp-grid">
             {/* Mobile carousel */}
             <div className="pdp-carousel">
@@ -186,7 +205,10 @@ export default function Product() {
                   <button
                     key={img.id}
                     className={`pdp-thumb${activeImage?.id === img.id ? ' active' : ''}`}
-                    onClick={() => setActiveImage(img)}
+                    onClick={() => {
+                      gsap.fromTo('.pdp-main-img', {autoAlpha: 0.3}, {autoAlpha: 1, duration: 0.3, ease: 'power2.out'});
+                      setActiveImage(img);
+                    }}
                   >
                     <ProductImage image={img} />
                   </button>

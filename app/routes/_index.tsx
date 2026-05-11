@@ -1,6 +1,6 @@
 import {Await, useLoaderData, Link} from 'react-router';
 import type {Route} from './+types/_index';
-import {Suspense} from 'react';
+import {Suspense, useRef} from 'react';
 import {Image, Money} from '@shopify/hydrogen';
 import type {
   FeaturedProductsQuery,
@@ -8,6 +8,11 @@ import type {
   FeaturedCollectionsQuery,
 } from 'storefrontapi.generated';
 import {MockShopNotice} from '~/components/MockShopNotice';
+import gsap from 'gsap';
+import {ScrollTrigger} from 'gsap/ScrollTrigger';
+import {useGSAP} from '@gsap/react';
+
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 export const meta: Route.MetaFunction = () => {
   return [{title: 'Craft Wood Furniture | Handcrafted Pieces'}];
@@ -57,8 +62,23 @@ export default function Homepage() {
 
 /* ─── Hero ─────────────────────────────────────────────────────────────────── */
 function HeroSection() {
+  const ref = useRef<HTMLElement>(null);
+
+  useGSAP(() => {
+    const mm = gsap.matchMedia();
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      const tl = gsap.timeline({defaults: {ease: 'power3.out'}});
+      tl.from('h1', {y: 44, autoAlpha: 0, duration: 0.9})
+        .from('.lede', {y: 24, autoAlpha: 0, duration: 0.7}, '-=0.55')
+        .from('.hero-cta a', {y: 18, autoAlpha: 0, stagger: 0.12, duration: 0.6}, '-=0.45')
+        .from('.hero-image', {y: 36, autoAlpha: 0, scale: 1.03, duration: 1.0, ease: 'power2.out'}, '-=0.5')
+        .from('.hero-floater', {y: 14, autoAlpha: 0, duration: 0.5}, '-=0.35')
+        .from('.hero-badge', {y: 14, autoAlpha: 0, duration: 0.5}, '-=0.45');
+    });
+  }, {scope: ref});
+
   return (
-    <section className="hero">
+    <section className="hero" ref={ref}>
       <div className="hero-grid">
         {/* Copy + image */}
         <div className="hero-copy">
@@ -140,8 +160,17 @@ function CollectionsSection({
 }: {
   collections: FeaturedCollectionsQuery['collections']['nodes'];
 }) {
+  const ref = useRef<HTMLElement>(null);
+  useGSAP(() => {
+    const mm = gsap.matchMedia();
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      gsap.from('.shead', {y: 28, autoAlpha: 0, duration: 0.7, ease: 'power2.out', scrollTrigger: {trigger: '.shead', start: 'top 88%'}});
+      gsap.from('.cell', {y: 32, autoAlpha: 0, duration: 0.65, stagger: 0.07, ease: 'power2.out', scrollTrigger: {trigger: '.bento', start: 'top 88%'}});
+    });
+  }, {scope: ref});
+
   return (
-    <section className="section-linen">
+    <section className="section-linen" ref={ref}>
       <div className="cwf-wrap">
         <div className="shead">
           <div>
@@ -201,8 +230,16 @@ function ProductsSection({
 }: {
   products: Promise<FeaturedProductsQuery | null>;
 }) {
+  const ref = useRef<HTMLElement>(null);
+  useGSAP(() => {
+    const mm = gsap.matchMedia();
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      gsap.from('.pcard', {y: 28, autoAlpha: 0, duration: 0.6, stagger: 0.08, ease: 'power2.out', scrollTrigger: {trigger: ref.current, start: 'top 88%'}});
+    });
+  }, {scope: ref});
+
   return (
-    <section className="section-linen-cont">
+    <section className="section-linen-cont" ref={ref}>
       <div className="cwf-wrap">
         <div className="shead">
           <div>
@@ -278,8 +315,24 @@ function ProductsSection({
 
 /* ─── Craft section ─────────────────────────────────────────────────────────── */
 function CraftSection() {
+  const ref = useRef<HTMLElement>(null);
+  useGSAP(() => {
+    const mm = gsap.matchMedia();
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      gsap.from('.craft-visual', {x: -40, autoAlpha: 0, duration: 0.9, ease: 'power3.out', scrollTrigger: {trigger: ref.current, start: 'top 82%'}});
+      gsap.from('.craft-copy .eyebrow, .craft-copy .title, .craft-copy p, .craft-signoff', {
+        y: 24, autoAlpha: 0, duration: 0.65, stagger: 0.1, ease: 'power2.out',
+        scrollTrigger: {trigger: '.craft-copy', start: 'top 85%'},
+      });
+      gsap.from('.craft-stats > div', {
+        y: 20, autoAlpha: 0, duration: 0.5, stagger: 0.08, ease: 'power2.out',
+        scrollTrigger: {trigger: '.craft-stats', start: 'top 88%'},
+      });
+    });
+  }, {scope: ref});
+
   return (
-    <section className="craft">
+    <section className="craft" ref={ref}>
       <div className="cwf-wrap">
         <div className="craft-visual">
           <img src="/images/craft.jpg" alt="Craftsman at work" />
@@ -343,8 +396,16 @@ const PROCESS_STEPS = [
 ];
 
 function ProcessSection() {
+  const ref = useRef<HTMLElement>(null);
+  useGSAP(() => {
+    const mm = gsap.matchMedia();
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      gsap.from('.step', {y: 28, autoAlpha: 0, duration: 0.6, stagger: 0.1, ease: 'power2.out', scrollTrigger: {trigger: ref.current, start: 'top 85%'}});
+    });
+  }, {scope: ref});
+
   return (
-    <section className="section-linen">
+    <section className="section-linen" ref={ref}>
       <div className="cwf-wrap">
         <div className="shead">
           <div>
@@ -378,8 +439,16 @@ const FEATURES = [
 ];
 
 function FeaturesBar() {
+  const ref = useRef<HTMLElement>(null);
+  useGSAP(() => {
+    const mm = gsap.matchMedia();
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      gsap.from('.f', {y: 20, autoAlpha: 0, duration: 0.55, stagger: 0.09, ease: 'power2.out', scrollTrigger: {trigger: ref.current, start: 'top 88%'}});
+    });
+  }, {scope: ref});
+
   return (
-    <section className="section-linen-cont">
+    <section className="section-linen-cont" ref={ref}>
       <div className="cwf-wrap">
         <div className="features">
           {FEATURES.map((f) => (
@@ -418,8 +487,16 @@ const TESTIMONIALS = [
 ];
 
 function TestimonialsSection() {
+  const ref = useRef<HTMLElement>(null);
+  useGSAP(() => {
+    const mm = gsap.matchMedia();
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      gsap.from('.tcard', {y: 24, autoAlpha: 0, duration: 0.6, stagger: 0.1, ease: 'power2.out', scrollTrigger: {trigger: ref.current, start: 'top 88%'}});
+    });
+  }, {scope: ref});
+
   return (
-    <section className="section-linen-cont">
+    <section className="section-linen-cont" ref={ref}>
       <div className="cwf-wrap">
         <div className="shead">
           <div>
