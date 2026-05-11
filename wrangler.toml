@@ -18,9 +18,3 @@ PUBLIC_CUSTOMER_ACCOUNT_API_URL = "https://shopify.com/authentication/1027134262
 SHOP_ID = "102713426262"
 GOOGLE_SHEET_ID = "1-pfqOs5DDdEWxQU87CFN3owluiIgpoZQ37jJYHcPQGg"
 
-[[workers]]
-name = "price-sync"
-main = "workers/price-sync.ts"
-
-[workers.triggers]
-crons = ["* * * * *"]

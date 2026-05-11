@@ -137,6 +137,7 @@ export default function AllProducts() {
   const [woods,      setWoods]      = useState<Set<string>>(new Set());
   const [finishes,   setFinishes]   = useState<Set<string>>(new Set());
   const [leadTimes,  setLeadTimes]  = useState<Set<string>>(new Set());
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   function toggle(set: Set<string>, setFn: (s: Set<string>) => void, val: string) {
     const next = new Set(set);
@@ -219,6 +220,10 @@ export default function AllProducts() {
             ))}
           </div>
           <div className="filter-bar-meta">
+            <button className="filter-mobile-btn" onClick={() => setMobileFiltersOpen(true)}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="12" y1="18" x2="20" y2="18"/></svg>
+              Filters{activeCount > 0 ? ` (${activeCount})` : ''}
+            </button>
             {activeCount > 0 && (
               <button className="filter-clear-btn" onClick={clearAll}>
                 Clear {activeCount}
@@ -300,6 +305,34 @@ export default function AllProducts() {
           </div>
         </div>
       </div>
+
+      {/* Mobile filter drawer */}
+      {mobileFiltersOpen && (
+        <div className="mob-filter-overlay" onClick={() => setMobileFiltersOpen(false)}>
+          <aside className="mob-filter-drawer" onClick={(e) => e.stopPropagation()}>
+            <div className="mob-filter-header">
+              <span className="eyebrow">Filters</span>
+              <button className="mob-filter-close" onClick={() => setMobileFiltersOpen(false)} aria-label="Close filters">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <div className="mob-filter-body">
+              <div className="fblock">
+                <h4>Category</h4>
+                <CheckList items={CATEGORIES} selected={categories} onToggle={handleCategoryToggle} />
+              </div>
+              <div className="fblock">
+                <h4>Wood</h4>
+                <CheckList items={WOODS} selected={woods} onToggle={(v) => toggle(woods, setWoods, v)} />
+              </div>
+            </div>
+            <div className="mob-filter-footer">
+              {activeCount > 0 && <button className="btn btn-line" onClick={() => { clearAll(); setMobileFiltersOpen(false); }}>Clear all</button>}
+              <button className="btn btn-primary" onClick={() => setMobileFiltersOpen(false)}>Show {filtered.length} pieces</button>
+            </div>
+          </aside>
+        </div>
+      )}
     </>
   );
 }

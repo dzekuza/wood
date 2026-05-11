@@ -1,0 +1,10 @@
+name = "price-sync"
+main = "price-sync.ts"
+compatibility_date = "2026-05-11"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+GOOGLE_SHEET_ID = "1-pfqOs5DDdEWxQU87CFN3owluiIgpoZQ37jJYHcPQGg"
+
+[triggers]
+crons = ["* * * * *"]

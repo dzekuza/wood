@@ -7,6 +7,7 @@ import {
 } from '@shopify/hydrogen';
 import type {HeaderQuery, CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
+import {useFavourites} from '~/hooks/useFavourites';
 
 interface HeaderProps {
   header: HeaderQuery;
@@ -49,6 +50,7 @@ export function Header({header, isLoggedIn, cart, publicStoreDomain}: HeaderProp
         <HeaderMenuMobileToggle />
         <SearchToggle />
         <AccountLink isLoggedIn={isLoggedIn} />
+        <FavouritesLink />
         <CartToggle cart={cart} />
       </div>
       </div>
@@ -103,6 +105,25 @@ export function HeaderMenu({
         </NavLink>
       ))}
     </nav>
+  );
+}
+
+function FavouritesLink() {
+  const {favourites} = useFavourites();
+  const count = favourites.length;
+  return (
+    <NavLink prefetch="intent" to="/pages/favourites" aria-label={`Favourites (${count})`} style={{display: 'flex', alignItems: 'center', position: 'relative'}}>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(243,239,234,0.7)" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+      </svg>
+      {count > 0 && (
+        <span style={{
+          position: 'absolute', top: -4, right: -4,
+          width: 8, height: 8, borderRadius: '50%',
+          background: '#e07b39', display: 'block',
+        }} />
+      )}
+    </NavLink>
   );
 }
 

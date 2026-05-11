@@ -178,6 +178,7 @@ export default function Product() {
               <ProductForm
                 productOptions={productOptions}
                 selectedVariant={selectedVariant}
+                product={product}
               />
 
               {/* Assurances */}
