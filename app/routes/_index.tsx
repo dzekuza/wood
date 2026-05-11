@@ -60,12 +60,8 @@ function HeroSection() {
   return (
     <section className="hero">
       <div className="hero-grid">
-        {/* Left copy */}
+        {/* Copy + image */}
         <div className="hero-copy">
-          <div className="hero-tag">
-            <span className="bar" />
-            Autumn collection · '26
-          </div>
           <h1>
             Built by hand.<br />Made to <em>last a lifetime.</em>
           </h1>
@@ -80,10 +76,6 @@ function HeroSection() {
               <i className="ti ti-player-play" /> Our story
             </Link>
           </div>
-        </div>
-
-        {/* Right visual */}
-        <div className="hero-visual">
           <div className="hero-image">
             <img src="/images/hero.jpg" alt="Handcrafted oak furniture" />
             <div className="hero-floater">

@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useRef} from 'react';
 import {redirect, useLoaderData, Link} from 'react-router';
 import type {Route} from './+types/products.$handle';
 import {
@@ -109,9 +109,26 @@ export default function Product() {
     ...productImages.filter((img) => img.id !== selectedVariant?.image?.id),
   ];
   const [activeImage, setActiveImage] = useState<typeof allImages[0] | null>(allImages[0] ?? null);
+  const [carouselIndex, setCarouselIndex] = useState(0);
+  const [descExpanded, setDescExpanded] = useState(false);
+  const carouselRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (selectedVariant?.image) setActiveImage(selectedVariant.image);
   }, [selectedVariant?.id]);
+
+  function scrollToSlide(i: number) {
+    const track = carouselRef.current;
+    if (!track) return;
+    track.scrollTo({left: track.clientWidth * i, behavior: 'smooth'});
+  }
+
+  function handleCarouselScroll() {
+    const track = carouselRef.current;
+    if (!track) return;
+    const index = Math.round(track.scrollLeft / track.clientWidth);
+    setCarouselIndex(index);
+  }
 
   return (
     <>
@@ -132,7 +149,37 @@ export default function Product() {
       <section className="pdp">
         <div className="pdp-wrap">
           <div className="pdp-grid">
-            {/* Gallery */}
+            {/* Mobile carousel */}
+            <div className="pdp-carousel">
+              <div
+                className="pdp-carousel-track"
+                ref={carouselRef}
+                onScroll={handleCarouselScroll}
+              >
+                {allImages.map((img) => (
+                  <div key={img.id} className="pdp-carousel-slide">
+                    <ProductImage image={img} />
+                    {selectedVariant?.availableForSale === false && (
+                      <span className="pdp-ribbon">Sold Out</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+              {allImages.length > 1 && (
+                <div className="pdp-carousel-dots">
+                  {allImages.map((img, i) => (
+                    <button
+                      key={img.id}
+                      className={`pdp-carousel-dot${carouselIndex === i ? ' active' : ''}`}
+                      onClick={() => scrollToSlide(i)}
+                      aria-label={`Image ${i + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Gallery — desktop only */}
             <div className="pdp-gallery">
               <div className="pdp-thumbs">
                 {allImages.map((img) => (
@@ -155,28 +202,31 @@ export default function Product() {
 
             {/* Info */}
             <div className="pdp-info">
-              <div className="ey eyebrow">{vendor || 'Craft Wood Furniture'}</div>
-              <h1>{title}</h1>
-              {descriptionHtml && (
-                <div className="pdp-sub" dangerouslySetInnerHTML={{__html: descriptionHtml}} />
-              )}
-              <div style={{display: 'flex', alignItems: 'center', gap: 10, marginTop: 18, fontSize: 13, color: 'rgba(74,47,31,.65)'}}>
+              <div style={{display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6, fontSize: 13, color: 'rgba(74,47,31,.65)'}}>
                 <span style={{color: 'var(--cwf-accent)', fontSize: 14, letterSpacing: 2}}>★★★★★</span>
                 <span>4.9 / 5</span>
                 <span style={{color: 'rgba(74,47,31,.3)'}}>·</span>
                 <a href="#reviews" style={{color: 'var(--cwf-accent-deep)', fontWeight: 600, borderBottom: '1px solid var(--cwf-accent)', paddingBottom: 2}}>128 reviews</a>
               </div>
-
-              <div className="pdp-priceblock">
-                <span className="pdp-price-from">From</span>
-                <span className="pdp-price-big">
-                  <ProductPrice
-                    price={selectedVariant?.price}
-                    compareAtPrice={selectedVariant?.compareAtPrice}
-                  />
-                </span>
-                <span style={{fontSize: 12, color: 'rgba(74,47,31,.5)', letterSpacing: '.04em', marginLeft: 'auto', alignSelf: 'center'}}>Incl. VAT</span>
+              <h1>{title}</h1>
+              <div className="pdp-price-big">
+                <ProductPrice
+                  price={selectedVariant?.price}
+                  compareAtPrice={selectedVariant?.compareAtPrice}
+                />
               </div>
+              {descriptionHtml && (
+                <div className={`pdp-sub-wrap${descExpanded ? ' pdp-sub-expanded' : ''}`}>
+                  <div className="pdp-sub" dangerouslySetInnerHTML={{__html: descriptionHtml}} />
+                  <button
+                    className="pdp-sub-toggle"
+                    onClick={() => setDescExpanded(v => !v)}
+                    aria-expanded={descExpanded}
+                  >
+                    {descExpanded ? 'Show less' : 'Show more'}
+                  </button>
+                </div>
+              )}
 
               <ProductForm
                 productOptions={productOptions}
@@ -308,18 +358,20 @@ export default function Product() {
             </div>
             <div className="rev-top">
               <div className="rev-score">
-                <div className="big">4.9</div>
-                <div className="stars">★★★★★</div>
-                <div className="count">Based on 128 verified reviews</div>
-              </div>
-              <div className="rev-bars">
-                {[['5 stars', 92], ['4 stars', 6], ['3 stars', 1.5], ['2 stars', 0], ['1 star', 0]].map(([lab, pct]) => (
-                  <div key={String(lab)} className="rev-bar">
-                    <span className="lab">{lab}</span>
-                    <span className="track"><span className="fill" style={{width: `${pct}%`}} /></span>
-                    <span>{Math.round(Number(pct) * 1.28)}</span>
-                  </div>
-                ))}
+                <div className="rev-score-left">
+                  <div className="big">4.9</div>
+                  <div className="stars">★★★★★</div>
+                  <div className="count">Based on 128 verified reviews</div>
+                </div>
+                <div className="rev-bars">
+                  {[['5 stars', 92], ['4 stars', 6], ['3 stars', 1.5], ['2 stars', 0], ['1 star', 0]].map(([lab, pct]) => (
+                    <div key={String(lab)} className="rev-bar">
+                      <span className="lab">{lab}</span>
+                      <span className="track"><span className="fill" style={{width: `${pct}%`}} /></span>
+                      <span>{Math.round(Number(pct) * 1.28)}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
             <div className="rev-list">

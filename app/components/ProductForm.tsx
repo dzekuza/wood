@@ -1,5 +1,5 @@
 import {Link, useNavigate} from 'react-router';
-import {type MappedProductOptions} from '@shopify/hydrogen';
+import {type MappedProductOptions, Money} from '@shopify/hydrogen';
 import type {
   Maybe,
   ProductOptionValueSwatch,
@@ -114,7 +114,16 @@ export function ProductForm({
                 : []
             }
           >
-            {selectedVariant?.availableForSale ? 'Add to cart' : 'Sold out'}
+            {selectedVariant?.availableForSale ? (
+              <>
+                <span>Add to cart</span>
+                {selectedVariant.price && (
+                  <span className="pdp-atc-price">
+                    · <Money data={selectedVariant.price} />
+                  </span>
+                )}
+              </>
+            ) : 'Sold out'}
           </AddToCartButton>
         </div>
         <button
