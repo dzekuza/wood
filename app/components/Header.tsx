@@ -18,17 +18,10 @@ interface HeaderProps {
 
 type Viewport = 'desktop' | 'mobile';
 
-const NAV_ITEMS = [
-  {title: 'Collections', url: '/collections'},
-  {title: 'Workshop', url: '/pages/workshop'},
-  {title: 'Materials', url: '/pages/materials'},
-  {title: 'Journal', url: '/blogs/journal'},
-  {title: 'Showroom', url: '/pages/showroom'},
-  {title: 'Contact', url: '/pages/contact'},
-];
 
 export function Header({header, isLoggedIn, cart, publicStoreDomain}: HeaderProps) {
-  const {shop, menu} = header;
+  const {shop, menu, collections} = header;
+  const categories = collections?.nodes ?? [];
   return (
     <header className="header">
       <div className="header-inner">
@@ -43,6 +36,7 @@ export function Header({header, isLoggedIn, cart, publicStoreDomain}: HeaderProp
         viewport="desktop"
         primaryDomainUrl={header.shop.primaryDomain.url}
         publicStoreDomain={publicStoreDomain}
+        categories={categories}
       />
 
       {/* Right CTAs */}
@@ -58,52 +52,60 @@ export function Header({header, isLoggedIn, cart, publicStoreDomain}: HeaderProp
   );
 }
 
+type Category = {id: string; title: string; handle: string};
+
 export function HeaderMenu({
   menu,
   primaryDomainUrl,
   viewport,
   publicStoreDomain,
+  categories = [],
 }: {
   menu: HeaderProps['header']['menu'];
   primaryDomainUrl: HeaderProps['header']['shop']['primaryDomain']['url'];
   viewport: Viewport;
   publicStoreDomain: HeaderProps['publicStoreDomain'];
+  categories?: Category[];
 }) {
   const {close} = useAside();
 
   if (viewport === 'mobile') {
     return (
       <nav className="header-menu-mobile" role="navigation">
-        <NavLink end onClick={close} prefetch="intent" to="/" className="header-menu-item">
-          Home
-        </NavLink>
-        {NAV_ITEMS.map((item) => (
-          <NavLink
-            key={item.url}
-            className={({isActive}) => `header-menu-item${isActive ? ' active' : ''}`}
-            onClick={close}
-            prefetch="intent"
-            to={item.url}
-          >
-            {item.title}
+        <NavLink end onClick={close} prefetch="intent" to="/" className="header-menu-item">Home</NavLink>
+        <NavLink onClick={close} prefetch="intent" to="/collections/all" className={({isActive}) => `header-menu-item${isActive ? ' active' : ''}`}>All Products</NavLink>
+        {categories.map((c) => (
+          <NavLink key={c.id} onClick={close} prefetch="intent" to={`/collections/${c.handle}`} className={({isActive}) => `header-menu-item${isActive ? ' active' : ''}`}>
+            {c.title}
           </NavLink>
         ))}
+        <NavLink onClick={close} prefetch="intent" to="/pages/contact" className={({isActive}) => `header-menu-item${isActive ? ' active' : ''}`}>Contact</NavLink>
       </nav>
     );
   }
 
   return (
     <nav className="header-menu-desktop" role="navigation">
-      {NAV_ITEMS.map((item) => (
-        <NavLink
-          key={item.url}
-          className={({isActive}) => `header-menu-item${isActive ? ' active' : ''}`}
-          prefetch="intent"
-          to={item.url}
-        >
-          {item.title}
-        </NavLink>
-      ))}
+      <NavLink prefetch="intent" to="/collections/all" className={({isActive}) => `header-menu-item${isActive ? ' active' : ''}`}>
+        All Products
+      </NavLink>
+      {categories.length > 0 && (
+        <div className="header-dropdown">
+          <span className="header-menu-item header-dropdown-toggle">
+            By Category <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </span>
+          <div className="header-dropdown-menu">
+            {categories.map((c) => (
+              <NavLink key={c.id} prefetch="intent" to={`/collections/${c.handle}`} className="header-dropdown-item">
+                {c.title}
+              </NavLink>
+            ))}
+          </div>
+        </div>
+      )}
+      <NavLink prefetch="intent" to="/pages/contact" className={({isActive}) => `header-menu-item${isActive ? ' active' : ''}`}>
+        Contact
+      </NavLink>
     </nav>
   );
 }
