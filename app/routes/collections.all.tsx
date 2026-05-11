@@ -228,7 +228,6 @@ export default function AllProducts() {
                 Clear {activeCount}
               </button>
             )}
-            <span className="filter-bar-count">{filtered.length} pieces</span>
             <button className="sort-btn">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--cwf-accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3 9l4-4 4 4" /><path d="M7 5v14" />
@@ -284,6 +283,7 @@ export default function AllProducts() {
 
             {/* Product grid — filtered */}
             <div style={{minWidth: 0}}>
+              <span className="filter-bar-count" style={{display: 'block', marginBottom: 16}}>{filtered.length} pieces</span>
               {filtered.length === 0 ? (
                 <div className="filter-empty">
                   <p>No pieces match your filters.</p>

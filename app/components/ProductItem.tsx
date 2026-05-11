@@ -85,7 +85,9 @@ export function ProductItem({
             <span className="pcard-from">From </span>
             <Money data={product.priceRange.minVariantPrice} />
           </span>
-          <span className="pcard-add" aria-label="Quick add">+</span>
+          <span className="pcard-add" aria-label="Quick add">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="7" y1="1" x2="7" y2="13"/><line x1="1" y1="7" x2="13" y2="7"/></svg>
+          </span>
         </div>
       </div>
     </Link>
