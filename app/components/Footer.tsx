@@ -18,6 +18,9 @@ export function Footer({
       <Await resolve={footerPromise}>
         {(footer) => (
           <footer className="footer">
+            <div className="footer-brand">
+              <img src="/logo.svg" alt={header.shop.name} />
+            </div>
             {footer?.menu && header.shop.primaryDomain?.url && (
               <FooterMenu
                 menu={footer.menu}
@@ -25,6 +28,18 @@ export function Footer({
                 publicStoreDomain={publicStoreDomain}
               />
             )}
+            <p
+              style={{
+                textAlign: 'center',
+                marginTop: '2rem',
+                fontSize: '0.75rem',
+                color: 'rgba(243,239,234,0.35)',
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+              }}
+            >
+              &copy; {new Date().getFullYear()} {header.shop.name}. All rights
+              reserved.
+            </p>
           </footer>
         )}
       </Await>
@@ -45,7 +60,6 @@ function FooterMenu({
     <nav className="footer-menu" role="navigation">
       {(menu || FALLBACK_FOOTER_MENU).items.map((item) => {
         if (!item.url) return null;
-        // if the url is internal, we strip the domain
         const url =
           item.url.includes('myshopify.com') ||
           item.url.includes(publicStoreDomain) ||
@@ -58,13 +72,7 @@ function FooterMenu({
             {item.title}
           </a>
         ) : (
-          <NavLink
-            end
-            key={item.id}
-            prefetch="intent"
-            style={activeLinkStyle}
-            to={url}
-          >
+          <NavLink end key={item.id} prefetch="intent" to={url}>
             {item.title}
           </NavLink>
         );
@@ -114,16 +122,3 @@ const FALLBACK_FOOTER_MENU = {
     },
   ],
 };
-
-function activeLinkStyle({
-  isActive,
-  isPending,
-}: {
-  isActive: boolean;
-  isPending: boolean;
-}) {
-  return {
-    fontWeight: isActive ? 'bold' : undefined,
-    color: isPending ? 'grey' : 'white',
-  };
-}
