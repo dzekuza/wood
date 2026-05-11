@@ -55,14 +55,19 @@ export function CartLineItem({
         </div>
 
         <div className="cart-line-body">
-          <Link
-            className="cart-line-name"
-            prefetch="intent"
-            to={lineItemUrl}
-            onClick={() => layout === 'aside' && close()}
-          >
-            {product.title}
-          </Link>
+          <div className="cart-line-top">
+            <Link
+              className="cart-line-name"
+              prefetch="intent"
+              to={lineItemUrl}
+              onClick={() => layout === 'aside' && close()}
+            >
+              {product.title}
+            </Link>
+            <div className="cart-line-price">
+              <ProductPrice price={line?.cost?.totalAmount} />
+            </div>
+          </div>
 
           {meaningfulOptions.length > 0 && (
             <div className="cart-line-opts">
@@ -71,9 +76,6 @@ export function CartLineItem({
           )}
 
           <div className="cart-line-bottom">
-            <div className="cart-line-price">
-              <ProductPrice price={line?.cost?.totalAmount} />
-            </div>
             <CartLineQuantity line={line} />
           </div>
         </div>

@@ -57,13 +57,13 @@ export default function Collections() {
           </div>
           <div className="page-header-inner">
             <div>
-              <div className="eyebrow" style={{color: 'var(--cwf-accent)'}}>
+              <div className="eyebrow">
                 All rooms
               </div>
               <h1>
                 Browse <em>Collections</em>
               </h1>
-              <div className="blurb" style={{color: 'rgba(243,239,234,.68)'}}>
+              <div className="blurb">
                 Every piece of furniture, sorted by room. All solid wood, all made in our workshop.
               </div>
             </div>

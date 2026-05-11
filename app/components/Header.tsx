@@ -33,7 +33,7 @@ export function Header({header, isLoggedIn, cart, publicStoreDomain}: HeaderProp
       <div className="header-inner">
       {/* Logo */}
       <NavLink prefetch="intent" to="/" className="header-logo" end>
-        <img src="/logo.svg" alt={shop.name} />
+        <img src="/darkwood.svg" alt={shop.name} />
       </NavLink>
 
       {/* Centered nav */}

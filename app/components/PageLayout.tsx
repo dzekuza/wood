@@ -96,25 +96,27 @@ function SearchAside() {
   return (
     <Aside type="search" heading="SEARCH">
       <div className="predictive-search">
-        <br />
         <SearchFormPredictive>
           {({fetchResults, goToSearch, inputRef}) => (
             <>
               <input
+                className="search-input"
                 name="q"
                 onChange={fetchResults}
                 onFocus={fetchResults}
-                placeholder="Search"
+                placeholder="Search products, collections…"
                 ref={inputRef}
                 type="search"
                 list={queriesDatalistId}
               />
-              &nbsp;
-              <button onClick={goToSearch}>Search</button>
+              <button className="search-submit" onClick={goToSearch} aria-label="Search">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              </button>
             </>
           )}
         </SearchFormPredictive>
 
+        <div className="predictive-search-results">
         <SearchResultsPredictive>
           {({items, total, term, state, closeSearch}) => {
             const {articles, collections, pages, products, queries} = items;
@@ -168,6 +170,7 @@ function SearchAside() {
             );
           }}
         </SearchResultsPredictive>
+        </div>
       </div>
     </Aside>
   );
