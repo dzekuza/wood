@@ -153,10 +153,8 @@ export default function Product() {
             <div className="pdp-info">
               <div className="ey eyebrow">{vendor || 'Craft Wood Furniture'}</div>
               <h1>{title}</h1>
-              {product.description && (
-                <p className="sub" style={{marginTop: 14, fontSize: 16, lineHeight: 1.65, color: 'rgba(74,47,31,.7)', maxWidth: 480}}>
-                  {product.description}
-                </p>
+              {descriptionHtml && (
+                <div className="pdp-sub" dangerouslySetInnerHTML={{__html: descriptionHtml}} />
               )}
               <div style={{display: 'flex', alignItems: 'center', gap: 10, marginTop: 18, fontSize: 13, color: 'rgba(74,47,31,.65)'}}>
                 <span style={{color: 'var(--cwf-accent)', fontSize: 14, letterSpacing: 2}}>★★★★★</span>
