@@ -8,7 +8,8 @@ import { readFileSync } from 'fs';
 
 const INTERVAL_SEC = parseInt(process.argv[2]) || 10;
 const SHEET_ID = '1-pfqOs5DDdEWxQU87CFN3owluiIgpoZQ37jJYHcPQGg';
-const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
+const SHEET_GID = '1731351599';
+const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
 
 const envPath = new URL('../.env', import.meta.url).pathname;
 const env = Object.fromEntries(
@@ -22,12 +23,20 @@ const ADMIN_TOKEN = env.SHOPIFY_ADMIN_TOKEN;
 const ADMIN_URL = `https://${SHOP}/admin/api/2025-01/graphql.json`;
 
 function parseCSV(text) {
-  const lines = text.trim().split('\n');
-  const headers = splitCSVLine(lines[0]);
-  return lines.slice(1).map(line => {
+  const rawLines = text.split('\n');
+  const headers = splitCSVLine(rawLines[0]);
+  const rows = [];
+  let i = 1;
+  while (i < rawLines.length) {
+    let line = rawLines[i];
+    while ((line.match(/"/g) || []).length % 2 !== 0 && i + 1 < rawLines.length) {
+      i++; line += '\n' + rawLines[i];
+    }
     const vals = splitCSVLine(line);
-    return Object.fromEntries(headers.map((h, i) => [h, vals[i] ?? '']));
-  });
+    rows.push(Object.fromEntries(headers.map((h, j) => [h, vals[j] ?? ''])));
+    i++;
+  }
+  return rows;
 }
 
 function splitCSVLine(line) {

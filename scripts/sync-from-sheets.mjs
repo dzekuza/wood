@@ -17,7 +17,8 @@ import path from 'path';
 // ── Config ────────────────────────────────────────────────────────────────────
 
 const SHEET_ID = '1-pfqOs5DDdEWxQU87CFN3owluiIgpoZQ37jJYHcPQGg';
-const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
+const SHEET_GID = '1731351599';
+const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
 
 // Load from .env
 const envPath = new URL('../.env', import.meta.url).pathname;
@@ -39,12 +40,20 @@ const DRY_RUN = !process.argv.includes('--apply');
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function parseCSV(text) {
-  const lines = text.trim().split('\n');
-  const headers = splitCSVLine(lines[0]);
-  return lines.slice(1).map(line => {
+  const rawLines = text.split('\n');
+  const headers = splitCSVLine(rawLines[0]);
+  const rows = [];
+  let i = 1;
+  while (i < rawLines.length) {
+    let line = rawLines[i];
+    while ((line.match(/"/g) || []).length % 2 !== 0 && i + 1 < rawLines.length) {
+      i++; line += '\n' + rawLines[i];
+    }
     const vals = splitCSVLine(line);
-    return Object.fromEntries(headers.map((h, i) => [h, vals[i] ?? '']));
-  });
+    rows.push(Object.fromEntries(headers.map((h, j) => [h, vals[j] ?? ''])));
+    i++;
+  }
+  return rows;
 }
 
 function splitCSVLine(line) {
@@ -130,28 +139,29 @@ async function fetchShopifyProducts() {
   const bySku = {};
   const byHandle = {};
   for (const product of allProducts) {
-    byHandle[product.handle] = { product, variants: product.variants.nodes, cursor: 0 };
+    byHandle[product.handle] = { product, variants: product.variants.nodes.map(v => ({...v, productId: product.id})), cursor: 0 };
     for (const variant of product.variants.nodes) {
-      if (variant.sku) bySku[variant.sku] = { product, variant };
+      if (variant.sku) bySku[variant.sku] = { product, variant: {...variant, productId: product.id} };
     }
   }
   return { bySku, byHandle };
 }
 
-async function updateVariantPrice(variantId, price, compareAtPrice) {
+async function updateVariantPrice(productId, variantId, price, compareAtPrice) {
   return shopifyQuery(`
-    mutation UpdateVariant($input: ProductVariantInput!) {
-      productVariantUpdate(input: $input) {
-        productVariant { id price compareAtPrice }
+    mutation UpdateVariant($productId: ID!, $variants: [ProductVariantsBulkInput!]!) {
+      productVariantsBulkUpdate(productId: $productId, variants: $variants) {
+        productVariants { id price compareAtPrice }
         userErrors { field message }
       }
     }
   `, {
-    input: {
+    productId,
+    variants: [{
       id: variantId,
       price: String(price),
       compareAtPrice: compareAtPrice ? String(compareAtPrice) : null,
-    }
+    }],
   });
 }
 
@@ -199,6 +209,7 @@ async function main() {
       changes.push({
         sku,
         title: product.title.substring(0, 60),
+        productId: variant.productId,
         variantId: variant.id,
         oldPrice: shopifyPrice,
         newPrice: sheetPrice,
@@ -225,7 +236,7 @@ async function main() {
       let ok = 0, fail = 0;
       for (const c of changes) {
         try {
-          await updateVariantPrice(c.variantId, c.newPrice, c.newCompare);
+          await updateVariantPrice(c.productId, c.variantId, c.newPrice, c.newCompare);
           console.log(`  ✓ Updated ${c.sku}`);
           ok++;
         } catch (e) {

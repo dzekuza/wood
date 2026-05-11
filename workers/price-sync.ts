@@ -9,12 +9,20 @@ const ADMIN_VERSION = '2025-01';
 // ── CSV parser ────────────────────────────────────────────────────────────────
 
 function parseCSV(text: string): Record<string, string>[] {
-  const lines = text.trim().split('\n');
-  const headers = splitLine(lines[0]);
-  return lines.slice(1).map(line => {
+  const rawLines = text.split('\n');
+  const headers = splitLine(rawLines[0]);
+  const rows: Record<string, string>[] = [];
+  let i = 1;
+  while (i < rawLines.length) {
+    let line = rawLines[i];
+    while ((line.match(/"/g) || []).length % 2 !== 0 && i + 1 < rawLines.length) {
+      i++; line += '\n' + rawLines[i];
+    }
     const vals = splitLine(line);
-    return Object.fromEntries(headers.map((h, i) => [h, vals[i] ?? '']));
-  });
+    rows.push(Object.fromEntries(headers.map((h, j) => [h, vals[j] ?? ''])));
+    i++;
+  }
+  return rows;
 }
 
 function splitLine(line: string): string[] {
@@ -92,7 +100,7 @@ async function updateVariantPrice(token: string, variantId: string, price: strin
 // ── Sync logic ────────────────────────────────────────────────────────────────
 
 async function sync(env: Env): Promise<string> {
-  const sheetUrl = `https://docs.google.com/spreadsheets/d/${env.GOOGLE_SHEET_ID}/export?format=csv`;
+  const sheetUrl = `https://docs.google.com/spreadsheets/d/${env.GOOGLE_SHEET_ID}/export?format=csv&gid=1731351599`;
   const [sheetRes, { bySku, byHandle }] = await Promise.all([
     fetch(sheetUrl),
     fetchShopifyProducts(env.SHOPIFY_ADMIN_TOKEN),
