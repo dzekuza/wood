@@ -20,9 +20,7 @@ export async function loader(args: Route.LoaderArgs) {
 }
 
 async function loadCriticalData({context}: Route.LoaderArgs) {
-  const [{collections}] = await Promise.all([
-    context.storefront.query(FEATURED_COLLECTIONS_QUERY),
-  ]);
+  const {collections} = await context.storefront.query(FEATURED_COLLECTIONS_QUERY);
   return {
     isShopLinked: Boolean(context.env.PUBLIC_STORE_DOMAIN),
     featuredCollections: collections.nodes,
@@ -64,52 +62,34 @@ function HeroSection() {
       <div className="hero-grid">
         {/* Left copy */}
         <div className="hero-copy">
-          <div className="top">
-            <div className="hero-tag">
-              <span className="bar" />
-              Autumn collection · '26
-            </div>
-            <h1>
-              Built by hand.<br />Made to <em>last a lifetime.</em>
-            </h1>
-            <p className="lede">
-              Solid timber furniture, joined and finished by a small workshop in the Cotswolds. No flat-pack, no veneers — just timber, traditional joinery, and patience pressed into every piece.
-            </p>
-            <div className="hero-cta">
-              <Link to="/collections/all" className="btn btn-primary">
-                Shop the collection <i className="ti ti-arrow-right" />
-              </Link>
-              <Link to="/pages/about" className="btn btn-ghost">
-                <i className="ti ti-player-play" /> Our story
-              </Link>
-            </div>
+          <div className="hero-tag">
+            <span className="bar" />
+            Autumn collection · '26
           </div>
-          <div className="hero-meta">
-            <div className="stat">
-              <span className="num">28<sup style={{fontSize: '.5em'}}>yrs</sup></span>
-              <span className="cap">Bench experience</span>
-            </div>
-            <div className="stat">
-              <span className="num">04</span>
-              <span className="cap">Master joiners</span>
-            </div>
-            <div className="stat">
-              <span className="num">100<small style={{fontSize: '.5em'}}>%</small></span>
-              <span className="cap">Solid timber</span>
-            </div>
+          <h1>
+            Built by hand.<br />Made to <em>last a lifetime.</em>
+          </h1>
+          <p className="lede">
+            Solid timber furniture, joined and finished by a small workshop in the Cotswolds. No flat-pack, no veneers — just timber, traditional joinery, and patience pressed into every piece.
+          </p>
+          <div className="hero-cta">
+            <Link to="/collections/all" className="btn btn-primary">
+              Shop the collection <i className="ti ti-arrow-right" />
+            </Link>
+            <Link to="/pages/about" className="btn btn-ghost">
+              <i className="ti ti-player-play" /> Our story
+            </Link>
           </div>
         </div>
 
         {/* Right visual */}
         <div className="hero-visual">
           <div className="hero-image">
-            <div className="placeholder">
-              <img src="/images/hero.jpg" alt="Handcrafted oak furniture" />
-            </div>
+            <img src="/images/hero.jpg" alt="Handcrafted oak furniture" />
             <div className="hero-floater">
               <div>
-                <div style={{fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--cwf-accent-deep)'}}>Featured</div>
-                <div style={{fontWeight: 600, marginTop: 2}}>The Aldsworth Table</div>
+                <div className="hero-floater-label">Featured</div>
+                <div className="hero-floater-name">The Aldsworth Table</div>
               </div>
               <span className="price">€2,840</span>
             </div>
@@ -137,12 +117,13 @@ const MARQUEE_ITEMS = [
   {icon: 'ti-truck', text: 'White-glove delivery'},
 ];
 
+const MARQUEE_DOUBLED = [...MARQUEE_ITEMS, ...MARQUEE_ITEMS];
+
 function MarqueeStrip() {
-  const items = [...MARQUEE_ITEMS, ...MARQUEE_ITEMS];
   return (
     <div className="marquee-strip">
       <div className="marquee-row">
-        {items.map((item, i) => (
+        {MARQUEE_DOUBLED.map((item, i) => (
           <span key={i}>
             <i className={`ti ${item.icon}`} />
             {item.text}
@@ -168,12 +149,12 @@ function CollectionsSection({
   collections: FeaturedCollectionsQuery['collections']['nodes'];
 }) {
   return (
-    <section style={{padding: '96px 0', background: 'var(--cwf-surface)'}}>
+    <section className="section-linen">
       <div className="cwf-wrap">
         <div className="shead">
           <div>
             <div className="eyebrow">01 · Collections</div>
-            <h2 className="title" style={{marginTop: 14}}>
+            <h2 className="title">
               Six rooms.<br />Each one furnished in solid timber.
             </h2>
           </div>
@@ -200,15 +181,15 @@ function CollectionsSection({
                 <div className="cell-inner">
                   <div className="meta">
                     <span className="count">{col ? `${col.handle}` : cell.count}</span>
-                    <i className="ti ti-arrow-up-right" style={{fontSize: 18}} />
+                    <i className="ti ti-arrow-up-right" />
                   </div>
                   <div>
                     {cell.label && (
-                      <div className="label" style={{color: 'var(--cwf-accent)', fontSize: 11, fontWeight: 600, letterSpacing: '.14em', textTransform: 'uppercase'}}>
+                      <div className="cell-label">
                         {cell.label}
                       </div>
                     )}
-                    <h3 style={{marginTop: cell.label ? 8 : 0}}>
+                    <h3>
                       {col ? col.title : cell.title}
                     </h3>
                   </div>
@@ -229,12 +210,12 @@ function ProductsSection({
   products: Promise<FeaturedProductsQuery | null>;
 }) {
   return (
-    <section style={{paddingTop: 0, paddingBottom: '96px', background: 'var(--cwf-surface)'}}>
+    <section className="section-linen-cont">
       <div className="cwf-wrap">
         <div className="shead">
           <div>
             <div className="eyebrow">02 · This season</div>
-            <h2 className="title" style={{marginTop: 14}}>
+            <h2 className="title">
               Pieces from the bench, this month.
             </h2>
           </div>
@@ -247,7 +228,7 @@ function ProductsSection({
           fallback={
             <div className="products-grid">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="pcard" style={{aspectRatio: '1/1.3'}} />
+                <div key={i} className="pcard pcard-skeleton" />
               ))}
             </div>
           }
@@ -306,7 +287,7 @@ function ProductsSection({
 /* ─── Craft section ─────────────────────────────────────────────────────────── */
 function CraftSection() {
   return (
-    <section className="craft" style={{padding: '96px 0'}}>
+    <section className="craft">
       <div className="cwf-wrap">
         <div className="craft-visual">
           <img src="/images/craft.jpg" alt="Craftsman at work" />
@@ -320,23 +301,23 @@ function CraftSection() {
         </div>
         <div className="craft-copy">
           <div className="eyebrow">Our workshop</div>
-          <h2>
+          <h2 className="title">
             Four pairs of hands.<br /><em>One bench at a time.</em>
           </h2>
           <p>
             We make slowly, on purpose. A single dining table passes through every joiner in the workshop before it leaves us — rough-cut by Will, drawn by Tom, jointed by Iris, oiled by Sam. No two pieces look alike because no two trees do.
           </p>
-          <p style={{marginTop: 14}}>
+          <p>
             If you ever damage a joint, we'll repair it. For twenty-five years. By the same hands that made it.
           </p>
 
           <div className="craft-stats">
             <div>
-              <div className="num">120<sup style={{fontSize: '.45em'}}>+</sup></div>
+              <div className="num">120<sup className="stat-unit">+</sup></div>
               <div className="cap">Hours per dining table</div>
             </div>
             <div>
-              <div className="num">25<sup style={{fontSize: '.45em'}}>yr</sup></div>
+              <div className="num">25<sup className="stat-unit">yr</sup></div>
               <div className="cap">Repair guarantee</div>
             </div>
             <div>
@@ -349,11 +330,11 @@ function CraftSection() {
             </div>
           </div>
 
-          <div className="craft-signoff" style={{marginTop: 36}}>
-            <Link to="/pages/about" className="btn" style={{background: 'var(--cwf-accent)', color: 'var(--cwf-primary)', borderRadius: 8, padding: '14px 22px', fontWeight: 600, fontSize: 14}}>
+          <div className="craft-signoff">
+            <Link to="/pages/about" className="btn btn-accent">
               Visit the workshop <i className="ti ti-arrow-right" />
             </Link>
-            <span style={{fontSize: 13, color: 'rgba(243,239,234,.5)'}}>Saturdays · by appointment</span>
+            <span className="craft-appt">Saturdays · by appointment</span>
           </div>
         </div>
       </div>
@@ -371,12 +352,12 @@ const PROCESS_STEPS = [
 
 function ProcessSection() {
   return (
-    <section style={{padding: '96px 0', background: 'var(--cwf-surface)'}}>
+    <section className="section-linen">
       <div className="cwf-wrap">
         <div className="shead">
           <div>
             <div className="eyebrow">03 · How we work</div>
-            <h2 className="title" style={{marginTop: 14}}>
+            <h2 className="title">
               From standing tree to your hallway — in four steps.
             </h2>
           </div>
@@ -406,7 +387,7 @@ const FEATURES = [
 
 function FeaturesBar() {
   return (
-    <section style={{paddingTop: 0, paddingBottom: '96px', background: 'var(--cwf-surface)'}}>
+    <section className="section-linen-cont">
       <div className="cwf-wrap">
         <div className="features">
           {FEATURES.map((f) => (
@@ -446,18 +427,18 @@ const TESTIMONIALS = [
 
 function TestimonialsSection() {
   return (
-    <section style={{paddingTop: 0, paddingBottom: '96px', background: 'var(--cwf-surface)'}}>
+    <section className="section-linen-cont">
       <div className="cwf-wrap">
         <div className="shead">
           <div>
             <div className="eyebrow">04 · From the people who live with it</div>
-            <h2 className="title" style={{marginTop: 14}}>
+            <h2 className="title">
               Bought once. Passed on twice.
             </h2>
           </div>
-          <div className="right" style={{display: 'flex', alignItems: 'center', gap: 12}}>
-            <div style={{color: 'var(--cwf-accent)', fontSize: 14, letterSpacing: 2}}>★★★★★</div>
-            <span style={{fontSize: 13, color: 'var(--cwf-accent-deep)', fontWeight: 600}}>4.94 · 612 reviews</span>
+          <div className="right">
+            <div className="tgrid-rating">★★★★★</div>
+            <span className="tgrid-count">4.94 · 612 reviews</span>
           </div>
         </div>
         <div className="tgrid">
@@ -483,7 +464,7 @@ function TestimonialsSection() {
 /* ─── Newsletter ────────────────────────────────────────────────────────────── */
 function NewsletterSection() {
   return (
-    <section style={{paddingTop: 0, paddingBottom: '96px', background: 'var(--cwf-surface)'}}>
+    <section className="section-linen-cont">
       <div className="cwf-wrap">
         <div className="news">
           <svg className="bg-mark" width="320" height="320" viewBox="0 0 192 192" aria-hidden>
@@ -492,16 +473,16 @@ function NewsletterSection() {
             <path d="M191.365 26.2393L138.208 79.3965L145.635 86.8232L182.506 49.9531L191.365 58.8125L154.494 95.6826L191.365 132.554L182.506 141.413L145.635 104.542L138.209 111.969L191.365 165.126L182.506 173.985L120.489 111.97L136.775 95.6826L120.489 79.3965L182.506 17.3799L191.365 26.2393Z" fill="#C9A27A"/>
             <path d="M173.985 8.85938L120.828 62.0156L111.97 70.876L95.6826 54.5889L79.3965 70.876L17.3799 8.85938L26.2393 0L79.3965 53.1572L86.8232 45.7295L49.9531 8.85938L58.8125 0L95.6826 36.8701L132.554 0L141.413 8.85938L104.542 45.7295L111.969 53.1562L165.126 0L173.985 8.85938Z" fill="#C9A27A"/>
           </svg>
-          <div style={{position: 'relative', zIndex: 1}}>
+          <div className="news-content">
             <div className="eyebrow">The Journal</div>
-            <h2 style={{marginTop: 14}}>
+            <h2 className="title">
               A letter from the bench, <em>once a month.</em>
             </h2>
             <p>
               Notes on timber, the slow business of joinery, and quiet word when a new collection is opening for orders. No marketing, ever.
             </p>
           </div>
-          <div style={{position: 'relative', zIndex: 1}}>
+          <div className="news-form-wrap">
             <form className="news-form" onSubmit={(e) => e.preventDefault()}>
               <input type="email" placeholder="your@address.com" required />
               <button type="submit">Subscribe</button>

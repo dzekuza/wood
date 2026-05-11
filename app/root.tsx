@@ -12,6 +12,7 @@ import {
 } from 'react-router';
 import type {Route} from './+types/root';
 import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
+import tablerStyles from '@tabler/icons-webfont/dist/tabler-icons.min.css?url';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
 import {PageLayout} from './components/PageLayout';
@@ -64,10 +65,8 @@ export function links() {
       rel: 'stylesheet',
       href: 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap',
     },
-    {
-      rel: 'stylesheet',
-      href: 'https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.34.0/dist/tabler-icons.min.css',
-    },
+
+    {rel: 'stylesheet', href: tablerStyles},
     {rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg'},
   ];
 }
