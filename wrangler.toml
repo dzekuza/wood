@@ -16,3 +16,11 @@ PRIVATE_STOREFRONT_API_TOKEN = "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"
 PUBLIC_CUSTOMER_ACCOUNT_API_CLIENT_ID = "fdc3b180-af47-4cdb-82e0-d8afc05b5ff2"
 PUBLIC_CUSTOMER_ACCOUNT_API_URL = "https://shopify.com/authentication/102713426262"
 SHOP_ID = "102713426262"
+GOOGLE_SHEET_ID = "1-pfqOs5DDdEWxQU87CFN3owluiIgpoZQ37jJYHcPQGg"
+
+[[workers]]
+name = "price-sync"
+main = "workers/price-sync.ts"
+
+[workers.triggers]
+crons = ["* * * * *"]
