@@ -195,7 +195,6 @@ export default function AllProducts() {
           </div>
           <div className="page-header-inner">
             <div>
-              <div className="eyebrow">full catalogue · {products.nodes.length} pieces</div>
               <h1>Every piece, every <em>room</em>.</h1>
               <p className="blurb">
                 Solid-timber furniture made to outlast the trends. Browse the full range or filter by what you need.
@@ -348,6 +347,9 @@ const COLLECTION_ITEM_FRAGMENT = `#graphql
     id
     handle
     title
+    options {
+      name
+    }
     featuredImage {
       id
       altText

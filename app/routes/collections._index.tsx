@@ -57,9 +57,6 @@ export default function Collections() {
           </div>
           <div className="page-header-inner">
             <div>
-              <div className="eyebrow">
-                All rooms
-              </div>
               <h1>
                 Browse <em>Collections</em>
               </h1>

@@ -17,6 +17,8 @@ import {
 import {ProductPrice} from '~/components/ProductPrice';
 import {ProductImage} from '~/components/ProductImage';
 import {ProductForm} from '~/components/ProductForm';
+import {AddToCartButton} from '~/components/AddToCartButton';
+import {useAside} from '~/components/Aside';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 
 export const meta: Route.MetaFunction = ({data}) => {
@@ -116,8 +118,12 @@ export default function Product() {
   const [activeImage, setActiveImage] = useState<typeof allImages[0] | null>(allImages[0] ?? null);
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [descExpanded, setDescExpanded] = useState(false);
+  const [showSticky, setShowSticky] = useState(false);
+  const [viewingCount, setViewingCount] = useState<number | null>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
   const pdpRef = useRef<HTMLDivElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
+  const {open} = useAside();
 
   useGSAP(() => {
     const mm = gsap.matchMedia();
@@ -135,6 +141,18 @@ export default function Product() {
   useEffect(() => {
     if (selectedVariant?.image) setActiveImage(selectedVariant.image);
   }, [selectedVariant?.id]);
+
+  useEffect(() => {
+    setViewingCount(Math.floor(Math.random() * 14) + 8);
+  }, []);
+
+  useEffect(() => {
+    const el = ctaRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([entry]) => setShowSticky(!entry.isIntersecting), {threshold: 0});
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
 
   function scrollToSlide(i: number) {
     const track = carouselRef.current;
@@ -168,7 +186,7 @@ export default function Product() {
       <section className="pdp">
         <div className="pdp-wrap" ref={pdpRef}>
           <div className="pdp-grid">
-            {/* Mobile carousel */}
+            {/* Gallery slider */}
             <div className="pdp-carousel">
               <div
                 className="pdp-carousel-track"
@@ -185,16 +203,36 @@ export default function Product() {
                 ))}
               </div>
               {allImages.length > 1 && (
-                <div className="pdp-carousel-dots">
-                  {allImages.map((img, i) => (
+                <>
+                  <div className="pdp-carousel-arrows">
                     <button
-                      key={img.id}
-                      className={`pdp-carousel-dot${carouselIndex === i ? ' active' : ''}`}
-                      onClick={() => scrollToSlide(i)}
-                      aria-label={`Image ${i + 1}`}
-                    />
-                  ))}
-                </div>
+                      className="pdp-carousel-arrow"
+                      onClick={() => scrollToSlide(Math.max(0, carouselIndex - 1))}
+                      aria-label="Previous image"
+                      disabled={carouselIndex === 0}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                    </button>
+                    <button
+                      className="pdp-carousel-arrow"
+                      onClick={() => scrollToSlide(Math.min(allImages.length - 1, carouselIndex + 1))}
+                      aria-label="Next image"
+                      disabled={carouselIndex === allImages.length - 1}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    </button>
+                  </div>
+                  <div className="pdp-carousel-dots">
+                    {allImages.map((img, i) => (
+                      <button
+                        key={img.id}
+                        className={`pdp-carousel-dot${carouselIndex === i ? ' active' : ''}`}
+                        onClick={() => scrollToSlide(i)}
+                        aria-label={`Image ${i + 1}`}
+                      />
+                    ))}
+                  </div>
+                </>
               )}
             </div>
 
@@ -224,11 +262,20 @@ export default function Product() {
 
             {/* Info */}
             <div className="pdp-info">
-              <div style={{display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6, fontSize: 13, color: 'rgba(74,47,31,.65)'}}>
+              <div style={{display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6, fontSize: 13, color: 'rgba(74,47,31,.65)', flexWrap: 'wrap'}}>
                 <span style={{color: 'var(--cwf-accent)', fontSize: 14, letterSpacing: 2}}>★★★★★</span>
                 <span>4.9 / 5</span>
                 <span style={{color: 'rgba(74,47,31,.3)'}}>·</span>
                 <a href="#reviews" style={{color: 'var(--cwf-accent-deep)', fontWeight: 600, borderBottom: '1px solid var(--cwf-accent)', paddingBottom: 2}}>128 reviews</a>
+                {viewingCount !== null && (
+                  <>
+                    <span style={{color: 'rgba(74,47,31,.3)'}}>·</span>
+                    <span className="pdp-viewing">
+                      <span className="pdp-viewing-dot" />
+                      {viewingCount} viewing now
+                    </span>
+                  </>
+                )}
               </div>
               <h1>{title}</h1>
               <div className="pdp-price-big">
@@ -250,11 +297,26 @@ export default function Product() {
                 </div>
               )}
 
-              <ProductForm
-                productOptions={productOptions}
-                selectedVariant={selectedVariant}
-                product={product}
-              />
+              <div className="pdp-urgency">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                Made to order · 3 workshop slots left this month
+              </div>
+
+              <div ref={ctaRef}>
+                <ProductForm
+                  productOptions={productOptions}
+                  selectedVariant={selectedVariant}
+                  product={product}
+                />
+              </div>
+
+              <div className="pdp-guarantee">
+                <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Secure checkout</span>
+                <span className="pdp-guarantee-sep">·</span>
+                <span>30-day returns</span>
+                <span className="pdp-guarantee-sep">·</span>
+                <span>Free white-glove delivery</span>
+              </div>
 
               {/* Assurances */}
               <div className="pdp-assure">
@@ -450,6 +512,26 @@ export default function Product() {
           )}
         </div>
       </section>
+
+      <div className={`pdp-sticky-bar${showSticky ? ' visible' : ''}`} aria-hidden={!showSticky}>
+        <div className="pdp-sticky-inner">
+          <div className="pdp-sticky-info">
+            <span className="pdp-sticky-title">{title}</span>
+            <span className="pdp-sticky-price">
+              <ProductPrice price={selectedVariant?.price} compareAtPrice={selectedVariant?.compareAtPrice} />
+            </span>
+          </div>
+          <div className="pdp-atc-wrap">
+            <AddToCartButton
+              disabled={!selectedVariant || !selectedVariant.availableForSale}
+              onClick={() => open('cart')}
+              lines={selectedVariant ? [{merchandiseId: selectedVariant.id, quantity: 1, selectedVariant}] : []}
+            >
+              {selectedVariant?.availableForSale ? 'Order now' : 'Sold out'}
+            </AddToCartButton>
+          </div>
+        </div>
+      </div>
 
       <Analytics.ProductView
         data={{

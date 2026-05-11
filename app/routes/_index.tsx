@@ -1,18 +1,19 @@
 import {Await, useLoaderData, Link} from 'react-router';
 import type {Route} from './+types/_index';
 import {Suspense, useRef} from 'react';
-import {Image, Money} from '@shopify/hydrogen';
 import type {
   FeaturedProductsQuery,
   FeaturedProductFragment,
   FeaturedCollectionsQuery,
 } from 'storefrontapi.generated';
 import {MockShopNotice} from '~/components/MockShopNotice';
+import {ProductItem} from '~/components/ProductItem';
 import gsap from 'gsap';
 import {ScrollTrigger} from 'gsap/ScrollTrigger';
 import {useGSAP} from '@gsap/react';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
+
 
 export const meta: Route.MetaFunction = () => {
   return [{title: 'Craft Wood Furniture | Handcrafted Pieces'}];
@@ -52,7 +53,6 @@ export default function Homepage() {
       <CollectionsSection collections={data.featuredCollections} />
       <ProductsSection products={data.featuredProducts} />
       <CraftSection />
-      <ProcessSection />
       <FeaturesBar />
       <TestimonialsSection />
       <NewsletterSection />
@@ -67,13 +67,18 @@ function HeroSection() {
   useGSAP(() => {
     const mm = gsap.matchMedia();
     mm.add('(prefers-reduced-motion: no-preference)', () => {
+      const targets = ['h1', '.lede', '.hero-cta a', '.hero-image', '.hero-floater', '.hero-badge'];
+      gsap.set(targets, {autoAlpha: 0, y: 20});
+      gsap.set('h1', {y: 44});
+      gsap.set('.hero-image', {y: 36, scale: 1.03});
+
       const tl = gsap.timeline({defaults: {ease: 'power3.out'}});
-      tl.from('h1', {y: 44, autoAlpha: 0, duration: 0.9})
-        .from('.lede', {y: 24, autoAlpha: 0, duration: 0.7}, '-=0.55')
-        .from('.hero-cta a', {y: 18, autoAlpha: 0, stagger: 0.12, duration: 0.6}, '-=0.45')
-        .from('.hero-image', {y: 36, autoAlpha: 0, scale: 1.03, duration: 1.0, ease: 'power2.out'}, '-=0.5')
-        .from('.hero-floater', {y: 14, autoAlpha: 0, duration: 0.5}, '-=0.35')
-        .from('.hero-badge', {y: 14, autoAlpha: 0, duration: 0.5}, '-=0.45');
+      tl.to('h1', {y: 0, autoAlpha: 1, duration: 0.9})
+        .to('.lede', {y: 0, autoAlpha: 1, duration: 0.7}, '-=0.55')
+        .to('.hero-cta a', {y: 0, autoAlpha: 1, stagger: 0.12, duration: 0.6}, '-=0.45')
+        .to('.hero-image', {y: 0, autoAlpha: 1, scale: 1, duration: 1.0, ease: 'power2.out'}, '-=0.5')
+        .to('.hero-floater', {y: 0, autoAlpha: 1, duration: 0.5}, '-=0.35')
+        .to('.hero-badge', {y: 0, autoAlpha: 1, duration: 0.5}, '-=0.45');
     });
   }, {scope: ref});
 
@@ -269,39 +274,7 @@ function ProductsSection({
               return (
                 <div className="products-grid">
                   {items.map((product) => (
-                    <Link
-                      key={product.id}
-                      className="pcard"
-                      to={`/products/${product.handle}`}
-                      prefetch="intent"
-                    >
-                      <div className="pcard-img">
-                        {product.featuredImage && (
-                          <Image
-                            data={product.featuredImage}
-                            sizes="(min-width: 45em) 25vw, 50vw"
-                            alt={product.featuredImage.altText || product.title}
-                          />
-                        )}
-                        <button
-                          className="pcard-heart"
-                          aria-label="Save"
-                          onClick={(e) => e.preventDefault()}
-                        >
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                        </button>
-                      </div>
-                      <div className="pcard-body">
-                        <div className="pcard-name">{product.title}</div>
-                        <div className="pcard-row">
-                          <span className="pcard-price">
-                            <span className="pcard-from">From </span>
-                            <Money data={product.priceRange.minVariantPrice} />
-                          </span>
-                          <span className="pcard-add" aria-label="Quick add">+</span>
-                        </div>
-                      </div>
-                    </Link>
+                    <ProductItem key={product.id} product={product} loading="lazy" />
                   ))}
                 </div>
               );
@@ -388,47 +361,6 @@ function CraftSection() {
 }
 
 /* ─── Process section ───────────────────────────────────────────────────────── */
-const PROCESS_STEPS = [
-  {num: '— 01', icon: 'ti-tree', title: 'Source', desc: 'We buy boards from three small estates within 90 miles. Slow-grown, air-dried, traceable to the stump.'},
-  {num: '— 02', icon: 'ti-ruler-2', title: 'Draw', desc: 'Each piece is drawn at full scale on the workshop wall, then prototyped in poplar before timber is cut.'},
-  {num: '— 03', icon: 'ti-hammer', title: 'Joint', desc: 'Mortise and tenon, dovetails, draw-bored pegs. No screws where a joint can hold instead.'},
-  {num: '— 04', icon: 'ti-flame', title: 'Finish', desc: 'Three coats of food-safe hardwax oil, hand-rubbed between coats. Cured for seven days before delivery.'},
-];
-
-function ProcessSection() {
-  const ref = useRef<HTMLElement>(null);
-  useGSAP(() => {
-    const mm = gsap.matchMedia();
-    mm.add('(prefers-reduced-motion: no-preference)', () => {
-      gsap.from('.step', {y: 28, autoAlpha: 0, duration: 0.6, stagger: 0.1, ease: 'power2.out', scrollTrigger: {trigger: ref.current, start: 'top 85%'}});
-    });
-  }, {scope: ref});
-
-  return (
-    <section className="section-linen" ref={ref}>
-      <div className="cwf-wrap">
-        <div className="shead">
-          <div>
-            <div className="eyebrow">03 · How we work</div>
-            <h2 className="title">
-              From standing tree to your hallway — in four steps.
-            </h2>
-          </div>
-        </div>
-        <div className="process">
-          {PROCESS_STEPS.map((s) => (
-            <div key={s.title} className="step">
-              <div className="stepnum">{s.num}</div>
-              <div className="ic"><i className={`ti ${s.icon}`} /></div>
-              <h3>{s.title}</h3>
-              <p>{s.desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
 
 /* ─── Features bar ──────────────────────────────────────────────────────────── */
 const FEATURES = [
@@ -589,6 +521,9 @@ const FEATURED_PRODUCTS_QUERY = `#graphql
     id
     title
     handle
+    options {
+      name
+    }
     priceRange {
       minVariantPrice {
         amount

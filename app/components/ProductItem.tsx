@@ -1,5 +1,21 @@
 import {Link} from 'react-router';
 import {Image, Money} from '@shopify/hydrogen';
+
+const DIMENSION_KEYWORDS = ['size', 'width', 'height', 'length', 'depth', 'thickness', 'diameter'];
+const STYLE_KEYWORDS = ['finish', 'color', 'colour', 'material', 'style', 'wood', 'stain'];
+
+function getVariantBadges(options?: {name: string}[]): string[] {
+  if (!options) return [];
+  return options
+    .filter(o => o.name.toLowerCase() !== 'title')
+    .map(o => {
+      const lower = o.name.toLowerCase();
+      if (DIMENSION_KEYWORDS.some(k => lower.includes(k))) return `Customisable ${o.name.toLowerCase()}`;
+      if (STYLE_KEYWORDS.some(k => lower.includes(k))) return `Choice of ${o.name.toLowerCase()}`;
+      return null;
+    })
+    .filter((b): b is string => b !== null);
+}
 import type {
   ProductItemFragment,
   CollectionItemFragment,
@@ -21,6 +37,8 @@ export function ProductItem({
   const variantUrl = useVariantUrl(product.handle);
   const image = product.featuredImage;
   const vendor = (product as {vendor?: string}).vendor;
+  const options = (product as {options?: {name: string}[]}).options;
+  const badges = getVariantBadges(options);
   const {isFavourite, toggleFavourite} = useFavourites();
   const saved = isFavourite(product.id);
 
@@ -53,9 +71,12 @@ export function ProductItem({
         </button>
       </div>
       <div className="pcard-body">
-        {vendor && (
+        {(vendor || badges.length > 0) && (
           <div className="pcard-tags">
-            <span className="pcard-tag">{vendor}</span>
+            {vendor && <span className="pcard-tag">{vendor}</span>}
+            {badges.map(b => (
+              <span key={b} className="pcard-tag pcard-tag--custom">{b}</span>
+            ))}
           </div>
         )}
         <div className="pcard-name">{product.title}</div>

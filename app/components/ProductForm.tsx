@@ -116,10 +116,10 @@ export function ProductForm({
           >
             {selectedVariant?.availableForSale ? (
               <>
-                <span>Add to cart</span>
+                <span>Order now</span>
                 {selectedVariant.price && (
                   <span className="pdp-atc-price">
-                    · <Money data={selectedVariant.price} />
+                    · <Money as="span" data={selectedVariant.price} />
                   </span>
                 )}
               </>

@@ -40,7 +40,7 @@ export default function FavouritesPage() {
           ) : (
             <>
               <p className="fav-count">{favourites.length} {favourites.length === 1 ? 'piece' : 'pieces'} saved</p>
-              <div className="fav-grid">
+              <div className="products-grid">
                 {favourites.map((item) => (
                   <FavCard key={item.id} item={item} onRemove={removeFavourite} />
                 ))}
@@ -55,8 +55,8 @@ export default function FavouritesPage() {
 
 function FavCard({item, onRemove}: {item: FavouriteProduct; onRemove: (id: string) => void}) {
   return (
-    <div className="fav-card">
-      <Link to={`/products/${item.handle}`} className="fav-card-img">
+    <Link className="pcard" to={`/products/${item.handle}`} prefetch="intent">
+      <div className="pcard-img">
         {item.image ? (
           <img
             src={item.image.url}
@@ -66,24 +66,25 @@ function FavCard({item, onRemove}: {item: FavouriteProduct; onRemove: (id: strin
             loading="lazy"
           />
         ) : (
-          <div className="fav-card-img-placeholder" />
+          <div style={{width: '100%', aspectRatio: '1/1', background: 'var(--cwf-sand)'}} />
         )}
-      </Link>
-      <div className="fav-card-body">
-        <Link to={`/products/${item.handle}`} className="fav-card-name">{item.title}</Link>
-        <div className="fav-card-row">
-          <span className="fav-card-price">
+        <button
+          className="pcard-heart saved"
+          aria-label="Remove from favourites"
+          onClick={(e) => { e.preventDefault(); onRemove(item.id); }}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+      </div>
+      <div className="pcard-body">
+        <div className="pcard-name">{item.title}</div>
+        <div className="pcard-row">
+          <span className="pcard-price">
+            <span className="pcard-from">From </span>
             <Money data={{amount: item.price.amount, currencyCode: item.price.currencyCode as CurrencyCode}} />
           </span>
-          <button
-            className="fav-remove-btn"
-            aria-label="Remove from favourites"
-            onClick={() => onRemove(item.id)}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-          </button>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

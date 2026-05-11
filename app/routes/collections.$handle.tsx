@@ -84,12 +84,7 @@ export default function Collection() {
           </div>
           <div className="page-header-inner">
             <div>
-              <div className="eyebrow">
-                {collection.handle} · {collection.products.nodes.length} pieces
-              </div>
-              <h1>
-                Pieces for the rooms<br />you actually <em>live in</em>.
-              </h1>
+              <h1>{collection.title}</h1>
               {collection.description && (
                 <div className="blurb">{collection.description}</div>
               )}
@@ -220,6 +215,9 @@ const PRODUCT_ITEM_FRAGMENT = `#graphql
     id
     handle
     title
+    options {
+      name
+    }
     featuredImage {
       id
       altText
