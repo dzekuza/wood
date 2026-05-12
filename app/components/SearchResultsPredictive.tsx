@@ -242,20 +242,38 @@ function SearchResultsPredictiveProducts({
 
 function SearchResultsPredictiveQueries({
   queries,
-  queriesDatalistId,
-}: PartialPredictiveSearchResult<'queries', never> & {
-  queriesDatalistId: string;
-}) {
+  closeSearch,
+  term,
+}: PartialPredictiveSearchResult<'queries'>) {
   if (!queries.length) return null;
 
   return (
-    <datalist id={queriesDatalistId}>
+    <div className="predictive-search-result predictive-search-suggestions" key="queries">
+      <h5>Suggestions</h5>
+      <ul>
       {queries.map((suggestion) => {
         if (!suggestion) return null;
 
-        return <option key={suggestion.text} value={suggestion.text} />;
+        return (
+          <li className="predictive-search-result-item predictive-search-suggestion-item" key={suggestion.text}>
+            <Link
+              onClick={closeSearch}
+              to={urlWithTrackingParams({
+                baseUrl: `/search?q=${encodeURIComponent(suggestion.text)}`,
+                trackingParams: suggestion.trackingParameters,
+                term: term.current,
+              })}
+            >
+              <span className="predictive-search-suggestion-icon">
+                <i className="ti ti-search" />
+              </span>
+              <span>{suggestion.text}</span>
+            </Link>
+          </li>
+        );
       })}
-    </datalist>
+      </ul>
+    </div>
   );
 }
 

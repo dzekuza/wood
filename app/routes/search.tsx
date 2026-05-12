@@ -40,6 +40,7 @@ export async function loader({request, context}: Route.LoaderArgs) {
 export default function SearchPage() {
   const {type, term, result, error} = useLoaderData<typeof loader>();
   if (type === 'predictive') return null;
+  const hasResults = Boolean(term && result?.total);
 
   return (
     <>
@@ -59,33 +60,65 @@ export default function SearchPage() {
       </div>
       <section className="search-page">
         <div className="cwf-wrap">
-          <SearchForm className="search-page-form">
-            {({inputRef}) => (
-              <>
-                <input
-                  defaultValue={term}
-                  name="q"
-                  placeholder="Search chairs, journal, oak…"
-                  ref={inputRef}
-                  type="search"
-                />
-                <button type="submit" className="btn btn-dark">Search</button>
-              </>
-            )}
-          </SearchForm>
-          {error && <p className="search-error">{error}</p>}
-          {!term || !result?.total ? (
-            <SearchResults.Empty />
-          ) : (
-            <SearchResults result={result} term={term}>
-              {({articles, pages, products, term}) => (
-                <div className="search-page-results">
-                  <SearchResults.Products products={products} term={term} />
-                  <SearchResults.Pages pages={pages} term={term} />
-                  <SearchResults.Articles articles={articles} term={term} />
-                </div>
+          <div className="search-page-shell">
+            <div className="search-page-intro">
+              <span className="search-page-kicker">Search the collection</span>
+              <p className="search-page-copy">
+                Look through furniture, journal entries, and workshop notes in one place.
+              </p>
+            </div>
+            <SearchForm className="search-page-form">
+              {({inputRef}) => (
+                <>
+                  <label className="search-page-field">
+                    <span className="sr-only">Search the store</span>
+                    <span className="search-page-field-icon" aria-hidden="true">
+                      <i className="ti ti-search" />
+                    </span>
+                    <input
+                      defaultValue={term}
+                      name="q"
+                      placeholder="Search chairs, journal, oak..."
+                      ref={inputRef}
+                      type="search"
+                    />
+                  </label>
+                  <button type="submit" className="search-page-submit">
+                    <span>Search</span>
+                    <i className="ti ti-arrow-right" aria-hidden="true" />
+                  </button>
+                </>
               )}
-            </SearchResults>
+            </SearchForm>
+          </div>
+          {error && <p className="search-error">{error}</p>}
+          {hasResults ? (
+            <>
+              <div className="search-page-summary">
+                <div>
+                  <span className="eyebrow">Results</span>
+                  <h2>
+                    {result.total} match{result.total === 1 ? '' : 'es'} for{' '}
+                    <span>&ldquo;{term}&rdquo;</span>
+                  </h2>
+                </div>
+                <p>
+                  Refined around relevance first, so the closest pieces and editorial pages rise
+                  to the top.
+                </p>
+              </div>
+              <SearchResults result={result} term={term}>
+                {({articles, pages, products, term}) => (
+                  <div className="search-page-results">
+                    <SearchResults.Products products={products} term={term} />
+                    <SearchResults.Pages pages={pages} term={term} />
+                    <SearchResults.Articles articles={articles} term={term} />
+                  </div>
+                )}
+              </SearchResults>
+            </>
+          ) : (
+            <SearchResults.Empty />
           )}
           <Analytics.SearchView data={{searchTerm: term, searchResults: result}} />
         </div>

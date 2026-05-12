@@ -1,5 +1,5 @@
 import {Await, Link} from 'react-router';
-import {Suspense, useId} from 'react';
+import {Suspense} from 'react';
 import type {
   CartApiQueryFragment,
   FooterQuery,
@@ -81,7 +81,6 @@ function CartAside({cart}: {cart: PageLayoutProps['cart']}) {
 }
 
 function SearchAside() {
-  const queriesDatalistId = useId();
   return (
     <Aside type="search" heading="SEARCH">
       <div className="predictive-search">
@@ -96,7 +95,6 @@ function SearchAside() {
                 placeholder="Search products, collections…"
                 ref={inputRef}
                 type="search"
-                list={queriesDatalistId}
               />
               <button className="search-submit" onClick={goToSearch} aria-label="Search">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -122,7 +120,8 @@ function SearchAside() {
               <>
                 <SearchResultsPredictive.Queries
                   queries={queries}
-                  queriesDatalistId={queriesDatalistId}
+                  closeSearch={closeSearch}
+                  term={term}
                 />
                 <SearchResultsPredictive.Products
                   products={products}
