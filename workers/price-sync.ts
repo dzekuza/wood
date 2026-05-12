@@ -52,7 +52,7 @@ async function shopifyQuery(token: string, query: string, variables = {}) {
     body: JSON.stringify({ query, variables }),
   });
   const json: any = await res.json();
-  if (json.errors) throw new Error(json.errors[0].message);
+  if (json.errors) throw new Error(typeof json.errors === 'string' ? json.errors : json.errors[0]?.message ?? JSON.stringify(json.errors));
   return json.data;
 }
 
