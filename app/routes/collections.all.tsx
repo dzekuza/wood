@@ -1,5 +1,5 @@
 import type {Route} from './+types/collections.all';
-import {useLoaderData, Link} from 'react-router';
+import {useLoaderData, Link, NavLink} from 'react-router';
 import {useState, useMemo} from 'react';
 import {getPaginationVariables} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
@@ -19,10 +19,11 @@ export async function loader(args: Route.LoaderArgs) {
 async function loadCriticalData({context, request}: Route.LoaderArgs) {
   const {storefront} = context;
   const paginationVariables = getPaginationVariables(request, {pageBy: 48});
-  const [{products}] = await Promise.all([
+  const [{products}, {collections}] = await Promise.all([
     storefront.query(CATALOG_QUERY, {variables: {...paginationVariables}}),
+    storefront.query(ALL_COLLECTIONS_QUERY),
   ]);
-  return {products};
+  return {products, collections: collections.nodes};
 }
 
 // ── filter helpers ────────────────────────────────────────────────────────────
@@ -79,7 +80,6 @@ function filterProducts(
 
 // ── sub-components ────────────────────────────────────────────────────────────
 
-const CHIPS = ['All', 'Seating', 'Tables', 'Storage', 'Beds', 'Outdoor'];
 const CATEGORIES = [['Seating', 31], ['Tables', 18], ['Storage', 14], ['Beds', 12], ['Outdoor', 8]] as const;
 const WOODS     = [['English Oak', 31], ['European Walnut', 18], ['Ash', 14], ['Reclaimed Beam', 12]] as const;
 const LEAD_TIMES = [['In stock', 12], ['4–6 weeks', 38], ['8–12 weeks', 24], ['Bespoke', 10]] as const;
@@ -131,7 +131,7 @@ function CheckList({
 // ── page ──────────────────────────────────────────────────────────────────────
 
 export default function AllProducts() {
-  const {products} = useLoaderData<typeof loader>();
+  const {products, collections} = useLoaderData<typeof loader>();
 
   const [activeChip, setActiveChip] = useState('All');
   const [categories, setCategories] = useState<Set<string>>(new Set());
@@ -217,14 +217,17 @@ export default function AllProducts() {
       <div className="filter-bar">
         <div className="filter-bar-row">
           <div className="filter-chips">
-            {CHIPS.map((chip) => (
-              <button
-                key={chip}
-                className={`filter-chip${activeChip === chip ? ' active' : ''}`}
-                onClick={() => handleChip(chip)}
+            <NavLink to="/collections/all" className="filter-chip active" end>
+              All
+            </NavLink>
+            {collections.map((col) => (
+              <NavLink
+                key={col.handle}
+                to={`/collections/${col.handle}`}
+                className="filter-chip"
               >
-                {chip}
-              </button>
+                {col.title}
+              </NavLink>
             ))}
           </div>
           <div className="filter-bar-meta">
@@ -379,6 +382,18 @@ const COLLECTION_ITEM_FRAGMENT = `#graphql
     priceRange {
       minVariantPrice { ...MoneyCollectionItem }
       maxVariantPrice { ...MoneyCollectionItem }
+    }
+  }
+` as const;
+
+const ALL_COLLECTIONS_QUERY = `#graphql
+  query AllCollectionsAll {
+    collections(first: 20, sortKey: TITLE) {
+      nodes {
+        id
+        title
+        handle
+      }
     }
   }
 ` as const;
