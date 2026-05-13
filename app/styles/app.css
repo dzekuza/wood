@@ -304,7 +304,7 @@ select:focus {
   top: 0;
   transition: opacity 300ms ease-in-out;
   visibility: hidden;
-  z-index: 100;
+  z-index: 300;
 }
 
 .overlay .close-outside {
