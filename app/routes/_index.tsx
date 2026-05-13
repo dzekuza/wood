@@ -148,7 +148,7 @@ function HeroSection() {
             </Link>
           </div>
           <div className="hero-image">
-            <img src="/images/hero.jpg" alt="Handcrafted oak furniture" />
+            <img src="/images/hero.webp" alt="Solid oak mantel beam with decorative shelf styling" />
             <div className="hero-floater">
               <div>
                 <div className="hero-floater-label">Featured</div>
