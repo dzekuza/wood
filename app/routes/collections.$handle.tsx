@@ -1,4 +1,4 @@
-import {redirect, useLoaderData, Link} from 'react-router';
+import {redirect, useLoaderData, Link, NavLink} from 'react-router';
 import type {Route} from './+types/collections.$handle';
 import {getPaginationVariables, Analytics} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
@@ -36,11 +36,11 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
     throw redirect('/collections');
   }
 
-  const [{collection}] = await Promise.all([
+  const [{collection}, {collections}] = await Promise.all([
     storefront.query(COLLECTION_QUERY, {
       variables: {handle, ...paginationVariables},
-      // Add other queries here, so that they are loaded in parallel
     }),
+    storefront.query(ALL_COLLECTIONS_QUERY),
   ]);
 
   if (!collection) {
@@ -54,6 +54,7 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
 
   return {
     collection,
+    collections: collections.nodes,
   };
 }
 
@@ -66,7 +67,6 @@ function loadDeferredData({context}: Route.LoaderArgs) {
   return {};
 }
 
-const FILTER_CHIPS = ['All', 'Seating', 'Tables', 'Storage', 'Beds', 'Lighting'];
 const WOOD_FILTERS = [['English Oak', 31], ['European Walnut', 18], ['Ash', 14], ['Reclaimed Beam', 12]] as const;
 const LEAD_TIME_FILTERS = [['In stock', 12], ['4–6 weeks', 38], ['8–12 weeks', 24], ['Bespoke', 10]] as const;
 const FINISH_SWATCHES = [
@@ -78,7 +78,7 @@ const FINISH_SWATCHES = [
 ];
 
 export default function Collection() {
-  const {collection} = useLoaderData<typeof loader>();
+  const {collection, collections} = useLoaderData<typeof loader>();
 
   return (
     <>
@@ -107,13 +107,21 @@ export default function Collection() {
       <div className="filter-bar">
         <div className="filter-bar-row">
           <div className="filter-chips">
-            {FILTER_CHIPS.map((chip) => (
-              <button
-                key={chip}
-                className={`filter-chip${chip === 'All' ? ' active' : ''}`}
+            <NavLink
+              to="/collections"
+              className="filter-chip"
+              end
+            >
+              All
+            </NavLink>
+            {collections.map((col) => (
+              <NavLink
+                key={col.handle}
+                to={`/collections/${col.handle}`}
+                className={({isActive}) => `filter-chip${isActive ? ' active' : ''}`}
               >
-                {chip}
-              </button>
+                {col.title}
+              </NavLink>
             ))}
           </div>
           <div className="filter-bar-meta">
@@ -245,6 +253,18 @@ const PRODUCT_ITEM_FRAGMENT = `#graphql
       }
       maxVariantPrice {
         ...MoneyProductItem
+      }
+    }
+  }
+` as const;
+
+const ALL_COLLECTIONS_QUERY = `#graphql
+  query AllCollections {
+    collections(first: 20, sortKey: TITLE) {
+      nodes {
+        id
+        title
+        handle
       }
     }
   }
