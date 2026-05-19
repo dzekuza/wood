@@ -488,7 +488,7 @@ export default function Product() {
                     <div className="pcard-body">
                       <div className="pname">{rec.title}</div>
                       <div className="pdp-price-big pdp-related-price">
-                        {rec.priceRange.minVariantPrice.currencyCode === 'EUR' ? '€' : rec.priceRange.minVariantPrice.currencyCode}
+                        {rec.priceRange.minVariantPrice.currencyCode === 'GBP' ? '£' : rec.priceRange.minVariantPrice.currencyCode}
                         {parseFloat(rec.priceRange.minVariantPrice.amount).toLocaleString('en-US', {minimumFractionDigits: 2})}
                       </div>
                     </div>

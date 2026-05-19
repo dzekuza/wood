@@ -148,7 +148,7 @@ export function ProductForm({
               handle: product.handle,
               title: product.title,
               image: product.featuredImage ?? undefined,
-              price: selectedVariant?.price ?? {amount: '0', currencyCode: 'EUR'},
+              price: selectedVariant?.price ?? {amount: '0', currencyCode: 'GBP'},
             });
           }}
         >

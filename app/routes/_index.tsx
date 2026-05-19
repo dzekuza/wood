@@ -148,7 +148,7 @@ function HeroSection() {
             </Link>
           </div>
           <div className="hero-image">
-            <img src="/images/hero.webp" alt="Solid oak mantel beam with decorative shelf styling" />
+            <img src="/images/hero.jpg" alt="Solid oak mantel beam with log burner" />
             <div className="hero-floater">
               <div>
                 <div className="hero-floater-label">Featured</div>
@@ -203,7 +203,7 @@ const BENTO_CELLS = [
   {cls: 'cell-2 dark', label: null, title: 'Mantels', count: '14 pieces', img: '/images/bento-2.jpg'},
   {cls: 'cell-3 primary', label: null, title: 'Media', count: '9 pieces', img: '/images/bento-3.jpg'},
   {cls: 'cell-4 light', label: null, title: 'Shelving', count: '18 pieces', img: '/images/bento-4.jpg'},
-  {cls: 'cell-5 dark', label: null, title: 'Seating', count: '7 pieces', img: '/images/bento-1.jpg'},
+  {cls: 'cell-5 dark', label: null, title: 'Seating', count: '7 pieces', img: '/images/bento-5.jpg'},
 ];
 
 function CollectionsSection({

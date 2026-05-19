@@ -2521,7 +2521,7 @@ section { padding: 0; }
 .hero-copy .hero-image { grid-column: 2; grid-row: 1 / 5; align-self: stretch; aspect-ratio: unset; min-height: 520px; }
 .hero-tag { color: var(--cwf-accent); display: inline-flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; }
 .hero-tag .bar { width: 36px; height: 1px; background: var(--cwf-accent); }
-.hero h1 { color: var(--cwf-primary); font-family: 'Mark Bold', 'Plus Jakarta Sans', sans-serif; font-weight: 700; letter-spacing: -.04em; }
+.hero h1 { color: var(--cwf-dark); font-family: 'Mark Bold', 'Plus Jakarta Sans', sans-serif; font-weight: 700; letter-spacing: -.04em; }
 .hero h1 em { font-style: normal; color: var(--cwf-accent); }
 .hero p.lede { font-size: 17px; line-height: 1.6; color: var(--cwf-accent-deep); max-width: 480px; font-weight: 400; letter-spacing: -.005em; }
 .hero-cta { display: flex; align-items: center; gap: 14px; margin-top: 6px; flex-wrap: wrap; }
@@ -2571,7 +2571,7 @@ section { padding: 0; }
 .cell.primary { background: var(--cwf-primary); color: #f3efea; }
 .cell.primary .ph { background: repeating-linear-gradient(135deg, #4a2f1f 0 12px, #553626 12px 24px); }
 .cell-inner { position: relative; z-index: 1; display: flex; flex-direction: column; justify-content: space-between; height: 100%; }
-.cell h3 { font-family: 'Mark Bold', sans-serif; font-weight: 700; letter-spacing: -.035em; }
+.cell h3 { font-family: 'Mark Bold', sans-serif; font-weight: 700; letter-spacing: -.035em; font-size: 24px; line-height: 34px; }
 .cell .meta { display: flex; align-items: center; justify-content: space-between; font-size: 12px; letter-spacing: .06em; }
 .cell .count { padding: 4px 10px; border-radius: 99px; background: rgba(0,0,0,.32); backdrop-filter: blur(4px); color: rgba(255,255,255,.9); font-weight: 600; letter-spacing: .1em; text-transform: uppercase; font-size: 10px; }
 .cell.light .count { background: rgba(255,255,255,.18); color: #fff; } .cell.light { color: #f3efea; }
@@ -2584,7 +2584,7 @@ section { padding: 0; }
 @media (max-width: 767px) {
   .bento { grid-template-rows: repeat(3, 240px); gap: 10px; }
   .cell { border-radius: 14px; padding: 16px; }
-  .cell h3 { font-size: clamp(18px, 5vw, 24px); }
+  .cell h3 { font-size: 20px; line-height: 28px; }
   .shead .title { font-size: clamp(22px, 6.5vw, 28px); }
 }
 
