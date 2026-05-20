@@ -8,6 +8,7 @@ import type {
   FeaturedCollectionsQuery,
 } from 'storefrontapi.generated';
 import {MockShopNotice} from '~/components/MockShopNotice';
+import {ReviewsSection} from '~/components/ReviewsSection';
 import {ProductItem} from '~/components/ProductItem';
 import {
   isValidNewsletterEmail,
@@ -119,7 +120,7 @@ export default function Homepage() {
       <ProductsSection products={data.featuredProducts} />
       <CraftSection />
       <FeaturesBar />
-      <TestimonialsSection />
+      <ReviewsSection />
       <ArticlesSection articles={data.featuredArticles} />
       <NewsletterSection />
     </div>
@@ -402,62 +403,6 @@ function FeaturesBar() {
 }
 
 /* ─── Testimonials ──────────────────────────────────────────────────────────── */
-const TESTIMONIALS = [
-  {
-    stars: '★★★★★',
-    quote: "The dining table arrived heavier than the man delivering it. Six years on, the grain has darkened to honey and the joints haven't shifted a millimetre.",
-    name: 'Eleanor Ashworth',
-    role: 'Aldsworth table · 2020',
-  },
-  {
-    stars: '★★★★★',
-    quote: "You can feel where the plane has been over the timber. It's not a piece of furniture, it's a piece of someone's working day.",
-    name: 'Marcus Lin',
-    role: 'Stow sideboard · 2023',
-  },
-  {
-    stars: '★★★★★',
-    quote: "Tom drove the chair down himself, sat in it for ten minutes, adjusted the back, and drove home. I've never been so politely fussed over.",
-    name: 'Hannah Reeves',
-    role: 'Burford armchair · 2024',
-  },
-];
-
-function TestimonialsSection() {
-  return (
-    <section className="section-linen-cont">
-      <div className="cwf-wrap">
-        <div className="shead">
-          <div>
-            <div className="eyebrow">04 · From the people who live with it</div>
-            <h2 className="title">
-              Bought once. Passed on twice.
-            </h2>
-          </div>
-          <div className="right">
-            <div className="tgrid-rating">★★★★★</div>
-            <span className="tgrid-count">4.94 · 612 reviews</span>
-          </div>
-        </div>
-        <div className="tgrid">
-          {TESTIMONIALS.map((t) => (
-            <div key={t.name} className="tcard">
-              <div className="stars">{t.stars}</div>
-              <q>{t.quote}</q>
-              <div className="who">
-                <span className="av" />
-                <div>
-                  <div className="nm">{t.name}</div>
-                  <div className="rl">{t.role}</div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
 
 /* ─── Articles ──────────────────────────────────────────────────────────────── */
 type ArticleNode = {

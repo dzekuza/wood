@@ -67,15 +67,6 @@ function loadDeferredData({context}: Route.LoaderArgs) {
   return {};
 }
 
-const WOOD_FILTERS = [['English Oak', 31], ['European Walnut', 18], ['Ash', 14], ['Reclaimed Beam', 12]] as const;
-const LEAD_TIME_FILTERS = [['In stock', 12], ['4–6 weeks', 38], ['8–12 weeks', 24], ['Bespoke', 10]] as const;
-const FINISH_SWATCHES = [
-  {label: 'Oak', className: 'finish-swatch-oak'},
-  {label: 'Walnut', className: 'finish-swatch-walnut'},
-  {label: 'Dark Walnut', className: 'finish-swatch-dark-walnut'},
-  {label: 'Whitewash', className: 'finish-swatch-whitewash'},
-  {label: 'Ebonised', className: 'finish-swatch-ebonised'},
-];
 
 export default function Collection() {
   const {collection, collections} = useLoaderData<typeof loader>();
@@ -142,58 +133,12 @@ export default function Collection() {
           {/* Sidebar */}
           <aside className="shop-sidebar">
             <div className="fblock">
-              <h4>Wood</h4>
-              <ul>
-                {WOOD_FILTERS.map(([name, ct]) => (
-                  <li key={String(name)}>
-                    <button type="button" className="filter-check-btn" aria-pressed="false">
-                      <span className="check-row">
-                        <span className="check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
-                        <span className="filter-check-label">{name}</span>
-                      </span>
-                      <span className="ct">{ct}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="fblock">
-              <h4>Finish</h4>
-              <div className="swatch-row">
-                {FINISH_SWATCHES.map(({label, className}, index) => (
-                  <button
-                    key={label}
-                    type="button"
-                    className={`sw ${className}${index === 0 ? ' on' : ''}`}
-                    title={label}
-                    aria-pressed={index === 0}
-                  />
-                ))}
-              </div>
-            </div>
-            <div className="fblock">
-              <h4>Price · €</h4>
+              <h4>Price · £</h4>
               <div className="price-range">
                 <input type="text" defaultValue="240" readOnly />
                 <span>—</span>
                 <input type="text" defaultValue="4,800" readOnly />
               </div>
-            </div>
-            <div className="fblock">
-              <h4>Lead time</h4>
-              <ul>
-                {LEAD_TIME_FILTERS.map(([name, ct]) => (
-                  <li key={String(name)}>
-                    <button type="button" className="filter-check-btn" aria-pressed="false">
-                      <span className="check-row">
-                        <span className="check" />
-                        <span className="filter-check-label">{name}</span>
-                      </span>
-                      <span className="ct">{ct}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
             </div>
           </aside>
 

@@ -16,6 +16,7 @@ import {AddToCartButton} from '~/components/AddToCartButton';
 import {useAside} from '~/components/Aside';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {SITE_NAME} from '~/lib/site';
+import {ReviewsSection} from '~/components/ReviewsSection';
 
 export const meta: Route.MetaFunction = ({data}) => {
   return [
@@ -519,6 +520,8 @@ export default function Product() {
           </div>
         </div>
       </div>
+
+      <ReviewsSection />
 
       <Analytics.ProductView
         data={{
