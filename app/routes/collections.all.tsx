@@ -19,8 +19,8 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
   const {storefront} = context;
   const paginationVariables = getPaginationVariables(request, {pageBy: 48});
   const [{products}, {collections}] = await Promise.all([
-    storefront.query(CATALOG_QUERY, {variables: {...paginationVariables}}),
-    storefront.query(ALL_COLLECTIONS_QUERY),
+    storefront.query(CATALOG_QUERY, {variables: {...paginationVariables}, cache: storefront.CacheNone()}),
+    storefront.query(ALL_COLLECTIONS_QUERY, {cache: storefront.CacheNone()}),
   ]);
   return {products, collections: collections.nodes};
 }
