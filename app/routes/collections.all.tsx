@@ -95,23 +95,17 @@ export default function AllProducts() {
         </div>
       </div>
 
-      {/* Shell: sidebar + grid */}
       <div className="shop-shell">
         <div className="cwf-wrap">
-          <div className="shop-inner">
-            {/* Product grid */}
-            <div className="filter-main">
-              <span className="filter-bar-count filter-bar-count-block">{products.nodes.length} pieces</span>
-              <div className="pgrid">
-                {(products.nodes as CollectionItemFragment[]).map((product, index) => (
-                  <ProductItem
-                    key={product.id}
-                    product={product}
-                    loading={index < 12 ? 'eager' : undefined}
-                  />
-                ))}
-              </div>
-            </div>
+          <span className="filter-bar-count filter-bar-count-block">{products.nodes.length} pieces</span>
+          <div className="pgrid">
+            {(products.nodes as CollectionItemFragment[]).map((product, index) => (
+              <ProductItem
+                key={product.id}
+                product={product}
+                loading={index < 12 ? 'eager' : undefined}
+              />
+            ))}
           </div>
         </div>
       </div>

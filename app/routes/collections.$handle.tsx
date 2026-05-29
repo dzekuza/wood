@@ -138,26 +138,20 @@ export default function Collection() {
         </div>
       </div>
 
-      {/* Shell: sidebar + grid */}
       <div className="shop-shell">
         <div className="cwf-wrap">
-          <div className="shop-inner">
-          {/* Product grid */}
-          <div className="filter-main">
-            <PaginatedResourceSection<ProductItemFragment>
-              connection={collection.products}
-              resourcesClassName="pgrid"
-            >
-              {({node: product, index}) => (
-                <ProductItem
-                  key={product.id}
-                  product={product}
-                  loading={index < 8 ? 'eager' : undefined}
-                />
-              )}
-            </PaginatedResourceSection>
-          </div>
-          </div>
+          <PaginatedResourceSection<ProductItemFragment>
+            connection={collection.products}
+            resourcesClassName="pgrid"
+          >
+            {({node: product, index}) => (
+              <ProductItem
+                key={product.id}
+                product={product}
+                loading={index < 8 ? 'eager' : undefined}
+              />
+            )}
+          </PaginatedResourceSection>
         </div>
       </div>
 
