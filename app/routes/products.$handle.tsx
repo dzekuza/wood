@@ -386,42 +386,6 @@ export default function Product() {
             </div>
           </div>
 
-          {/* Specs */}
-            <div className="pdp-specs">
-              <div className="pdp-specs-head">
-                <div>
-                  <div className="ey eyebrow">By the numbers</div>
-                  <h2 className="pdp-specs-title">The honest specifications.</h2>
-                </div>
-              </div>
-            <div className="pdp-specs-grid">
-              <div className="pdp-spec-card">
-                <svg className="pdp-spec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22V12"/><path d="M17 8l-5-6-5 6h3l-3 4h4l-3 4h8l-3-4h4l-3-4z"/></svg>
-                <div className="pdp-spec-label">Wood</div>
-                <div className="pdp-spec-val">Solid Hardwood</div>
-                <div className="pdp-spec-sub">No MDF or particleboard</div>
-              </div>
-              <div className="pdp-spec-card">
-                <svg className="pdp-spec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
-                <div className="pdp-spec-label">Guarantee</div>
-                <div className="pdp-spec-val">25 Years</div>
-                <div className="pdp-spec-sub">Joints and frame</div>
-              </div>
-              <div className="pdp-spec-card">
-                <svg className="pdp-spec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-                <div className="pdp-spec-label">Delivery</div>
-                <div className="pdp-spec-val">White Glove</div>
-                <div className="pdp-spec-sub">Assembled in your room</div>
-              </div>
-              <div className="pdp-spec-card">
-                <svg className="pdp-spec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
-                <div className="pdp-spec-label">Sourcing</div>
-                <div className="pdp-spec-val">FSC Certified</div>
-                <div className="pdp-spec-sub">Responsibly managed</div>
-              </div>
-            </div>
-          </div>
-
           {/* Reviews */}
           <div className="pdp-reviews" id="reviews">
             <div className="rhead">
@@ -466,13 +430,49 @@ export default function Product() {
             </div>
           </div>
 
+          {/* Specs */}
+            <div className="pdp-specs">
+              <div className="pdp-specs-head">
+                <div>
+                  <div className="ey eyebrow">By the numbers</div>
+                  <h2 className="pdp-specs-title">The honest specifications.</h2>
+                </div>
+              </div>
+            <div className="pdp-specs-grid">
+              <div className="pdp-spec-card">
+                <svg className="pdp-spec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22V12"/><path d="M17 8l-5-6-5 6h3l-3 4h4l-3 4h8l-3-4h4l-3-4z"/></svg>
+                <div className="pdp-spec-label">Wood</div>
+                <div className="pdp-spec-val">Solid Hardwood</div>
+                <div className="pdp-spec-sub">No MDF or particleboard</div>
+              </div>
+              <div className="pdp-spec-card">
+                <svg className="pdp-spec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+                <div className="pdp-spec-label">Guarantee</div>
+                <div className="pdp-spec-val">25 Years</div>
+                <div className="pdp-spec-sub">Joints and frame</div>
+              </div>
+              <div className="pdp-spec-card">
+                <svg className="pdp-spec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                <div className="pdp-spec-label">Delivery</div>
+                <div className="pdp-spec-val">White Glove</div>
+                <div className="pdp-spec-sub">Assembled in your room</div>
+              </div>
+              <div className="pdp-spec-card">
+                <svg className="pdp-spec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+                <div className="pdp-spec-label">Sourcing</div>
+                <div className="pdp-spec-val">FSC Certified</div>
+                <div className="pdp-spec-sub">Responsibly managed</div>
+              </div>
+            </div>
+          </div>
+
           {/* Related */}
           {recommendations.length > 0 && (
             <div className="pdp-related">
               <div className="related-head">
                 <div>
-                  <div className="ey">Pairs well with</div>
-                  <h2>From the same bench.</h2>
+                  <div className="ey">You may also like</div>
+                  <h2>Recommended for you.</h2>
                 </div>
                 <Link to="/collections/all">
                   Browse all pieces <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>

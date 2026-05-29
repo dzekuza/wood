@@ -5,6 +5,9 @@ import {getPaginationVariables} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {ProductItem} from '~/components/ProductItem';
 import {SITE_NAME} from '~/lib/site';
+import {SortDropdown} from '~/components/SortDropdown';
+import type {SortValue} from '~/components/SortDropdown';
+import type {CollectionItemFragment} from 'storefrontapi.generated';
 
 export const meta: Route.MetaFunction = () => [
   {title: `All Products | ${SITE_NAME}`},
@@ -15,20 +18,31 @@ export async function loader(args: Route.LoaderArgs) {
   return criticalData;
 }
 
+const SORT_MAP: Record<SortValue, {sortKey: string; reverse: boolean}> = {
+  newest: {sortKey: 'CREATED_AT', reverse: true},
+  'price-high': {sortKey: 'PRICE', reverse: true},
+  'price-low': {sortKey: 'PRICE', reverse: false},
+};
+
 async function loadCriticalData({context, request}: Route.LoaderArgs) {
   const {storefront} = context;
   const paginationVariables = getPaginationVariables(request, {pageBy: 48});
+
+  const url = new URL(request.url);
+  const sortParam = (url.searchParams.get('sort') ?? 'newest') as SortValue;
+  const {sortKey, reverse} = SORT_MAP[sortParam] ?? SORT_MAP.newest;
+
   const [{products}, {collections}] = await Promise.all([
-    storefront.query(CATALOG_QUERY, {variables: {...paginationVariables}, cache: storefront.CacheNone()}),
+    storefront.query(CATALOG_QUERY, {variables: {...paginationVariables, sortKey, reverse}, cache: storefront.CacheNone()}),
     storefront.query(ALL_COLLECTIONS_QUERY, {cache: storefront.CacheNone()}),
   ]);
-  return {products, collections: collections.nodes};
+  return {products, collections: collections.nodes, sortParam};
 }
 
 // ── page ──────────────────────────────────────────────────────────────────────
 
 export default function AllProducts() {
-  const {products, collections} = useLoaderData<typeof loader>();
+  const {products, collections, sortParam} = useLoaderData<typeof loader>();
 
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
@@ -76,13 +90,7 @@ export default function AllProducts() {
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="12" y1="18" x2="20" y2="18"/></svg>
               Filters
             </button>
-            <button className="sort-btn">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--cwf-accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 9l4-4 4 4" /><path d="M7 5v14" />
-                <path d="M21 15l-4 4-4-4" /><path d="M17 19V5" />
-              </svg>
-              Newest first
-            </button>
+            <SortDropdown current={sortParam} />
           </div>
         </div>
       </div>
@@ -91,22 +99,11 @@ export default function AllProducts() {
       <div className="shop-shell">
         <div className="cwf-wrap">
           <div className="shop-inner">
-            <aside className="shop-sidebar">
-              <div className="fblock">
-                <h4>Price · £</h4>
-                <div className="price-range">
-                  <input type="text" defaultValue="240" readOnly />
-                  <span>—</span>
-                  <input type="text" defaultValue="4,800" readOnly />
-                </div>
-              </div>
-            </aside>
-
             {/* Product grid */}
             <div className="filter-main">
               <span className="filter-bar-count filter-bar-count-block">{products.nodes.length} pieces</span>
               <div className="pgrid">
-                {products.nodes.map((product, index) => (
+                {(products.nodes as CollectionItemFragment[]).map((product, index) => (
                   <ProductItem
                     key={product.id}
                     product={product}
@@ -209,8 +206,10 @@ const CATALOG_QUERY = `#graphql
     $last: Int
     $startCursor: String
     $endCursor: String
+    $sortKey: ProductSortKeys
+    $reverse: Boolean
   ) @inContext(country: $country, language: $language) {
-    products(first: $first, last: $last, before: $startCursor, after: $endCursor) {
+    products(first: $first, last: $last, before: $startCursor, after: $endCursor, sortKey: $sortKey, reverse: $reverse) {
       nodes { ...CollectionItem }
       pageInfo {
         hasPreviousPage

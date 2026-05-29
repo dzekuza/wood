@@ -6,6 +6,8 @@ import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {ProductItem} from '~/components/ProductItem';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 import {SITE_NAME} from '~/lib/site';
+import {SortDropdown, SORT_OPTIONS} from '~/components/SortDropdown';
+import type {SortValue} from '~/components/SortDropdown';
 
 export const meta: Route.MetaFunction = ({data}) => {
   return [{title: `${data?.collection.title ?? 'Collection'} | ${SITE_NAME}`}];
@@ -25,6 +27,12 @@ export async function loader(args: Route.LoaderArgs) {
  * Load data necessary for rendering content above the fold. This is the critical data
  * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
  */
+const SORT_MAP: Record<SortValue, {sortKey: string; reverse: boolean}> = {
+  newest: {sortKey: 'CREATED', reverse: true},
+  'price-high': {sortKey: 'PRICE', reverse: true},
+  'price-low': {sortKey: 'PRICE', reverse: false},
+};
+
 async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   const {handle} = params;
   const {storefront} = context;
@@ -36,9 +44,13 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
     throw redirect('/collections');
   }
 
+  const url = new URL(request.url);
+  const sortParam = (url.searchParams.get('sort') ?? 'newest') as SortValue;
+  const {sortKey, reverse} = SORT_MAP[sortParam] ?? SORT_MAP.newest;
+
   const [{collection}, {collections}] = await Promise.all([
     storefront.query(COLLECTION_QUERY, {
-      variables: {handle, ...paginationVariables},
+      variables: {handle, ...paginationVariables, sortKey, reverse},
       cache: storefront.CacheNone(),
     }),
     storefront.query(ALL_COLLECTIONS_QUERY, {cache: storefront.CacheNone()}),
@@ -56,6 +68,7 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   return {
     collection,
     collections: collections.nodes,
+    sortParam,
   };
 }
 
@@ -70,7 +83,7 @@ function loadDeferredData({context}: Route.LoaderArgs) {
 
 
 export default function Collection() {
-  const {collection, collections} = useLoaderData<typeof loader>();
+  const {collection, collections, sortParam} = useLoaderData<typeof loader>();
 
   return (
     <>
@@ -120,9 +133,7 @@ export default function Collection() {
             <span className="filter-bar-count">
               {collection.products.nodes.length} pieces
             </span>
-            <button type="button" className="sort-btn">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--cwf-accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l4-4 4 4"/><path d="M7 5v14"/><path d="M21 15l-4 4-4-4"/><path d="M17 19V5"/></svg> Newest first
-            </button>
+            <SortDropdown current={sortParam} />
           </div>
         </div>
       </div>
@@ -131,18 +142,6 @@ export default function Collection() {
       <div className="shop-shell">
         <div className="cwf-wrap">
           <div className="shop-inner">
-          {/* Sidebar */}
-          <aside className="shop-sidebar">
-            <div className="fblock">
-              <h4>Price · £</h4>
-              <div className="price-range">
-                <input type="text" defaultValue="240" readOnly />
-                <span>—</span>
-                <input type="text" defaultValue="4,800" readOnly />
-              </div>
-            </div>
-          </aside>
-
           {/* Product grid */}
           <div className="filter-main">
             <PaginatedResourceSection<ProductItemFragment>
@@ -227,6 +226,8 @@ const COLLECTION_QUERY = `#graphql
     $last: Int
     $startCursor: String
     $endCursor: String
+    $sortKey: ProductCollectionSortKeys
+    $reverse: Boolean
   ) @inContext(country: $country, language: $language) {
     collection(handle: $handle) {
       id
@@ -237,7 +238,9 @@ const COLLECTION_QUERY = `#graphql
         first: $first,
         last: $last,
         before: $startCursor,
-        after: $endCursor
+        after: $endCursor,
+        sortKey: $sortKey,
+        reverse: $reverse
       ) {
         nodes {
           ...ProductItem

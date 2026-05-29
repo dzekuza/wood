@@ -2301,7 +2301,7 @@ section { padding: 0; }
   .pdp-assure { grid-template-columns: 1fr; gap: 8px; margin-top: 20px; }
 }
 
-.pdp-gallery { display: grid; grid-template-columns: 88px 1fr; gap: 14px; }
+.pdp-gallery { display: grid; grid-template-columns: 88px 1fr; gap: 14px; position: sticky; top: 88px; }
 .pdp-thumbs { display: flex; flex-direction: column; gap: 10px; }
 .pdp-thumb { width: 88px; aspect-ratio: 1/1; border-radius: 12px; overflow: hidden; border: 1.5px solid transparent; background: var(--cwf-sand); position: relative; cursor: pointer; transition: border-color .15s; padding: 0; }
 .pdp-thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 0; }
@@ -2801,8 +2801,14 @@ section { padding: 0; }
 .filter-bar-meta { display: flex; align-items: center; gap: 18px; font-size: 13px; color: var(--cwf-accent-deep); }
 .filter-bar-count { color: rgba(74,47,31,.6); }
 .filter-bar-count-block { display: block; margin-bottom: 16px; }
+.sort-wrap { position: relative; }
+.sort-backdrop { position: fixed; inset: 0; z-index: 49; }
 .sort-btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; border: .5px solid var(--cwf-line); border-radius: 99px; background: #fff; cursor: pointer; font-weight: 600; color: var(--cwf-primary); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; transition: border-color .15s; }
 .sort-btn:hover { border-color: var(--cwf-accent); }
+.sort-dropdown { position: absolute; top: calc(100% + 6px); right: 0; z-index: 50; background: #fff; border: .5px solid var(--cwf-line); border-radius: 12px; box-shadow: 0 8px 24px rgba(74,47,31,.12); overflow: hidden; min-width: 180px; }
+.sort-option { display: block; width: 100%; text-align: left; padding: 11px 16px; background: none; border: none; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--cwf-primary); cursor: pointer; transition: background .12s; }
+.sort-option:hover { background: var(--cwf-surface); }
+.sort-option.active { font-weight: 700; color: var(--cwf-accent-deep); background: var(--cwf-sand); }
 
 /* ── Sidebar check-row ── */
 .check-row { display: flex; align-items: center; }
