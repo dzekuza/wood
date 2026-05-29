@@ -576,6 +576,9 @@ const FEATURED_PRODUCTS_QUERY = `#graphql
       width
       height
     }
+    metafield(namespace: "reviews", key: "product_reviews") {
+      value
+    }
   }
   query FeaturedProducts($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {

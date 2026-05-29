@@ -16,6 +16,7 @@ import {AddToCartButton} from '~/components/AddToCartButton';
 import {useAside} from '~/components/Aside';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {SITE_NAME} from '~/lib/site';
+import {ProductItem} from '~/components/ProductItem';
 import {ReviewsSection} from '~/components/ReviewsSection';
 
 export const meta: Route.MetaFunction = ({data}) => {
@@ -28,13 +29,6 @@ export const meta: Route.MetaFunction = ({data}) => {
   ];
 };
 
-const REVIEW_BREAKDOWN = [
-  {label: '5 stars', barClassName: 'review-fill-92', count: 118},
-  {label: '4 stars', barClassName: 'review-fill-6', count: 8},
-  {label: '3 stars', barClassName: 'review-fill-2', count: 2},
-  {label: '2 stars', barClassName: 'review-fill-0', count: 0},
-  {label: '1 star', barClassName: 'review-fill-0', count: 0},
-] as const;
 
 export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte
@@ -179,6 +173,7 @@ export default function Product() {
           <div className="pdp-grid">
             {/* Gallery slider */}
             <div className="pdp-carousel">
+              <div className="pdp-carousel-stage">
               <div
                 className="pdp-carousel-track"
                 ref={carouselRef}
@@ -213,17 +208,20 @@ export default function Product() {
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                     </button>
                   </div>
-                  <div className="pdp-carousel-dots">
-                    {allImages.map((img, i) => (
-                      <button
-                        key={img.id}
-                        className={`pdp-carousel-dot${carouselIndex === i ? ' active' : ''}`}
-                        onClick={() => scrollToSlide(i)}
-                        aria-label={`Image ${i + 1}`}
-                      />
-                    ))}
-                  </div>
                 </>
+              )}
+              </div>
+              {allImages.length > 1 && (
+                <div className="pdp-carousel-dots">
+                  {allImages.map((img, i) => (
+                    <button
+                      key={img.id}
+                      className={`pdp-carousel-dot${carouselIndex === i ? ' active' : ''}`}
+                      onClick={() => scrollToSlide(i)}
+                      aria-label={`Image ${i + 1}`}
+                    />
+                  ))}
+                </div>
               )}
             </div>
 
@@ -254,7 +252,7 @@ export default function Product() {
                 <span className="pdp-rating-stars">★★★★★</span>
                 <span>4.9 / 5</span>
                 <span className="pdp-rating-sep">·</span>
-                <a href="#reviews" className="pdp-rating-link">128 reviews</a>
+                <a href="#reviews" className="pdp-rating-link">See reviews</a>
                 {viewingCount !== null && (
                   <>
                     <span className="pdp-rating-sep">·</span>
@@ -386,49 +384,7 @@ export default function Product() {
             </div>
           </div>
 
-          {/* Reviews */}
-          <div className="pdp-reviews" id="reviews">
-            <div className="rhead">
-              <div className="ey">128 owner reviews</div>
-              <h2>From the people<br />who sit in it daily.</h2>
-            </div>
-            <div className="rev-top">
-              <div className="rev-score">
-                <div className="rev-score-left">
-                  <div className="big">4.9</div>
-                  <div className="stars">★★★★★</div>
-                  <div className="count">Based on 128 verified reviews</div>
-                </div>
-                <div className="rev-bars">
-                  {REVIEW_BREAKDOWN.map((review) => (
-                    <div key={review.label} className="rev-bar">
-                      <span className="lab">{review.label}</span>
-                      <span className="track"><span className={`fill ${review.barClassName}`} /></span>
-                      <span>{review.count}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-            <div className="rev-list">
-              {[
-                {stars: '★★★★★', headline: 'Sits low, sits long.', body: 'We bought a pair for the sitting room. Two winters in and the walnut has darkened to something honestly better than the catalogue photos.', who: 'Eleanor M.', when: 'Verified · Sept 2025'},
-                {stars: '★★★★★', headline: 'The joints are obvious.', body: "You can see the draw-bore pegs from underneath. That's a level of 'look at how I'm made' that I really respect in a chair.", who: 'Daniel R.', when: 'Verified · July 2025'},
-                {stars: '★★★★★', headline: 'White-glove was worth it.', body: 'Two chaps brought it in, placed it where I asked, took the wrapping back with them. No flat-pack guilt.', who: 'Priya K.', when: 'Verified · May 2025'},
-                {stars: '★★★★☆', headline: 'Bouclé sheds for a week.', body: 'Lovely chair, but the natural bouclé does shed for the first week — worth knowing if you have a dark rug. Settled completely after.', who: 'Mark T.', when: 'Verified · March 2025'},
-              ].map((r) => (
-                <div key={r.who} className="rev-card">
-                  <div className="stars">{r.stars}</div>
-                  <span className="headline">{r.headline}</span>
-                  <div className="body">{r.body}</div>
-                  <div className="who">
-                    <strong>{r.who}</strong>
-                    <span>{r.when}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+
 
           {/* Specs */}
             <div className="pdp-specs">
@@ -466,40 +422,30 @@ export default function Product() {
             </div>
           </div>
 
-          {/* Related */}
-          {recommendations.length > 0 && (
-            <div className="pdp-related">
-              <div className="related-head">
-                <div>
-                  <div className="ey">You may also like</div>
-                  <h2>Recommended for you.</h2>
-                </div>
-                <Link to="/collections/all">
-                  Browse all pieces <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                </Link>
-              </div>
-              <div className="pgrid">
-                {recommendations.map((rec) => (
-                  <Link key={rec.id} to={`/products/${rec.handle}`} className="pcard">
-                    <div className="pcard-img">
-                      {rec.images.nodes[0] && (
-                        <img src={rec.images.nodes[0].url} alt={rec.images.nodes[0].altText || rec.title} width={rec.images.nodes[0].width || 400} height={rec.images.nodes[0].height || 400} loading="lazy" />
-                      )}
-                    </div>
-                    <div className="pcard-body">
-                      <div className="pname">{rec.title}</div>
-                      <div className="pdp-price-big pdp-related-price">
-                        {rec.priceRange.minVariantPrice.currencyCode === 'GBP' ? '£' : rec.priceRange.minVariantPrice.currencyCode}
-                        {parseFloat(rec.priceRange.minVariantPrice.amount).toLocaleString('en-US', {minimumFractionDigits: 2})}
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </section>
+
+      <ReviewsSection />
+
+      {/* Related */}
+      {recommendations.length > 0 && (
+        <div className="pdp-related">
+          <div className="related-head">
+            <div>
+              <div className="ey">You may also like</div>
+              <h2>Recommended for you.</h2>
+            </div>
+            <Link to="/collections/all">
+              Browse all pieces <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </Link>
+          </div>
+          <div className="pgrid">
+            {recommendations.map((rec) => (
+              <ProductItem key={rec.id} product={rec as any} loading="lazy" />
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className={`pdp-sticky-bar${showSticky ? ' visible' : ''}`} aria-hidden={!showSticky}>
         <div className="pdp-sticky-inner">
@@ -521,7 +467,6 @@ export default function Product() {
         </div>
       </div>
 
-      <ReviewsSection />
 
       <Analytics.ProductView
         data={{
@@ -622,6 +567,9 @@ const PRODUCT_FRAGMENT = `#graphql
         height
       }
     }
+    metafield(namespace: "reviews", key: "product_reviews") {
+      value
+    }
     seo {
       description
       title
@@ -637,12 +585,13 @@ const PRODUCT_RECOMMENDATIONS_QUERY = `#graphql
       id
       title
       handle
+      options { name }
+      featuredImage { id altText url width height }
       priceRange {
         minVariantPrice { amount currencyCode }
+        maxVariantPrice { amount currencyCode }
       }
-      images(first: 1) {
-        nodes { url altText width height }
-      }
+      metafield(namespace: "reviews", key: "product_reviews") { value }
     }
   }
 ` as const;

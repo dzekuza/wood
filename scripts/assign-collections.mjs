@@ -1,5 +1,6 @@
 const SHOP = 'wood-123252.myshopify.com';
-const TOKEN = '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';
+const TOKEN = process.env.SHOPIFY_ADMIN_TOKEN;
+if (!TOKEN) throw new Error('SHOPIFY_ADMIN_TOKEN env var is required');
 const API = `https://${SHOP}/admin/api/2024-01/graphql.json`;
 
 const COLLECTIONS = {

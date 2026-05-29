@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState, useRef} from 'react';
 import {useNavigate, useSearchParams} from 'react-router';
 
 export const SORT_OPTIONS = [
@@ -11,10 +11,23 @@ export type SortValue = (typeof SORT_OPTIONS)[number]['value'];
 
 export function SortDropdown({current}: {current: SortValue}) {
   const [open, setOpen] = useState(false);
+  const [dropdownPos, setDropdownPos] = useState<{top: number; right: number} | null>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   const currentLabel = SORT_OPTIONS.find((o) => o.value === current)?.label ?? 'Newest First';
+
+  function toggle() {
+    if (!open && btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect();
+      setDropdownPos({
+        top: rect.bottom + 6,
+        right: window.innerWidth - rect.right,
+      });
+    }
+    setOpen((o) => !o);
+  }
 
   function select(value: SortValue) {
     const params = new URLSearchParams(searchParams);
@@ -29,7 +42,7 @@ export function SortDropdown({current}: {current: SortValue}) {
       {open && (
         <div className="sort-backdrop" onClick={() => setOpen(false)} />
       )}
-      <button type="button" className="sort-btn" onClick={() => setOpen((o) => !o)}>
+      <button ref={btnRef} type="button" className="sort-btn" onClick={toggle}>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--cwf-accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M3 9l4-4 4 4"/><path d="M7 5v14"/>
           <path d="M21 15l-4 4-4-4"/><path d="M17 19V5"/>
@@ -39,8 +52,11 @@ export function SortDropdown({current}: {current: SortValue}) {
           <polyline points="6 9 12 15 18 9"/>
         </svg>
       </button>
-      {open && (
-        <div className="sort-dropdown">
+      {open && dropdownPos && (
+        <div
+          className="sort-dropdown"
+          style={{position: 'fixed', top: dropdownPos.top, right: dropdownPos.right, left: 'auto'}}
+        >
           {SORT_OPTIONS.map((opt) => (
             <button
               key={opt.value}

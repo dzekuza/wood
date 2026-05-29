@@ -86,10 +86,6 @@ export default function AllProducts() {
             ))}
           </div>
           <div className="filter-bar-meta">
-            <button className="filter-mobile-btn" onClick={() => setMobileFiltersOpen(true)}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="12" y1="18" x2="20" y2="18"/></svg>
-              Filters
-            </button>
             <SortDropdown current={sortParam} />
           </div>
         </div>
@@ -175,6 +171,9 @@ const COLLECTION_ITEM_FRAGMENT = `#graphql
     priceRange {
       minVariantPrice { ...MoneyCollectionItem }
       maxVariantPrice { ...MoneyCollectionItem }
+    }
+    metafield(namespace: "reviews", key: "product_reviews") {
+      value
     }
   }
 ` as const;

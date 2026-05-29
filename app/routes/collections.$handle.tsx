@@ -113,7 +113,7 @@ export default function Collection() {
         <div className="filter-bar-row">
           <div className="filter-chips">
             <NavLink
-              to="/collections"
+              to="/collections/all"
               className="filter-chip"
               end
             >
@@ -193,6 +193,9 @@ const PRODUCT_ITEM_FRAGMENT = `#graphql
       maxVariantPrice {
         ...MoneyProductItem
       }
+    }
+    metafield(namespace: "reviews", key: "product_reviews") {
+      value
     }
   }
 ` as const;

@@ -1,6 +1,7 @@
 import {useState, useEffect, useCallback} from 'react';
 
 const STORAGE_KEY = 'cwf_favourites';
+const SYNC_EVENT = 'cwf:favourites';
 
 export type FavouriteProduct = {
   id: string;
@@ -23,6 +24,7 @@ function readStorage(): FavouriteProduct[] {
 function writeStorage(items: FavouriteProduct[]): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    window.dispatchEvent(new CustomEvent(SYNC_EVENT));
   } catch {
     return;
   }
@@ -33,6 +35,9 @@ export function useFavourites() {
 
   useEffect(() => {
     setFavourites(readStorage());
+    const sync = () => setFavourites(readStorage());
+    window.addEventListener(SYNC_EVENT, sync);
+    return () => window.removeEventListener(SYNC_EVENT, sync);
   }, []);
 
   const isFavourite = useCallback(

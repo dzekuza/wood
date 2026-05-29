@@ -42,6 +42,17 @@ export function ProductItem({
   const {isFavourite, toggleFavourite} = useFavourites();
   const saved = isFavourite(product.id);
 
+  const reviewsRaw = (product as {metafield?: {value: string} | null}).metafield?.value;
+  const reviewStats = (() => {
+    if (!reviewsRaw) return null;
+    try {
+      const reviews = JSON.parse(reviewsRaw) as {rating: number}[];
+      if (!reviews.length) return null;
+      const avg = reviews.reduce((s, r) => s + r.rating, 0) / reviews.length;
+      return {avg: avg.toFixed(1), count: reviews.length};
+    } catch { return null; }
+  })();
+
   return (
     <Link className="pcard" key={product.id} prefetch="intent" to={variantUrl}>
       <div className="pcard-img">
@@ -52,6 +63,13 @@ export function ProductItem({
             loading={loading}
             sizes="(min-width: 45em) 400px, 100vw"
           />
+        )}
+        {reviewStats && (
+          <div className="pcard-rating">
+            <span className="pcard-rating-star">★</span>
+            <span className="pcard-rating-avg">{reviewStats.avg}</span>
+            <span className="pcard-rating-count">({reviewStats.count})</span>
+          </div>
         )}
         <button
           className={`pcard-heart${saved ? ' saved' : ''}`}
