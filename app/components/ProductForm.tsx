@@ -41,10 +41,19 @@ export function ProductForm({
   return (
     <div className="product-form">
       {productOptions.map((option) => {
-        // If there is only a single value in the option values, don't display the option
-        if (option.optionValues.length === 1) return null;
-
         const selectedValue = option.optionValues.find((v) => v.selected);
+
+        // Single-value option: show as read-only info label, not interactive
+        if (option.optionValues.length === 1) {
+          return (
+            <div className="product-opts" key={option.name}>
+              <div className="product-opt-label">
+                {option.name}
+                <span className="product-opt-picked">{option.optionValues[0].name}</span>
+              </div>
+            </div>
+          );
+        }
 
         return (
           <div className="product-opts" key={option.name}>
