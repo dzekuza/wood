@@ -9,6 +9,7 @@ import type {
 } from 'storefrontapi.generated';
 import {MockShopNotice} from '~/components/MockShopNotice';
 import {ReviewsSection} from '~/components/ReviewsSection';
+import {HOMEPAGE_REVIEWS} from '~/lib/reviews';
 import {ProductItem} from '~/components/ProductItem';
 import {
   isValidNewsletterEmail,
@@ -120,7 +121,7 @@ export default function Homepage() {
       <ProductsSection products={data.featuredProducts} />
       <CraftSection />
       <FeaturesBar />
-      <ReviewsSection />
+      <ReviewsSection reviews={HOMEPAGE_REVIEWS} />
       <ArticlesSection articles={data.featuredArticles} />
       <NewsletterSection />
     </div>

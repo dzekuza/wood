@@ -1,6 +1,46 @@
 import {REVIEWS} from '~/lib/reviews';
 
-function ReviewCard({r}: {r: (typeof REVIEWS)[number]}) {
+export type ProductReview = {
+  author: string;
+  rating: number;
+  body: string;
+  created_at: string;
+  images?: string[];
+  product?: string;
+};
+
+function StarRow({rating}: {rating: number}) {
+  return (
+    <div className="stars">{'★'.repeat(rating)}{'☆'.repeat(5 - rating)}</div>
+  );
+}
+
+function ProductReviewCard({review}: {review: ProductReview}) {
+  return (
+    <div className="tcard">
+      <StarRow rating={review.rating} />
+      <q>{review.body}</q>
+      {review.images && review.images.length > 0 && (
+        <div className="rev-images">
+          {review.images.slice(0, 4).map((src, i) => (
+            <a key={i} href={src} target="_blank" rel="noopener noreferrer">
+              <img src={src} alt={`Review photo ${i + 1}`} className="rev-img-thumb" loading="lazy" />
+            </a>
+          ))}
+        </div>
+      )}
+      <div className="who">
+        <span className="av" />
+        <div>
+          <div className="nm">{review.author}</div>
+          <div className="rl">{review.product || review.created_at}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StaticReviewCard({r}: {r: (typeof REVIEWS)[number]}) {
   return (
     <div className="tcard rev-marquee-card" aria-hidden="true">
       <div className="stars">{r.stars}</div>
@@ -16,7 +56,35 @@ function ReviewCard({r}: {r: (typeof REVIEWS)[number]}) {
   );
 }
 
-export function ReviewsSection() {
+export function ReviewsSection({reviews}: {reviews?: ProductReview[]}) {
+  // PDP mode — real product reviews from metafield
+  if (reviews && reviews.length > 0) {
+    const totalReviews = reviews.length;
+    const avgRating = (reviews.reduce((s, r) => s + r.rating, 0) / totalReviews).toFixed(1);
+    return (
+      <section id="reviews" className="section-linen-cont">
+        <div className="cwf-wrap">
+          <div className="shead">
+            <div>
+              <div className="eyebrow">Verified Etsy reviews</div>
+              <h2 className="title">What our customers say</h2>
+            </div>
+            <div className="right">
+              <div className="tgrid-rating">★★★★★</div>
+              <span className="tgrid-count">{avgRating} · {totalReviews} reviews</span>
+            </div>
+          </div>
+          <div className="tgrid">
+            {reviews.map((r, i) => (
+              <ProductReviewCard key={i} review={r} />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Homepage / fallback — static marquee
   const useMarquee = REVIEWS.length >= 6;
   const mid = Math.ceil(REVIEWS.length / 2);
   const topRow = REVIEWS.slice(0, mid);
@@ -42,15 +110,15 @@ export function ReviewsSection() {
           {/* Row 1 — slides left */}
           <div className="rev-marquee-wrap">
             <div className="rev-marquee-track rev-marquee-left">
-              {topRow.map((r) => <ReviewCard key={r.name + r.product} r={r} />)}
-              {topRow.map((r) => <ReviewCard key={'b-' + r.name + r.product} r={r} />)}
+              {topRow.map((r) => <StaticReviewCard key={r.name + r.product} r={r} />)}
+              {topRow.map((r) => <StaticReviewCard key={'b-' + r.name + r.product} r={r} />)}
             </div>
           </div>
           {/* Row 2 — slides right */}
           <div className="rev-marquee-wrap">
             <div className="rev-marquee-track rev-marquee-right">
-              {bottomRow.map((r) => <ReviewCard key={r.name + r.product} r={r} />)}
-              {bottomRow.map((r) => <ReviewCard key={'b-' + r.name + r.product} r={r} />)}
+              {bottomRow.map((r) => <StaticReviewCard key={r.name + r.product} r={r} />)}
+              {bottomRow.map((r) => <StaticReviewCard key={'b-' + r.name + r.product} r={r} />)}
             </div>
           </div>
         </div>

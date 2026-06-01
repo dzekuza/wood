@@ -17,7 +17,7 @@ import {useAside} from '~/components/Aside';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {SITE_NAME} from '~/lib/site';
 import {ProductItem} from '~/components/ProductItem';
-import {ReviewsSection} from '~/components/ReviewsSection';
+import {ReviewsSection, type ProductReview} from '~/components/ReviewsSection';
 
 export const meta: Route.MetaFunction = ({data}) => {
   return [
@@ -90,6 +90,14 @@ function loadDeferredData({context, params}: Route.LoaderArgs) {
 
 export default function Product() {
   const {product, recommendations} = useLoaderData<typeof loader>();
+
+  const productReviews: ProductReview[] = (() => {
+    try {
+      return JSON.parse(product.metafield?.value ?? '[]') as ProductReview[];
+    } catch {
+      return [];
+    }
+  })();
 
   // Optimistically selects a variant with given available variant information
   const selectedVariant = useOptimisticVariant(
@@ -425,7 +433,7 @@ export default function Product() {
         </div>
       </section>
 
-      <ReviewsSection />
+      <ReviewsSection reviews={productReviews.length > 0 ? productReviews : undefined} />
 
       {/* Related */}
       {recommendations.length > 0 && (
