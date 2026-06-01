@@ -9,7 +9,7 @@ export const HOMEPAGE_REVIEWS: ProductReview[] = [
     created_at: 'May 2026',
     product: 'Floating Oak Shelf',
     images: [
-      'https://i.etsystatic.com/iap/be53cd/7996301110/iap_640x640.7996301110_rzcqibux.jpg',
+      '/review-images/r01.jpg',
     ],
   },
   {
@@ -19,8 +19,8 @@ export const HOMEPAGE_REVIEWS: ProductReview[] = [
     created_at: 'May 2026',
     product: 'Floating Oak Shelf',
     images: [
-      'https://i.etsystatic.com/iap/ae1314/8044232149/iap_640x640.8044232149_s3jmmbh6.jpg',
-      'https://i.etsystatic.com/iap/0b4bcc/7756232501/iap_640x640.7756232501_np3i6dtg.jpg',
+      '/review-images/r02.jpg',
+      '/review-images/r03.jpg',
     ],
   },
   {
@@ -30,8 +30,8 @@ export const HOMEPAGE_REVIEWS: ProductReview[] = [
     created_at: 'Apr 2026',
     product: 'Oak Coat Rack with Shelf',
     images: [
-      'https://i.etsystatic.com/iap/fd704d/6579906614/iap_640x640.6579906614_9a5nxrev.jpg',
-      'https://i.etsystatic.com/iap/9d8d97/6966054298/iap_640x640.6966054298_nikp8rd9.jpg',
+      '/review-images/r04.jpg',
+      '/review-images/r05.jpg',
     ],
   },
   {
@@ -41,7 +41,7 @@ export const HOMEPAGE_REVIEWS: ProductReview[] = [
     created_at: 'May 2026',
     product: 'Oak Fireplace Beam Mantel',
     images: [
-      'https://i.etsystatic.com/iap/78d6b3/8031910096/iap_640x640.8031910096_orv6zp9e.jpg',
+      '/review-images/r06.jpg',
     ],
   },
   {
@@ -51,7 +51,7 @@ export const HOMEPAGE_REVIEWS: ProductReview[] = [
     created_at: 'May 2026',
     product: 'Oak Fireplace Beam Mantel',
     images: [
-      'https://i.etsystatic.com/iap/b58058/7994053728/iap_640x640.7994053728_ee2qw21f.jpg',
+      '/review-images/r07.jpg',
     ],
   },
   {
@@ -61,8 +61,8 @@ export const HOMEPAGE_REVIEWS: ProductReview[] = [
     created_at: 'Apr 2026',
     product: 'Oak Fireplace Beam Mantel',
     images: [
-      'https://i.etsystatic.com/iap/7a1aba/7251809270/iap_640x640.7251809270_8jw866z8.jpg',
-      'https://i.etsystatic.com/iap/7c948f/6708420677/iap_640x640.6708420677_cptnk330.jpg',
+      '/review-images/r08.jpg',
+      '/review-images/r09.jpg',
     ],
   },
   {
@@ -72,7 +72,7 @@ export const HOMEPAGE_REVIEWS: ProductReview[] = [
     created_at: 'Mar 2026',
     product: 'Oak Mantle Beam',
     images: [
-      'https://i.etsystatic.com/iap/d2894f/7850078199/iap_640x640.7850078199_9zfd8mz4.jpg',
+      '/review-images/r10.jpg',
     ],
   },
   {
@@ -82,7 +82,6 @@ export const HOMEPAGE_REVIEWS: ProductReview[] = [
     created_at: 'Mar 2026',
     product: 'Oak Mantle Beam',
     images: [
-      'https://i.etsystatic.com/iap/02b7b2/7820148793/iap_640x640.7820148793_mz1tdpzj.jpg',
     ],
   },
   {
@@ -92,8 +91,8 @@ export const HOMEPAGE_REVIEWS: ProductReview[] = [
     created_at: 'Feb 2026',
     product: 'Oak Mantle Beam',
     images: [
-      'https://i.etsystatic.com/iap/05f5e7/7745961078/iap_640x640.7745961078_rs7pp2p2.jpg',
-      'https://i.etsystatic.com/iap/b470da/7650790970/iap_640x640.7650790970_o1pzfbq5.jpg',
+      '/review-images/r12.jpg',
+      '/review-images/r13.jpg',
     ],
   },
   {
@@ -103,7 +102,7 @@ export const HOMEPAGE_REVIEWS: ProductReview[] = [
     created_at: 'May 2026',
     product: 'Oak Coat Rack with Shelf',
     images: [
-      'https://i.etsystatic.com/iap/fbcfc1/8012023478/iap_640x640.8012023478_kfia0059.jpg',
+      '/review-images/r14.jpg',
     ],
   },
   {
@@ -113,8 +112,8 @@ export const HOMEPAGE_REVIEWS: ProductReview[] = [
     created_at: 'Apr 2026',
     product: 'Oak Coat Rack with Shelf',
     images: [
-      'https://i.etsystatic.com/iap/fd8bed/7577720216/iap_640x640.7577720216_fip8cizv.jpg',
-      'https://i.etsystatic.com/iap/1610e5/7947525037/iap_640x640.7947525037_l5wbqzf4.jpg',
+      '/review-images/r15.jpg',
+      '/review-images/r16.jpg',
     ],
   },
   {
@@ -124,8 +123,8 @@ export const HOMEPAGE_REVIEWS: ProductReview[] = [
     created_at: 'Nov 2024',
     product: 'Oak Mantle Beam',
     images: [
-      'https://i.etsystatic.com/iap/97562c/6393643291/iap_640x640.6393643291_84imb0sk.jpg',
-      'https://i.etsystatic.com/iap/a01879/5640425967/iap_640x640.5640425967_2n2ueow4.jpg',
+      '/review-images/r17.jpg',
+      '/review-images/r18.jpg',
     ],
   },
   {
@@ -135,8 +134,8 @@ export const HOMEPAGE_REVIEWS: ProductReview[] = [
     created_at: 'May 2024',
     product: 'Oak Coat Rack Shelf',
     images: [
-      'https://i.etsystatic.com/iap/e34826/6020904321/iap_640x640.6020904321_kjvyvbpa.jpg',
-      'https://i.etsystatic.com/iap/42f621/6338267211/iap_640x640.6338267211_bmrr1g37.jpg',
+      '/review-images/r19.jpg',
+      '/review-images/r20.jpg',
     ],
   },
   {
@@ -146,8 +145,6 @@ export const HOMEPAGE_REVIEWS: ProductReview[] = [
     created_at: 'Nov 2024',
     product: 'Rustic Mantle Beam',
     images: [
-      'https://i.etsystatic.com/iap/be3f10/6387011038/iap_640x640.6387011038_n7ojz7ue.jpg',
-      'https://i.etsystatic.com/iap/bce7b5/6527461975/iap_640x640.6527461975_lhblf8g5.jpg',
     ],
   },
   {
@@ -157,8 +154,7 @@ export const HOMEPAGE_REVIEWS: ProductReview[] = [
     created_at: 'Jan 2025',
     product: 'Rustic Mantle Beam',
     images: [
-      'https://i.etsystatic.com/iap/7a34b8/5656502403/iap_640x640.7a34b8_7o8xcwkc.jpg',
-      'https://i.etsystatic.com/iap/ca69d4/6498164704/iap_640x640.6498164704_r58oo9fg.jpg',
+      '/review-images/r24.jpg',
     ],
   },
   {
@@ -168,7 +164,7 @@ export const HOMEPAGE_REVIEWS: ProductReview[] = [
     created_at: 'Oct 2024',
     product: 'Oak Mantel Beam with Corbels',
     images: [
-      'https://i.etsystatic.com/iap/ad0140/6377160602/iap_640x640.6377160602_kryupnmg.jpg',
+      '/review-images/r25.jpg',
     ],
   },
   {
@@ -178,7 +174,7 @@ export const HOMEPAGE_REVIEWS: ProductReview[] = [
     created_at: 'Oct 2024',
     product: 'Oak Mantel Beam with Corbels',
     images: [
-      'https://i.etsystatic.com/iap/ad0140/6377160602/iap_640x640.6377160602_kryupnmg.jpg',
+      '/review-images/r25.jpg',
     ],
   },
 ];
