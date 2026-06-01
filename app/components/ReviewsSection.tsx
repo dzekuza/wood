@@ -1,4 +1,5 @@
 import {useState, useEffect, useCallback} from 'react';
+import {Link} from 'react-router';
 import {REVIEWS} from '~/lib/reviews';
 
 export type ProductReview = {
@@ -8,6 +9,7 @@ export type ProductReview = {
   created_at: string;
   images?: string[];
   product?: string;
+  productHandle?: string;
 };
 
 function StarRow({rating}: {rating: number}) {
@@ -61,7 +63,12 @@ function ProductReviewCard({review}: {review: ProductReview}) {
         <span className="av" />
         <div>
           <div className="nm">{review.author}</div>
-          <div className="rl">{review.product || review.created_at}</div>
+          <div className="rl">
+            {review.productHandle
+              ? <Link to={`/products/${review.productHandle}`} className="rev-product-link">{review.product || review.created_at}</Link>
+              : (review.product || review.created_at)
+            }
+          </div>
         </div>
       </div>
       {lightboxSrc && <ImageLightbox src={lightboxSrc} onClose={close} />}
