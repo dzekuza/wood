@@ -2819,8 +2819,8 @@ section { padding: 0; }
 .rev-marquee-section { display: flex; flex-direction: column; gap: 14px; overflow: hidden; margin-top: 40px; padding-bottom: 4px; }
 .rev-marquee-wrap { overflow: hidden; width: 100%; }
 .rev-marquee-track { display: flex; gap: 14px; width: max-content; will-change: transform; }
-.rev-marquee-left  { animation: marquee-left  32s linear infinite; }
-.rev-marquee-right { animation: marquee-right 32s linear infinite; }
+.rev-marquee-left  { animation: marquee-left  45s linear infinite; }
+.rev-marquee-right { animation: marquee-right 45s linear infinite; }
 .rev-marquee-wrap:hover .rev-marquee-track { animation-play-state: paused; }
 .rev-marquee-card { width: 380px; flex-shrink: 0; }
 @media (max-width: 767px) { .rev-marquee-card { width: 280px; } }

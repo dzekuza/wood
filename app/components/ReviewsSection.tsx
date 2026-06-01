@@ -20,7 +20,9 @@ function StarRow({rating}: {rating: number}) {
 
 function ImageLightbox({src, onClose}: {src: string; onClose: () => void}) {
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
     document.addEventListener('keydown', onKey);
     document.body.style.overflow = 'hidden';
     return () => {
@@ -30,8 +32,19 @@ function ImageLightbox({src, onClose}: {src: string; onClose: () => void}) {
   }, [onClose]);
 
   return (
-    <div className="rev-lightbox-backdrop" onClick={onClose} role="dialog" aria-modal="true">
-      <button className="rev-lightbox-close" onClick={onClose} aria-label="Close image">✕</button>
+    <div
+      className="rev-lightbox-backdrop"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+    >
+      <button
+        className="rev-lightbox-close"
+        onClick={onClose}
+        aria-label="Close image"
+      >
+        ✕
+      </button>
       <img
         src={src}
         alt="Review photo"
@@ -42,19 +55,30 @@ function ImageLightbox({src, onClose}: {src: string; onClose: () => void}) {
   );
 }
 
-function ProductReviewCard({review}: {review: ProductReview}) {
+function ProductReviewCard({review, ariaHidden}: {review: ProductReview; ariaHidden?: boolean}) {
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
   const close = useCallback(() => setLightboxSrc(null), []);
 
   return (
-    <div className="tcard">
+    <div className="tcard rev-marquee-card" aria-hidden={ariaHidden || undefined}>
       <StarRow rating={review.rating} />
       <q>{review.body}</q>
       {review.images && review.images.length > 0 && (
         <div className="rev-images">
           {review.images.slice(0, 4).map((src, i) => (
-            <button key={i} className="rev-img-btn" onClick={() => setLightboxSrc(src)} aria-label={`View review photo ${i + 1}`}>
-              <img src={src} alt={`Review photo ${i + 1}`} className="rev-img-thumb" loading="lazy" />
+            <button
+              key={i}
+              className="rev-img-btn"
+              onClick={() => !ariaHidden && setLightboxSrc(src)}
+              tabIndex={ariaHidden ? -1 : 0}
+              aria-label={`View review photo ${i + 1}`}
+            >
+              <img
+                src={src}
+                alt={`Review photo ${i + 1}`}
+                className="rev-img-thumb"
+                loading="lazy"
+              />
             </button>
           ))}
         </div>
@@ -64,21 +88,30 @@ function ProductReviewCard({review}: {review: ProductReview}) {
         <div>
           <div className="nm">{review.author}</div>
           <div className="rl">
-            {review.productHandle
-              ? <Link to={`/products/${review.productHandle}`} className="rev-product-link">{review.product || review.created_at}</Link>
-              : (review.product || review.created_at)
-            }
+            {review.productHandle ? (
+              <Link
+                to={`/products/${review.productHandle}`}
+                className="rev-product-link"
+                tabIndex={ariaHidden ? -1 : 0}
+              >
+                {review.product || review.created_at}
+              </Link>
+            ) : (
+              review.product || review.created_at
+            )}
           </div>
         </div>
       </div>
-      {lightboxSrc && <ImageLightbox src={lightboxSrc} onClose={close} />}
+      {lightboxSrc && !ariaHidden && (
+        <ImageLightbox src={lightboxSrc} onClose={close} />
+      )}
     </div>
   );
 }
 
-function StaticReviewCard({r}: {r: (typeof REVIEWS)[number]}) {
+function StaticReviewCard({r, ariaHidden}: {r: (typeof REVIEWS)[number]; ariaHidden?: boolean}) {
   return (
-    <div className="tcard rev-marquee-card" aria-hidden="true">
+    <div className="tcard rev-marquee-card" aria-hidden={ariaHidden || undefined}>
       <div className="stars">{r.stars}</div>
       <q>{r.quote}</q>
       <div className="who">
@@ -93,10 +126,24 @@ function StaticReviewCard({r}: {r: (typeof REVIEWS)[number]}) {
 }
 
 export function ReviewsSection({reviews}: {reviews?: ProductReview[]}) {
-  // PDP mode — real product reviews from metafield
-  if (reviews && reviews.length > 0) {
-    const totalReviews = reviews.length;
-    const avgRating = (reviews.reduce((s, r) => s + r.rating, 0) / totalReviews).toFixed(1);
+  const source = reviews && reviews.length > 0 ? reviews : null;
+
+  // Ensure enough cards to fill the marquee by duplicating if needed
+  const ensureFull = (arr: ProductReview[], min = 6): ProductReview[] => {
+    if (arr.length >= min) return arr;
+    const result = [...arr];
+    while (result.length < min) result.push(...arr);
+    return result;
+  };
+
+  if (source) {
+    const full = ensureFull(source);
+    const mid = Math.ceil(full.length / 2);
+    const topRow = full.slice(0, mid);
+    const bottomRow = full.slice(mid).length >= 3 ? full.slice(mid) : full.slice(0, mid);
+
+    const avgRating = (source.reduce((s, r) => s + r.rating, 0) / source.length).toFixed(1);
+
     return (
       <section id="reviews" className="section-linen-cont">
         <div className="cwf-wrap">
@@ -107,21 +154,42 @@ export function ReviewsSection({reviews}: {reviews?: ProductReview[]}) {
             </div>
             <div className="right">
               <div className="tgrid-rating">★★★★★</div>
-              <span className="tgrid-count">{avgRating} · {totalReviews} reviews</span>
+              <span className="tgrid-count">
+                {avgRating} · {source.length} reviews
+              </span>
             </div>
           </div>
-          <div className="tgrid">
-            {reviews.map((r, i) => (
-              <ProductReviewCard key={i} review={r} />
-            ))}
+        </div>
+
+        <div className="rev-marquee-section">
+          {/* Row 1 — slides left */}
+          <div className="rev-marquee-wrap">
+            <div className="rev-marquee-track rev-marquee-left">
+              {topRow.map((r, i) => (
+                <ProductReviewCard key={`t-${i}`} review={r} />
+              ))}
+              {topRow.map((r, i) => (
+                <ProductReviewCard key={`td-${i}`} review={r} ariaHidden />
+              ))}
+            </div>
+          </div>
+          {/* Row 2 — slides right */}
+          <div className="rev-marquee-wrap">
+            <div className="rev-marquee-track rev-marquee-right">
+              {bottomRow.map((r, i) => (
+                <ProductReviewCard key={`b-${i}`} review={r} />
+              ))}
+              {bottomRow.map((r, i) => (
+                <ProductReviewCard key={`bd-${i}`} review={r} ariaHidden />
+              ))}
+            </div>
           </div>
         </div>
       </section>
     );
   }
 
-  // Homepage / fallback — static marquee
-  const useMarquee = REVIEWS.length >= 6;
+  // Fallback — static REVIEWS marquee (no real reviews available)
   const mid = Math.ceil(REVIEWS.length / 2);
   const topRow = REVIEWS.slice(0, mid);
   const bottomRow = REVIEWS.slice(mid);
@@ -141,42 +209,28 @@ export function ReviewsSection({reviews}: {reviews?: ProductReview[]}) {
         </div>
       </div>
 
-      {useMarquee ? (
-        <div className="rev-marquee-section">
-          {/* Row 1 — slides left */}
-          <div className="rev-marquee-wrap">
-            <div className="rev-marquee-track rev-marquee-left">
-              {topRow.map((r) => <StaticReviewCard key={r.name + r.product} r={r} />)}
-              {topRow.map((r) => <StaticReviewCard key={'b-' + r.name + r.product} r={r} />)}
-            </div>
-          </div>
-          {/* Row 2 — slides right */}
-          <div className="rev-marquee-wrap">
-            <div className="rev-marquee-track rev-marquee-right">
-              {bottomRow.map((r) => <StaticReviewCard key={r.name + r.product} r={r} />)}
-              {bottomRow.map((r) => <StaticReviewCard key={'b-' + r.name + r.product} r={r} />)}
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="cwf-wrap">
-          <div className="tgrid">
-            {REVIEWS.map((r) => (
-              <div key={r.name + r.product} className="tcard">
-                <div className="stars">{r.stars}</div>
-                <q>{r.quote}</q>
-                <div className="who">
-                  <span className="av" />
-                  <div>
-                    <div className="nm">{r.name}</div>
-                    <div className="rl">{r.product}</div>
-                  </div>
-                </div>
-              </div>
+      <div className="rev-marquee-section">
+        <div className="rev-marquee-wrap">
+          <div className="rev-marquee-track rev-marquee-left">
+            {topRow.map((r) => (
+              <StaticReviewCard key={r.name + r.product} r={r} />
+            ))}
+            {topRow.map((r) => (
+              <StaticReviewCard key={'d-' + r.name + r.product} r={r} ariaHidden />
             ))}
           </div>
         </div>
-      )}
+        <div className="rev-marquee-wrap">
+          <div className="rev-marquee-track rev-marquee-right">
+            {bottomRow.map((r) => (
+              <StaticReviewCard key={r.name + r.product} r={r} />
+            ))}
+            {bottomRow.map((r) => (
+              <StaticReviewCard key={'d-' + r.name + r.product} r={r} ariaHidden />
+            ))}
+          </div>
+        </div>
+      </div>
     </section>
   );
 }
