@@ -1,3 +1,4 @@
+import {useState, useEffect, useCallback} from 'react';
 import {REVIEWS} from '~/lib/reviews';
 
 export type ProductReview = {
@@ -15,7 +16,34 @@ function StarRow({rating}: {rating: number}) {
   );
 }
 
+function ImageLightbox({src, onClose}: {src: string; onClose: () => void}) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = '';
+    };
+  }, [onClose]);
+
+  return (
+    <div className="rev-lightbox-backdrop" onClick={onClose} role="dialog" aria-modal="true">
+      <button className="rev-lightbox-close" onClick={onClose} aria-label="Close image">✕</button>
+      <img
+        src={src}
+        alt="Review photo"
+        className="rev-lightbox-img"
+        onClick={(e) => e.stopPropagation()}
+      />
+    </div>
+  );
+}
+
 function ProductReviewCard({review}: {review: ProductReview}) {
+  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
+  const close = useCallback(() => setLightboxSrc(null), []);
+
   return (
     <div className="tcard">
       <StarRow rating={review.rating} />
@@ -23,9 +51,9 @@ function ProductReviewCard({review}: {review: ProductReview}) {
       {review.images && review.images.length > 0 && (
         <div className="rev-images">
           {review.images.slice(0, 4).map((src, i) => (
-            <a key={i} href={src} target="_blank" rel="noopener noreferrer">
+            <button key={i} className="rev-img-btn" onClick={() => setLightboxSrc(src)} aria-label={`View review photo ${i + 1}`}>
               <img src={src} alt={`Review photo ${i + 1}`} className="rev-img-thumb" loading="lazy" />
-            </a>
+            </button>
           ))}
         </div>
       )}
@@ -36,6 +64,7 @@ function ProductReviewCard({review}: {review: ProductReview}) {
           <div className="rl">{review.product || review.created_at}</div>
         </div>
       </div>
+      {lightboxSrc && <ImageLightbox src={lightboxSrc} onClose={close} />}
     </div>
   );
 }
