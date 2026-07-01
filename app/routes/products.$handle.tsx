@@ -52,10 +52,13 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
     throw new Error('Expected product handle to be defined');
   }
 
-  const [{product}] = await Promise.all([
+  const [{product}, {product: surchargeProduct}] = await Promise.all([
     storefront.query(PRODUCT_QUERY, {
       variables: {handle, selectedOptions: getSelectedProductOptions(request)},
       cache: storefront.CacheNone(),
+    }),
+    storefront.query(WORKING_TYPE_SURCHARGE_QUERY, {
+      cache: storefront.CacheLong(),
     }),
   ]);
 
@@ -70,9 +73,16 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
     cache: storefront.CacheShort(),
   });
 
+  const surchargeVariants = surchargeProduct?.variants?.nodes ?? [];
+  const workingTypeSurcharge = {
+    lightly: surchargeVariants.find((v) => v.title === 'Lightly Worked') ?? null,
+    heavily: surchargeVariants.find((v) => v.title === 'Heavily Worked') ?? null,
+  };
+
   return {
     product,
     recommendations: productRecommendations?.slice(0, 4) ?? [],
+    workingTypeSurcharge,
   };
 }
 
@@ -88,8 +98,16 @@ function loadDeferredData({context, params}: Route.LoaderArgs) {
   return {};
 }
 
+const WORKING_TYPE_LABELS = {
+  sanded: 'Sanded',
+  lightly: 'Lightly Worked',
+  heavily: 'Heavily Worked',
+} as const;
+
+type WorkingType = keyof typeof WORKING_TYPE_LABELS;
+
 export default function Product() {
-  const {product, recommendations} = useLoaderData<typeof loader>();
+  const {product, recommendations, workingTypeSurcharge} = useLoaderData<typeof loader>();
 
   const productReviews: ProductReview[] = (() => {
     try {
@@ -116,6 +134,33 @@ export default function Product() {
   });
 
   const {title, descriptionHtml} = product;
+
+  const [workingType, setWorkingType] = useState<WorkingType>('sanded');
+  const surchargeVariant = workingType === 'sanded' ? null : workingTypeSurcharge[workingType];
+
+  const cartLines = selectedVariant
+    ? [
+        {
+          merchandiseId: selectedVariant.id,
+          quantity: 1,
+          selectedVariant,
+          attributes: [{key: 'Working type', value: WORKING_TYPE_LABELS[workingType]}],
+        },
+        ...(surchargeVariant
+          ? [
+              {
+                merchandiseId: surchargeVariant.id,
+                quantity: 1,
+                selectedVariant: surchargeVariant,
+                attributes: [
+                  {key: 'Working type', value: WORKING_TYPE_LABELS[workingType]},
+                  {key: 'Surcharge for', value: title},
+                ],
+              },
+            ]
+          : []),
+      ]
+    : [];
 
   const productImages = product.images?.nodes ?? [];
   const allImages = [
@@ -301,6 +346,10 @@ export default function Product() {
                   productOptions={productOptions}
                   selectedVariant={selectedVariant}
                   product={product}
+                  lines={cartLines}
+                  workingType={workingType}
+                  onWorkingTypeChange={setWorkingType}
+                  workingTypeSurcharge={workingTypeSurcharge}
                 />
               </div>
 
@@ -467,7 +516,7 @@ export default function Product() {
             <AddToCartButton
               disabled={!selectedVariant || !selectedVariant.availableForSale}
               onClick={() => open('cart')}
-              lines={selectedVariant ? [{merchandiseId: selectedVariant.id, quantity: 1, selectedVariant}] : []}
+              lines={cartLines}
             >
               {selectedVariant?.availableForSale ? 'Order now' : 'Sold out'}
             </AddToCartButton>
@@ -616,4 +665,18 @@ const PRODUCT_QUERY = `#graphql
     }
   }
   ${PRODUCT_FRAGMENT}
+` as const;
+
+const WORKING_TYPE_SURCHARGE_QUERY = `#graphql
+  query WorkingTypeSurcharge($country: CountryCode, $language: LanguageCode)
+  @inContext(country: $country, language: $language) {
+    product(handle: "working-type-surcharge") {
+      variants(first: 10) {
+        nodes {
+          ...ProductVariant
+        }
+      }
+    }
+  }
+  ${PRODUCT_VARIANT_FRAGMENT}
 ` as const;

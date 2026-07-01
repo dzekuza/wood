@@ -1,13 +1,25 @@
 import {Link, useNavigate} from 'react-router';
-import {type MappedProductOptions, Money} from '@shopify/hydrogen';
+import {type MappedProductOptions, type OptimisticCartLineInput, Money} from '@shopify/hydrogen';
 import type {
   Maybe,
   ProductOptionValueSwatch,
 } from '@shopify/hydrogen/storefront-api-types';
 import {AddToCartButton} from './AddToCartButton';
 import {useAside} from './Aside';
-import type {ProductFragment} from 'storefrontapi.generated';
+import type {ProductFragment, WorkingTypeSurchargeQuery} from 'storefrontapi.generated';
 import {useFavourites} from '~/hooks/useFavourites';
+
+const WORKING_TYPE_LABELS = {
+  sanded: 'Sanded',
+  lightly: 'Lightly Worked',
+  heavily: 'Heavily Worked',
+} as const;
+
+type WorkingType = keyof typeof WORKING_TYPE_LABELS;
+type WorkingTypeSurcharge = {
+  lightly: NonNullable<WorkingTypeSurchargeQuery['product']>['variants']['nodes'][number] | null;
+  heavily: NonNullable<WorkingTypeSurchargeQuery['product']>['variants']['nodes'][number] | null;
+};
 
 function getSwatchTone(name: string, color?: string | null) {
   const value = `${name} ${color ?? ''}`.toLowerCase();
@@ -27,12 +39,20 @@ export function ProductForm({
   productOptions,
   selectedVariant,
   product,
+  lines,
+  workingType,
+  onWorkingTypeChange,
+  workingTypeSurcharge,
 }: {
   productOptions: MappedProductOptions[];
   selectedVariant: ProductFragment['selectedOrFirstAvailableVariant'];
   product?: Pick<ProductFragment, 'id' | 'handle' | 'title'> & {
     featuredImage?: {url: string; altText?: string | null; width?: number | null; height?: number | null} | null;
   };
+  lines: Array<OptimisticCartLineInput>;
+  workingType: WorkingType;
+  onWorkingTypeChange: (workingType: WorkingType) => void;
+  workingTypeSurcharge: WorkingTypeSurcharge;
 }) {
   const navigate = useNavigate();
   const {open} = useAside();
@@ -51,6 +71,42 @@ export function ProductForm({
                 {option.name}
                 <span className="product-opt-picked">{option.optionValues[0].name}</span>
               </div>
+            </div>
+          );
+        }
+
+        const hasSwatches = option.optionValues.some(
+          (v) => v.swatch?.color || v.swatch?.image?.previewImage?.url,
+        );
+
+        // Size-like options (no swatches, e.g. Height x Depth, Length, Width) render as a dropdown
+        if (!hasSwatches) {
+          return (
+            <div className="product-opts" key={option.name}>
+              <div className="product-opt-label">
+                {option.name}
+                {selectedValue && (
+                  <span className="product-opt-picked">{selectedValue.name}</span>
+                )}
+              </div>
+              <select
+                className="product-opt-select"
+                value={selectedValue?.name ?? ''}
+                onChange={(e) => {
+                  const value = option.optionValues.find((v) => v.name === e.target.value);
+                  if (!value || value.selected) return;
+                  const to = value.isDifferentProduct
+                    ? `/products/${value.handle}?${value.variantUriQuery}`
+                    : `?${value.variantUriQuery}`;
+                  void navigate(to, {replace: true, preventScrollReset: true});
+                }}
+              >
+                {option.optionValues.map((value) => (
+                  <option key={option.name + value.name} value={value.name} disabled={!value.exists}>
+                    {value.name}{value.available ? '' : ' (unavailable)'}
+                  </option>
+                ))}
+              </select>
             </div>
           );
         }
@@ -116,6 +172,54 @@ export function ProductForm({
           </div>
         );
       })}
+      <div className="product-opts">
+        <div className="product-opt-label">
+          Working type
+          <span className="product-opt-picked">{WORKING_TYPE_LABELS[workingType]}</span>
+        </div>
+        <div className="product-opt-row">
+          <button
+            type="button"
+            className="product-optn"
+            data-selected={workingType === 'sanded' ? 'true' : 'false'}
+            onClick={() => onWorkingTypeChange('sanded')}
+          >
+            Sanded <span className="product-opt-surcharge">Free</span>
+          </button>
+          <button
+            type="button"
+            className="product-optn"
+            data-selected={workingType === 'lightly' ? 'true' : 'false'}
+            disabled={!workingTypeSurcharge.lightly}
+            onClick={() => onWorkingTypeChange('lightly')}
+          >
+            Lightly Worked
+            {workingTypeSurcharge.lightly && (
+              <span className="product-opt-surcharge">
+                +<Money as="span" data={workingTypeSurcharge.lightly.price} />
+              </span>
+            )}
+          </button>
+          <button
+            type="button"
+            className="product-optn"
+            data-selected={workingType === 'heavily' ? 'true' : 'false'}
+            disabled={!workingTypeSurcharge.heavily}
+            onClick={() => onWorkingTypeChange('heavily')}
+          >
+            Heavily Worked
+            {workingTypeSurcharge.heavily && (
+              <span className="product-opt-surcharge">
+                +<Money as="span" data={workingTypeSurcharge.heavily.price} />
+              </span>
+            )}
+          </button>
+        </div>
+        <p className="product-opt-note">
+          Working type is added as a separate line — your total price will be calculated at cart.
+        </p>
+      </div>
+
       <div className="pdp-cta-row">
         <div className="pdp-atc-wrap">
           <AddToCartButton
@@ -123,17 +227,7 @@ export function ProductForm({
             onClick={() => {
               open('cart');
             }}
-            lines={
-              selectedVariant
-                ? [
-                    {
-                      merchandiseId: selectedVariant.id,
-                      quantity: 1,
-                      selectedVariant,
-                    },
-                  ]
-                : []
-            }
+            lines={lines}
           >
             {selectedVariant?.availableForSale ? (
               <>
