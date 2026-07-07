@@ -6,20 +6,9 @@ import type {
 } from '@shopify/hydrogen/storefront-api-types';
 import {AddToCartButton} from './AddToCartButton';
 import {useAside} from './Aside';
-import type {ProductFragment, WorkingTypeSurchargeQuery} from 'storefrontapi.generated';
+import type {ProductFragment} from 'storefrontapi.generated';
 import {useFavourites} from '~/hooks/useFavourites';
-
-const WORKING_TYPE_LABELS = {
-  sanded: 'Sanded',
-  lightly: 'Lightly Worked',
-  heavily: 'Heavily Worked',
-} as const;
-
-type WorkingType = keyof typeof WORKING_TYPE_LABELS;
-type WorkingTypeSurcharge = {
-  lightly: NonNullable<WorkingTypeSurchargeQuery['product']>['variants']['nodes'][number] | null;
-  heavily: NonNullable<WorkingTypeSurchargeQuery['product']>['variants']['nodes'][number] | null;
-};
+import type {UpsellGroupData} from '~/lib/upsells';
 
 function getSwatchTone(name: string, color?: string | null) {
   const value = `${name} ${color ?? ''}`.toLowerCase();
@@ -40,9 +29,9 @@ export function ProductForm({
   selectedVariant,
   product,
   lines,
-  workingType,
-  onWorkingTypeChange,
-  workingTypeSurcharge,
+  upsellGroupsData,
+  selectedUpsells,
+  onUpsellChange,
 }: {
   productOptions: MappedProductOptions[];
   selectedVariant: ProductFragment['selectedOrFirstAvailableVariant'];
@@ -50,9 +39,9 @@ export function ProductForm({
     featuredImage?: {url: string; altText?: string | null; width?: number | null; height?: number | null} | null;
   };
   lines: Array<OptimisticCartLineInput>;
-  workingType: WorkingType;
-  onWorkingTypeChange: (workingType: WorkingType) => void;
-  workingTypeSurcharge: WorkingTypeSurcharge;
+  upsellGroupsData: UpsellGroupData[];
+  selectedUpsells: Record<string, string>;
+  onUpsellChange: (groupId: string, optionKey: string) => void;
 }) {
   const navigate = useNavigate();
   const {open} = useAside();
@@ -172,53 +161,46 @@ export function ProductForm({
           </div>
         );
       })}
-      <div className="product-opts">
-        <div className="product-opt-label">
-          Working type
-          <span className="product-opt-picked">{WORKING_TYPE_LABELS[workingType]}</span>
+      {upsellGroupsData.map(({group, options}) => (
+        <div className="product-opts" key={group.id}>
+          <div className="product-opt-label">
+            {group.label}
+            <span className="product-opt-picked">
+              {options.find((o) => o.option.key === selectedUpsells[group.id])
+                ?.option.label}
+            </span>
+          </div>
+          <div className="product-opt-row">
+            {options.map(({option, variant}) => (
+              <button
+                key={option.key}
+                type="button"
+                className="product-optn"
+                data-selected={
+                  selectedUpsells[group.id] === option.key ? 'true' : 'false'
+                }
+                disabled={Boolean(option.variantTitle) && !variant}
+                onClick={() => onUpsellChange(group.id, option.key)}
+              >
+                {option.label}
+                {option.variantTitle ? (
+                  variant && (
+                    <span className="product-opt-surcharge">
+                      +<Money as="span" data={variant.price} />
+                    </span>
+                  )
+                ) : (
+                  <span className="product-opt-surcharge">Free</span>
+                )}
+              </button>
+            ))}
+          </div>
+          <p className="product-opt-note">
+            {group.label} is added as a separate line — your total price will
+            be calculated at cart.
+          </p>
         </div>
-        <div className="product-opt-row">
-          <button
-            type="button"
-            className="product-optn"
-            data-selected={workingType === 'sanded' ? 'true' : 'false'}
-            onClick={() => onWorkingTypeChange('sanded')}
-          >
-            Sanded <span className="product-opt-surcharge">Free</span>
-          </button>
-          <button
-            type="button"
-            className="product-optn"
-            data-selected={workingType === 'lightly' ? 'true' : 'false'}
-            disabled={!workingTypeSurcharge.lightly}
-            onClick={() => onWorkingTypeChange('lightly')}
-          >
-            Lightly Worked
-            {workingTypeSurcharge.lightly && (
-              <span className="product-opt-surcharge">
-                +<Money as="span" data={workingTypeSurcharge.lightly.price} />
-              </span>
-            )}
-          </button>
-          <button
-            type="button"
-            className="product-optn"
-            data-selected={workingType === 'heavily' ? 'true' : 'false'}
-            disabled={!workingTypeSurcharge.heavily}
-            onClick={() => onWorkingTypeChange('heavily')}
-          >
-            Heavily Worked
-            {workingTypeSurcharge.heavily && (
-              <span className="product-opt-surcharge">
-                +<Money as="span" data={workingTypeSurcharge.heavily.price} />
-              </span>
-            )}
-          </button>
-        </div>
-        <p className="product-opt-note">
-          Working type is added as a separate line — your total price will be calculated at cart.
-        </p>
-      </div>
+      ))}
 
       <div className="pdp-cta-row">
         <div className="pdp-atc-wrap">

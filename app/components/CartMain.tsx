@@ -16,20 +16,46 @@ export type LineItemChildrenMap = {[parentId: string]: CartLine[]};
 /** Returns a map of all line items and their children. */
 function getLineItemChildrenMap(lines: CartLine[]): LineItemChildrenMap {
   const children: LineItemChildrenMap = {};
+  const addChild = (parentId: string, line: CartLine) => {
+    if (!children[parentId]) children[parentId] = [];
+    children[parentId].push(line);
+  };
+
   for (const line of lines) {
     if ('parentRelationship' in line && line.parentRelationship?.parent) {
-      const parentId = line.parentRelationship.parent.id;
-      if (!children[parentId]) children[parentId] = [];
-      children[parentId].push(line);
+      addChild(line.parentRelationship.parent.id, line);
     }
     if ('lineComponents' in line) {
-      const children = getLineItemChildrenMap(line.lineComponents);
-      for (const [parentId, childIds] of Object.entries(children)) {
+      const nested = getLineItemChildrenMap(line.lineComponents);
+      for (const [parentId, kids] of Object.entries(nested)) {
         if (!children[parentId]) children[parentId] = [];
-        children[parentId].push(...childIds);
+        children[parentId].push(...kids);
       }
     }
   }
+
+  // Add-on lines (e.g. the "Working type" surcharge) are added to the cart as
+  // their own line rather than a real Shopify bundle component, tagged with a
+  // "Surcharge for" attribute naming the product they belong to. Pair them
+  // with that product's line here so they render nested instead of as their
+  // own top-level cart row.
+  const nestedIds = new Set(Object.values(children).flat().map((l) => l.id));
+  for (const line of lines) {
+    if (nestedIds.has(line.id)) continue;
+    const surchargeFor = line.attributes?.find(
+      (a) => a.key === 'Surcharge for',
+    )?.value;
+    if (!surchargeFor) continue;
+    const candidates = lines.filter(
+      (l) =>
+        l.id !== line.id &&
+        !nestedIds.has(l.id) &&
+        !l.attributes?.some((a) => a.key === 'Surcharge for') &&
+        l.merchandise.product.title === surchargeFor,
+    );
+    if (candidates.length === 1) addChild(candidates[0].id, line);
+  }
+
   return children;
 }
 /**
@@ -48,6 +74,11 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
   const className = `cart-main ${withDiscount ? 'with-discount' : ''}`;
   const cartHasItems = cart?.totalQuantity ? cart.totalQuantity > 0 : false;
   const childrenMap = getLineItemChildrenMap(cart?.lines?.nodes ?? []);
+  const nestedLineIds = new Set(
+    Object.values(childrenMap)
+      .flat()
+      .map((line) => line.id),
+  );
 
   return (
     <section
@@ -64,8 +95,9 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
             {(cart?.lines?.nodes ?? []).map((line) => {
               // we do not render non-parent lines at the root of the cart
               if (
-                'parentRelationship' in line &&
-                line.parentRelationship?.parent
+                ('parentRelationship' in line &&
+                  line.parentRelationship?.parent) ||
+                nestedLineIds.has(line.id)
               ) {
                 return null;
               }

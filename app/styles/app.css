@@ -859,6 +859,11 @@ button.reset > * {
   line-height: 1.5;
 }
 
+.cart-line-surcharge {
+  color: var(--cwf-accent-deep);
+  font-weight: 600;
+}
+
 .cart-line-bottom {
   display: flex;
   align-items: center;

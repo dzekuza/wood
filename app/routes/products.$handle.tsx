@@ -18,6 +18,7 @@ import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {SITE_NAME} from '~/lib/site';
 import {ProductItem} from '~/components/ProductItem';
 import {ReviewsSection, type ProductReview} from '~/components/ReviewsSection';
+import {UPSELL_GROUPS} from '~/lib/upsells';
 
 export const meta: Route.MetaFunction = ({data}) => {
   return [
@@ -52,14 +53,21 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
     throw new Error('Expected product handle to be defined');
   }
 
-  const [{product}, {product: surchargeProduct}] = await Promise.all([
+  const upsellHandlesQuery = UPSELL_GROUPS.map(
+    (group) => `handle:${group.surchargeProductHandle}`,
+  ).join(' OR ');
+
+  const [{product}, {products: surchargeProducts}] = await Promise.all([
     storefront.query(PRODUCT_QUERY, {
       variables: {handle, selectedOptions: getSelectedProductOptions(request)},
       cache: storefront.CacheNone(),
     }),
-    storefront.query(WORKING_TYPE_SURCHARGE_QUERY, {
-      cache: storefront.CacheLong(),
-    }),
+    upsellHandlesQuery
+      ? storefront.query(UPSELL_SURCHARGES_QUERY, {
+          variables: {query: upsellHandlesQuery},
+          cache: storefront.CacheLong(),
+        })
+      : Promise.resolve({products: {nodes: []}}),
   ]);
 
   if (!product?.id) {
@@ -73,16 +81,27 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
     cache: storefront.CacheShort(),
   });
 
-  const surchargeVariants = surchargeProduct?.variants?.nodes ?? [];
-  const workingTypeSurcharge = {
-    lightly: surchargeVariants.find((v) => v.title === 'Lightly Worked') ?? null,
-    heavily: surchargeVariants.find((v) => v.title === 'Heavily Worked') ?? null,
-  };
+  const surchargeVariantsByHandle = new Map(
+    (surchargeProducts?.nodes ?? []).map((p) => [p.handle, p.variants.nodes]),
+  );
+
+  const upsellGroupsData = UPSELL_GROUPS.map((group) => {
+    const variants = surchargeVariantsByHandle.get(group.surchargeProductHandle) ?? [];
+    return {
+      group,
+      options: group.options.map((option) => ({
+        option,
+        variant: option.variantTitle
+          ? variants.find((v) => v.title === option.variantTitle) ?? null
+          : null,
+      })),
+    };
+  });
 
   return {
     product,
     recommendations: productRecommendations?.slice(0, 4) ?? [],
-    workingTypeSurcharge,
+    upsellGroupsData,
   };
 }
 
@@ -98,16 +117,8 @@ function loadDeferredData({context, params}: Route.LoaderArgs) {
   return {};
 }
 
-const WORKING_TYPE_LABELS = {
-  sanded: 'Sanded',
-  lightly: 'Lightly Worked',
-  heavily: 'Heavily Worked',
-} as const;
-
-type WorkingType = keyof typeof WORKING_TYPE_LABELS;
-
 export default function Product() {
-  const {product, recommendations, workingTypeSurcharge} = useLoaderData<typeof loader>();
+  const {product, recommendations, upsellGroupsData} = useLoaderData<typeof loader>();
 
   const productReviews: ProductReview[] = (() => {
     try {
@@ -135,8 +146,23 @@ export default function Product() {
 
   const {title, descriptionHtml} = product;
 
-  const [workingType, setWorkingType] = useState<WorkingType>('sanded');
-  const surchargeVariant = workingType === 'sanded' ? null : workingTypeSurcharge[workingType];
+  const [selectedUpsells, setSelectedUpsells] = useState<Record<string, string>>(
+    () =>
+      Object.fromEntries(
+        upsellGroupsData.map(({group}) => [group.id, group.defaultOptionKey]),
+      ),
+  );
+
+  function handleUpsellChange(groupId: string, optionKey: string) {
+    setSelectedUpsells((prev) => ({...prev, [groupId]: optionKey}));
+  }
+
+  const selectedUpsellEntries = upsellGroupsData.map(({group, options}) => {
+    const selected =
+      options.find((o) => o.option.key === selectedUpsells[group.id]) ??
+      options[0];
+    return {group, selected};
+  });
 
   const cartLines = selectedVariant
     ? [
@@ -144,21 +170,27 @@ export default function Product() {
           merchandiseId: selectedVariant.id,
           quantity: 1,
           selectedVariant,
-          attributes: [{key: 'Working type', value: WORKING_TYPE_LABELS[workingType]}],
+          attributes: selectedUpsellEntries.map(({group, selected}) => ({
+            key: group.label,
+            value: selected.option.label,
+          })),
         },
-        ...(surchargeVariant
-          ? [
-              {
-                merchandiseId: surchargeVariant.id,
-                quantity: 1,
-                selectedVariant: surchargeVariant,
-                attributes: [
-                  {key: 'Working type', value: WORKING_TYPE_LABELS[workingType]},
-                  {key: 'Surcharge for', value: title},
-                ],
-              },
-            ]
-          : []),
+        ...selectedUpsellEntries.flatMap(({group, selected}) =>
+          selected.variant
+            ? [
+                {
+                  merchandiseId: selected.variant.id,
+                  quantity: 1,
+                  selectedVariant: selected.variant,
+                  attributes: [
+                    {key: 'Upsell group', value: group.label},
+                    {key: 'Upsell option', value: selected.option.label},
+                    {key: 'Surcharge for', value: title},
+                  ],
+                },
+              ]
+            : [],
+        ),
       ]
     : [];
 
@@ -347,9 +379,9 @@ export default function Product() {
                   selectedVariant={selectedVariant}
                   product={product}
                   lines={cartLines}
-                  workingType={workingType}
-                  onWorkingTypeChange={setWorkingType}
-                  workingTypeSurcharge={workingTypeSurcharge}
+                  upsellGroupsData={upsellGroupsData}
+                  selectedUpsells={selectedUpsells}
+                  onUpsellChange={handleUpsellChange}
                 />
               </div>
 
@@ -667,13 +699,16 @@ const PRODUCT_QUERY = `#graphql
   ${PRODUCT_FRAGMENT}
 ` as const;
 
-const WORKING_TYPE_SURCHARGE_QUERY = `#graphql
-  query WorkingTypeSurcharge($country: CountryCode, $language: LanguageCode)
+const UPSELL_SURCHARGES_QUERY = `#graphql
+  query UpsellSurcharges($query: String!, $country: CountryCode, $language: LanguageCode)
   @inContext(country: $country, language: $language) {
-    product(handle: "working-type-surcharge") {
-      variants(first: 10) {
-        nodes {
-          ...ProductVariant
+    products(first: 20, query: $query) {
+      nodes {
+        handle
+        variants(first: 20) {
+          nodes {
+            ...ProductVariant
+          }
         }
       }
     }

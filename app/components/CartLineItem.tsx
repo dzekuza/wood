@@ -1,6 +1,6 @@
 import type {CartLineUpdateInput} from '@shopify/hydrogen/storefront-api-types';
 import type {CartLayout, LineItemChildrenMap} from '~/components/CartMain';
-import {CartForm, Image, type OptimisticCartLine} from '@shopify/hydrogen';
+import {CartForm, Image, Money, type OptimisticCartLine} from '@shopify/hydrogen';
 import {useVariantUrl} from '~/lib/variants';
 import {Link} from 'react-router';
 import {ProductPrice} from './ProductPrice';
@@ -31,7 +31,16 @@ export function CartLineItem({
   const {product, title, image, selectedOptions} = merchandise;
   const lineItemUrl = useVariantUrl(product.handle, selectedOptions);
   const {close} = useAside();
-  const lineItemChildren = childrenMap[id];
+  const allChildren = childrenMap[id] ?? [];
+  // Surcharge add-ons (any configured upsell group, e.g. "Working type")
+  // render inline next to this line's options instead of as a nested cart
+  // line of their own.
+  const surchargeChildren = allChildren.filter((child) =>
+    child.attributes?.some((a) => a.key === 'Surcharge for'),
+  );
+  const lineItemChildren = allChildren.filter(
+    (child) => !surchargeChildren.includes(child),
+  );
   const childrenLabelId = `cart-line-children-${id}`;
 
   const meaningfulOptions = selectedOptions.filter(
@@ -69,9 +78,23 @@ export function CartLineItem({
             </div>
           </div>
 
-          {meaningfulOptions.length > 0 && (
+          {(meaningfulOptions.length > 0 || surchargeChildren.length > 0) && (
             <div className="cart-line-opts">
               {meaningfulOptions.map((o) => o.value).join(' · ')}
+              {surchargeChildren.map((child) => {
+                const upsellOption = child.attributes?.find(
+                  (a) => a.key === 'Upsell option',
+                )?.value;
+                return (
+                  <span key={child.id} className="cart-line-surcharge">
+                    {meaningfulOptions.length > 0 ? ' · ' : ''}
+                    {upsellOption}
+                    {' ('}
+                    <Money as="span" data={child.cost?.totalAmount} />
+                    {')'}
+                  </span>
+                );
+              })}
             </div>
           )}
 
