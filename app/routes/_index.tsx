@@ -1,6 +1,7 @@
 import {Await, useFetcher, useLoaderData, Link, data} from 'react-router';
 import type {Route} from './+types/_index';
-import {Suspense} from 'react';
+import {Suspense, useRef, useState} from 'react';
+import type {CSSProperties} from 'react';
 import {Image} from '@shopify/hydrogen';
 import type {
   FeaturedProductsQuery,
@@ -199,20 +200,22 @@ function MarqueeStrip() {
   );
 }
 
-/* ─── Collections (bento) ────────────────────────────────────────────────────── */
-const BENTO_CELLS = [
-  {cls: 'cell-1 dark', label: 'Featured', title: 'Living\nRoom', count: '22 pieces', img: '/images/bento-1.jpg'},
-  {cls: 'cell-2 dark', label: null, title: 'Mantels', count: '14 pieces', img: '/images/bento-2.jpg'},
-  {cls: 'cell-3 primary', label: null, title: 'Media', count: '9 pieces', img: '/images/bento-3.jpg'},
-  {cls: 'cell-4 light', label: null, title: 'Shelving', count: '18 pieces', img: '/images/bento-4.jpg'},
-  {cls: 'cell-5 dark', label: null, title: 'Seating', count: '7 pieces', img: '/images/bento-5.jpg'},
-];
-
+/* ─── Collections (carousel) ─────────────────────────────────────────────────── */
 function CollectionsSection({
   collections,
 }: {
   collections: FeaturedCollectionsQuery['collections']['nodes'];
 }) {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [scrollPct, setScrollPct] = useState(0);
+
+  const handleScroll = () => {
+    const el = trackRef.current;
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    setScrollPct(max > 0 ? el.scrollLeft / max : 0);
+  };
+
   return (
     <section className="section-linen">
       <div className="cwf-wrap">
@@ -228,40 +231,31 @@ function CollectionsSection({
           </div>
         </div>
 
-        <div className="bento">
-          {BENTO_CELLS.map((cell, i) => {
-            const col = collections[i];
-            return (
-              <Link
-                key={col?.id ?? cell.title}
-                to={col ? `/collections/${col.handle}` : '/collections'}
-                className={`cell ${cell.cls}`}
-              >
-                <div className="ph">
-                  <img
-                    src={col?.image?.url ?? cell.img}
-                    alt={col?.image?.altText ?? cell.title}
-                  />
-                </div>
-                <div className="cell-inner">
-                  <div className="meta">
-                    <span className="count">{col ? `${col.handle}` : cell.count}</span>
+        <div className="ccarousel">
+          <div className="ccarousel-track" ref={trackRef} onScroll={handleScroll}>
+            {collections.map((col) => (
+              <Link key={col.id} to={`/collections/${col.handle}`} className="ccard">
+                <div className="ccard-img">
+                  {col.image?.url ? (
+                    <img src={col.image.url} alt={col.image.altText ?? col.title} loading="lazy" />
+                  ) : null}
+                  <span className="ccard-arrow" aria-hidden>
                     <i className="ti ti-arrow-up-right" />
-                  </div>
-                  <div>
-                    {cell.label && (
-                      <div className="cell-label">
-                        {cell.label}
-                      </div>
-                    )}
-                    <h3>
-                      {col ? col.title : cell.title}
-                    </h3>
-                  </div>
+                  </span>
+                </div>
+                <div className="ccard-body">
+                  <h3 className="ccard-title">{col.title}</h3>
                 </div>
               </Link>
-            );
-          })}
+            ))}
+          </div>
+
+          <div className="ccarousel-progress">
+            <div
+              className="ccarousel-progress-bar"
+              style={{'--progress': scrollPct} as CSSProperties}
+            />
+          </div>
         </div>
       </div>
     </section>
@@ -512,7 +506,7 @@ function NewsletterSection() {
 const FEATURED_COLLECTIONS_QUERY = `#graphql
   query FeaturedCollections($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    collections(first: 5, sortKey: UPDATED_AT, reverse: true) {
+    collections(first: 8, sortKey: UPDATED_AT, reverse: true) {
       nodes {
         id
         title
