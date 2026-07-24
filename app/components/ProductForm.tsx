@@ -9,6 +9,7 @@ import {useAside} from './Aside';
 import type {ProductFragment} from 'storefrontapi.generated';
 import {useFavourites} from '~/hooks/useFavourites';
 import {useUnitSystem} from '~/hooks/useUnitSystem';
+import {UnitToggle} from '~/components/UnitToggle';
 import {formatMeasurement} from '~/lib/units';
 import type {UpsellGroupData} from '~/lib/upsells';
 
@@ -67,6 +68,12 @@ export function ProductForm({
 
   return (
     <div className="product-form">
+      <div className="product-opts product-opts-unit">
+        <div className="product-opt-label">
+          Units
+          <UnitToggle />
+        </div>
+      </div>
       {productOptions.map((option) => {
         const selectedValue = option.optionValues.find((v) => v.selected);
 
