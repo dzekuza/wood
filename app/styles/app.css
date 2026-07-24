@@ -2681,7 +2681,7 @@ section { padding: 0; }
 .hero-badge .t2 { font-size: 11px; color: var(--cwf-accent-deep); }
 .hero-floater { position: absolute; right: 24px; top: 24px; background: rgba(243,239,234,.96); color: var(--cwf-primary); border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 500; box-shadow: 0 8px 24px rgba(0,0,0,.25); }
 .hero-floater .price { font-family: 'Mark Bold', sans-serif; font-weight: 700; font-size: 20px; letter-spacing: -.03em; }
-@media (max-width: 980px) { .hero-copy { grid-template-columns: 1fr; padding: 56px 24px 48px; row-gap: 20px; } .hero-copy h1, .hero-copy .lede, .hero-copy .hero-cta { grid-column: 1; } .hero-copy .hero-image { grid-column: 1; grid-row: auto; width: 100%; min-width: 0; min-height: 0; aspect-ratio: 16/7; } }
+@media (max-width: 980px) { .hero-copy { grid-template-columns: 1fr; padding: 56px 24px 48px; row-gap: 20px; } .hero-copy h1, .hero-copy .lede, .hero-copy .hero-cta { grid-column: 1; } .hero-copy .hero-image { grid-column: 1; grid-row: auto; width: 100%; min-width: 0; min-height: 0; aspect-ratio: 4/3; } }
 
 /* ---- Marquee strip ---- */
 .marquee-strip { background: var(--cwf-ink, #1c1c1c); color: rgba(243,239,234,.55); border-top: .5px solid var(--cwf-line-dark); border-bottom: .5px solid var(--cwf-line-dark); overflow: hidden; }
