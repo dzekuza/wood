@@ -2,11 +2,12 @@ import {Await, useFetcher, useLoaderData, Link, data} from 'react-router';
 import type {Route} from './+types/_index';
 import {Suspense, useRef, useState} from 'react';
 import type {CSSProperties} from 'react';
-import {Image} from '@shopify/hydrogen';
+import {Image, Money} from '@shopify/hydrogen';
 import type {
   FeaturedProductsQuery,
   FeaturedProductFragment,
   FeaturedCollectionsQuery,
+  HeroProductQuery,
 } from 'storefrontapi.generated';
 import {MockShopNotice} from '~/components/MockShopNotice';
 import {ReviewsSection} from '~/components/ReviewsSection';
@@ -89,15 +90,17 @@ export async function loader(args: Route.LoaderArgs) {
 }
 
 async function loadCriticalData({context}: Route.LoaderArgs) {
-  const [{collections}, {blogs}] = await Promise.all([
+  const [{collections}, {blogs}, {products}] = await Promise.all([
     context.storefront.query(FEATURED_COLLECTIONS_QUERY),
     context.storefront.query(FEATURED_ARTICLES_QUERY),
+    context.storefront.query(HERO_PRODUCT_QUERY),
   ]);
   const articles = blogs.nodes[0]?.articles.nodes ?? [];
   return {
     isShopLinked: Boolean(context.env.PUBLIC_STORE_DOMAIN),
     featuredCollections: collections.nodes,
     featuredArticles: articles,
+    heroProduct: products.nodes[0] ?? null,
   };
 }
 
@@ -116,7 +119,7 @@ export default function Homepage() {
   return (
     <div>
       {data.isShopLinked ? null : <MockShopNotice />}
-      <HeroSection />
+      <HeroSection product={data.heroProduct} />
       <MarqueeStrip />
       <CollectionsSection collections={data.featuredCollections} />
       <ProductsSection products={data.featuredProducts} />
@@ -130,7 +133,12 @@ export default function Homepage() {
 }
 
 /* ─── Hero ─────────────────────────────────────────────────────────────────── */
-function HeroSection() {
+function HeroSection({
+  product,
+}: {
+  product: HeroProductQuery['products']['nodes'][number] | null;
+}) {
+  const image = product?.featuredImage;
   return (
     <section className="hero">
       <div className="hero-grid">
@@ -151,14 +159,21 @@ function HeroSection() {
             </Link>
           </div>
           <div className="hero-image">
-            <img src="/images/hero.jpg" alt="Solid oak mantel beam with log burner" />
-            <div className="hero-floater">
-              <div>
-                <div className="hero-floater-label">Featured</div>
-                <div className="hero-floater-name">The Aldsworth Table</div>
-              </div>
-              <span className="price">€2,840</span>
-            </div>
+            <img
+              src={image?.url ?? '/images/hero.jpg'}
+              alt={image?.altText ?? 'Solid oak mantel beam with log burner'}
+            />
+            {product ? (
+              <Link to={`/products/${product.handle}`} className="hero-floater">
+                <div>
+                  <div className="hero-floater-label">Featured</div>
+                  <div className="hero-floater-name">{product.title}</div>
+                </div>
+                <span className="price">
+                  <Money data={product.priceRange.minVariantPrice} />
+                </span>
+              </Link>
+            ) : null}
             <div className="hero-badge">
               <span className="icon"><i className="ti ti-certificate" /></span>
               <div>
@@ -512,6 +527,32 @@ const FEATURED_COLLECTIONS_QUERY = `#graphql
         title
         handle
         image {
+          url
+          altText
+          width
+          height
+        }
+      }
+    }
+  }
+` as const;
+
+const HERO_PRODUCT_QUERY = `#graphql
+  query HeroProduct($country: CountryCode, $language: LanguageCode)
+    @inContext(country: $country, language: $language) {
+    products(first: 1, query: "tag:hero") {
+      nodes {
+        id
+        title
+        handle
+        priceRange {
+          minVariantPrice {
+            amount
+            currencyCode
+          }
+        }
+        featuredImage {
+          id
           url
           altText
           width

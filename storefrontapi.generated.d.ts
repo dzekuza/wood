@@ -397,6 +397,32 @@ export type FeaturedCollectionsQuery = {
   };
 };
 
+export type HeroProductQueryVariables = StorefrontAPI.Exact<{
+  country?: StorefrontAPI.InputMaybe<StorefrontAPI.CountryCode>;
+  language?: StorefrontAPI.InputMaybe<StorefrontAPI.LanguageCode>;
+}>;
+
+export type HeroProductQuery = {
+  products: {
+    nodes: Array<
+      Pick<StorefrontAPI.Product, 'id' | 'title' | 'handle'> & {
+        priceRange: {
+          minVariantPrice: Pick<
+            StorefrontAPI.MoneyV2,
+            'amount' | 'currencyCode'
+          >;
+        };
+        featuredImage?: StorefrontAPI.Maybe<
+          Pick<
+            StorefrontAPI.Image,
+            'id' | 'url' | 'altText' | 'width' | 'height'
+          >
+        >;
+      }
+    >;
+  };
+};
+
 export type FeaturedArticlesQueryVariables = StorefrontAPI.Exact<{
   country?: StorefrontAPI.InputMaybe<StorefrontAPI.CountryCode>;
   language?: StorefrontAPI.InputMaybe<StorefrontAPI.LanguageCode>;
@@ -1441,6 +1467,10 @@ interface GeneratedQueryTypes {
   '#graphql\n  query FeaturedCollections($country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    collections(first: 8, sortKey: UPDATED_AT, reverse: true) {\n      nodes {\n        id\n        title\n        handle\n        image {\n          url\n          altText\n          width\n          height\n        }\n      }\n    }\n  }\n': {
     return: FeaturedCollectionsQuery;
     variables: FeaturedCollectionsQueryVariables;
+  };
+  '#graphql\n  query HeroProduct($country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    products(first: 1, query: "tag:hero") {\n      nodes {\n        id\n        title\n        handle\n        priceRange {\n          minVariantPrice {\n            amount\n            currencyCode\n          }\n        }\n        featuredImage {\n          id\n          url\n          altText\n          width\n          height\n        }\n      }\n    }\n  }\n': {
+    return: HeroProductQuery;
+    variables: HeroProductQueryVariables;
   };
   '#graphql\n  query FeaturedArticles($country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    blogs(first: 1, sortKey: HANDLE) {\n      nodes {\n        handle\n        articles(first: 3, sortKey: PUBLISHED_AT, reverse: true) {\n          nodes {\n            title\n            handle\n            excerpt\n            publishedAt\n            image {\n              url\n              altText\n              width\n              height\n            }\n            blog {\n              handle\n            }\n          }\n        }\n      }\n    }\n  }\n': {
     return: FeaturedArticlesQuery;
