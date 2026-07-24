@@ -65,7 +65,7 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
     upsellHandlesQuery
       ? storefront.query(UPSELL_SURCHARGES_QUERY, {
           variables: {query: upsellHandlesQuery},
-          cache: storefront.CacheLong(),
+          cache: storefront.CacheShort(),
         })
       : Promise.resolve({products: {nodes: []}}),
   ]);
@@ -93,12 +93,20 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
     const variants = surchargeVariantsByHandle.get(group.surchargeProductHandle) ?? [];
     return {
       group,
-      options: group.options.map((option) => ({
-        option,
-        variant: option.variantTitle
-          ? variants.find((v) => v.title === option.variantTitle) ?? null
-          : null,
-      })),
+      options: [
+        {
+          option: {key: group.defaultOptionKey, label: group.defaultOptionLabel},
+          variant: null,
+        },
+        // Every other paid option comes straight from the surcharge product's
+        // live variants — the variant title is both its label and its price
+        // lookup key, so adding/renaming/repricing a variant in Shopify admin
+        // shows up here with no code change.
+        ...variants.map((variant) => ({
+          option: {key: variant.id, label: variant.title, variantTitle: variant.title},
+          variant,
+        })),
+      ],
     };
   });
 

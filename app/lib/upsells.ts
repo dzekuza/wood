@@ -3,7 +3,7 @@ import type {UpsellSurchargesQuery} from 'storefrontapi.generated';
 export type UpsellOption = {
   key: string;
   label: string;
-  /** Must match a variant title on the group's surcharge product. Omit for the free/default option. */
+  /** Present for paid options — the label doubles as the price lookup key against the group's surcharge variant. */
   variantTitle?: string;
 };
 
@@ -22,18 +22,10 @@ export type UpsellGroup = {
   /** Handle of a hidden Shopify product whose variants price each paid option. */
   surchargeProductHandle: string;
   defaultOptionKey: string;
-  options: UpsellOption[];
+  /** Label for the always-free option (has no backing Shopify variant). */
+  defaultOptionLabel: string;
 };
 
-/**
- * To add a new upsell group:
- * 1. Create a hidden Shopify product (status can stay unpublished/draft-like via
- *    not adding it to any collection) with one variant per paid option, titled
- *    to match `variantTitle` below exactly.
- * 2. Add a group entry here.
- * The PDP form, cart line creation, and cart line display all read this array —
- * no other code changes are needed.
- */
 /**
  * Merchants can scope which upsell groups appear on a given product via a
  * Shopify product metafield: namespace `custom`, key `addon_groups`, type
@@ -63,36 +55,32 @@ export function resolveUpsellGroupsForProduct(metafieldValue?: string | null): U
   return UPSELL_GROUPS.filter((group) => enabled.has(group.id));
 }
 
+/**
+ * To add a new upsell group:
+ * 1. Create a hidden Shopify product (status can stay unpublished/draft-like via
+ *    not adding it to any collection) with one variant per paid option — each
+ *    variant's title becomes that option's button label on the PDP, so name
+ *    variants exactly as you want them to read to shoppers (e.g. "+2 ft").
+ * 2. Add a group entry here (id, label, surchargeProductHandle, and the
+ *    always-free default option's key/label).
+ * The PDP form, cart line creation, and cart line display all read this array
+ * plus the surcharge product's live variants — no other code changes are
+ * needed, and adding/renaming/repricing a variant in Shopify admin now shows
+ * up on the PDP automatically.
+ */
 export const UPSELL_GROUPS: UpsellGroup[] = [
   {
     id: 'workingType',
     label: 'Working type',
     surchargeProductHandle: 'working-type-surcharge',
     defaultOptionKey: 'sanded',
-    options: [
-      {key: 'sanded', label: 'Sanded'},
-      {
-        key: 'lightly',
-        label: 'Lightly Worked',
-        variantTitle: 'Lightly Worked',
-      },
-      {
-        key: 'heavily',
-        label: 'Heavily Worked',
-        variantTitle: 'Heavily Worked',
-      },
-    ],
+    defaultOptionLabel: 'Sanded',
   },
   {
     id: 'heightAllowance',
     label: 'Height allowance',
     surchargeProductHandle: 'height-allowance-surcharge',
     defaultOptionKey: 'standard',
-    options: [
-      {key: 'standard', label: 'Standard'},
-      {key: 'plus1ft', label: '+1 ft', variantTitle: '+1 ft'},
-      {key: 'plus2ft', label: '+2 ft', variantTitle: '+2 ft'},
-      {key: 'plus3ft', label: '+3 ft', variantTitle: '+3 ft'},
-    ],
+    defaultOptionLabel: 'Standard',
   },
 ];
