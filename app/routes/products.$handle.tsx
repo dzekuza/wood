@@ -18,7 +18,7 @@ import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {SITE_NAME} from '~/lib/site';
 import {ProductItem} from '~/components/ProductItem';
 import {ReviewsSection, type ProductReview} from '~/components/ReviewsSection';
-import {UPSELL_GROUPS} from '~/lib/upsells';
+import {UPSELL_GROUPS, resolveUpsellGroupsForProduct} from '~/lib/upsells';
 
 export const meta: Route.MetaFunction = ({data}) => {
   return [
@@ -85,7 +85,11 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
     (surchargeProducts?.nodes ?? []).map((p) => [p.handle, p.variants.nodes]),
   );
 
-  const upsellGroupsData = UPSELL_GROUPS.map((group) => {
+  const applicableUpsellGroups = resolveUpsellGroupsForProduct(
+    product.addonGroupsMetafield?.value,
+  );
+
+  const upsellGroupsData = applicableUpsellGroups.map((group) => {
     const variants = surchargeVariantsByHandle.get(group.surchargeProductHandle) ?? [];
     return {
       group,
@@ -657,6 +661,9 @@ const PRODUCT_FRAGMENT = `#graphql
       }
     }
     metafield(namespace: "reviews", key: "product_reviews") {
+      value
+    }
+    addonGroupsMetafield: metafield(namespace: "custom", key: "addon_groups") {
       value
     }
     seo {

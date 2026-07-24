@@ -34,6 +34,35 @@ export type UpsellGroup = {
  * The PDP form, cart line creation, and cart line display all read this array —
  * no other code changes are needed.
  */
+/**
+ * Merchants can scope which upsell groups appear on a given product via a
+ * Shopify product metafield: namespace `custom`, key `addon_groups`, type
+ * "List of single line text values" — one Storefront -> Admin -> Custom data
+ * -> Products definition, no code changes needed after that.
+ *
+ * The value is a JSON array of `UpsellGroup.id`s, e.g. ["workingType"].
+ * - Metafield not set at all -> every group in UPSELL_GROUPS applies (legacy
+ *   default, keeps existing products unaffected).
+ * - Metafield set to `[]` -> no upsell groups show on that product.
+ * - Metafield set to specific ids -> only those groups show, in the order
+ *   they're defined in UPSELL_GROUPS below.
+ */
+export function resolveUpsellGroupsForProduct(metafieldValue?: string | null): UpsellGroup[] {
+  if (metafieldValue == null) return UPSELL_GROUPS;
+
+  let enabledIds: unknown;
+  try {
+    enabledIds = JSON.parse(metafieldValue);
+  } catch {
+    return UPSELL_GROUPS;
+  }
+
+  if (!Array.isArray(enabledIds)) return UPSELL_GROUPS;
+
+  const enabled = new Set(enabledIds);
+  return UPSELL_GROUPS.filter((group) => enabled.has(group.id));
+}
+
 export const UPSELL_GROUPS: UpsellGroup[] = [
   {
     id: 'workingType',
