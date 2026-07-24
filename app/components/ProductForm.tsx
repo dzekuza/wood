@@ -8,6 +8,8 @@ import {AddToCartButton} from './AddToCartButton';
 import {useAside} from './Aside';
 import type {ProductFragment} from 'storefrontapi.generated';
 import {useFavourites} from '~/hooks/useFavourites';
+import {useUnitSystem} from '~/hooks/useUnitSystem';
+import {formatMeasurement} from '~/lib/units';
 import type {UpsellGroupData} from '~/lib/upsells';
 
 function getSwatchTone(name: string, color?: string | null) {
@@ -47,6 +49,22 @@ export function ProductForm({
   const {open} = useAside();
   const {isFavourite, toggleFavourite} = useFavourites();
   const saved = product ? isFavourite(product.id) : false;
+  const {unit} = useUnitSystem();
+
+  const upsellSurcharge = upsellGroupsData.reduce((sum, {group, options}) => {
+    const selectedKey = selectedUpsells[group.id];
+    const selectedOption = options.find((o) => o.option.key === selectedKey);
+    const amount = selectedOption?.variant ? parseFloat(selectedOption.variant.price.amount) : 0;
+    return sum + amount;
+  }, 0);
+
+  const totalPrice = selectedVariant?.price
+    ? {
+        amount: (parseFloat(selectedVariant.price.amount) + upsellSurcharge).toFixed(2),
+        currencyCode: selectedVariant.price.currencyCode,
+      }
+    : undefined;
+
   return (
     <div className="product-form">
       {productOptions.map((option) => {
@@ -58,7 +76,7 @@ export function ProductForm({
             <div className="product-opts" key={option.name}>
               <div className="product-opt-label">
                 {option.name}
-                <span className="product-opt-picked">{option.optionValues[0].name}</span>
+                <span className="product-opt-picked">{formatMeasurement(option.optionValues[0].name, unit, option.name)}</span>
               </div>
             </div>
           );
@@ -68,14 +86,77 @@ export function ProductForm({
           (v) => v.swatch?.color || v.swatch?.image?.previewImage?.url,
         );
 
-        // Size-like options (no swatches, e.g. Height x Depth, Length, Width) render as a dropdown
+        // Length renders as a progress bar across the available steps
+        if (!hasSwatches && option.name.toLowerCase() === 'length') {
+          const values = option.optionValues;
+          const selectedIndex = values.findIndex((v) => v.selected);
+          const percent =
+            values.length > 1 ? (Math.max(selectedIndex, 0) / (values.length - 1)) * 100 : 0;
+
+          const selectValue = (value: (typeof values)[number]) => {
+            if (value.selected || !value.exists) return;
+            const to = value.isDifferentProduct
+              ? `/products/${value.handle}?${value.variantUriQuery}`
+              : `?${value.variantUriQuery}`;
+            void navigate(to, {replace: true, preventScrollReset: true});
+          };
+
+          return (
+            <div className="product-opts" key={option.name}>
+              <div className="product-opt-label">
+                {option.name}
+                {selectedValue && (
+                  <span className="product-opt-picked">{formatMeasurement(selectedValue.name, unit, option.name)}</span>
+                )}
+              </div>
+              <div className="product-opt-progress">
+                <div className="product-opt-progress-track">
+                  <div
+                    className="product-opt-progress-fill"
+                    style={{width: `${percent}%`}}
+                  />
+                  {values.map((value, i) => {
+                    const stepPercent =
+                      values.length > 1 ? (i / (values.length - 1)) * 100 : 0;
+                    return (
+                      <button
+                        key={option.name + value.name}
+                        type="button"
+                        className={`product-opt-progress-step${value.selected ? ' is-selected' : ''}${!value.exists ? ' is-unavailable' : ''}`}
+                        style={{left: `${stepPercent}%`}}
+                        disabled={!value.exists}
+                        aria-label={value.name}
+                        onClick={() => selectValue(value)}
+                      />
+                    );
+                  })}
+                </div>
+                <div className="product-opt-progress-labels">
+                  {values.map((value) => (
+                    <button
+                      key={option.name + value.name}
+                      type="button"
+                      className={`product-opt-progress-label${value.selected ? ' is-selected' : ''}`}
+                      disabled={!value.exists}
+                      onClick={() => selectValue(value)}
+                    >
+                      {formatMeasurement(value.name, unit, option.name)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        // Other size-like options (no swatches, e.g. Height x Depth, Width) render as a dropdown
         if (!hasSwatches) {
           return (
             <div className="product-opts" key={option.name}>
               <div className="product-opt-label">
                 {option.name}
                 {selectedValue && (
-                  <span className="product-opt-picked">{selectedValue.name}</span>
+                  <span className="product-opt-picked">{formatMeasurement(selectedValue.name, unit, option.name)}</span>
                 )}
               </div>
               <select
@@ -92,7 +173,7 @@ export function ProductForm({
               >
                 {option.optionValues.map((value) => (
                   <option key={option.name + value.name} value={value.name} disabled={!value.exists}>
-                    {value.name}{value.available ? '' : ' (unavailable)'}
+                    {formatMeasurement(value.name, unit, option.name)}{value.available ? '' : ' (unavailable)'}
                   </option>
                 ))}
               </select>
@@ -161,13 +242,16 @@ export function ProductForm({
           </div>
         );
       })}
-      {upsellGroupsData.map(({group, options}) => (
+      {upsellGroupsData.map(({group, options}) => {
+        const selectedUpsellOption = options.find(
+          (o) => o.option.key === selectedUpsells[group.id],
+        )?.option;
+        return (
         <div className="product-opts" key={group.id}>
           <div className="product-opt-label">
             {group.label}
             <span className="product-opt-picked">
-              {options.find((o) => o.option.key === selectedUpsells[group.id])
-                ?.option.label}
+              {selectedUpsellOption && formatMeasurement(selectedUpsellOption.label, unit, group.label)}
             </span>
           </div>
           <div className="product-opt-row">
@@ -182,7 +266,7 @@ export function ProductForm({
                 disabled={Boolean(option.variantTitle) && !variant}
                 onClick={() => onUpsellChange(group.id, option.key)}
               >
-                {option.label}
+                {formatMeasurement(option.label, unit, group.label)}
                 {option.variantTitle ? (
                   variant && (
                     <span className="product-opt-surcharge">
@@ -195,12 +279,9 @@ export function ProductForm({
               </button>
             ))}
           </div>
-          <p className="product-opt-note">
-            {group.label} is added as a separate line — your total price will
-            be calculated at cart.
-          </p>
         </div>
-      ))}
+        );
+      })}
 
       <div className="pdp-cta-row">
         <div className="pdp-atc-wrap">
@@ -214,9 +295,9 @@ export function ProductForm({
             {selectedVariant?.availableForSale ? (
               <>
                 <span>Order now</span>
-                {selectedVariant.price && (
+                {totalPrice && (
                   <span className="pdp-atc-price">
-                    · <Money as="span" data={selectedVariant.price} />
+                    · <Money as="span" data={totalPrice} />
                   </span>
                 )}
               </>
@@ -258,11 +339,21 @@ function ProductOptionSwatch({
 
   return (
     <>
-      <span
-        aria-label={name}
-        className={`product-swatch ${image ? 'product-swatch-has-image' : getSwatchTone(name, color)}`}
-      >
-        {!!image && <img src={image} alt={name} />}
+      <span className="product-swatch-wrap">
+        <span
+          aria-label={name}
+          className={`product-swatch ${image ? 'product-swatch-has-image' : getSwatchTone(name, color)}`}
+        >
+          {!!image && <img src={image} alt={name} />}
+        </span>
+        <span className="product-swatch-tooltip" role="tooltip">
+          <span
+            className={`product-swatch-tooltip-preview ${image ? 'product-swatch-has-image' : getSwatchTone(name, color)}`}
+          >
+            {!!image && <img src={image} alt={name} />}
+          </span>
+          <span className="product-swatch-tooltip-label">{name}</span>
+        </span>
       </span>
       {name}
     </>
