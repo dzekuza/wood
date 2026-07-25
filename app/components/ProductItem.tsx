@@ -1,27 +1,20 @@
+import {useEffect, useRef, useState} from 'react';
 import {Link} from 'react-router';
-import {Image, Money} from '@shopify/hydrogen';
-
-const DIMENSION_KEYWORDS = ['size', 'width', 'height', 'length', 'depth', 'thickness', 'diameter'];
-const STYLE_KEYWORDS = ['finish', 'color', 'colour', 'material', 'style', 'wood', 'stain'];
-
-function getVariantBadges(options?: {name: string}[]): string[] {
-  if (!options) return [];
-  return options
-    .filter(o => o.name.toLowerCase() !== 'title')
-    .map(o => {
-      const lower = o.name.toLowerCase();
-      if (DIMENSION_KEYWORDS.some(k => lower.includes(k))) return `Customisable ${o.name.toLowerCase()}`;
-      if (STYLE_KEYWORDS.some(k => lower.includes(k))) return `Choice of ${o.name.toLowerCase()}`;
-      return null;
-    })
-    .filter((b): b is string => b !== null);
-}
+import {Money} from '@shopify/hydrogen';
 import type {
   ProductItemFragment,
   CollectionItemFragment,
 } from 'storefrontapi.generated';
 import {useVariantUrl} from '~/lib/variants';
 import {useFavourites} from '~/hooks/useFavourites';
+
+type GalleryImage = {
+  id: string;
+  url: string;
+  altText?: string | null;
+  width?: number | null;
+  height?: number | null;
+};
 
 export function ProductItem({
   product,
@@ -32,11 +25,15 @@ export function ProductItem({
 }) {
   const variantUrl = useVariantUrl(product.handle);
   const image = product.featuredImage;
-  const vendor = (product as {vendor?: string}).vendor;
-  const options = (product as {options?: {name: string}[]}).options;
-  const badges = getVariantBadges(options);
   const {isFavourite, toggleFavourite} = useFavourites();
   const saved = isFavourite(product.id);
+
+  const price = product.priceRange.minVariantPrice;
+  const compareAtPrice = (product as {compareAtPriceRange?: {minVariantPrice: typeof price}}).compareAtPriceRange?.minVariantPrice;
+  const showCompareAt = compareAtPrice && Number(compareAtPrice.amount) > Number(price.amount);
+  const saveAmount = showCompareAt
+    ? (Number(compareAtPrice.amount) - Number(price.amount)).toFixed(2)
+    : null;
 
   const reviewsRaw = (product as {metafield?: {value: string} | null}).metafield?.value;
   const reviewStats = (() => {
@@ -49,16 +46,51 @@ export function ProductItem({
     } catch { return null; }
   })();
 
+  const galleryImages = (product as {images?: {nodes: GalleryImage[]}}).images?.nodes;
+  const gallery = galleryImages?.length ? galleryImages : image ? [image] : [];
+  const [imageIndex, setImageIndex] = useState(0);
+  const hoverTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const startCycling = () => {
+    if (gallery.length < 2 || hoverTimer.current) return;
+    hoverTimer.current = setInterval(() => {
+      setImageIndex((i) => (i + 1) % gallery.length);
+    }, 700);
+  };
+
+  const stopCycling = () => {
+    if (hoverTimer.current) {
+      clearInterval(hoverTimer.current);
+      hoverTimer.current = null;
+    }
+    setImageIndex(0);
+  };
+
+  useEffect(() => () => stopCycling(), []);
+
   return (
-    <Link className="pcard" key={product.id} prefetch="intent" to={variantUrl}>
+    <Link
+      className="pcard"
+      key={product.id}
+      prefetch="intent"
+      to={variantUrl}
+      onMouseEnter={startCycling}
+      onMouseLeave={stopCycling}
+    >
       <div className="pcard-img">
-        {image && (
-          <Image
-            alt={image.altText || product.title}
-            data={image}
+        {gallery.map((img, i) => (
+          <img
+            key={img.id}
+            src={img.url}
+            alt={img.altText || product.title}
             loading={loading}
-            sizes="(min-width: 45em) 400px, 100vw"
+            className={`pcard-img-frame${i === imageIndex ? ' active' : ''}`}
           />
+        ))}
+        {saveAmount && (
+          <span className="pcard-badge">
+            Save <Money data={{amount: saveAmount, currencyCode: price.currencyCode}} />
+          </span>
         )}
         {reviewStats && (
           <div className="pcard-rating">
@@ -77,31 +109,29 @@ export function ProductItem({
               handle: product.handle,
               title: product.title,
               image: image ? {url: image.url, altText: image.altText, width: image.width, height: image.height} : undefined,
-              price: product.priceRange.minVariantPrice,
+              price,
             });
           }}
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill={saved ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         </button>
-      </div>
-      <div className="pcard-body">
-        {(vendor || badges.length > 0) && (
-          <div className="pcard-tags">
-            {vendor && <span className="pcard-tag">{vendor}</span>}
-            {badges.map(b => (
-              <span key={b} className="pcard-tag pcard-tag--custom">{b}</span>
+        {gallery.length > 1 && (
+          <div className="pcard-dots">
+            {gallery.map((img, i) => (
+              <span key={img.id} className={`pcard-dot${i === imageIndex ? ' active' : ''}`} />
             ))}
           </div>
         )}
-        <div className="pcard-name">{product.title}</div>
-        <div className="pcard-row">
-          <span className="pcard-price">
-            <span className="pcard-from">From </span>
-            <Money data={product.priceRange.minVariantPrice} />
-          </span>
-          <span className="pcard-add" aria-label="Quick add">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="7" y1="1" x2="7" y2="13"/><line x1="1" y1="7" x2="13" y2="7"/></svg>
-          </span>
+      </div>
+      <div className="pcard-body">
+        <p className="pcard-name">{product.title}</p>
+        <div className="pcard-price">
+          <Money data={price} />
+          {showCompareAt && compareAtPrice && (
+            <span className="pcard-compare-at">
+              <Money data={compareAtPrice} />
+            </span>
+          )}
         </div>
       </div>
     </Link>

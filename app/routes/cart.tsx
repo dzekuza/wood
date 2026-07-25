@@ -1,4 +1,4 @@
-import {Link, useLoaderData, data, type HeadersFunction} from 'react-router';
+import {useLoaderData, data, type HeadersFunction} from 'react-router';
 import type {Route} from './+types/cart';
 import type {CartQueryDataReturn} from '@shopify/hydrogen';
 import {CartForm} from '@shopify/hydrogen';
@@ -106,27 +106,19 @@ export default function Cart() {
   const cart = useLoaderData<typeof loader>();
 
   return (
-    <>
-      <div className="page-header">
-        <div className="cwf-wrap">
-          <div className="page-breadcrumb">
-            <Link to="/">Home</Link>
-            <span>/</span>
-            <span>Cart</span>
-          </div>
-          <div className="page-header-inner">
-            <div>
-              <span className="eyebrow">Your basket</span>
-              <h1>Everything heading to your room.</h1>
-            </div>
+    <div className="archive-page">
+      <div className="archive-hero">
+        <div className="archive-wrap">
+          <div className="archive-hero-inner">
+            <h1 className="archive-hero-title">Everything heading to your room.</h1>
           </div>
         </div>
       </div>
       <section className="cart-page">
-        <div className="cwf-wrap">
+        <div className="archive-wrap">
           <CartMain layout="page" cart={cart} />
         </div>
       </section>
-    </>
+    </div>
   );
 }

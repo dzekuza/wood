@@ -77,25 +77,17 @@ export default function Article() {
   }).format(new Date(article.publishedAt));
 
   return (
-    <>
-      <div className="page-header">
-        <div className="cwf-wrap">
-          <div className="page-breadcrumb">
-            <span>Journal</span>
-            <span>/</span>
-            <span>{title}</span>
+    <div className="archive-page">
+      <div className="archive-hero">
+        <div className="archive-wrap">
+          <div className="archive-hero-inner">
+            <h1 className="archive-hero-title">{title}</h1>
           </div>
-          <div className="page-header-inner">
-            <div>
-              <span className="eyebrow">Workshop journal</span>
-              <h1>{title}</h1>
-              <p className="blurb">{publishedDate}{author?.name ? ` · ${author.name}` : ''}</p>
-            </div>
-          </div>
+          <p className="archive-hero-blurb">{publishedDate}{author?.name ? ` · ${author.name}` : ''}</p>
         </div>
       </div>
       <article className="article-page">
-        <div className="cwf-wrap">
+        <div className="archive-wrap">
           {image && <Image data={image} sizes="90vw" loading="eager" className="article-page-image" />}
           <div
             dangerouslySetInnerHTML={{__html: contentHtml}}
@@ -103,7 +95,7 @@ export default function Article() {
           />
         </div>
       </article>
-    </>
+    </div>
   );
 }
 

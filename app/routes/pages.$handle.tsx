@@ -75,29 +75,21 @@ export default function Page() {
   const {page} = useLoaderData<typeof loader>();
 
   return (
-    <>
-      <div className="page-header">
-        <div className="cwf-wrap">
-          <div className="page-breadcrumb">
-            <span>Pages</span>
-            <span>/</span>
-            <span>{page.title}</span>
-          </div>
-          <div className="page-header-inner">
-            <div>
-              <span className="eyebrow">From the workshop</span>
-              <h1>{page.title}</h1>
-            </div>
+    <div className="archive-page">
+      <div className="archive-hero">
+        <div className="archive-wrap">
+          <div className="archive-hero-inner">
+            <h1 className="archive-hero-title">{page.title}</h1>
           </div>
         </div>
       </div>
 
-      <section className="section-linen">
-        <div className="cwf-wrap">
+      <section className="section-white">
+        <div className="archive-wrap">
           <article className="cms-page-body" dangerouslySetInnerHTML={{__html: page.body}} />
         </div>
       </section>
-    </>
+    </div>
   );
 }
 

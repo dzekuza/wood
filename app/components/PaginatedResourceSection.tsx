@@ -24,7 +24,7 @@ export function PaginatedResourceSection<NodesType>({
 
         return (
           <div>
-            <PreviousLink className="btn btn-line">
+            <PreviousLink className="btn btn-line btn-pill">
               {isLoading ? (
                 'Loading...'
               ) : (
@@ -44,7 +44,7 @@ export function PaginatedResourceSection<NodesType>({
             ) : (
               resourcesMarkup
             )}
-            <NextLink className="btn btn-line">
+            <NextLink className="btn btn-line btn-pill">
               {isLoading ? (
                 'Loading...'
               ) : (

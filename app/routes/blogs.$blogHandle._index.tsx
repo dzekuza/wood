@@ -65,21 +65,15 @@ export default function Blog() {
   const {articles} = blog;
 
   return (
-    <div>
-      <div className="page-header">
-        <div className="cwf-wrap">
-          <div className="page-breadcrumb">
-            <Link to="/">Home</Link>
-            <span>/</span>
-            <Link to="/blogs">Journal</Link>
-            <span>/</span>
-            <span>{blog.title}</span>
+    <div className="archive-page">
+      <div className="archive-hero">
+        <div className="archive-wrap">
+          <div className="archive-hero-inner">
+            <h1 className="archive-hero-title">{blog.title}</h1>
           </div>
-          <div className="eyebrow">The Journal</div>
-          <h1>{blog.title}</h1>
         </div>
       </div>
-      <div className="cwf-wrap blog-index-section">
+      <div className="archive-wrap blog-index-section">
         <div className="blog-articles-grid">
           <PaginatedResourceSection<ArticleItemFragment> connection={articles}>
             {({node: article, index}) => (

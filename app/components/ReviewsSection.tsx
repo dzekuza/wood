@@ -149,7 +149,6 @@ export function ReviewsSection({reviews}: {reviews?: ProductReview[]}) {
         <div className="cwf-wrap">
           <div className="shead">
             <div>
-              <div className="eyebrow">Verified Etsy reviews</div>
               <h2 className="title">What our customers say</h2>
             </div>
             <div className="right">
@@ -199,7 +198,6 @@ export function ReviewsSection({reviews}: {reviews?: ProductReview[]}) {
       <div className="cwf-wrap">
         <div className="shead">
           <div>
-            <div className="eyebrow">Verified Etsy reviews</div>
             <h2 className="title">What our customers say</h2>
           </div>
           <div className="right">

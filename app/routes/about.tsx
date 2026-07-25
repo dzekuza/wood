@@ -34,35 +34,26 @@ export const meta: Route.MetaFunction = () => [
 
 export default function AboutPage() {
   return (
-    <>
-      <div className="page-header page-header-story">
-        <div className="cwf-wrap">
-          <div className="page-breadcrumb">
-            <Link to="/">Home</Link>
-            <span>/</span>
-            <span>About</span>
+    <div className="archive-page">
+      <div className="archive-hero">
+        <div className="archive-wrap">
+          <div className="archive-hero-inner">
+            <h1 className="archive-hero-title">
+              Made slowly, by hand, in the <em>Cotswolds</em>.
+            </h1>
           </div>
-          <div className="page-header-inner">
-            <div>
-              <span className="eyebrow">The workshop</span>
-              <h1>
-                Made slowly, by hand, in the <em>Cotswolds</em>.
-              </h1>
-              <p className="blurb">
-                Craft Wood Furniture is a small workshop in {WORKSHOP_LOCATION}. We build solid-timber
-                furniture the old way: careful stock selection, visible joinery, and finishes meant to age
-                well in lived-in rooms.
-              </p>
-            </div>
-          </div>
+          <p className="archive-hero-blurb">
+            Craft Wood Furniture is a small workshop in {WORKSHOP_LOCATION}. We build solid-timber
+            furniture the old way: careful stock selection, visible joinery, and finishes meant to age
+            well in lived-in rooms.
+          </p>
         </div>
       </div>
 
-      <section className="section-linen">
-        <div className="cwf-wrap">
+      <section className="section-white">
+        <div className="archive-wrap">
           <div className="story-grid">
             <div className="story-copy">
-              <div className="eyebrow">What we believe</div>
               <h2 className="title">Furniture should feel honest before it feels impressive.</h2>
               <p>
                 We build pieces that show their material, their structure, and the time they took to make.
@@ -85,11 +76,10 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="section-linen-cont">
-        <div className="cwf-wrap">
+      <section className="section-white-cont">
+        <div className="archive-wrap">
           <div className="shead">
             <div>
-              <div className="eyebrow">How we work</div>
               <h2 className="title">A small bench, a short material chain, and zero rush.</h2>
             </div>
           </div>
@@ -104,11 +94,10 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="section-linen-cont">
-        <div className="cwf-wrap">
+      <section className="section-white-cont">
+        <div className="archive-wrap">
           <div className="story-cta">
             <div>
-              <div className="eyebrow">Visit or enquire</div>
               <h2 className="title">See the timber, the bench, and the work in progress.</h2>
               <p>
                 We welcome appointments for commissions, material reviews, and in-person viewings of current
@@ -116,16 +105,16 @@ export default function AboutPage() {
               </p>
             </div>
             <div className="story-cta-actions">
-              <Link to="/contact" className="btn btn-primary">
+              <Link to="/contact" className="btn btn-primary btn-pill">
                 Plan a visit <i className="ti ti-arrow-right" />
               </Link>
-              <Link to="/collections/all" className="btn btn-line">
+              <Link to="/collections/all" className="btn btn-line btn-pill">
                 Browse the collection
               </Link>
             </div>
           </div>
         </div>
       </section>
-    </>
+    </div>
   );
 }

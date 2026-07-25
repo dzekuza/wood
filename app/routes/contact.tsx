@@ -1,4 +1,3 @@
-import {Link} from 'react-router';
 import type {Route} from './+types/contact';
 import {
   CONTACT_EMAIL,
@@ -44,44 +43,35 @@ export const meta: Route.MetaFunction = () => [
 
 export default function ContactPage() {
   return (
-    <>
-      <div className="page-header page-header-story">
-        <div className="cwf-wrap">
-          <div className="page-breadcrumb">
-            <Link to="/">Home</Link>
-            <span>/</span>
-            <span>Contact</span>
+    <div className="archive-page">
+      <div className="archive-hero">
+        <div className="archive-wrap">
+          <div className="archive-hero-inner">
+            <h1 className="archive-hero-title">
+              Start with a question, a sketch, or a <em>room in mind</em>.
+            </h1>
           </div>
-          <div className="page-header-inner">
-            <div>
-              <span className="eyebrow">Get in touch</span>
-              <h1>
-                Start with a question, a sketch, or a <em>room in mind</em>.
-              </h1>
-              <p className="blurb">
-                We handle enquiries directly from the workshop. Use email for detailed project notes, or call
-                for a quick conversation about lead time, timber, or arranging a visit to {WORKSHOP_LOCATION}.
-              </p>
-            </div>
-          </div>
+          <p className="archive-hero-blurb">
+            We handle enquiries directly from the workshop. Use email for detailed project notes, or call
+            for a quick conversation about lead time, timber, or arranging a visit to {WORKSHOP_LOCATION}.
+          </p>
         </div>
       </div>
 
-      <section className="section-linen">
-        <div className="cwf-wrap">
+      <section className="section-white">
+        <div className="archive-wrap">
           <div className="contact-shell">
             <div className="contact-primary-card">
-              <div className="eyebrow">Direct contact</div>
               <h2 className="title">No ticket desk, no chatbot, no fake form.</h2>
               <p>
                 We would rather answer fewer messages properly than hide behind a generic inbox. Reach out
                 directly and we will respond with the right next step.
               </p>
               <div className="contact-action-row">
-                <a href={`mailto:${CONTACT_EMAIL}`} className="btn btn-primary">
+                <a href={`mailto:${CONTACT_EMAIL}`} className="btn btn-primary btn-pill">
                   Email the workshop <i className="ti ti-arrow-right" />
                 </a>
-                <a href={`tel:${CONTACT_PHONE_HREF}`} className="btn btn-line">
+                <a href={`tel:${CONTACT_PHONE_HREF}`} className="btn btn-line btn-pill">
                   Call {CONTACT_PHONE_DISPLAY}
                 </a>
               </div>
@@ -115,11 +105,10 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section className="section-linen-cont">
-        <div className="cwf-wrap">
+      <section className="section-white-cont">
+        <div className="archive-wrap">
           <div className="shead">
             <div>
-              <div className="eyebrow">What to send</div>
               <h2 className="title">The more practical the enquiry, the faster we can help.</h2>
             </div>
           </div>
@@ -133,6 +122,6 @@ export default function ContactPage() {
           </div>
         </div>
       </section>
-    </>
+    </div>
   );
 }

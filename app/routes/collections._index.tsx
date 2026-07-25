@@ -58,31 +58,24 @@ export default function Collections() {
   const {collections} = useLoaderData<typeof loader>();
 
   return (
-    <>
-      {/* Page header */}
-      <div className="page-header">
-        <div className="cwf-wrap">
-          <div className="page-breadcrumb">
-            <Link to="/">Home</Link>
-            <span>/</span>
-            <span>Collections</span>
+    <div className="archive-page">
+      {/* Hero */}
+      <div className="archive-hero">
+        <div className="archive-wrap">
+          <div className="archive-hero-inner">
+            <h1 className="archive-hero-title">
+              Browse <em>Collections</em>
+            </h1>
           </div>
-          <div className="page-header-inner">
-            <div>
-              <h1>
-                Browse <em>Collections</em>
-              </h1>
-              <div className="blurb">
-                Every piece of furniture, sorted by room. All solid wood, all made in our workshop.
-              </div>
-            </div>
-          </div>
+          <p className="archive-hero-blurb">
+            Every piece of furniture, sorted by room. All solid wood, all made in our workshop.
+          </p>
         </div>
       </div>
 
       {/* Grid */}
       <div className="collections-index-shell">
-        <div className="cwf-wrap">
+        <div className="archive-wrap">
           <PaginatedResourceSection<CollectionFragment>
             connection={collections}
             resourcesClassName="collections-grid-new"
@@ -97,7 +90,7 @@ export default function Collections() {
           </PaginatedResourceSection>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

@@ -794,7 +794,7 @@ function ArticlesSection({articles}: {articles: ArticleNode[]}) {
             <div className="eyebrow">From the Journal</div>
             <h2 className="title">Thoughts from the bench</h2>
           </div>
-          <Link to="/blogs/journal" className="btn btn-line">
+          <Link to="/blogs/journal" className="btn btn-line btn-pill">
             All articles <i className="ti ti-arrow-right" />
           </Link>
         </Reveal>

@@ -1,4 +1,4 @@
-import {redirect, useLoaderData, Link, NavLink} from 'react-router';
+import {redirect, useLoaderData} from 'react-router';
 import type {Route} from './+types/collections.$handle';
 import {getPaginationVariables, Analytics} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
@@ -6,7 +6,6 @@ import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {ProductItem} from '~/components/ProductItem';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 import {SITE_NAME} from '~/lib/site';
-import {SortDropdown, SORT_OPTIONS} from '~/components/SortDropdown';
 import type {SortValue} from '~/components/SortDropdown';
 
 export const meta: Route.MetaFunction = ({data}) => {
@@ -48,13 +47,10 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   const sortParam = (url.searchParams.get('sort') ?? 'newest') as SortValue;
   const {sortKey, reverse} = SORT_MAP[sortParam] ?? SORT_MAP.newest;
 
-  const [{collection}, {collections}] = await Promise.all([
-    storefront.query(COLLECTION_QUERY, {
-      variables: {handle, ...paginationVariables, sortKey, reverse},
-      cache: storefront.CacheNone(),
-    }),
-    storefront.query(ALL_COLLECTIONS_QUERY, {cache: storefront.CacheNone()}),
-  ]);
+  const {collection} = await storefront.query(COLLECTION_QUERY, {
+    variables: {handle, ...paginationVariables, sortKey, reverse},
+    cache: storefront.CacheNone(),
+  });
 
   if (!collection) {
     throw new Response(`Collection ${handle} not found`, {
@@ -67,8 +63,6 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
 
   return {
     collection,
-    collections: collections.nodes,
-    sortParam,
   };
 }
 
@@ -83,63 +77,23 @@ function loadDeferredData({context}: Route.LoaderArgs) {
 
 
 export default function Collection() {
-  const {collection, collections, sortParam} = useLoaderData<typeof loader>();
+  const {collection} = useLoaderData<typeof loader>();
 
   return (
-    <>
-      {/* Dark page header */}
-      <div className="page-header">
-        <div className="cwf-wrap">
-          <div className="page-breadcrumb">
-            <Link to="/">Home</Link>
-            <span>/</span>
-            <Link to="/collections">Collections</Link>
-            <span>/</span>
-            <span>{collection.title}</span>
+    <div className="archive-page">
+      <div className="archive-hero">
+        <div className="archive-wrap">
+          <div className="archive-hero-inner">
+            <h1 className="archive-hero-title">{collection.title}</h1>
           </div>
-          <div className="page-header-inner">
-            <div>
-              <h1>{collection.title}</h1>
-              {collection.description && (
-                <div className="blurb">{collection.description}</div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Filter bar */}
-      <div className="filter-bar">
-        <div className="filter-bar-row">
-          <div className="filter-chips">
-            <NavLink
-              to="/collections/all"
-              className="filter-chip"
-              end
-            >
-              All
-            </NavLink>
-            {collections.map((col) => (
-              <NavLink
-                key={col.handle}
-                to={`/collections/${col.handle}`}
-                className={({isActive}) => `filter-chip${isActive ? ' active' : ''}`}
-              >
-                {col.title}
-              </NavLink>
-            ))}
-          </div>
-          <div className="filter-bar-meta">
-            <span className="filter-bar-count">
-              {collection.products.nodes.length} pieces
-            </span>
-            <SortDropdown current={sortParam} />
-          </div>
+          {collection.description && (
+            <p className="archive-hero-blurb">{collection.description}</p>
+          )}
         </div>
       </div>
 
       <div className="shop-shell">
-        <div className="cwf-wrap">
+        <div className="archive-wrap">
           <PaginatedResourceSection<ProductItemFragment>
             connection={collection.products}
             resourcesClassName="pgrid"
@@ -163,7 +117,7 @@ export default function Collection() {
           },
         }}
       />
-    </>
+    </div>
   );
 }
 
@@ -186,6 +140,15 @@ const PRODUCT_ITEM_FRAGMENT = `#graphql
       width
       height
     }
+    images(first: 4) {
+      nodes {
+        id
+        url
+        altText
+        width
+        height
+      }
+    }
     priceRange {
       minVariantPrice {
         ...MoneyProductItem
@@ -194,20 +157,13 @@ const PRODUCT_ITEM_FRAGMENT = `#graphql
         ...MoneyProductItem
       }
     }
+    compareAtPriceRange {
+      minVariantPrice {
+        ...MoneyProductItem
+      }
+    }
     metafield(namespace: "reviews", key: "product_reviews") {
       value
-    }
-  }
-` as const;
-
-const ALL_COLLECTIONS_QUERY = `#graphql
-  query AllCollections {
-    collections(first: 20, sortKey: TITLE) {
-      nodes {
-        id
-        title
-        handle
-      }
     }
   }
 ` as const;

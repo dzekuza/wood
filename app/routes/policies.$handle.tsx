@@ -46,31 +46,21 @@ export default function Policy() {
   const {policy} = useLoaderData<typeof loader>();
 
   return (
-    <>
-      <div className="page-header">
-        <div className="cwf-wrap">
-          <div className="page-breadcrumb">
-            <Link to="/">Home</Link>
-            <span>/</span>
-            <Link to="/policies">Policies</Link>
-            <span>/</span>
-            <span>{policy.title}</span>
-          </div>
-          <div className="page-header-inner">
-            <div>
-              <span className="eyebrow">Policy</span>
-              <h1>{policy.title}</h1>
-            </div>
+    <div className="archive-page">
+      <div className="archive-hero">
+        <div className="archive-wrap">
+          <div className="archive-hero-inner">
+            <h1 className="archive-hero-title">{policy.title}</h1>
           </div>
         </div>
       </div>
       <section className="cms-page-shell">
-        <div className="cwf-wrap">
-          <Link to="/policies" className="btn btn-line policy-back-link">Back to policies</Link>
+        <div className="archive-wrap">
+          <Link to="/policies" className="btn btn-line btn-pill policy-back-link">Back to policies</Link>
           <article className="cms-page-body" dangerouslySetInnerHTML={{__html: policy.body}} />
         </div>
       </section>
-    </>
+    </div>
   );
 }
 

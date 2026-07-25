@@ -194,10 +194,10 @@ function SearchResultsEmpty() {
         coat rack work best.
       </p>
       <div className="search-empty-actions">
-        <Link className="btn btn-primary" to="/collections/all">
+        <Link className="btn btn-primary btn-pill" to="/collections/all">
           Browse all pieces
         </Link>
-        <Link className="btn btn-line" to="/blogs">
+        <Link className="btn btn-line btn-pill" to="/blogs">
           Read the journal
         </Link>
       </div>

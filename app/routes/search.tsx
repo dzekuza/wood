@@ -43,23 +43,17 @@ export default function SearchPage() {
   const hasResults = Boolean(term && result?.total);
 
   return (
-    <>
-      <div className="page-header">
-        <div className="cwf-wrap">
-          <div className="page-breadcrumb">
-            <span>Search</span>
+    <div className="archive-page">
+      <div className="archive-hero">
+        <div className="archive-wrap">
+          <div className="archive-hero-inner">
+            <h1 className="archive-hero-title">Find the right piece.</h1>
           </div>
-          <div className="page-header-inner">
-            <div>
-              <span className="eyebrow">Store search</span>
-              <h1>Find the right piece.</h1>
-              <p className="blurb">Search products, journal entries, and workshop pages in one place.</p>
-            </div>
-          </div>
+          <p className="archive-hero-blurb">Search products, journal entries, and workshop pages in one place.</p>
         </div>
       </div>
       <section className="search-page">
-        <div className="cwf-wrap">
+        <div className="archive-wrap">
           <div className="search-page-shell">
             <div className="search-page-intro">
               <span className="search-page-kicker">Search the collection</span>
@@ -123,7 +117,7 @@ export default function SearchPage() {
           <Analytics.SearchView data={{searchTerm: term, searchResults: result}} />
         </div>
       </section>
-    </>
+    </div>
   );
 }
 

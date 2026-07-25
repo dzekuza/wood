@@ -1,11 +1,10 @@
 import type {Route} from './+types/collections.all';
-import {useLoaderData, Link, NavLink} from 'react-router';
+import {useLoaderData, Link} from 'react-router';
 import {useState} from 'react';
 import {getPaginationVariables} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {ProductItem} from '~/components/ProductItem';
 import {SITE_NAME} from '~/lib/site';
-import {SortDropdown} from '~/components/SortDropdown';
 import type {SortValue} from '~/components/SortDropdown';
 import type {CollectionItemFragment} from 'storefrontapi.generated';
 
@@ -39,6 +38,29 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
   return {products, collections: collections.nodes, sortParam};
 }
 
+const FAQ_ITEMS = [
+  {
+    question: 'What wood do you use?',
+    answer: 'Every piece is made from solid oak, hand-selected for grain and durability — no veneers, no MDF.',
+  },
+  {
+    question: 'How long does delivery take?',
+    answer: 'Most orders ship within 5–10 business days. Larger made-to-order pieces can take up to 4 weeks — exact estimates are shown at checkout.',
+  },
+  {
+    question: 'Do you offer a warranty?',
+    answer: 'Yes, every piece comes with a 5-year structural warranty covering joinery and hardware.',
+  },
+  {
+    question: 'Can pieces be customised?',
+    answer: 'Many of our pieces support custom dimensions and finish options — look for the "Customisable" tag on the product page.',
+  },
+  {
+    question: 'How do I care for solid wood furniture?',
+    answer: 'Dust with a dry cloth and avoid direct sunlight or damp. A light oil treatment once a year keeps the finish looking new.',
+  },
+];
+
 // ── page ──────────────────────────────────────────────────────────────────────
 
 export default function AllProducts() {
@@ -47,52 +69,35 @@ export default function AllProducts() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   return (
-    <>
-      <div className="page-header">
-        <div className="cwf-wrap">
-          <div className="page-breadcrumb">
-            <Link to="/">Home</Link>
-            <span>/</span>
-            <Link to="/collections">Collections</Link>
-            <span>/</span>
-            <span>All Products</span>
+    <div className="archive-page">
+      <div className="archive-hero">
+        <div className="archive-wrap">
+          <div className="archive-hero-inner">
+            <h1 className="archive-hero-title">Products</h1>
           </div>
-          <div className="page-header-inner">
-            <div>
-              <h1>Every piece, every <em>room</em>.</h1>
-              <p className="blurb">
-                Solid-timber furniture made to outlast the trends. Browse the full range or filter by what you need.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      {/* Filter bar */}
-      <div className="filter-bar">
-        <div className="filter-bar-row">
-          <div className="filter-chips">
-            <NavLink to="/collections/all" className="filter-chip active" end>
-              All
-            </NavLink>
-            {collections.map((col) => (
-              <NavLink
-                key={col.handle}
-                to={`/collections/${col.handle}`}
-                className="filter-chip"
-              >
-                {col.title}
-              </NavLink>
-            ))}
-          </div>
-          <div className="filter-bar-meta">
-            <SortDropdown current={sortParam} />
-          </div>
+          {collections.length > 0 && (
+            <div className="category-row">
+              {collections.slice(0, 4).map((col) => {
+                const image = (col as {image?: {url: string; altText: string | null}}).image;
+                return (
+                  <Link key={col.handle} to={`/collections/${col.handle}`} className="category-card">
+                    {image && (
+                      <div className="category-card-img">
+                        <img src={image.url} alt={image.altText ?? col.title} loading="lazy" />
+                      </div>
+                    )}
+                    <span className="category-card-name">{col.title}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
 
       <div className="shop-shell">
-        <div className="cwf-wrap">
+        <div className="archive-wrap">
           <span className="filter-bar-count filter-bar-count-block">{products.nodes.length} pieces</span>
           <div className="pgrid">
             {(products.nodes as CollectionItemFragment[]).map((product, index) => (
@@ -101,6 +106,20 @@ export default function AllProducts() {
                 product={product}
                 loading={index < 12 ? 'eager' : undefined}
               />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="archive-faq">
+        <div className="archive-wrap">
+          <h2 className="archive-faq-title">Still have questions?</h2>
+          <div className="faq-list">
+            {FAQ_ITEMS.map((item) => (
+              <details key={item.question} className="faq-item">
+                <summary>{item.question}</summary>
+                <div className="faq-item-body">{item.answer}</div>
+              </details>
             ))}
           </div>
         </div>
@@ -138,12 +157,12 @@ export default function AllProducts() {
               </div>
             </div>
             <div className="mob-filter-footer">
-              <button className="btn btn-primary" onClick={() => setMobileFiltersOpen(false)}>Show {products.nodes.length} pieces</button>
+              <button className="btn btn-primary btn-pill" onClick={() => setMobileFiltersOpen(false)}>Show {products.nodes.length} pieces</button>
             </div>
           </aside>
         </div>
       )}
-    </>
+    </div>
   );
 }
 
@@ -168,9 +187,21 @@ const COLLECTION_ITEM_FRAGMENT = `#graphql
       width
       height
     }
+    images(first: 4) {
+      nodes {
+        id
+        url
+        altText
+        width
+        height
+      }
+    }
     priceRange {
       minVariantPrice { ...MoneyCollectionItem }
       maxVariantPrice { ...MoneyCollectionItem }
+    }
+    compareAtPriceRange {
+      minVariantPrice { ...MoneyCollectionItem }
     }
     metafield(namespace: "reviews", key: "product_reviews") {
       value
@@ -185,6 +216,12 @@ const ALL_COLLECTIONS_QUERY = `#graphql
         id
         title
         handle
+        image {
+          url
+          altText
+          width
+          height
+        }
       }
     }
   }

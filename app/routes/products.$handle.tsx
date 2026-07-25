@@ -239,7 +239,25 @@ export default function Product() {
   function scrollToSlide(i: number) {
     const track = carouselRef.current;
     if (!track) return;
-    track.scrollTo({left: track.clientWidth * i, behavior: 'smooth'});
+    const start = track.scrollLeft;
+    const target = track.clientWidth * i;
+    const distance = target - start;
+    const duration = 420;
+    let startTime: number | null = null;
+
+    function easeInOutCubic(t: number) {
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+
+    function step(timestamp: number) {
+      if (startTime === null) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      track!.scrollLeft = start + distance * easeInOutCubic(progress);
+      if (progress < 1) requestAnimationFrame(step);
+    }
+
+    requestAnimationFrame(step);
   }
 
   function handleCarouselScroll() {
@@ -250,10 +268,10 @@ export default function Product() {
   }
 
   return (
-    <>
+    <div className="archive-page">
       {/* Breadcrumb */}
       <div className="crumbbar">
-        <div className="cwf-wrap">
+        <div className="archive-wrap">
           <div className="crumb">
             <Link to="/">Home</Link>
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
@@ -491,7 +509,6 @@ export default function Product() {
             <div className="pdp-specs">
               <div className="pdp-specs-head">
                 <div>
-                  <div className="ey eyebrow">By the numbers</div>
                   <h2 className="pdp-specs-title">The honest specifications.</h2>
                 </div>
               </div>
@@ -533,7 +550,6 @@ export default function Product() {
         <div className="pdp-related">
           <div className="related-head">
             <div>
-              <div className="ey">You may also like</div>
               <h2>Recommended for you.</h2>
             </div>
             <Link to="/collections/all">
@@ -558,7 +574,7 @@ export default function Product() {
           </div>
           <div className="pdp-atc-wrap">
             <AddToCartButton
-              className="btn btn-primary pdp-atc-btn"
+              className="btn btn-primary btn-pill pdp-atc-btn"
               disabled={!selectedVariant || !selectedVariant.availableForSale}
               onClick={() => open('cart')}
               lines={cartLines}
@@ -585,7 +601,7 @@ export default function Product() {
           ],
         }}
       />
-    </>
+    </div>
   );
 }
 
@@ -692,9 +708,15 @@ const PRODUCT_RECOMMENDATIONS_QUERY = `#graphql
       handle
       options { name }
       featuredImage { id altText url width height }
+      images(first: 4) {
+        nodes { id url altText width height }
+      }
       priceRange {
         minVariantPrice { amount currencyCode }
         maxVariantPrice { amount currencyCode }
+      }
+      compareAtPriceRange {
+        minVariantPrice { amount currencyCode }
       }
       metafield(namespace: "reviews", key: "product_reviews") { value }
     }

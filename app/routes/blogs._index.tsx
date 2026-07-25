@@ -55,20 +55,17 @@ export default function Blogs() {
   const {blogs} = useLoaderData<typeof loader>();
 
   return (
-    <>
-      <div className="page-header">
-        <div className="cwf-wrap">
-          <div className="page-header-inner">
-            <div>
-              <span className="eyebrow">Journal</span>
-              <h1>Stories from the bench.</h1>
-              <p className="blurb">Finish notes, workshop process, and interiors that are meant to age well.</p>
-            </div>
+    <div className="archive-page">
+      <div className="archive-hero">
+        <div className="archive-wrap">
+          <div className="archive-hero-inner">
+            <h1 className="archive-hero-title">Stories from the bench.</h1>
           </div>
+          <p className="archive-hero-blurb">Finish notes, workshop process, and interiors that are meant to age well.</p>
         </div>
       </div>
       <section className="collections-index-shell">
-        <div className="cwf-wrap">
+        <div className="archive-wrap">
           <div className="blog-index-grid">
             <PaginatedResourceSection<BlogNode> connection={blogs}>
               {({node: blog}) => (
@@ -87,7 +84,7 @@ export default function Blogs() {
           </div>
         </div>
       </section>
-    </>
+    </div>
   );
 }
 
