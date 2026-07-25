@@ -17,6 +17,7 @@ import {BrushIcon} from '~/components/animate-ui/icons/brush';
 import {PaintbrushIcon} from '~/components/animate-ui/icons/paintbrush';
 import {FrameIcon} from '~/components/animate-ui/icons/frame';
 import {Reveal} from '~/components/animate-ui/Reveal';
+import {StaggerGroup, StaggerItem} from '~/components/animate-ui/StaggerGroup';
 import {
   isValidNewsletterEmail,
   normalizeNewsletterEmail,
@@ -257,7 +258,9 @@ function SaleShowcaseSection({
   return (
     <section className="sale-showcase">
       <div className="sale-showcase-inner">
-        <h2 className="sale-showcase-title">On sale this month.</h2>
+        <Reveal>
+          <h2 className="sale-showcase-title">On sale this month.</h2>
+        </Reveal>
 
         <Suspense fallback={null}>
           <Await resolve={products}>
@@ -314,11 +317,13 @@ function SaleShowcaseCarousel({
 
   return (
     <div className="sale-carousel">
-      <div className="sale-carousel-track" ref={trackRef} onScroll={handleScroll}>
+      <StaggerGroup ref={trackRef} className="sale-carousel-track" onScroll={handleScroll}>
         {items.map((product) => (
-          <SaleProductCard key={product.id} product={product} isSale={isSale} />
+          <StaggerItem key={product.id}>
+            <SaleProductCard product={product} isSale={isSale} />
+          </StaggerItem>
         ))}
-      </div>
+      </StaggerGroup>
 
       {pageCount > 1 && (
         <div className="sale-carousel-nav">
