@@ -68,20 +68,18 @@ git commit -m "feat: add shared motion tokens for landing page animations"
 
 ```tsx
 // app/components/animate-ui/Reveal.tsx
-import * as React from 'react';
 import {motion, type HTMLMotionProps} from 'motion/react';
 import {useIsInView} from '~/hooks/use-is-in-view';
 import {DISTANCE, DURATION, EASE_OUT} from '~/lib/motion';
 
-interface RevealProps extends Omit<HTMLMotionProps<'div'>, 'ref'> {
+interface RevealProps extends HTMLMotionProps<'div'> {
   delay?: number;
   y?: number;
   once?: boolean;
 }
 
-function Reveal({delay = 0, y = DISTANCE, once = true, children, ...props}: RevealProps) {
-  const localRef = React.useRef<HTMLDivElement>(null);
-  const {ref, isInView} = useIsInView<HTMLDivElement>(localRef, {inViewOnce: once});
+function Reveal({delay = 0, y = DISTANCE, once = true, children, ref: externalRef, ...props}: RevealProps) {
+  const {ref, isInView} = useIsInView<HTMLDivElement>(externalRef ?? null, {inViewOnce: once});
 
   return (
     <motion.div
@@ -130,7 +128,6 @@ git commit -m "feat: add Reveal scroll-in animation primitive"
 
 ```tsx
 // app/components/animate-ui/StaggerGroup.tsx
-import * as React from 'react';
 import {motion, type HTMLMotionProps, type Variants} from 'motion/react';
 import {useIsInView} from '~/hooks/use-is-in-view';
 import {DISTANCE, DURATION, EASE_OUT, STAGGER} from '~/lib/motion';
@@ -149,13 +146,12 @@ const itemVariants: Variants = {
   },
 };
 
-interface StaggerGroupProps extends Omit<HTMLMotionProps<'div'>, 'ref'> {
+interface StaggerGroupProps extends HTMLMotionProps<'div'> {
   once?: boolean;
 }
 
-function StaggerGroup({once = true, children, ...props}: StaggerGroupProps) {
-  const localRef = React.useRef<HTMLDivElement>(null);
-  const {ref, isInView} = useIsInView<HTMLDivElement>(localRef, {inViewOnce: once});
+function StaggerGroup({once = true, children, ref: externalRef, ...props}: StaggerGroupProps) {
+  const {ref, isInView} = useIsInView<HTMLDivElement>(externalRef ?? null, {inViewOnce: once});
 
   return (
     <motion.div
