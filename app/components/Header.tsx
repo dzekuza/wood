@@ -123,7 +123,8 @@ export function HeaderMenu({
 function AccountLink({isLoggedIn}: Pick<HeaderProps, 'isLoggedIn'>) {
   return (
     <NavLink prefetch="intent" to="/account" aria-label="Account" className="header-account-btn">
-      Account
+      <i className="ti ti-user" aria-hidden />
+      <span className="header-account-label">Account</span>
     </NavLink>
   );
 }
@@ -175,11 +176,13 @@ function CartBadge({
       className="header-cart-btn"
     >
       <i className="ti ti-shopping-cart" aria-hidden />
-      {subtotal?.amount && subtotal.currencyCode ? (
-        <Money data={{amount: subtotal.amount, currencyCode: subtotal.currencyCode as CartApiQueryFragment['cost']['subtotalAmount']['currencyCode']}} />
-      ) : (
-        <span>$0.00</span>
-      )}
+      <span className="header-cart-amount">
+        {subtotal?.amount && subtotal.currencyCode ? (
+          <Money data={{amount: subtotal.amount, currencyCode: subtotal.currencyCode as CartApiQueryFragment['cost']['subtotalAmount']['currencyCode']}} />
+        ) : (
+          '$0.00'
+        )}
+      </span>
     </a>
   );
 }
