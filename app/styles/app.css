@@ -2511,7 +2511,7 @@ section { padding: 0; }
   left: 0;
   right: 0;
   height: 48px;
-  background: linear-gradient(to bottom, transparent, var(--cwf-surface));
+  background: linear-gradient(to bottom, transparent, #fff);
   pointer-events: none;
 }
 .pdp-sub-toggle {
@@ -2758,10 +2758,7 @@ section { padding: 0; }
 
 /* ---- Hero v2 (headline + collection showcase) ---- */
 .hero {
-  background:
-    radial-gradient(ellipse 70% 60% at 102% -8%, rgba(201,162,122,.22), transparent 60%),
-    radial-gradient(ellipse 60% 50% at -8% 108%, rgba(122,90,58,.10), transparent 55%),
-    var(--cwf-surface);
+  background: #fff;
   color: var(--cwf-primary);
   position: relative;
   overflow: hidden;
@@ -3130,7 +3127,7 @@ section { padding: 0; }
 @media (max-width: 780px) { .shead { flex-direction: column; align-items: flex-start; } }
 
 /* ---- Archive hero (Products page) ---- */
-.archive-page { background: #fff; }
+.archive-page { background: #fff; display: flow-root; }
 .archive-hero { padding: 64px 0 0; }
 .archive-hero-inner { display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
 .archive-hero-title { font-family: 'Mark Bold', 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: clamp(40px, 5vw, 72px); letter-spacing: -.02em; color: var(--cwf-primary); line-height: 1.05; }
