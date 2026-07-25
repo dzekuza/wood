@@ -16,6 +16,7 @@ import {AxeIcon} from '~/components/animate-ui/icons/axe';
 import {BrushIcon} from '~/components/animate-ui/icons/brush';
 import {PaintbrushIcon} from '~/components/animate-ui/icons/paintbrush';
 import {FrameIcon} from '~/components/animate-ui/icons/frame';
+import {Reveal} from '~/components/animate-ui/Reveal';
 import {
   isValidNewsletterEmail,
   normalizeNewsletterEmail,
@@ -155,29 +156,31 @@ function HeroSection({showcase}: {showcase: HeroShowcaseQuery | undefined}) {
     <section className="hero">
       <div className="hero-inner">
         <div className="hero-head">
-          <h1>
-            Built by hand.
-            <br />
-            Made to <em>last a lifetime.</em>
-          </h1>
-          <div className="hero-cta">
+          <Reveal>
+            <h1>
+              Built by hand.
+              <br />
+              Made to <em>last a lifetime.</em>
+            </h1>
+          </Reveal>
+          <Reveal delay={0.08} className="hero-cta">
             <Link to="/collections/all" className="btn btn-primary btn-pill">
               Shop the collection
             </Link>
             <Link to="/about" className="btn btn-line btn-pill">
               Our story
             </Link>
-          </div>
+          </Reveal>
         </div>
 
-        <div className="hero-showcase">
+        <Reveal delay={0.16} className="hero-showcase">
           <HeroShowcaseCard collection={doorStops} />
           <HeroShowcaseCard collection={shelves} />
           <div className="hero-showcase-wide">
             <HeroShowcaseRow collection={mantelBeams} />
             <HeroShowcaseRow collection={coatRacks} />
           </div>
-        </div>
+        </Reveal>
       </div>
     </section>
   );
