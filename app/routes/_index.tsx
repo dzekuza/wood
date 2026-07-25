@@ -514,15 +514,17 @@ function SaleSpotlightSection({
   return (
     <section className="spotlight">
       <div className="cwf-wrap">
-        <h2 className="spotlight-title">
-          Fresh off the bench.
-          <br />
-          Ready to bring home.
-        </h2>
+        <Reveal>
+          <h2 className="spotlight-title">
+            Fresh off the bench.
+            <br />
+            Ready to bring home.
+          </h2>
+        </Reveal>
         <div className="spotlight-grid">
-          <div className="spotlight-photo">
+          <Reveal delay={0.1} className="spotlight-photo">
             <img src="/images/bento-2.jpg" alt="A finished piece styled in a home" />
-          </div>
+          </Reveal>
           <div className="spotlight-panel">
             <Suspense fallback={null}>
               <Await resolve={products}>
@@ -559,11 +561,13 @@ function SaleSpotlightCarousel({
 
   return (
     <>
-      <div className="spotlight-cards">
+      <StaggerGroup className="spotlight-cards">
         {current.map((product) => (
-          <SaleProductCard key={product.id} product={product} isSale={isSale} />
+          <StaggerItem key={product.id}>
+            <SaleProductCard product={product} isSale={isSale} />
+          </StaggerItem>
         ))}
-      </div>
+      </StaggerGroup>
 
       {pageCount > 1 && (
         <div className="sale-carousel-nav">
