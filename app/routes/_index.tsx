@@ -1,6 +1,7 @@
 import {Await, useFetcher, useLoaderData, Link, data} from 'react-router';
 import type {Route} from './+types/_index';
 import {Suspense, useEffect, useRef, useState} from 'react';
+import {motion} from 'motion/react';
 import {Image, Money} from '@shopify/hydrogen';
 import type {
   HeroShowcaseQuery,
@@ -18,6 +19,8 @@ import {PaintbrushIcon} from '~/components/animate-ui/icons/paintbrush';
 import {FrameIcon} from '~/components/animate-ui/icons/frame';
 import {Reveal} from '~/components/animate-ui/Reveal';
 import {StaggerGroup, StaggerItem} from '~/components/animate-ui/StaggerGroup';
+import {useIsInView} from '~/hooks/use-is-in-view';
+import {DURATION, EASE_OUT} from '~/lib/motion';
 import {
   isValidNewsletterEmail,
   normalizeNewsletterEmail,
@@ -616,12 +619,28 @@ const CRAFT_LIGHT_STATS = [
 function CraftLightSection() {
   const [imageIndex, setImageIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const craftCopyLocalRef = useRef<HTMLDivElement>(null);
+  const craftVisualLocalRef = useRef<HTMLDivElement>(null);
+  const {ref: craftCopyRef, isInView: craftCopyInView} = useIsInView<HTMLDivElement>(
+    craftCopyLocalRef,
+    {inViewOnce: true},
+  );
+  const {ref: craftVisualRef, isInView: craftVisualInView} = useIsInView<HTMLDivElement>(
+    craftVisualLocalRef,
+    {inViewOnce: true},
+  );
 
   return (
     <section className="craft-light">
       <div className="cwf-wrap">
         <div className="craft-light-top">
-          <div className="craft-light-copy">
+          <motion.div
+            ref={craftCopyRef}
+            className="craft-light-copy"
+            initial={{opacity: 0, transform: 'translateX(-20px)'}}
+            animate={craftCopyInView ? {opacity: 1, transform: 'translateX(0px)'} : undefined}
+            transition={{duration: DURATION, ease: EASE_OUT}}
+          >
             <h2>
               Four pairs of hands.
               <br />
@@ -633,8 +652,14 @@ function CraftLightSection() {
             <p>
               If you ever damage a joint, we&rsquo;ll repair it. For twenty-five years. By the same hands that made it.
             </p>
-          </div>
-          <div className="craft-light-visual">
+          </motion.div>
+          <motion.div
+            ref={craftVisualRef}
+            className="craft-light-visual"
+            initial={{opacity: 0, transform: 'translateX(20px)'}}
+            animate={craftVisualInView ? {opacity: 1, transform: 'translateX(0px)'} : undefined}
+            transition={{duration: DURATION, ease: EASE_OUT}}
+          >
             <img
               src={CRAFT_LIGHT_IMAGES[imageIndex].src}
               alt={CRAFT_LIGHT_IMAGES[imageIndex].alt}
@@ -658,17 +683,17 @@ function CraftLightSection() {
             >
               <i className="ti ti-chevron-right" />
             </button>
-          </div>
+          </motion.div>
         </div>
 
-        <div className="craft-light-stats">
+        <StaggerGroup className="craft-light-stats">
           {CRAFT_LIGHT_STATS.map((stat) => (
-            <div key={stat.cap} className="craft-light-stat">
+            <StaggerItem key={stat.cap} className="craft-light-stat">
               <div className="num">{stat.num}</div>
               <div className="cap">{stat.cap}</div>
-            </div>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerGroup>
       </div>
 
       {lightboxOpen && (
