@@ -473,28 +473,32 @@ function WorkshopStepsSection() {
   return (
     <section className="workshop">
       <div className="cwf-wrap">
-        <h2 className="workshop-title">
-          Every piece passes through
-          <br />
-          four pairs of hands.
-        </h2>
+        <Reveal>
+          <h2 className="workshop-title">
+            Every piece passes through
+            <br />
+            four pairs of hands.
+          </h2>
+        </Reveal>
         <div className="workshop-grid">
-          <div className="workshop-photo">
+          <Reveal delay={0.1} className="workshop-photo">
             <img src="/images/bento-1.jpg" alt="Craftsman shaping timber in the workshop" />
-          </div>
-          <div className="workshop-cards">
+          </Reveal>
+          <StaggerGroup className="workshop-cards">
             {WORKSHOP_STEPS.map((step) => (
-              <AnimateIcon key={step.title} animateOnHover asChild>
-                <div className="workshop-card">
-                  <step.Icon className="ic" size={64} />
-                  <div>
-                    <h3>{step.title}</h3>
-                    <p>{step.desc}</p>
+              <StaggerItem key={step.title}>
+                <AnimateIcon animateOnHover asChild>
+                  <div className="workshop-card">
+                    <step.Icon className="ic" size={64} />
+                    <div>
+                      <h3>{step.title}</h3>
+                      <p>{step.desc}</p>
+                    </div>
                   </div>
-                </div>
-              </AnimateIcon>
+                </AnimateIcon>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerGroup>
         </div>
       </div>
     </section>
