@@ -789,7 +789,7 @@ function ArticlesSection({articles}: {articles: ArticleNode[]}) {
   return (
     <section className="section-linen art-section">
       <div className="cwf-wrap">
-        <div className="shead">
+        <Reveal className="shead">
           <div>
             <div className="eyebrow">From the Journal</div>
             <h2 className="title">Thoughts from the bench</h2>
@@ -797,7 +797,7 @@ function ArticlesSection({articles}: {articles: ArticleNode[]}) {
           <Link to="/blogs/journal" className="btn btn-line">
             All articles <i className="ti ti-arrow-right" />
           </Link>
-        </div>
+        </Reveal>
         <div className="art-grid">
           {articles.map((a) => (
             <Link
@@ -846,7 +846,7 @@ function NewsletterSection() {
             <path d="M191.365 26.2393L138.208 79.3965L145.635 86.8232L182.506 49.9531L191.365 58.8125L154.494 95.6826L191.365 132.554L182.506 141.413L145.635 104.542L138.209 111.969L191.365 165.126L182.506 173.985L120.489 111.97L136.775 95.6826L120.489 79.3965L182.506 17.3799L191.365 26.2393Z" fill="currentColor"/>
             <path d="M173.985 8.85938L120.828 62.0156L111.97 70.876L95.6826 54.5889L79.3965 70.876L17.3799 8.85938L26.2393 0L79.3965 53.1572L86.8232 45.7295L49.9531 8.85938L58.8125 0L95.6826 36.8701L132.554 0L141.413 8.85938L104.542 45.7295L111.969 53.1562L165.126 0L173.985 8.85938Z" fill="currentColor"/>
           </svg>
-          <div className="news-content">
+          <Reveal className="news-content">
             <div className="eyebrow">The Journal</div>
             <h2 className="title">
               A letter from the bench, <em>once a month.</em>
@@ -854,7 +854,7 @@ function NewsletterSection() {
             <p>
               Notes on timber, the slow business of joinery, and quiet word when a new collection is opening for orders. No marketing, ever.
             </p>
-          </div>
+          </Reveal>
           <div className="news-form-wrap">
             <newsletter.Form className="news-form" method="post">
               <input type="hidden" name="intent" value="newsletter-subscribe" />
