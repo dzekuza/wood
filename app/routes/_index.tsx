@@ -1,7 +1,7 @@
 import {Await, useFetcher, useLoaderData, Link, data} from 'react-router';
 import type {Route} from './+types/_index';
 import {Suspense, useEffect, useRef, useState} from 'react';
-import {motion} from 'motion/react';
+import {motion, type Variants} from 'motion/react';
 import {Image, Money} from '@shopify/hydrogen';
 import type {
   HeroShowcaseQuery,
@@ -722,32 +722,41 @@ const GALLERY_IMAGES: LightboxImage[] = [
 function GallerySection() {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
+  const galleryItemVariants: Variants = {
+    hidden: {opacity: 0, transform: 'scale(0.96)'},
+    visible: {
+      opacity: 1,
+      transform: 'scale(1)',
+      transition: {duration: DURATION, ease: EASE_OUT},
+    },
+  };
+
   return (
     <section className="gallery">
       <div className="cwf-wrap">
-        <div className="gallery-top">
-          <div className="gallery-large">
+        <StaggerGroup className="gallery-top">
+          <StaggerItem className="gallery-large" variants={galleryItemVariants}>
             <img
               src={GALLERY_IMAGES[0].src}
               alt={GALLERY_IMAGES[0].alt}
               onClick={() => setLightboxIndex(0)}
             />
-          </div>
+          </StaggerItem>
           <div className="gallery-quad">
             {GALLERY_IMAGES.slice(1, 5).map((img, i) => (
-              <div key={img.src} className="gallery-quad-item">
+              <StaggerItem key={img.src} className="gallery-quad-item" variants={galleryItemVariants}>
                 <img src={img.src} alt={img.alt} onClick={() => setLightboxIndex(i + 1)} />
-              </div>
+              </StaggerItem>
             ))}
           </div>
-        </div>
-        <div className="gallery-bottom">
+        </StaggerGroup>
+        <StaggerGroup className="gallery-bottom">
           {GALLERY_IMAGES.slice(5).map((img, i) => (
-            <div key={img.src} className="gallery-bottom-item">
+            <StaggerItem key={img.src} className="gallery-bottom-item" variants={galleryItemVariants}>
               <img src={img.src} alt={img.alt} onClick={() => setLightboxIndex(i + 5)} />
-            </div>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerGroup>
       </div>
 
       {lightboxIndex !== null && (
