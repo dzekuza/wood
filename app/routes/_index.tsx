@@ -1,24 +1,28 @@
 import {Await, useFetcher, useLoaderData, Link, data} from 'react-router';
 import type {Route} from './+types/_index';
-import {Suspense, useRef, useState} from 'react';
-import type {CSSProperties} from 'react';
+import {Suspense, useEffect, useRef, useState} from 'react';
 import {Image, Money} from '@shopify/hydrogen';
 import type {
-  FeaturedProductsQuery,
-  FeaturedProductFragment,
-  FeaturedCollectionsQuery,
-  HeroProductQuery,
+  HeroShowcaseQuery,
+  SaleProductsQuery,
+  SaleProductFragment,
 } from 'storefrontapi.generated';
 import {MockShopNotice} from '~/components/MockShopNotice';
+import {Lightbox, type LightboxImage} from '~/components/Lightbox';
 import {ReviewsSection} from '~/components/ReviewsSection';
 import {HOMEPAGE_REVIEWS} from '~/lib/reviews';
-import {ProductItem} from '~/components/ProductItem';
+import {AnimateIcon} from '~/components/animate-ui/icons/icon';
+import {AxeIcon} from '~/components/animate-ui/icons/axe';
+import {BrushIcon} from '~/components/animate-ui/icons/brush';
+import {PaintbrushIcon} from '~/components/animate-ui/icons/paintbrush';
+import {FrameIcon} from '~/components/animate-ui/icons/frame';
 import {
   isValidNewsletterEmail,
   normalizeNewsletterEmail,
   subscribeEmailToNewsletter,
 } from '~/lib/newsletter.server';
 import {SITE_NAME} from '~/lib/site';
+import {EXCLUDE_HIDDEN_PRODUCTS_QUERY} from '~/lib/upsells';
 
 
 export const meta: Route.MetaFunction = () => {
@@ -90,28 +94,28 @@ export async function loader(args: Route.LoaderArgs) {
 }
 
 async function loadCriticalData({context}: Route.LoaderArgs) {
-  const [{collections}, {blogs}, {products}] = await Promise.all([
-    context.storefront.query(FEATURED_COLLECTIONS_QUERY),
+  const [{blogs}, heroShowcase] = await Promise.all([
     context.storefront.query(FEATURED_ARTICLES_QUERY),
-    context.storefront.query(HERO_PRODUCT_QUERY),
+    context.storefront.query(HERO_SHOWCASE_QUERY),
   ]);
   const articles = blogs.nodes[0]?.articles.nodes ?? [];
   return {
     isShopLinked: Boolean(context.env.PUBLIC_STORE_DOMAIN),
-    featuredCollections: collections.nodes,
     featuredArticles: articles,
-    heroProduct: products.nodes[0] ?? null,
+    heroShowcase,
   };
 }
 
 function loadDeferredData({context}: Route.LoaderArgs) {
-  const featuredProducts = context.storefront
-    .query(FEATURED_PRODUCTS_QUERY)
+  const saleProducts = context.storefront
+    .query(SALE_PRODUCTS_QUERY, {
+      variables: {query: EXCLUDE_HIDDEN_PRODUCTS_QUERY},
+    })
     .catch((error: Error) => {
       console.error(error);
       return null;
     });
-  return {featuredProducts};
+  return {saleProducts};
 }
 
 export default function Homepage() {
@@ -119,12 +123,12 @@ export default function Homepage() {
   return (
     <div>
       {data.isShopLinked ? null : <MockShopNotice />}
-      <HeroSection product={data.heroProduct} />
-      <MarqueeStrip />
-      <CollectionsSection collections={data.featuredCollections} />
-      <ProductsSection products={data.featuredProducts} />
-      <CraftSection />
-      <FeaturesBar />
+      <HeroSection showcase={data.heroShowcase} />
+      <SaleShowcaseSection products={data.saleProducts} />
+      <WorkshopStepsSection />
+      <SaleSpotlightSection products={data.saleProducts} />
+      <CraftLightSection />
+      <GallerySection />
       <ReviewsSection reviews={HOMEPAGE_REVIEWS} />
       <ArticlesSection articles={data.featuredArticles} />
       <NewsletterSection />
@@ -133,54 +137,45 @@ export default function Homepage() {
 }
 
 /* ─── Hero ─────────────────────────────────────────────────────────────────── */
-function HeroSection({
-  product,
-}: {
-  product: HeroProductQuery['products']['nodes'][number] | null;
-}) {
-  const image = product?.featuredImage;
+type HeroShowcaseCollection = NonNullable<
+  HeroShowcaseQuery['doorStops'] | HeroShowcaseQuery['shelves']
+>;
+
+function heroShowcaseImage(collection: HeroShowcaseCollection | null | undefined) {
+  return collection?.image ?? collection?.products.nodes[0]?.featuredImage ?? null;
+}
+
+function HeroSection({showcase}: {showcase: HeroShowcaseQuery | undefined}) {
+  const doorStops = showcase?.doorStops;
+  const shelves = showcase?.shelves;
+  const mantelBeams = showcase?.mantelBeams;
+  const coatRacks = showcase?.coatRacks;
+
   return (
     <section className="hero">
-      <div className="hero-grid">
-        {/* Copy + image */}
-        <div className="hero-copy">
+      <div className="hero-inner">
+        <div className="hero-head">
           <h1>
-            Built by hand.<br />Made to <em>last a lifetime.</em>
+            Built by hand.
+            <br />
+            Made to <em>last a lifetime.</em>
           </h1>
-          <p className="lede">
-            Solid timber furniture, joined and finished by a small workshop in the Cotswolds. No flat-pack, no veneers — just timber, traditional joinery, and patience pressed into every piece.
-          </p>
           <div className="hero-cta">
-            <Link to="/collections/all" className="btn btn-dark">
-              Shop the collection <i className="ti ti-arrow-right" />
+            <Link to="/collections/all" className="btn btn-primary btn-pill">
+              Shop the collection
             </Link>
-            <Link to="/about" className="btn btn-line">
-              <i className="ti ti-player-play" /> Our story
+            <Link to="/about" className="btn btn-line btn-pill">
+              Our story
             </Link>
           </div>
-          <div className="hero-image">
-            <img
-              src={image?.url ?? '/images/hero.jpg'}
-              alt={image?.altText ?? 'Solid oak mantel beam with log burner'}
-            />
-            {product ? (
-              <Link to={`/products/${product.handle}`} className="hero-floater">
-                <div>
-                  <div className="hero-floater-label">Featured</div>
-                  <div className="hero-floater-name">{product.title}</div>
-                </div>
-                <span className="price">
-                  <Money data={product.priceRange.minVariantPrice} />
-                </span>
-              </Link>
-            ) : null}
-            <div className="hero-badge">
-              <span className="icon"><i className="ti ti-certificate" /></span>
-              <div>
-                <div className="t1">25-year guarantee</div>
-                <div className="t2">On every piece we make</div>
-              </div>
-            </div>
+        </div>
+
+        <div className="hero-showcase">
+          <HeroShowcaseCard collection={doorStops} />
+          <HeroShowcaseCard collection={shelves} />
+          <div className="hero-showcase-wide">
+            <HeroShowcaseRow collection={mantelBeams} />
+            <HeroShowcaseRow collection={coatRacks} />
           </div>
         </div>
       </div>
@@ -188,226 +183,540 @@ function HeroSection({
   );
 }
 
-/* ─── Marquee strip ─────────────────────────────────────────────────────────── */
-const MARQUEE_ITEMS = [
-  {icon: 'ti-tree', text: 'European white oak'},
-  {icon: 'ti-hammer', text: 'Mortise & tenon joinery'},
-  {icon: 'ti-flame', text: 'Hand-rubbed oils'},
-  {icon: 'ti-leaf', text: 'FSC-certified timber'},
-  {icon: 'ti-shield-check', text: '25-year guarantee'},
-  {icon: 'ti-truck', text: 'White-glove delivery'},
-];
+function HeroShowcaseCard({
+  collection,
+}: {
+  collection: HeroShowcaseCollection | null | undefined;
+}) {
+  if (!collection) return null;
+  const image = heroShowcaseImage(collection);
 
-const MARQUEE_DOUBLED = [...MARQUEE_ITEMS, ...MARQUEE_ITEMS];
-
-function MarqueeStrip() {
   return (
-    <div className="marquee-strip">
-      <div className="marquee-row">
-        {MARQUEE_DOUBLED.map((item, i) => (
-          <span key={`${item.icon}-${item.text}-${i < MARQUEE_ITEMS.length ? 'a' : 'b'}`}>
-            <i className={`ti ${item.icon}`} />
-            {item.text}
-          </span>
-        ))}
+    <div className="hero-showcase-card">
+      {image ? (
+        <img src={image.url} alt={image.altText ?? collection.title} />
+      ) : (
+        <div className="hero-showcase-image-placeholder" />
+      )}
+      <p>{collection.title}</p>
+      <Link to={`/collections/${collection.handle}`} className="btn btn-pill hero-showcase-link">
+        Explore now
+      </Link>
+    </div>
+  );
+}
+
+function HeroShowcaseRow({
+  collection,
+}: {
+  collection: HeroShowcaseCollection | null | undefined;
+}) {
+  if (!collection) return null;
+  const image = heroShowcaseImage(collection);
+
+  return (
+    <div className="hero-showcase-row">
+      {image ? (
+        <img src={image.url} alt={image.altText ?? collection.title} />
+      ) : (
+        <div className="hero-showcase-image-placeholder" />
+      )}
+      <div className="hero-showcase-row-copy">
+        <p>{collection.title}</p>
+        <Link to={`/collections/${collection.handle}`} className="btn btn-pill hero-showcase-link">
+          Explore now
+        </Link>
       </div>
     </div>
   );
 }
 
-/* ─── Collections (carousel) ─────────────────────────────────────────────────── */
-function CollectionsSection({
-  collections,
-}: {
-  collections: FeaturedCollectionsQuery['collections']['nodes'];
-}) {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const [scrollPct, setScrollPct] = useState(0);
-
-  const handleScroll = () => {
-    const el = trackRef.current;
-    if (!el) return;
-    const max = el.scrollWidth - el.clientWidth;
-    setScrollPct(max > 0 ? el.scrollLeft / max : 0);
-  };
-
-  return (
-    <section className="section-linen">
-      <div className="cwf-wrap">
-        <div className="shead">
-          <div>
-            <div className="eyebrow">01 · Collections</div>
-            <h2 className="title">
-              Six rooms.<br />Each one furnished in solid timber.
-            </h2>
-          </div>
-          <div className="right">
-            <Link to="/collections">Browse all rooms <i className="ti ti-arrow-right" /></Link>
-          </div>
-        </div>
-
-        <div className="ccarousel">
-          <div className="ccarousel-track" ref={trackRef} onScroll={handleScroll}>
-            {collections.map((col) => (
-              <Link key={col.id} to={`/collections/${col.handle}`} className="ccard">
-                <div className="ccard-img">
-                  {col.image?.url ? (
-                    <img src={col.image.url} alt={col.image.altText ?? col.title} loading="lazy" />
-                  ) : null}
-                  <span className="ccard-arrow" aria-hidden>
-                    <i className="ti ti-arrow-up-right" />
-                  </span>
-                </div>
-                <div className="ccard-body">
-                  <h3 className="ccard-title">{col.title}</h3>
-                </div>
-              </Link>
-            ))}
-          </div>
-
-          <div className="ccarousel-progress">
-            <div
-              className="ccarousel-progress-bar"
-              style={{'--progress': scrollPct} as CSSProperties}
-            />
-          </div>
-        </div>
-      </div>
-    </section>
-  );
+/* ─── Sale showcase (carousel) ───────────────────────────────────────────────── */
+function pickSaleProducts(
+  products: SaleProductFragment[],
+): {items: SaleProductFragment[]; isSale: boolean} {
+  const onSale = products.filter((product) => {
+    const price = Number(product.priceRange.minVariantPrice.amount);
+    const compareAt = Number(
+      product.compareAtPriceRange?.minVariantPrice.amount ?? 0,
+    );
+    return compareAt > price;
+  });
+  if (onSale.length >= 3) return {items: onSale.slice(0, 8), isSale: true};
+  return {items: products.slice(0, 6), isSale: false};
 }
 
-/* ─── Featured Products ─────────────────────────────────────────────────────── */
-function ProductsSection({
+function SaleShowcaseSection({
   products,
 }: {
-  products: Promise<FeaturedProductsQuery | null>;
+  products: Promise<SaleProductsQuery | null>;
 }) {
   return (
-    <section className="section-linen-cont">
-      <div className="cwf-wrap">
-        <div className="shead">
-          <div>
-            <div className="eyebrow">02 · This season</div>
-            <h2 className="title">
-              Pieces from the bench, this month.
-            </h2>
-          </div>
-          <div className="right">
-            <Link to="/collections/all">Shop all new <i className="ti ti-arrow-right" /></Link>
-          </div>
-        </div>
+    <section className="sale-showcase">
+      <div className="sale-showcase-inner">
+        <h2 className="sale-showcase-title">On sale this month.</h2>
 
-        <Suspense
-          fallback={
-            <div className="products-grid">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="pcard pcard-skeleton" />
-              ))}
-            </div>
-          }
-        >
+        <Suspense fallback={null}>
           <Await resolve={products}>
             {(response) => {
-              const items: FeaturedProductFragment[] = response?.products?.nodes ?? [];
+              const all = response?.products?.nodes ?? [];
+              if (!all.length) return null;
+              const {items, isSale} = pickSaleProducts(all);
               if (!items.length) return null;
-              return (
-                <div className="products-grid">
-                  {items.map((product) => (
-                    <ProductItem key={product.id} product={product} loading="lazy" />
-                  ))}
-                </div>
-              );
+              return <SaleShowcaseCarousel items={items} isSale={isSale} />;
             }}
           </Await>
         </Suspense>
+
+        <Link to="/collections/all" className="btn btn-line btn-pill cta-center">
+          View all products
+        </Link>
       </div>
     </section>
   );
 }
 
-/* ─── Craft section ─────────────────────────────────────────────────────────── */
-function CraftSection() {
+function SaleShowcaseCarousel({
+  items,
+  isSale,
+}: {
+  items: SaleProductFragment[];
+  isSale: boolean;
+}) {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [page, setPage] = useState(0);
+  const [pageCount, setPageCount] = useState(1);
+
+  const measure = () => {
+    const el = trackRef.current;
+    if (!el || el.clientWidth === 0) return;
+    setPageCount(Math.max(1, Math.ceil(el.scrollWidth / el.clientWidth)));
+    setPage(Math.round(el.scrollLeft / el.clientWidth));
+  };
+
+  const handleScroll = () => measure();
+
+  const scrollByPage = (dir: 1 | -1) => {
+    const el = trackRef.current;
+    if (!el) return;
+    el.scrollBy({left: dir * el.clientWidth, behavior: 'smooth'});
+  };
+
+  useEffect(() => {
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items.length]);
+
   return (
-    <section className="craft">
-      <div className="cwf-wrap">
-        <div className="craft-visual">
-          <img src="/images/craft.jpg" alt="Craftsman at work" />
-          <div className="craft-card">
-            <span className="av" />
-            <div>
-              <div className="nm">Tom Whitfield</div>
-              <div className="rl">Founder · master joiner, 28 years</div>
-            </div>
-          </div>
-        </div>
-        <div className="craft-copy">
-          <div className="eyebrow">Our workshop</div>
-          <h2 className="title">
-            Four pairs of hands.<br /><em>One bench at a time.</em>
-          </h2>
-          <p>
-            We make slowly, on purpose. A single dining table passes through every joiner in the workshop before it leaves us — rough-cut by Will, drawn by Tom, jointed by Iris, oiled by Sam. No two pieces look alike because no two trees do.
-          </p>
-          <p>
-            If you ever damage a joint, we&rsquo;ll repair it. For twenty-five years. By the same hands that made it.
-          </p>
-
-          <div className="craft-stats">
-            <div>
-              <div className="num">120<sup className="stat-unit">+</sup></div>
-              <div className="cap">Hours per dining table</div>
-            </div>
-            <div>
-              <div className="num">25<sup className="stat-unit">yr</sup></div>
-              <div className="cap">Repair guarantee</div>
-            </div>
-            <div>
-              <div className="num">0</div>
-              <div className="cap">Veneers · ever</div>
-            </div>
-            <div>
-              <div className="num">3</div>
-              <div className="cap">Counties of timber sourced</div>
-            </div>
-          </div>
-
-          <div className="craft-signoff">
-            <Link to="/about" className="btn btn-primary">
-              Visit the workshop <i className="ti ti-arrow-right" />
-            </Link>
-            <span className="craft-appt">Saturdays · by appointment</span>
-          </div>
-        </div>
+    <div className="sale-carousel">
+      <div className="sale-carousel-track" ref={trackRef} onScroll={handleScroll}>
+        {items.map((product) => (
+          <SaleProductCard key={product.id} product={product} isSale={isSale} />
+        ))}
       </div>
-    </section>
+
+      {pageCount > 1 && (
+        <div className="sale-carousel-nav">
+          <button
+            type="button"
+            className="sale-carousel-arrow reset"
+            onClick={() => scrollByPage(-1)}
+            disabled={page === 0}
+            aria-label="Previous"
+          >
+            <i className="ti ti-chevron-left" />
+          </button>
+          <div className="sale-carousel-dots">
+            {Array.from({length: pageCount}).map((_, i) => (
+              <span key={i} className={`sale-carousel-dot${i === page ? ' active' : ''}`} />
+            ))}
+          </div>
+          <button
+            type="button"
+            className="sale-carousel-arrow reset"
+            onClick={() => scrollByPage(1)}
+            disabled={page >= pageCount - 1}
+            aria-label="Next"
+          >
+            <i className="ti ti-chevron-right" />
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
 
-/* ─── Process section ───────────────────────────────────────────────────────── */
+function SaleProductCard({
+  product,
+  isSale,
+}: {
+  product: SaleProductFragment;
+  isSale: boolean;
+}) {
+  const price = product.priceRange.minVariantPrice;
+  const compareAt = product.compareAtPriceRange?.minVariantPrice;
+  const showCompareAt =
+    isSale && compareAt && Number(compareAt.amount) > Number(price.amount);
+  const saveAmount = showCompareAt
+    ? (Number(compareAt.amount) - Number(price.amount)).toFixed(2)
+    : null;
 
-/* ─── Features bar ──────────────────────────────────────────────────────────── */
-const FEATURES = [
-  {icon: 'ti-truck', title: 'White-glove delivery', desc: 'Two-person crew, room of choice, packaging removed.'},
-  {icon: 'ti-certificate', title: '25-year guarantee', desc: 'Free repairs on any joint we made, for a quarter-century.'},
-  {icon: 'ti-refresh', title: '30-day at-home trial', desc: "Live with it. If it isn't right, we collect and refund."},
-  {icon: 'ti-leaf', title: 'FSC-certified timber', desc: 'Every board traced to a managed European forest.'},
+  const gallery = product.images.nodes.length ? product.images.nodes : product.featuredImage
+    ? [product.featuredImage]
+    : [];
+  const [imageIndex, setImageIndex] = useState(0);
+  const hoverTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const startCycling = () => {
+    if (gallery.length < 2 || hoverTimer.current) return;
+    hoverTimer.current = setInterval(() => {
+      setImageIndex((i) => (i + 1) % gallery.length);
+    }, 700);
+  };
+
+  const stopCycling = () => {
+    if (hoverTimer.current) {
+      clearInterval(hoverTimer.current);
+      hoverTimer.current = null;
+    }
+    setImageIndex(0);
+  };
+
+  useEffect(() => () => stopCycling(), []);
+
+  return (
+    <Link
+      to={`/products/${product.handle}`}
+      className="sale-card"
+      prefetch="intent"
+      onMouseEnter={startCycling}
+      onMouseLeave={stopCycling}
+    >
+      <div className="sale-card-img">
+        {gallery.length ? (
+          gallery.map((img, i) => (
+            <img
+              key={img.id}
+              src={img.url}
+              alt={img.altText ?? product.title}
+              loading="lazy"
+              className={`sale-card-img-frame${i === imageIndex ? ' active' : ''}`}
+            />
+          ))
+        ) : (
+          <div className="sale-card-image-placeholder" />
+        )}
+        {gallery.length > 1 && (
+          <div className="sale-card-dots">
+            {gallery.map((img, i) => (
+              <span
+                key={img.id}
+                className={`sale-card-dot${i === imageIndex ? ' active' : ''}`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+      {saveAmount && (
+        <span className="sale-card-badge">
+          Save <Money data={{amount: saveAmount, currencyCode: price.currencyCode}} />
+        </span>
+      )}
+      <p className="sale-card-title">{product.title}</p>
+      <div className="sale-card-price">
+        <Money data={price} />
+        {showCompareAt && compareAt && (
+          <span className="sale-card-compare-at">
+            <Money data={compareAt} />
+          </span>
+        )}
+      </div>
+    </Link>
+  );
+}
+
+/* ─── Workshop steps ──────────────────────────────────────────────────────────── */
+const WORKSHOP_STEPS = [
+  {
+    Icon: AxeIcon,
+    title: 'Rough-cut',
+    desc: 'Every board starts as rough-sawn timber, hand-selected by Will for grain and character.',
+  },
+  {
+    Icon: BrushIcon,
+    title: 'Drawn & marked',
+    desc: 'Tom draws each joint by hand before a single cut is made — no two pieces are ever identical.',
+  },
+  {
+    Icon: FrameIcon,
+    title: 'Jointed by hand',
+    desc: "Iris cuts and fits every joint on the bench, the same way it's been done for generations.",
+  },
+  {
+    Icon: PaintbrushIcon,
+    title: 'Oiled & finished',
+    desc: 'Sam hand-oils each piece, backed by our 25-year repair guarantee.',
+  },
 ];
 
-function FeaturesBar() {
+function WorkshopStepsSection() {
   return (
-    <section className="section-linen-cont">
+    <section className="workshop">
       <div className="cwf-wrap">
-        <div className="features">
-          {FEATURES.map((f) => (
-            <div key={f.title} className="f">
-              <i className={`ti ${f.icon}`} />
-              <h4>{f.title}</h4>
-              <p>{f.desc}</p>
+        <h2 className="workshop-title">
+          Every piece passes through
+          <br />
+          four pairs of hands.
+        </h2>
+        <div className="workshop-grid">
+          <div className="workshop-photo">
+            <img src="/images/bento-1.jpg" alt="Craftsman shaping timber in the workshop" />
+          </div>
+          <div className="workshop-cards">
+            {WORKSHOP_STEPS.map((step) => (
+              <AnimateIcon key={step.title} animateOnHover asChild>
+                <div className="workshop-card">
+                  <step.Icon className="ic" size={64} />
+                  <div>
+                    <h3>{step.title}</h3>
+                    <p>{step.desc}</p>
+                  </div>
+                </div>
+              </AnimateIcon>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── Sale spotlight ──────────────────────────────────────────────────────────── */
+function SaleSpotlightSection({
+  products,
+}: {
+  products: Promise<SaleProductsQuery | null>;
+}) {
+  return (
+    <section className="spotlight">
+      <div className="cwf-wrap">
+        <h2 className="spotlight-title">
+          Fresh off the bench.
+          <br />
+          Ready to bring home.
+        </h2>
+        <div className="spotlight-grid">
+          <div className="spotlight-photo">
+            <img src="/images/bento-2.jpg" alt="A finished piece styled in a home" />
+          </div>
+          <div className="spotlight-panel">
+            <Suspense fallback={null}>
+              <Await resolve={products}>
+                {(response) => {
+                  const all = response?.products?.nodes ?? [];
+                  if (!all.length) return null;
+                  const {items, isSale} = pickSaleProducts(all);
+                  if (!items.length) return null;
+                  return <SaleSpotlightCarousel items={items} isSale={isSale} />;
+                }}
+              </Await>
+            </Suspense>
+          </div>
+        </div>
+        <Link to="/collections/all" className="btn btn-line btn-pill cta-center">
+          View all products
+        </Link>
+      </div>
+    </section>
+  );
+}
+
+function SaleSpotlightCarousel({
+  items,
+  isSale,
+}: {
+  items: SaleProductFragment[];
+  isSale: boolean;
+}) {
+  const [page, setPage] = useState(0);
+  const perPage = 2;
+  const pageCount = Math.max(1, Math.ceil(items.length / perPage));
+  const current = items.slice(page * perPage, page * perPage + perPage);
+
+  return (
+    <>
+      <div className="spotlight-cards">
+        {current.map((product) => (
+          <SaleProductCard key={product.id} product={product} isSale={isSale} />
+        ))}
+      </div>
+
+      {pageCount > 1 && (
+        <div className="sale-carousel-nav">
+          <button
+            type="button"
+            className="sale-carousel-arrow reset"
+            onClick={() => setPage((p) => Math.max(0, p - 1))}
+            disabled={page === 0}
+            aria-label="Previous"
+          >
+            <i className="ti ti-chevron-left" />
+          </button>
+          <div className="sale-carousel-dots">
+            {Array.from({length: pageCount}).map((_, i) => (
+              <span key={i} className={`sale-carousel-dot${i === page ? ' active' : ''}`} />
+            ))}
+          </div>
+          <button
+            type="button"
+            className="sale-carousel-arrow reset"
+            onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
+            disabled={page >= pageCount - 1}
+            aria-label="Next"
+          >
+            <i className="ti ti-chevron-right" />
+          </button>
+        </div>
+      )}
+    </>
+  );
+}
+
+/* ─── Craft (light card variant) ─────────────────────────────────────────────── */
+const CRAFT_LIGHT_IMAGES: LightboxImage[] = [
+  {src: '/images/bento-3.jpg', alt: 'Craftsman at work in the workshop'},
+  {src: '/images/bento-4.jpg', alt: 'Craftsman at work in the workshop'},
+  {src: '/images/bento-5.jpg', alt: 'Craftsman at work in the workshop'},
+];
+const CRAFT_LIGHT_STATS = [
+  {num: '120+', cap: 'Hours per dining table'},
+  {num: '25yr', cap: 'Repair guarantee'},
+  {num: '0', cap: 'Veneers · ever'},
+  {num: '3', cap: 'Counties of timber sourced'},
+];
+
+function CraftLightSection() {
+  const [imageIndex, setImageIndex] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+
+  return (
+    <section className="craft-light">
+      <div className="cwf-wrap">
+        <div className="craft-light-top">
+          <div className="craft-light-copy">
+            <h2>
+              Four pairs of hands.
+              <br />
+              One bench at a time.
+            </h2>
+            <p>
+              We make slowly, on purpose. A single dining table passes through every joiner in the workshop before it leaves us — rough-cut by Will, drawn by Tom, jointed by Iris, oiled by Sam. No two pieces look alike because no two trees do.
+            </p>
+            <p>
+              If you ever damage a joint, we&rsquo;ll repair it. For twenty-five years. By the same hands that made it.
+            </p>
+          </div>
+          <div className="craft-light-visual">
+            <img
+              src={CRAFT_LIGHT_IMAGES[imageIndex].src}
+              alt={CRAFT_LIGHT_IMAGES[imageIndex].alt}
+              onClick={() => setLightboxOpen(true)}
+            />
+            <button
+              type="button"
+              className="craft-light-arrow prev reset"
+              onClick={() =>
+                setImageIndex((i) => (i - 1 + CRAFT_LIGHT_IMAGES.length) % CRAFT_LIGHT_IMAGES.length)
+              }
+              aria-label="Previous image"
+            >
+              <i className="ti ti-chevron-left" />
+            </button>
+            <button
+              type="button"
+              className="craft-light-arrow next reset"
+              onClick={() => setImageIndex((i) => (i + 1) % CRAFT_LIGHT_IMAGES.length)}
+              aria-label="Next image"
+            >
+              <i className="ti ti-chevron-right" />
+            </button>
+          </div>
+        </div>
+
+        <div className="craft-light-stats">
+          {CRAFT_LIGHT_STATS.map((stat) => (
+            <div key={stat.cap} className="craft-light-stat">
+              <div className="num">{stat.num}</div>
+              <div className="cap">{stat.cap}</div>
             </div>
           ))}
         </div>
       </div>
+
+      {lightboxOpen && (
+        <Lightbox
+          images={CRAFT_LIGHT_IMAGES}
+          index={imageIndex}
+          onClose={() => setLightboxOpen(false)}
+          onNavigate={setImageIndex}
+        />
+      )}
+    </section>
+  );
+}
+
+/* ─── Workshop gallery (bento) ────────────────────────────────────────────────── */
+const GALLERY_IMAGES: LightboxImage[] = [
+  {src: '/images/hero.jpg', alt: 'Workshop bench with tools laid out'},
+  {src: '/images/bento-1.jpg', alt: 'Finished furniture piece styled in a home'},
+  {src: '/images/bento-2.jpg', alt: 'Close-up of joinery detail'},
+  {src: '/images/bento-3.jpg', alt: 'Craftsman shaping timber'},
+  {src: '/images/bento-4.jpg', alt: 'Oiled timber grain detail'},
+  {src: '/images/bento-5.jpg', alt: 'Workshop tools on the bench'},
+  {src: '/images/craft.jpg', alt: 'Craftsman at work'},
+];
+
+function GallerySection() {
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+
+  return (
+    <section className="gallery">
+      <div className="cwf-wrap">
+        <div className="gallery-top">
+          <div className="gallery-large">
+            <img
+              src={GALLERY_IMAGES[0].src}
+              alt={GALLERY_IMAGES[0].alt}
+              onClick={() => setLightboxIndex(0)}
+            />
+          </div>
+          <div className="gallery-quad">
+            {GALLERY_IMAGES.slice(1, 5).map((img, i) => (
+              <div key={img.src} className="gallery-quad-item">
+                <img src={img.src} alt={img.alt} onClick={() => setLightboxIndex(i + 1)} />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="gallery-bottom">
+          {GALLERY_IMAGES.slice(5).map((img, i) => (
+            <div key={img.src} className="gallery-bottom-item">
+              <img src={img.src} alt={img.alt} onClick={() => setLightboxIndex(i + 5)} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {lightboxIndex !== null && (
+        <Lightbox
+          images={GALLERY_IMAGES}
+          index={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+          onNavigate={setLightboxIndex}
+        />
+      )}
     </section>
   );
 }
@@ -518,15 +827,20 @@ function NewsletterSection() {
 }
 
 /* ─── GraphQL ───────────────────────────────────────────────────────────────── */
-const FEATURED_COLLECTIONS_QUERY = `#graphql
-  query FeaturedCollections($country: CountryCode, $language: LanguageCode)
-    @inContext(country: $country, language: $language) {
-    collections(first: 8, sortKey: UPDATED_AT, reverse: true) {
+const HERO_SHOWCASE_COLLECTION_FIELDS = `#graphql
+  fragment HeroShowcaseCollection on Collection {
+    id
+    title
+    handle
+    image {
+      url
+      altText
+      width
+      height
+    }
+    products(first: 1) {
       nodes {
-        id
-        title
-        handle
-        image {
+        featuredImage {
           url
           altText
           width
@@ -537,30 +851,23 @@ const FEATURED_COLLECTIONS_QUERY = `#graphql
   }
 ` as const;
 
-const HERO_PRODUCT_QUERY = `#graphql
-  query HeroProduct($country: CountryCode, $language: LanguageCode)
+const HERO_SHOWCASE_QUERY = `#graphql
+  query HeroShowcase($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    products(first: 1, query: "tag:hero") {
-      nodes {
-        id
-        title
-        handle
-        priceRange {
-          minVariantPrice {
-            amount
-            currencyCode
-          }
-        }
-        featuredImage {
-          id
-          url
-          altText
-          width
-          height
-        }
-      }
+    doorStops: collection(handle: "solid-oak-door-stops") {
+      ...HeroShowcaseCollection
+    }
+    shelves: collection(handle: "solid-oak-shelves") {
+      ...HeroShowcaseCollection
+    }
+    mantelBeams: collection(handle: "solid-oak-mantel-beams") {
+      ...HeroShowcaseCollection
+    }
+    coatRacks: collection(handle: "solid-oak-coat-racks") {
+      ...HeroShowcaseCollection
     }
   }
+  ${HERO_SHOWCASE_COLLECTION_FIELDS}
 ` as const;
 
 const FEATURED_ARTICLES_QUERY = `#graphql
@@ -591,15 +898,18 @@ const FEATURED_ARTICLES_QUERY = `#graphql
   }
 ` as const;
 
-const FEATURED_PRODUCTS_QUERY = `#graphql
-  fragment FeaturedProduct on Product {
+const SALE_PRODUCTS_QUERY = `#graphql
+  fragment SaleProduct on Product {
     id
     title
     handle
-    options {
-      name
-    }
     priceRange {
+      minVariantPrice {
+        amount
+        currencyCode
+      }
+    }
+    compareAtPriceRange {
       minVariantPrice {
         amount
         currencyCode
@@ -612,15 +922,21 @@ const FEATURED_PRODUCTS_QUERY = `#graphql
       width
       height
     }
-    metafield(namespace: "reviews", key: "product_reviews") {
-      value
+    images(first: 4) {
+      nodes {
+        id
+        url
+        altText
+        width
+        height
+      }
     }
   }
-  query FeaturedProducts($country: CountryCode, $language: LanguageCode)
+  query SaleProducts($country: CountryCode, $language: LanguageCode, $query: String)
     @inContext(country: $country, language: $language) {
-    products(first: 4, sortKey: UPDATED_AT, reverse: true) {
+    products(first: 24, sortKey: UPDATED_AT, reverse: true, query: $query) {
       nodes {
-        ...FeaturedProduct
+        ...SaleProduct
       }
     }
   }

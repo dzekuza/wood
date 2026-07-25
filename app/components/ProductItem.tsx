@@ -19,7 +19,6 @@ function getVariantBadges(options?: {name: string}[]): string[] {
 import type {
   ProductItemFragment,
   CollectionItemFragment,
-  FeaturedProductFragment,
 } from 'storefrontapi.generated';
 import {useVariantUrl} from '~/lib/variants';
 import {useFavourites} from '~/hooks/useFavourites';
@@ -28,10 +27,7 @@ export function ProductItem({
   product,
   loading,
 }: {
-  product:
-    | CollectionItemFragment
-    | ProductItemFragment
-    | FeaturedProductFragment;
+  product: CollectionItemFragment | ProductItemFragment;
   loading?: 'eager' | 'lazy';
 }) {
   const variantUrl = useVariantUrl(product.handle);

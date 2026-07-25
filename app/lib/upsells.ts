@@ -84,3 +84,17 @@ export const UPSELL_GROUPS: UpsellGroup[] = [
     defaultOptionLabel: 'Standard',
   },
 ];
+
+/**
+ * Handles of hidden pricing-helper products (surcharges, gift cards) that
+ * should never appear in customer-facing product listings/carousels.
+ */
+export const HIDDEN_PRODUCT_HANDLES: string[] = [
+  ...UPSELL_GROUPS.map((group) => group.surchargeProductHandle),
+  'gift-card',
+];
+
+/** Storefront search query fragment that excludes hidden pricing-helper products. */
+export const EXCLUDE_HIDDEN_PRODUCTS_QUERY = HIDDEN_PRODUCT_HANDLES.map(
+  (handle) => `-handle:${handle}`,
+).join(' AND ');

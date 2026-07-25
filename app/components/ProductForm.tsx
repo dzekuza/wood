@@ -293,6 +293,7 @@ export function ProductForm({
       <div className="pdp-cta-row">
         <div className="pdp-atc-wrap">
           <AddToCartButton
+            className="btn btn-primary pdp-atc-btn"
             disabled={!selectedVariant || !selectedVariant.availableForSale}
             onClick={() => {
               open('cart');

@@ -78,7 +78,7 @@ export default function ContactPage() {
                 directly and we will respond with the right next step.
               </p>
               <div className="contact-action-row">
-                <a href={`mailto:${CONTACT_EMAIL}`} className="btn btn-dark">
+                <a href={`mailto:${CONTACT_EMAIL}`} className="btn btn-primary">
                   Email the workshop <i className="ti ti-arrow-right" />
                 </a>
                 <a href={`tel:${CONTACT_PHONE_HREF}`} className="btn btn-line">

@@ -4,11 +4,11 @@ import {
   type CartViewPayload,
   useAnalytics,
   useOptimisticCart,
+  Money,
 } from '@shopify/hydrogen';
 import type {HeaderQuery, CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
-import {useFavourites} from '~/hooks/useFavourites';
-import {UnitToggle} from '~/components/UnitToggle';
+import {HeaderSearch} from '~/components/HeaderSearch';
 import {FLAGSHIP_PAGE_ROUTES, shouldHideCollection} from '~/lib/site';
 
 interface HeaderProps {
@@ -32,30 +32,27 @@ export function Header({header, isLoggedIn, cart, publicStoreDomain}: HeaderProp
   );
   return (
     <header className="header">
-      <div className="header-inner">
-      {/* Logo */}
-      <NavLink prefetch="intent" to="/" className="header-logo" end>
-        <img src="/darkwood.svg" alt={shop.name} />
-      </NavLink>
+      <div className="header-topbar">
+        <NavLink prefetch="intent" to="/" className="header-logo" end>
+          <img src="/darkwood.svg" alt={shop.name} />
+        </NavLink>
 
-      {/* Centered nav */}
-      <HeaderMenu
-        menu={menu}
-        viewport="desktop"
-        primaryDomainUrl={header.shop.primaryDomain.url}
-        publicStoreDomain={publicStoreDomain}
-        categories={categories}
-      />
+        <HeaderMenu
+          menu={menu}
+          viewport="desktop"
+          primaryDomainUrl={header.shop.primaryDomain.url}
+          publicStoreDomain={publicStoreDomain}
+          categories={categories}
+        />
 
-      {/* Right CTAs */}
-      <div className="header-ctas">
-        <UnitToggle />
-        <HeaderMenuMobileToggle />
-        <SearchToggle />
-        <AccountLink isLoggedIn={isLoggedIn} />
-        <FavouritesLink />
-        <CartToggle cart={cart} />
-      </div>
+        <HeaderSearch />
+
+        <div className="header-topbar-ctas">
+          <HeaderMenuMobileToggle />
+          <SearchToggle />
+          <AccountLink isLoggedIn={isLoggedIn} />
+          <CartToggle cart={cart} />
+        </div>
       </div>
     </header>
   );
@@ -123,32 +120,10 @@ export function HeaderMenu({
   );
 }
 
-function FavouritesLink() {
-  const {favourites} = useFavourites();
-  const count = favourites.length;
-  const badgeLabel = count > 99 ? '99+' : String(count);
-  return (
-    <NavLink
-      prefetch="intent"
-      to="/pages/favourites"
-      aria-label={`Favourites (${count})`}
-      className="header-icon-link"
-    >
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(243,239,234,0.7)" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-      </svg>
-      {count > 0 && <span className="header-icon-badge">{badgeLabel}</span>}
-    </NavLink>
-  );
-}
-
 function AccountLink({isLoggedIn}: Pick<HeaderProps, 'isLoggedIn'>) {
   return (
-    <NavLink prefetch="intent" to="/account" aria-label="Account" className="header-icon-link">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(243,239,234,0.7)" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="8" r="4" />
-        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
-      </svg>
+    <NavLink prefetch="intent" to="/account" aria-label="Account" className="header-account-btn">
+      Account
     </NavLink>
   );
 }
@@ -178,7 +153,13 @@ function SearchToggle() {
   );
 }
 
-function CartBadge({count}: {count: number}) {
+function CartBadge({
+  count,
+  subtotal,
+}: {
+  count: number;
+  subtotal?: {amount?: string; currencyCode?: string};
+}) {
   const {open} = useAside();
   const {publish, shop, cart, prevCart} = useAnalytics();
 
@@ -191,14 +172,14 @@ function CartBadge({count}: {count: number}) {
         publish('cart_viewed', {cart, prevCart, shop, url: window.location.href || ''} as CartViewPayload);
       }}
       aria-label={`Cart (${count} items)`}
-      className="header-icon-link"
+      className="header-cart-btn"
     >
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(243,239,234,0.7)" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
-        <line x1="3" y1="6" x2="21" y2="6" />
-        <path d="M16 10a4 4 0 01-8 0" />
-      </svg>
-      {count > 0 && <span className="header-icon-badge">{count}</span>}
+      <i className="ti ti-shopping-cart" aria-hidden />
+      {subtotal?.amount && subtotal.currencyCode ? (
+        <Money data={{amount: subtotal.amount, currencyCode: subtotal.currencyCode as CartApiQueryFragment['cost']['subtotalAmount']['currencyCode']}} />
+      ) : (
+        <span>$0.00</span>
+      )}
     </a>
   );
 }
@@ -216,5 +197,10 @@ function CartToggle({cart}: Pick<HeaderProps, 'cart'>) {
 function CartBanner() {
   const originalCart = useAsyncValue() as CartApiQueryFragment | null;
   const cart = useOptimisticCart(originalCart);
-  return <CartBadge count={cart?.totalQuantity ?? 0} />;
+  return (
+    <CartBadge
+      count={cart?.totalQuantity ?? 0}
+      subtotal={cart?.cost?.subtotalAmount}
+    />
+  );
 }

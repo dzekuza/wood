@@ -116,7 +116,7 @@ export default function AboutPage() {
               </p>
             </div>
             <div className="story-cta-actions">
-              <Link to="/contact" className="btn btn-dark">
+              <Link to="/contact" className="btn btn-primary">
                 Plan a visit <i className="ti ti-arrow-right" />
               </Link>
               <Link to="/collections/all" className="btn btn-line">

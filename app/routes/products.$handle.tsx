@@ -558,6 +558,7 @@ export default function Product() {
           </div>
           <div className="pdp-atc-wrap">
             <AddToCartButton
+              className="btn btn-primary pdp-atc-btn"
               disabled={!selectedVariant || !selectedVariant.availableForSale}
               onClick={() => open('cart')}
               lines={cartLines}
