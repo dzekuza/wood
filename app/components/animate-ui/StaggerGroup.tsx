@@ -1,6 +1,6 @@
 import {motion, type HTMLMotionProps, type Variants} from 'motion/react';
 import {useIsInView} from '~/hooks/use-is-in-view';
-import {DISTANCE, DURATION, EASE_OUT, STAGGER} from '~/lib/motion';
+import {DISTANCE, DURATION, EASE_OUT, IN_VIEW_MARGIN, STAGGER} from '~/lib/motion';
 
 const containerVariants: Variants = {
   hidden: {},
@@ -21,7 +21,11 @@ interface StaggerGroupProps extends HTMLMotionProps<'div'> {
 }
 
 function StaggerGroup({once = true, children, ref: externalRef, ...props}: StaggerGroupProps) {
-  const {ref, isInView} = useIsInView<HTMLDivElement>(externalRef ?? null, {inViewOnce: once});
+  const {ref, isInView} = useIsInView<HTMLDivElement>(externalRef ?? null, {
+    inView: true,
+    inViewOnce: once,
+    inViewMargin: IN_VIEW_MARGIN,
+  });
 
   return (
     <motion.div

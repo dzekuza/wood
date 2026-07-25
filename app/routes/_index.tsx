@@ -20,7 +20,7 @@ import {FrameIcon} from '~/components/animate-ui/icons/frame';
 import {Reveal} from '~/components/animate-ui/Reveal';
 import {StaggerGroup, StaggerItem} from '~/components/animate-ui/StaggerGroup';
 import {useIsInView} from '~/hooks/use-is-in-view';
-import {DURATION, EASE_OUT} from '~/lib/motion';
+import {DURATION, EASE_OUT, IN_VIEW_MARGIN} from '~/lib/motion';
 import {
   isValidNewsletterEmail,
   normalizeNewsletterEmail,
@@ -623,11 +623,11 @@ function CraftLightSection() {
   const craftVisualLocalRef = useRef<HTMLDivElement>(null);
   const {ref: craftCopyRef, isInView: craftCopyInView} = useIsInView<HTMLDivElement>(
     craftCopyLocalRef,
-    {inViewOnce: true},
+    {inView: true, inViewOnce: true, inViewMargin: IN_VIEW_MARGIN},
   );
   const {ref: craftVisualRef, isInView: craftVisualInView} = useIsInView<HTMLDivElement>(
     craftVisualLocalRef,
-    {inViewOnce: true},
+    {inView: true, inViewOnce: true, inViewMargin: IN_VIEW_MARGIN},
   );
 
   return (
