@@ -34,6 +34,7 @@ export default defineConfig({
         'react-router',
       ],
     },
+    external: ['@google/model-viewer'], // Client-only: exclude from server bundle (~1.5MB three.js savings)
   },
   server: {
     allowedHosts: ['.tryhydrogen.dev'],
