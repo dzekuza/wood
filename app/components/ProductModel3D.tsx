@@ -23,7 +23,10 @@ export function ProductModel3D({
   useEffect(() => {
     if (modelViewerLoaded) return;
     modelViewerLoaded = true;
-    import('@google/model-viewer');
+    import('@google/model-viewer').catch((err) => {
+      console.warn('[ProductModel3D] Failed to load model-viewer:', err);
+      modelViewerLoaded = false; // Allow retry on next mount
+    });
   }, []);
 
   const src = useMemo(
