@@ -1,4 +1,4 @@
-import {useState, useEffect, useRef} from 'react';
+import {useState, useEffect, useMemo, useRef} from 'react';
 import {useLoaderData, Link} from 'react-router';
 import type {Route} from './+types/products.$handle';
 import {motion} from 'motion/react';
@@ -12,6 +12,7 @@ import {
 } from '@shopify/hydrogen';
 import {ProductPrice} from '~/components/ProductPrice';
 import {ProductImage} from '~/components/ProductImage';
+import {ProductModel3D} from '~/components/ProductModel3D';
 import {ProductForm} from '~/components/ProductForm';
 import {AddToCartButton} from '~/components/AddToCartButton';
 import {useAside} from '~/components/Aside';
@@ -210,12 +211,44 @@ export default function Product() {
       ]
     : [];
 
-  const productImages = product.images?.nodes ?? [];
-  const allImages = [
-    ...(selectedVariant?.image ? [selectedVariant.image] : []),
-    ...productImages.filter((img) => img.id !== selectedVariant?.image?.id),
-  ];
-  const [activeImage, setActiveImage] = useState<typeof allImages[0] | null>(allImages[0] ?? null);
+  const galleryItems = useMemo(() => {
+    const mediaNodes = product.media?.nodes ?? [];
+    const mediaImages = mediaNodes
+      .filter(
+        (m): m is Extract<typeof mediaNodes[number], {__typename: 'MediaImage'}> =>
+          m.__typename === 'MediaImage' && !!m.image,
+      )
+      .map((m) => ({
+        __typename: 'Image' as const,
+        id: m.id,
+        url: m.image!.url,
+        altText: m.image!.altText,
+        width: m.image!.width,
+        height: m.image!.height,
+      }));
+    const modelMedia = mediaNodes.filter(
+      (m): m is Extract<typeof mediaNodes[number], {__typename: 'Model3d'}> =>
+        m.__typename === 'Model3d' && !!m.sources?.length,
+    );
+
+    const galleryImages = [
+      ...(selectedVariant?.image ? [selectedVariant.image] : []),
+      ...mediaImages.filter((img) => img.url !== selectedVariant?.image?.url),
+    ];
+
+    return [
+      ...galleryImages.map((image) => ({
+        type: 'image' as const,
+        key: image.id ?? image.url,
+        image,
+      })),
+      ...modelMedia.map((m) => ({type: 'model' as const, key: m.id, alt: m.alt, sources: m.sources})),
+    ];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product.media, selectedVariant?.image?.id, selectedVariant?.image?.url]);
+
+  type GalleryItem = (typeof galleryItems)[number];
+  const [activeItem, setActiveItem] = useState<GalleryItem | null>(galleryItems[0] ?? null);
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [descExpanded, setDescExpanded] = useState(false);
   const [showSticky, setShowSticky] = useState(false);
@@ -225,7 +258,10 @@ export default function Product() {
   const {open} = useAside();
 
   useEffect(() => {
-    if (selectedVariant?.image) setActiveImage(selectedVariant.image);
+    if (selectedVariant?.image) {
+      const image = selectedVariant.image;
+      setActiveItem({type: 'image', key: image.id ?? image.url, image});
+    }
   }, [selectedVariant?.id, selectedVariant?.image]);
 
   useEffect(() => {
@@ -304,16 +340,20 @@ export default function Product() {
                 ref={carouselRef}
                 onScroll={handleCarouselScroll}
               >
-                {allImages.map((img) => (
-                  <div key={img.id} className="pdp-carousel-slide">
-                    <ProductImage image={img} />
+                {galleryItems.map((item) => (
+                  <div key={item.key} className="pdp-carousel-slide">
+                    {item.type === 'model' ? (
+                      <ProductModel3D sources={item.sources} alt={item.alt ?? title} />
+                    ) : (
+                      <ProductImage image={item.image} />
+                    )}
                     {selectedVariant?.availableForSale === false && (
                       <span className="pdp-ribbon">Sold Out</span>
                     )}
                   </div>
                 ))}
               </div>
-              {allImages.length > 1 && (
+              {galleryItems.length > 1 && (
                 <>
                   <div className="pdp-carousel-arrows">
                     <button
@@ -326,9 +366,9 @@ export default function Product() {
                     </button>
                     <button
                       className="pdp-carousel-arrow"
-                      onClick={() => scrollToSlide(Math.min(allImages.length - 1, carouselIndex + 1))}
+                      onClick={() => scrollToSlide(Math.min(galleryItems.length - 1, carouselIndex + 1))}
                       aria-label="Next image"
-                      disabled={carouselIndex === allImages.length - 1}
+                      disabled={carouselIndex === galleryItems.length - 1}
                     >
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                     </button>
@@ -336,14 +376,14 @@ export default function Product() {
                 </>
               )}
               </div>
-              {allImages.length > 1 && (
+              {galleryItems.length > 1 && (
                 <div className="pdp-carousel-dots">
-                  {allImages.map((img, i) => (
+                  {galleryItems.map((item, i) => (
                     <button
-                      key={img.id}
+                      key={item.key}
                       className={`pdp-carousel-dot${carouselIndex === i ? ' active' : ''}`}
                       onClick={() => scrollToSlide(i)}
-                      aria-label={`Image ${i + 1}`}
+                      aria-label={item.type === 'model' ? '3D model' : `Image ${i + 1}`}
                     />
                   ))}
                 </div>
@@ -353,18 +393,35 @@ export default function Product() {
             {/* Gallery — desktop only */}
             <div className="pdp-gallery">
               <div className="pdp-thumbs">
-                {allImages.map((img) => (
+                {galleryItems.map((item) => (
                   <button
-                    key={img.id}
-                    className={`pdp-thumb${activeImage?.id === img.id ? ' active' : ''}`}
-                    onClick={() => setActiveImage(img)}
+                    key={item.key}
+                    className={`pdp-thumb${activeItem?.key === item.key ? ' active' : ''}`}
+                    onClick={() => setActiveItem(item)}
                   >
-                    <ProductImage image={img} />
+                    {item.type === 'model' ? (
+                      <>
+                        <ProductModel3D
+                          sources={item.sources}
+                          alt={item.alt ?? title}
+                          interactive={false}
+                        />
+                        <span className="pdp-thumb-3d" aria-hidden="true">
+                          <i className="ti ti-cube" />
+                        </span>
+                      </>
+                    ) : (
+                      <ProductImage image={item.image} />
+                    )}
                   </button>
                 ))}
               </div>
               <div className="pdp-main-img">
-                <ProductImage image={activeImage ?? selectedVariant?.image} />
+                {activeItem?.type === 'model' ? (
+                  <ProductModel3D sources={activeItem.sources} alt={activeItem.alt ?? title} />
+                ) : (
+                  <ProductImage image={activeItem?.image ?? selectedVariant?.image} />
+                )}
                 {selectedVariant?.availableForSale === false && (
                   <span className="pdp-ribbon">Sold Out</span>
                 )}
@@ -691,14 +748,28 @@ const PRODUCT_FRAGMENT = `#graphql
     adjacentVariants (selectedOptions: $selectedOptions) {
       ...ProductVariant
     }
-    images(first: 10) {
+    media(first: 25) {
       nodes {
         __typename
-        id
-        url
-        altText
-        width
-        height
+        ... on MediaImage {
+          id
+          image {
+            url
+            altText
+            width
+            height
+          }
+        }
+        ... on Model3d {
+          id
+          alt
+          sources {
+            url
+            format
+            mimeType
+            filesize
+          }
+        }
       }
     }
     metafield(namespace: "reviews", key: "product_reviews") {
