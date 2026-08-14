@@ -7,6 +7,7 @@ import {ProductItem} from '~/components/ProductItem';
 import {SITE_NAME} from '~/lib/site';
 import type {SortValue} from '~/components/SortDropdown';
 import type {CollectionItemFragment} from 'storefrontapi.generated';
+import {EXCLUDE_HIDDEN_PRODUCTS_QUERY} from '~/lib/upsells';
 
 export const meta: Route.MetaFunction = () => [
   {title: `All Products | ${SITE_NAME}`},
@@ -32,7 +33,7 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
   const {sortKey, reverse} = SORT_MAP[sortParam] ?? SORT_MAP.newest;
 
   const [{products}, {collections}] = await Promise.all([
-    storefront.query(CATALOG_QUERY, {variables: {...paginationVariables, sortKey, reverse}, cache: storefront.CacheNone()}),
+    storefront.query(CATALOG_QUERY, {variables: {...paginationVariables, sortKey, reverse, query: EXCLUDE_HIDDEN_PRODUCTS_QUERY}, cache: storefront.CacheNone()}),
     storefront.query(ALL_COLLECTIONS_QUERY, {cache: storefront.CacheNone()}),
   ]);
   return {products, collections: collections.nodes, sortParam};
@@ -253,8 +254,9 @@ const CATALOG_QUERY = `#graphql
     $endCursor: String
     $sortKey: ProductSortKeys
     $reverse: Boolean
+    $query: String
   ) @inContext(country: $country, language: $language) {
-    products(first: $first, last: $last, before: $startCursor, after: $endCursor, sortKey: $sortKey, reverse: $reverse) {
+    products(first: $first, last: $last, before: $startCursor, after: $endCursor, sortKey: $sortKey, reverse: $reverse, query: $query) {
       nodes { ...CollectionItem }
       pageInfo {
         hasPreviousPage
