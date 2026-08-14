@@ -5,6 +5,7 @@ import type {
   ProductItemFragment,
   CollectionItemFragment,
   SaleProductFragment,
+  ProductRecommendationsQuery,
 } from 'storefrontapi.generated';
 import {useVariantUrl} from '~/lib/variants';
 import {useFavourites} from '~/hooks/useFavourites';
@@ -20,14 +21,15 @@ type GalleryImage = {
 type ProductCardFragment =
   | CollectionItemFragment
   | ProductItemFragment
-  | SaleProductFragment;
+  | SaleProductFragment
+  | NonNullable<ProductRecommendationsQuery['productRecommendations']>[number];
 
 const COLOR_OPTION_NAMES = ['color', 'colour', 'finish', 'tone'];
 
 function getSwatchOption(product: ProductCardFragment) {
   const options = product.options ?? [];
   const withSwatches = options.find((option) =>
-    option.optionValues.some((value) => value.swatch),
+    option.optionValues?.some((value) => value.swatch),
   );
   if (withSwatches) return withSwatches;
   return options.find((option) =>
@@ -73,7 +75,7 @@ export function ProductItem({
   const hoverTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const swatchOption = getSwatchOption(product);
-  const swatchValues = swatchOption?.optionValues.slice(0, 6) ?? [];
+  const swatchValues = swatchOption?.optionValues?.slice(0, 6) ?? [];
 
   const quickAddVariant = product.selectedOrFirstAvailableVariant;
   const cartFetcher = useFetcher({key: `quick-add-${product.id}`});

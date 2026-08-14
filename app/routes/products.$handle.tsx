@@ -630,7 +630,7 @@ export default function Product() {
           <StaggerGroup className="pgrid">
             {recommendations.map((rec) => (
               <StaggerItem key={rec.id}>
-                <ProductItem product={rec as any} loading="lazy" />
+                <ProductItem product={rec} loading="lazy" />
               </StaggerItem>
             ))}
           </StaggerGroup>
@@ -793,7 +793,24 @@ const PRODUCT_RECOMMENDATIONS_QUERY = `#graphql
       id
       title
       handle
-      options { name }
+      options {
+        name
+        optionValues {
+          name
+          swatch {
+            color
+            image {
+              previewImage {
+                url
+              }
+            }
+          }
+        }
+      }
+      selectedOrFirstAvailableVariant(selectedOptions: [], ignoreUnknownOptions: true) {
+        id
+        availableForSale
+      }
       featuredImage { id altText url width height }
       images(first: 4) {
         nodes { id url altText width height }

@@ -1270,7 +1270,26 @@ export type ProductRecommendationsQuery = {
   productRecommendations?: StorefrontAPI.Maybe<
     Array<
       Pick<StorefrontAPI.Product, 'id' | 'title' | 'handle'> & {
-        options: Array<Pick<StorefrontAPI.ProductOption, 'name'>>;
+        options: Array<
+          Pick<StorefrontAPI.ProductOption, 'name'> & {
+            optionValues: Array<
+              Pick<StorefrontAPI.ProductOptionValue, 'name'> & {
+                swatch?: StorefrontAPI.Maybe<
+                  Pick<StorefrontAPI.ProductOptionValueSwatch, 'color'> & {
+                    image?: StorefrontAPI.Maybe<{
+                      previewImage?: StorefrontAPI.Maybe<
+                        Pick<StorefrontAPI.Image, 'url'>
+                      >;
+                    }>;
+                  }
+                >;
+              }
+            >;
+          }
+        >;
+        selectedOrFirstAvailableVariant?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.ProductVariant, 'id' | 'availableForSale'>
+        >;
         featuredImage?: StorefrontAPI.Maybe<
           Pick<
             StorefrontAPI.Image,
@@ -1774,7 +1793,7 @@ interface GeneratedQueryTypes {
     return: PoliciesQuery;
     variables: PoliciesQueryVariables;
   };
-  '#graphql\n  query ProductRecommendations($productId: ID!, $country: CountryCode, $language: LanguageCode)\n  @inContext(country: $country, language: $language) {\n    productRecommendations(productId: $productId) {\n      id\n      title\n      handle\n      options { name }\n      featuredImage { id altText url width height }\n      images(first: 4) {\n        nodes { id url altText width height }\n      }\n      priceRange {\n        minVariantPrice { amount currencyCode }\n        maxVariantPrice { amount currencyCode }\n      }\n      compareAtPriceRange {\n        minVariantPrice { amount currencyCode }\n      }\n      metafield(namespace: "reviews", key: "product_reviews") { value }\n    }\n  }\n': {
+  '#graphql\n  query ProductRecommendations($productId: ID!, $country: CountryCode, $language: LanguageCode)\n  @inContext(country: $country, language: $language) {\n    productRecommendations(productId: $productId) {\n      id\n      title\n      handle\n      options {\n        name\n        optionValues {\n          name\n          swatch {\n            color\n            image {\n              previewImage {\n                url\n              }\n            }\n          }\n        }\n      }\n      selectedOrFirstAvailableVariant(selectedOptions: [], ignoreUnknownOptions: true) {\n        id\n        availableForSale\n      }\n      featuredImage { id altText url width height }\n      images(first: 4) {\n        nodes { id url altText width height }\n      }\n      priceRange {\n        minVariantPrice { amount currencyCode }\n        maxVariantPrice { amount currencyCode }\n      }\n      compareAtPriceRange {\n        minVariantPrice { amount currencyCode }\n      }\n      metafield(namespace: "reviews", key: "product_reviews") { value }\n    }\n  }\n': {
     return: ProductRecommendationsQuery;
     variables: ProductRecommendationsQueryVariables;
   };
