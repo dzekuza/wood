@@ -1,9 +1,10 @@
 import {useEffect, useRef, useState} from 'react';
-import {Link} from 'react-router';
-import {Money} from '@shopify/hydrogen';
+import {Link, useFetcher} from 'react-router';
+import {CartForm, Money} from '@shopify/hydrogen';
 import type {
   ProductItemFragment,
   CollectionItemFragment,
+  SaleProductFragment,
 } from 'storefrontapi.generated';
 import {useVariantUrl} from '~/lib/variants';
 import {useFavourites} from '~/hooks/useFavourites';
@@ -16,12 +17,32 @@ type GalleryImage = {
   height?: number | null;
 };
 
+type ProductCardFragment =
+  | CollectionItemFragment
+  | ProductItemFragment
+  | SaleProductFragment;
+
+const COLOR_OPTION_NAMES = ['color', 'colour', 'finish', 'tone'];
+
+function getSwatchOption(product: ProductCardFragment) {
+  const options = product.options ?? [];
+  const withSwatches = options.find((option) =>
+    option.optionValues.some((value) => value.swatch),
+  );
+  if (withSwatches) return withSwatches;
+  return options.find((option) =>
+    COLOR_OPTION_NAMES.includes(option.name.toLowerCase()),
+  );
+}
+
 export function ProductItem({
   product,
   loading,
+  className,
 }: {
-  product: CollectionItemFragment | ProductItemFragment;
+  product: ProductCardFragment;
   loading?: 'eager' | 'lazy';
+  className?: string;
 }) {
   const variantUrl = useVariantUrl(product.handle);
   const image = product.featuredImage;
@@ -51,6 +72,28 @@ export function ProductItem({
   const [imageIndex, setImageIndex] = useState(0);
   const hoverTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const swatchOption = getSwatchOption(product);
+  const swatchValues = swatchOption?.optionValues.slice(0, 6) ?? [];
+
+  const quickAddVariant = product.selectedOrFirstAvailableVariant;
+  const cartFetcher = useFetcher({key: `quick-add-${product.id}`});
+  const addingToCart = cartFetcher.state !== 'idle';
+
+  function handleQuickAdd(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!quickAddVariant?.id || !quickAddVariant.availableForSale || addingToCart) return;
+    const formData = new FormData();
+    formData.append(
+      CartForm.INPUT_NAME,
+      JSON.stringify({
+        action: CartForm.ACTIONS.LinesAdd,
+        inputs: {lines: [{merchandiseId: quickAddVariant.id, quantity: 1}]},
+      }),
+    );
+    void cartFetcher.submit(formData, {method: 'post', action: '/cart'});
+  }
+
   const startCycling = () => {
     if (gallery.length < 2 || hoverTimer.current) return;
     hoverTimer.current = setInterval(() => {
@@ -70,7 +113,7 @@ export function ProductItem({
 
   return (
     <Link
-      className="pcard"
+      className={className ? `pcard ${className}` : 'pcard'}
       key={product.id}
       prefetch="intent"
       to={variantUrl}
@@ -125,12 +168,50 @@ export function ProductItem({
       </div>
       <div className="pcard-body">
         <p className="pcard-name">{product.title}</p>
-        <div className="pcard-price">
-          <Money data={price} />
-          {showCompareAt && compareAtPrice && (
-            <span className="pcard-compare-at">
-              <Money data={compareAtPrice} />
+        {swatchValues.length > 0 && (
+          <div className="pcard-swatches">
+            {swatchValues.map((value, i) => {
+              const swatchImage = value.swatch?.image?.previewImage?.url;
+              const swatchColor = value.swatch?.color;
+              return (
+                <span
+                  key={value.name}
+                  className={`pcard-swatch${i === 0 ? ' active' : ''}`}
+                  title={value.name}
+                  style={
+                    !swatchImage && swatchColor
+                      ? {backgroundColor: swatchColor}
+                      : undefined
+                  }
+                >
+                  {swatchImage && <img src={swatchImage} alt="" />}
+                </span>
+              );
+            })}
+          </div>
+        )}
+        <div className="pcard-price-row">
+          <div className="pcard-price">
+            <span className="pcard-price-eyebrow">From</span>
+            <span className="pcard-price-value">
+              <Money data={price} />
+              {showCompareAt && compareAtPrice && (
+                <span className="pcard-compare-at">
+                  <Money data={compareAtPrice} />
+                </span>
+              )}
             </span>
+          </div>
+          {quickAddVariant?.availableForSale && (
+            <button
+              type="button"
+              className="pcard-quickadd"
+              aria-label={`Quick add ${product.title}`}
+              disabled={addingToCart}
+              onClick={handleQuickAdd}
+            >
+              <i className="ti ti-plus" />
+            </button>
           )}
         </div>
       </div>

@@ -132,6 +132,21 @@ const PRODUCT_ITEM_FRAGMENT = `#graphql
     title
     options {
       name
+      optionValues {
+        name
+        swatch {
+          color
+          image {
+            previewImage {
+              url
+            }
+          }
+        }
+      }
+    }
+    selectedOrFirstAvailableVariant(selectedOptions: [], ignoreUnknownOptions: true) {
+      id
+      availableForSale
     }
     featuredImage {
       id

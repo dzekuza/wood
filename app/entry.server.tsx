@@ -22,6 +22,7 @@ export default async function handleRequest(
     scriptSrc: [
       "'self'",
       "'wasm-unsafe-eval'", // Required for @google/model-viewer 3D renderer (WebAssembly)
+      'https://cdn.shopify.com',
     ],
     workerSrc: [
       "'self'",

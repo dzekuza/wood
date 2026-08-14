@@ -2,13 +2,14 @@ import {Await, useFetcher, useLoaderData, Link, data} from 'react-router';
 import type {Route} from './+types/_index';
 import {Suspense, useEffect, useRef, useState} from 'react';
 import {motion, type Variants} from 'motion/react';
-import {Image, Money} from '@shopify/hydrogen';
+import {Image} from '@shopify/hydrogen';
 import type {
   HeroShowcaseQuery,
   SaleProductsQuery,
   SaleProductFragment,
 } from 'storefrontapi.generated';
 import {MockShopNotice} from '~/components/MockShopNotice';
+import {ProductItem} from '~/components/ProductItem';
 import {Lightbox, type LightboxImage} from '~/components/Lightbox';
 import {ReviewsSection} from '~/components/ReviewsSection';
 import {HOMEPAGE_REVIEWS} from '~/lib/reviews';
@@ -270,9 +271,9 @@ function SaleShowcaseSection({
             {(response) => {
               const all = response?.products?.nodes ?? [];
               if (!all.length) return null;
-              const {items, isSale} = pickSaleProducts(all);
+              const {items} = pickSaleProducts(all);
               if (!items.length) return null;
-              return <SaleShowcaseCarousel items={items} isSale={isSale} />;
+              return <SaleShowcaseCarousel items={items} />;
             }}
           </Await>
         </Suspense>
@@ -287,10 +288,8 @@ function SaleShowcaseSection({
 
 function SaleShowcaseCarousel({
   items,
-  isSale,
 }: {
   items: SaleProductFragment[];
-  isSale: boolean;
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [page, setPage] = useState(0);
@@ -323,7 +322,7 @@ function SaleShowcaseCarousel({
       <StaggerGroup ref={trackRef} className="sale-carousel-track" onScroll={handleScroll}>
         {items.map((product) => (
           <StaggerItem key={product.id}>
-            <SaleProductCard product={product} isSale={isSale} />
+            <ProductItem product={product} loading="lazy" className="sale-carousel-item" />
           </StaggerItem>
         ))}
       </StaggerGroup>
@@ -359,94 +358,6 @@ function SaleShowcaseCarousel({
   );
 }
 
-function SaleProductCard({
-  product,
-  isSale,
-}: {
-  product: SaleProductFragment;
-  isSale: boolean;
-}) {
-  const price = product.priceRange.minVariantPrice;
-  const compareAt = product.compareAtPriceRange?.minVariantPrice;
-  const showCompareAt =
-    isSale && compareAt && Number(compareAt.amount) > Number(price.amount);
-  const saveAmount = showCompareAt
-    ? (Number(compareAt.amount) - Number(price.amount)).toFixed(2)
-    : null;
-
-  const gallery = product.images.nodes.length ? product.images.nodes : product.featuredImage
-    ? [product.featuredImage]
-    : [];
-  const [imageIndex, setImageIndex] = useState(0);
-  const hoverTimer = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  const startCycling = () => {
-    if (gallery.length < 2 || hoverTimer.current) return;
-    hoverTimer.current = setInterval(() => {
-      setImageIndex((i) => (i + 1) % gallery.length);
-    }, 700);
-  };
-
-  const stopCycling = () => {
-    if (hoverTimer.current) {
-      clearInterval(hoverTimer.current);
-      hoverTimer.current = null;
-    }
-    setImageIndex(0);
-  };
-
-  useEffect(() => () => stopCycling(), []);
-
-  return (
-    <Link
-      to={`/products/${product.handle}`}
-      className="sale-card"
-      prefetch="intent"
-      onMouseEnter={startCycling}
-      onMouseLeave={stopCycling}
-    >
-      <div className="sale-card-img">
-        {gallery.length ? (
-          gallery.map((img, i) => (
-            <img
-              key={img.id}
-              src={img.url}
-              alt={img.altText ?? product.title}
-              loading="lazy"
-              className={`sale-card-img-frame${i === imageIndex ? ' active' : ''}`}
-            />
-          ))
-        ) : (
-          <div className="sale-card-image-placeholder" />
-        )}
-        {gallery.length > 1 && (
-          <div className="sale-card-dots">
-            {gallery.map((img, i) => (
-              <span
-                key={img.id}
-                className={`sale-card-dot${i === imageIndex ? ' active' : ''}`}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-      {saveAmount && (
-        <span className="sale-card-badge">
-          Save <Money data={{amount: saveAmount, currencyCode: price.currencyCode}} />
-        </span>
-      )}
-      <p className="sale-card-title">{product.title}</p>
-      <div className="sale-card-price">
-        <Money data={price} />
-        {showCompareAt && compareAt && (
-          <span className="sale-card-compare-at">
-            <Money data={compareAt} />
-          </span>
-        )}
-      </div>
-    </Link>
-  );
-}
 
 /* ─── Workshop steps ──────────────────────────────────────────────────────────── */
 const WORKSHOP_STEPS = [
@@ -534,9 +445,9 @@ function SaleSpotlightSection({
                 {(response) => {
                   const all = response?.products?.nodes ?? [];
                   if (!all.length) return null;
-                  const {items, isSale} = pickSaleProducts(all);
+                  const {items} = pickSaleProducts(all);
                   if (!items.length) return null;
-                  return <SaleSpotlightCarousel items={items} isSale={isSale} />;
+                  return <SaleSpotlightCarousel items={items} />;
                 }}
               </Await>
             </Suspense>
@@ -552,10 +463,8 @@ function SaleSpotlightSection({
 
 function SaleSpotlightCarousel({
   items,
-  isSale,
 }: {
   items: SaleProductFragment[];
-  isSale: boolean;
 }) {
   const [page, setPage] = useState(0);
   const perPage = 2;
@@ -567,7 +476,7 @@ function SaleSpotlightCarousel({
       <StaggerGroup className="spotlight-cards">
         {current.map((product) => (
           <StaggerItem key={product.id}>
-            <SaleProductCard product={product} isSale={isSale} />
+            <ProductItem product={product} loading="lazy" />
           </StaggerItem>
         ))}
       </StaggerGroup>
@@ -953,6 +862,24 @@ const SALE_PRODUCTS_QUERY = `#graphql
     id
     title
     handle
+    options {
+      name
+      optionValues {
+        name
+        swatch {
+          color
+          image {
+            previewImage {
+              url
+            }
+          }
+        }
+      }
+    }
+    selectedOrFirstAvailableVariant(selectedOptions: [], ignoreUnknownOptions: true) {
+      id
+      availableForSale
+    }
     priceRange {
       minVariantPrice {
         amount
@@ -980,6 +907,9 @@ const SALE_PRODUCTS_QUERY = `#graphql
         width
         height
       }
+    }
+    metafield(namespace: "reviews", key: "product_reviews") {
+      value
     }
   }
   query SaleProducts($country: CountryCode, $language: LanguageCode, $query: String)
