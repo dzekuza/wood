@@ -1,4 +1,5 @@
 import {Link} from 'react-router';
+import {CONTACT_EMAIL, CONTACT_PHONE_DISPLAY, CONTACT_PHONE_HREF} from '~/lib/site';
 
 export function ContactBanner() {
   return (
@@ -12,8 +13,8 @@ export function ContactBanner() {
             <h2>Contact us</h2>
             <p>Have a question? Let&rsquo;s reach us</p>
           </div>
-          <Link to="https://www.etsy.com" className="demo-contact-etsy">
-            Etsy shop
+          <Link to="/contact" className="demo-contact-etsy">
+            Contact the workshop
           </Link>
         </div>
 
@@ -21,26 +22,8 @@ export function ContactBanner() {
           <div className="demo-contact-block">
             <span className="demo-contact-label">General inquiries</span>
             <div className="demo-contact-lines">
-              <span>work@craftwoodfurniture.com</span>
-              <span>+3700000000</span>
-            </div>
-          </div>
-
-          <div className="demo-contact-col">
-            <div className="demo-contact-block">
-              <span className="demo-contact-label">General inquiries</span>
-              <div className="demo-contact-lines">
-                <span>work@craftwoodfurniture.com</span>
-                <span>+3700000000</span>
-              </div>
-            </div>
-
-            <div className="demo-contact-block">
-              <span className="demo-contact-label">Address</span>
-              <p className="demo-contact-address">
-                Express House, Crow Arch Lane Industrial Estate, Crow Arch Ln,
-                Ringwood BH24 1PD, United Kingdom
-              </p>
+              <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+              <a href={`tel:${CONTACT_PHONE_HREF}`}>{CONTACT_PHONE_DISPLAY}</a>
             </div>
           </div>
         </div>

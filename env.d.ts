@@ -5,3 +5,10 @@
 
 // Enhance TypeScript's built-in typings.
 import '@total-typescript/ts-reset';
+
+declare global {
+  interface Env {
+    /** When set, gates the whole storefront behind /coming-soon until this password is submitted. */
+    SITE_PASSWORD?: string;
+  }
+}

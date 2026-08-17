@@ -4,7 +4,6 @@ import {CartForm, Money} from '@shopify/hydrogen';
 import type {
   ProductItemFragment,
   CollectionItemFragment,
-  SaleProductFragment,
   ProductRecommendationsQuery,
 } from 'storefrontapi.generated';
 import {useVariantUrl} from '~/lib/variants';
@@ -21,7 +20,6 @@ type GalleryImage = {
 type ProductCardFragment =
   | CollectionItemFragment
   | ProductItemFragment
-  | SaleProductFragment
   | NonNullable<ProductRecommendationsQuery['productRecommendations']>[number];
 
 const COLOR_OPTION_NAMES = ['color', 'colour', 'finish', 'tone'];

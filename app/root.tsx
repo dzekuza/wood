@@ -1,6 +1,7 @@
 import {Analytics, getShopAnalytics, useNonce} from '@shopify/hydrogen';
 import {
   Outlet,
+  redirect,
   useRouteError,
   isRouteErrorResponse,
   type ShouldRevalidateFunction,
@@ -8,6 +9,7 @@ import {
   Meta,
   Scripts,
   ScrollRestoration,
+  useLocation,
   useRouteLoaderData,
 } from 'react-router';
 import type {Route} from './+types/root';
@@ -72,13 +74,25 @@ export function links() {
 }
 
 export async function loader(args: Route.LoaderArgs) {
+  const {request, context} = args;
+  const {session, env} = context;
+  const pathname = new URL(request.url).pathname;
+
+  if (
+    env.SITE_PASSWORD &&
+    pathname !== '/coming-soon' &&
+    !session.get('site_unlocked')
+  ) {
+    throw redirect('/coming-soon');
+  }
+
   // Start fetching non-critical data without blocking time to first byte
   const deferredData = loadDeferredData(args);
 
   // Await the critical data required to render initial state of the page
   const criticalData = await loadCriticalData(args);
 
-  const {storefront, env} = args.context;
+  const {storefront} = args.context;
 
   return {
     ...deferredData,
@@ -171,9 +185,22 @@ export function Layout({children}: {children?: React.ReactNode}) {
 
 export default function App() {
   const data = useRouteLoaderData<RootLoader>('root');
+  const location = useLocation();
 
   if (!data) {
     return <Outlet />;
+  }
+
+  if (location.pathname === '/coming-soon') {
+    return (
+      <Analytics.Provider
+        cart={data.cart}
+        shop={data.shop}
+        consent={data.consent}
+      >
+        <Outlet />
+      </Analytics.Provider>
+    );
   }
 
   return (

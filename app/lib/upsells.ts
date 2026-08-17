@@ -98,3 +98,12 @@ export const HIDDEN_PRODUCT_HANDLES: string[] = [
 export const EXCLUDE_HIDDEN_PRODUCTS_QUERY = HIDDEN_PRODUCT_HANDLES.map(
   (handle) => `-handle:${handle}`,
 ).join(' AND ');
+
+/**
+ * The Storefront API's `-handle:` search-query negation is silently ignored
+ * whenever a `sortKey` is also passed to `products(...)` — so any listing
+ * that sorts must additionally filter hidden products out client-side.
+ */
+export function filterHiddenProducts<T extends {handle: string}>(nodes: T[]): T[] {
+  return nodes.filter((node) => !HIDDEN_PRODUCT_HANDLES.includes(node.handle));
+}

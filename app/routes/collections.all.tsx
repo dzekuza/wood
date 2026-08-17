@@ -7,7 +7,7 @@ import {ProductItem} from '~/components/ProductItem';
 import {SITE_NAME} from '~/lib/site';
 import type {SortValue} from '~/components/SortDropdown';
 import type {CollectionItemFragment} from 'storefrontapi.generated';
-import {EXCLUDE_HIDDEN_PRODUCTS_QUERY} from '~/lib/upsells';
+import {EXCLUDE_HIDDEN_PRODUCTS_QUERY, filterHiddenProducts} from '~/lib/upsells';
 
 export const meta: Route.MetaFunction = () => [
   {title: `All Products | ${SITE_NAME}`},
@@ -36,7 +36,13 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
     storefront.query(CATALOG_QUERY, {variables: {...paginationVariables, sortKey, reverse, query: EXCLUDE_HIDDEN_PRODUCTS_QUERY}, cache: storefront.CacheNone()}),
     storefront.query(ALL_COLLECTIONS_QUERY, {cache: storefront.CacheNone()}),
   ]);
-  return {products, collections: collections.nodes, sortParam};
+  // The Storefront API silently ignores the `-handle:` search-query negation
+  // above whenever a sortKey is also passed, so filter hidden products here too.
+  return {
+    products: {...products, nodes: filterHiddenProducts(products.nodes)},
+    collections: collections.nodes,
+    sortParam,
+  };
 }
 
 const FAQ_ITEMS = [
