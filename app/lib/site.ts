@@ -2,8 +2,8 @@ export const SITE_NAME = 'Craft Wood Furniture';
 export const SITE_DOMAIN = 'craftwoodfurniture.co.uk';
 
 export const CONTACT_EMAIL = 'hello@craftwoodfurniture.co.uk';
-export const CONTACT_PHONE_DISPLAY = '+44 (0)1451 640 280';
-export const CONTACT_PHONE_HREF = '+441451640280';
+export const CONTACT_PHONE_DISPLAY = '+44 7904 497890';
+export const CONTACT_PHONE_HREF = '+447904497890';
 
 export const WORKSHOP_LOCATION = 'Aldsworth workshop, Cotswolds';
 export const WORKSHOP_VISIT_NOTE = 'By appointment only';
