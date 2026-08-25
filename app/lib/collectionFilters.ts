@@ -110,3 +110,80 @@ export function getListAndBooleanFilters(filters: Filter[] | undefined) {
 export function getPriceFilter(filters: Filter[] | undefined) {
   return (filters ?? []).find((filter) => filter.type === 'PRICE_RANGE');
 }
+
+/** Shopify's PRICE_RANGE filter carries the catalog's min/max as its single value's `input`. */
+export function getPriceBounds(priceFilter: Filter | undefined) {
+  const fallback = {min: 0, max: 1000};
+  const raw = priceFilter?.values?.[0]?.input;
+  if (!raw) return fallback;
+  try {
+    const parsed = JSON.parse(String(raw)) as {price?: {min?: number; max?: number}};
+    return {
+      min: parsed.price?.min ?? fallback.min,
+      max: parsed.price?.max ?? fallback.max,
+    };
+  } catch {
+    return fallback;
+  }
+}
+
+type LocalFilterableProduct = {
+  selectedOrFirstAvailableVariant?: {availableForSale?: boolean} | null;
+  priceRange: {minVariantPrice: {amount: string}};
+};
+
+/**
+ * The Storefront API's top-level `products` field has no `filters` argument
+ * (only `Collection.products` does), so the all-products page computes its own
+ * Availability/Price facets from the fetched product set and filters locally.
+ */
+export function buildLocalFilters<T extends LocalFilterableProduct>(products: T[]): Filter[] {
+  const inStock = products.filter((p) => p.selectedOrFirstAvailableVariant?.availableForSale).length;
+  const outOfStock = products.length - inStock;
+  const prices = products.map((p) => Number(p.priceRange.minVariantPrice.amount));
+  const min = prices.length ? Math.floor(Math.min(...prices)) : 0;
+  const max = prices.length ? Math.ceil(Math.max(...prices)) : 1000;
+
+  return [
+    {
+      id: 'availability',
+      label: 'Availability',
+      type: 'LIST',
+      values: [
+        {id: 'in-stock', label: 'In stock', count: inStock, input: JSON.stringify({available: true})},
+        {id: 'out-of-stock', label: 'Out of stock', count: outOfStock, input: JSON.stringify({available: false})},
+      ],
+    },
+    {
+      id: 'price',
+      label: 'Price',
+      type: 'PRICE_RANGE',
+      values: [
+        {id: 'price-range', label: 'Price', count: products.length, input: JSON.stringify({price: {min, max}})},
+      ],
+    },
+  ] as Filter[];
+}
+
+export function applyLocalFilters<T extends LocalFilterableProduct>(
+  products: T[],
+  searchParams: URLSearchParams,
+): T[] {
+  const filters = parseFiltersFromSearchParams(searchParams);
+  if (filters.length === 0) return products;
+
+  return products.filter((product) => {
+    const price = Number(product.priceRange.minVariantPrice.amount);
+    const available = Boolean(product.selectedOrFirstAvailableVariant?.availableForSale);
+
+    return filters.every((filter) => {
+      if (filter.available !== undefined) return available === filter.available;
+      if (filter.price) {
+        const {min: priceMin, max: priceMax} = filter.price;
+        if (priceMin != null && price < priceMin) return false;
+        if (priceMax != null && price > priceMax) return false;
+      }
+      return true;
+    });
+  });
+}
