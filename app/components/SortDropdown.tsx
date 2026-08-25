@@ -33,14 +33,19 @@ export function SortDropdown({current}: {current: SortValue}) {
     const params = new URLSearchParams(searchParams);
     params.set('sort', value);
     params.delete('cursor');
-    navigate(`?${params.toString()}`);
+    void navigate(`?${params.toString()}`);
     setOpen(false);
   }
 
   return (
     <div className="sort-wrap">
       {open && (
-        <div className="sort-backdrop" onClick={() => setOpen(false)} />
+        <button
+          type="button"
+          className="sort-backdrop"
+          aria-label="Close sort menu"
+          onClick={() => setOpen(false)}
+        />
       )}
       <button ref={btnRef} type="button" className="sort-btn" onClick={toggle}>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--cwf-accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

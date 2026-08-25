@@ -163,6 +163,8 @@ export default function Product() {
 
   const {title, descriptionHtml} = product;
 
+  const [quantity, setQuantity] = useState(1);
+
   const [selectedUpsells, setSelectedUpsells] = useState<Record<string, string>>(
     () =>
       Object.fromEntries(
@@ -185,7 +187,7 @@ export default function Product() {
     ? [
         {
           merchandiseId: selectedVariant.id,
-          quantity: 1,
+          quantity,
           selectedVariant,
           attributes: selectedUpsellEntries.map(({group, selected}) => ({
             key: group.label,
@@ -197,7 +199,7 @@ export default function Product() {
             ? [
                 {
                   merchandiseId: selected.variant.id,
-                  quantity: 1,
+                  quantity,
                   selectedVariant: selected.variant,
                   attributes: [
                     {key: 'Upsell group', value: group.label},
@@ -271,7 +273,14 @@ export default function Product() {
   useEffect(() => {
     const el = ctaRef.current;
     if (!el) return;
-    const obs = new IntersectionObserver(([entry]) => setShowSticky(!entry.isIntersecting), {threshold: 0});
+    // Only stick once the CTA has scrolled above the viewport — "not intersecting"
+    // is also true before the user has scrolled down to it at all (e.g. a tall
+    // options form pushes it below the fold on load), which would show the bar
+    // immediately instead of only after the real button scrolls out of view.
+    const obs = new IntersectionObserver(
+      ([entry]) => setShowSticky(!entry.isIntersecting && entry.boundingClientRect.top < 0),
+      {threshold: 0},
+    );
     obs.observe(el);
     return () => obs.disconnect();
   }, []);
@@ -448,6 +457,20 @@ export default function Product() {
               <StaggerItem>
                 <h1>{title}</h1>
               </StaggerItem>
+              <StaggerItem className="pdp-highlights">
+                <span className="pdp-highlight-item">
+                  <i className="ti ti-tree" aria-hidden="true" />
+                  Solid hardwood, no MDF
+                </span>
+                <span className="pdp-highlight-item">
+                  <i className="ti ti-certificate" aria-hidden="true" />
+                  25-year joinery guarantee
+                </span>
+                <span className="pdp-highlight-item">
+                  <i className="ti ti-package" aria-hidden="true" />
+                  White-glove delivery included
+                </span>
+              </StaggerItem>
               <StaggerItem className="pdp-price-big">
                 <ProductPrice
                   price={selectedVariant?.price}
@@ -482,6 +505,8 @@ export default function Product() {
                     upsellGroupsData={upsellGroupsData}
                     selectedUpsells={selectedUpsells}
                     onUpsellChange={handleUpsellChange}
+                    quantity={quantity}
+                    onQuantityChange={setQuantity}
                   />
                 </div>
               </StaggerItem>
@@ -554,29 +579,7 @@ export default function Product() {
             </StaggerGroup>
           </motion.div>
 
-          {/* Maker strip */}
-          <Reveal className="maker">
-            <div className="ph">
-              {selectedVariant?.image && (
-                <ProductImage image={selectedVariant.image} />
-              )}
-            </div>
-            <div>
-              <div className="ey">The maker</div>
-              <h2>
-                Crafted with <em>care and precision</em>.
-              </h2>
-              <p>
-                Each piece passes through our workshop from rough boards to final wax. The mortice-and-tenon joints are draw-bored — a peg driven through offset holes that pulls the joint tighter the longer it sits. No screws, no metal in the frame.
-              </p>
-              <div className="sig">— Craft Wood Furniture</div>
-              <div className="by">Oxfordshire workshop</div>
-            </div>
-          </Reveal>
-
-
-
-          {/* Specs */}
+          {/* Main benefits */}
             <div className="pdp-specs">
               <Reveal className="pdp-specs-head">
                 <div>
@@ -610,6 +613,26 @@ export default function Product() {
               </StaggerItem>
             </StaggerGroup>
           </div>
+
+          {/* Maker strip */}
+          <Reveal className="maker">
+            <div className="ph">
+              {selectedVariant?.image && (
+                <ProductImage image={selectedVariant.image} />
+              )}
+            </div>
+            <div>
+              <div className="ey">The maker</div>
+              <h2>
+                Crafted with <em>care and precision</em>.
+              </h2>
+              <p>
+                Each piece passes through our workshop from rough boards to final wax. The mortice-and-tenon joints are draw-bored — a peg driven through offset holes that pulls the joint tighter the longer it sits. No screws, no metal in the frame.
+              </p>
+              <div className="sig">— Craft Wood Furniture</div>
+              <div className="by">Oxfordshire workshop</div>
+            </div>
+          </Reveal>
 
         </div>
       </section>

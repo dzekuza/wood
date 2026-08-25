@@ -9,6 +9,131 @@ Chronological log of notable changes to the project. Newest first.
 This is a human-curated log — not a mirror of `git log`. Record *why*, not just
 *what*; the diff already covers *what*.
 
+## 2026-08-25 — Fixed inline "Order now" button text wrap on mobile
+
+The main `.pdp-atc-btn` (inline CTA in `.pdp-cta-row`, not the sticky bar) was
+wrapping its label onto two lines on narrow phones — "Order" / "now · €400.00" —
+because the qty stepper + button + price suffix no longer fit on one row at
+375px after the quantity stepper was added. Fixed in `app.css`: `.pdp-atc-btn`
+now has `white-space: nowrap`, and at `≤480px` its padding tightens and the
+`.pdp-atc-price` suffix (the "· €X.XX" after the label) hides entirely — the
+price is already shown above in `.pdp-price-big`, so dropping it from the button
+label at this width is not a loss of information, just less crowding.
+
+## 2026-08-25 — Fixed premature sticky ATC bar + restyled to dark overlay
+
+`.pdp-sticky-bar` (mounted in `products.$handle.tsx`) was showing immediately on
+page load for any product with a tall options form (many variant/upsell rows push
+the CTA below the fold before the user scrolls at all). Root cause: the
+`IntersectionObserver` callback did `setShowSticky(!entry.isIntersecting)` —
+`isIntersecting` is `false` both when the target has scrolled *past* (above the
+viewport) and when it simply hasn't been scrolled *to* yet (below the viewport on
+initial load), and the code treated both as "show the bar." Fixed by also
+requiring `entry.boundingClientRect.top < 0` (target's top edge is above the
+viewport — i.e. actually scrolled past), not just "not currently visible."
+**Rule of thumb:** never treat `!isIntersecting` alone as "scrolled past" for a
+one-way reveal trigger — check the target's `boundingClientRect` for direction too,
+or it fires for elements that just haven't been reached yet.
+
+Also restyled `.pdp-sticky-bar` from a plain white bar to a dark translucent
+overlay (`rgba(28,28,28,.94)` derived from `--cwf-ink`, `backdrop-filter: blur`)
+with a light pill CTA button (`.pdp-sticky-bar .pdp-atc-btn` overrides to
+`--cwf-surface` bg / `--cwf-primary` text) — closer to how competitor PDPs treat
+this pattern and more visually distinct as an overlay vs. page content. Mobile now
+keeps the price visible in the bar (only the product title hides at `≤600px`),
+where it previously hid the whole price/title block and showed just the button.
+
+## 2026-08-25 — PDP layout updated to match reference IA (highlights, qty stepper, benefits card)
+
+Restructured `app/routes/products.$handle.tsx` / `app/components/ProductForm.tsx`
+after reviewing a reference storefront's product page layout:
+- Added `.pdp-highlights` — a short icon+text bullet list (material, guarantee,
+  delivery) between the title and price, mirroring the reference's benefit list
+  above the variant picker. New CSS block next to `.pdp-rating-row` in `app.css`.
+- Added a quantity stepper (`.pdp-qty`) to the CTA row — previously there was no
+  way to order more than 1 in a single line add. `quantity` state now lives in
+  the route (`products.$handle.tsx`) and is threaded into `ProductForm` via new
+  `quantity`/`onQuantityChange` props; it scales both the main variant line and
+  any selected upsell lines in `cartLines`. `.pdp-cta-row` grid changed from
+  `1fr auto` to `auto 1fr auto` to fit the new stepper; the wishlist heart button
+  hides at `max-width: 480px` to keep the row from cramping on small phones.
+  **Gotcha:** the mobile-hide media query must be declared *after* the base
+  `.pdp-wish-btn { display: flex }` rule in the cascade — putting it earlier (same
+  specificity) meant the base rule always won and the button never actually
+  hid on mobile, even though the query matched.
+- Moved the "honest specifications" benefit grid (`.pdp-specs`) to sit directly
+  after the hero grid, before the maker strip — reference puts its benefits
+  section immediately below the fold, not after the story section. Restyled it
+  from a bare grid into a `var(--cwf-surface)` (cream) rounded card so it reads
+  as a distinct section against the page's white background, without going
+  full-bleed (kept inside `.pdp-wrap`, per the "hero is the only full-bleed
+  exception" rule).
+- Fixed `.claude/launch.json`: it pointed `npm run dev` at port 5173, but this
+  project's actual dev command is `shopify hydrogen dev` (default port 3000,
+  CLAUDE.md recommends `--port 3001`). Updated to the real command/port so the
+  Browser-pane preview tooling attaches correctly.
+
+Follow-ups on the collection-page redesign above, both in `.category-card*`
+(`app/styles/app.css`):
+- Mobile cards were `flex: 0 0 42%` (~150px), leaving ~38px for text after
+  the 64px image + padding + gap — titles like "Solid Oak Coat Racks"
+  rendered as "So…". `.category-card-name` was single-line
+  `white-space: nowrap` + ellipsis everywhere, not just mobile. Changed it
+  to a 2-line `-webkit-line-clamp` (both breakpoints) and widened the
+  mobile card to `flex: 0 0 78%` / `min-width: 240px` with a smaller
+  52px image, so the full title fits.
+- `.category-card-img` had `background: var(--cwf-card)` + `object-fit:
+  cover`, filling the square with a cream box and cropping the photo —
+  wrong for these Shopify collection images, which are transparent
+  product cutouts (same style as the `public/demo/category-*.png` assets
+  used elsewhere). Reverted to `object-fit: contain` with no background,
+  so the product floats on the card's own white background like the
+  reference.
+
+## 2026-08-25 — Collection pages redesigned: real filters, sort, badges, sibling-category row
+
+Reference: a Thrive Market collection page screenshot (title + horizontal
+sibling-category row + sidebar filters + product badges).
+
+- `collections.$handle.tsx` had **no sidebar, no sort control, no category
+  row** — `SortDropdown` existed but was never mounted, and
+  `app/styles/app.css` had a fully-built but completely unwired sidebar
+  filter shell (`.shop-sidebar`, `.fblock`, `.check`, `.price-range`) from
+  an earlier pass. `collections.all.tsx` had a vertical/centered
+  `.category-row` (no counts) and a **fake** mobile filter drawer — the
+  price inputs were `readOnly` with hardcoded "240"/"4,800" values, wired
+  to nothing.
+- Added `app/lib/collectionFilters.ts` + `app/components/CollectionFilters.tsx`
+  (see [[../frontend/utils|utils]] / [[../frontend/components/common|components]])
+  implementing **real** Shopify-native filtering: the Storefront API
+  returns a `filters` array on `Collection.products(...)` (Availability,
+  Price, and any store-configured facet) where each value's `input` field
+  is a ready-to-resend `ProductFilter` JSON blob — round-tripped through
+  `?filter=`/`price_min`/`price_max` URL params. **Important constraint
+  discovered while wiring this up:** the top-level `QueryRoot.products`
+  field (used by `collections.all.tsx`) has **no `filters` argument** —
+  only `Collection.products` supports it. So `collections.all.tsx` only
+  gained sort + category row + real counts; the filter sidebar only exists
+  on `collections.$handle.tsx`, where it's genuinely scoped to that
+  collection's real facets (no "Benefits" group renders for this store
+  today because it has no such Shopify filter configured — that's correct,
+  not a missing feature).
+- Mounted `<SortDropdown>` on both routes (fixed 2 real bugs while making
+  it load-bearing: a floating promise on `navigate()`, and a non-interactive
+  `<div>` click-to-close backdrop converted to a real `<button>`).
+- `collections.$handle.tsx` now also fetches sibling collections
+  (`SIBLING_COLLECTIONS_QUERY`, same `products(first:250){nodes{id}}`
+  count pattern used elsewhere) to render the horizontal category row.
+- Converted `.category-card` from a vertical/centered card to a horizontal
+  one (small image left, title + real count stacked right) on both routes,
+  matching the reference. Added `.pbadge`/`.pbadge-sale`/`.pbadge-sold-out`
+  to `ProductItem` — no badge classes existed in the codebase before this.
+- Incidental fix: typing `SORT_MAP`'s `sortKey` values properly (was
+  `string`, now the literal union) resolved the 2 pre-existing TS errors
+  in these two files that [[../../CLAUDE.md|CLAUDE.md]]'s "Known issues" section
+  used to call out as "do not fix unless specifically asked" — they're
+  gone now as a side effect of touching this code, not chased separately.
+
 ## 2026-08-25 — Categories/Popular/Textures white backgrounds were boxed, not full-bleed
 
 - Flagged as a known caveat in the previous entry, now fixed properly:

@@ -1,9 +1,8 @@
 import type {Route} from './+types/collections.all';
 import {useLoaderData, Link} from 'react-router';
-import {useState} from 'react';
 import {getPaginationVariables} from '@shopify/hydrogen';
-import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {ProductItem} from '~/components/ProductItem';
+import {SortDropdown} from '~/components/SortDropdown';
 import {SITE_NAME} from '~/lib/site';
 import type {SortValue} from '~/components/SortDropdown';
 import type {CollectionItemFragment} from 'storefrontapi.generated';
@@ -18,7 +17,7 @@ export async function loader(args: Route.LoaderArgs) {
   return criticalData;
 }
 
-const SORT_MAP: Record<SortValue, {sortKey: string; reverse: boolean}> = {
+const SORT_MAP: Record<SortValue, {sortKey: 'CREATED_AT' | 'PRICE'; reverse: boolean}> = {
   newest: {sortKey: 'CREATED_AT', reverse: true},
   'price-high': {sortKey: 'PRICE', reverse: true},
   'price-low': {sortKey: 'PRICE', reverse: false},
@@ -34,7 +33,7 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
 
   const [{products}, {collections}] = await Promise.all([
     storefront.query(CATALOG_QUERY, {variables: {...paginationVariables, sortKey, reverse, query: EXCLUDE_HIDDEN_PRODUCTS_QUERY}, cache: storefront.CacheNone()}),
-    storefront.query(ALL_COLLECTIONS_QUERY, {cache: storefront.CacheNone()}),
+    storefront.query(ALL_COLLECTIONS_QUERY, {cache: storefront.CacheShort()}),
   ]);
   // The Storefront API silently ignores the `-handle:` search-query negation
   // above whenever a sortKey is also passed, so filter hidden products here too.
@@ -73,8 +72,6 @@ const FAQ_ITEMS = [
 export default function AllProducts() {
   const {products, collections, sortParam} = useLoaderData<typeof loader>();
 
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-
   return (
     <div className="archive-page">
       <div className="archive-hero">
@@ -87,14 +84,20 @@ export default function AllProducts() {
             <div className="category-row">
               {collections.slice(0, 4).map((col) => {
                 const image = (col as {image?: {url: string; altText: string | null}}).image;
+                const count = (col as {products?: {nodes: {id: string}[]}}).products?.nodes.length ?? 0;
                 return (
                   <Link key={col.handle} to={`/collections/${col.handle}`} className="category-card">
                     {image && (
-                      <div className="category-card-img">
+                      <span className="category-card-img">
                         <img src={image.url} alt={image.altText ?? col.title} loading="lazy" />
-                      </div>
+                      </span>
                     )}
-                    <span className="category-card-name">{col.title}</span>
+                    <span className="category-card-text">
+                      <span className="category-card-name">{col.title}</span>
+                      <span className="category-card-count">
+                        {count} {count === 1 ? 'product' : 'products'}
+                      </span>
+                    </span>
                   </Link>
                 );
               })}
@@ -105,7 +108,13 @@ export default function AllProducts() {
 
       <div className="shop-shell">
         <div className="archive-wrap">
-          <span className="filter-bar-count filter-bar-count-block">{products.nodes.length} pieces</span>
+          <div className="shop-toolbar">
+            <span className="filter-bar-count">{products.nodes.length} pieces</span>
+            <div className="shop-toolbar-right">
+              <SortDropdown current={sortParam} />
+            </div>
+          </div>
+
           <div className="pgrid">
             {(products.nodes as CollectionItemFragment[]).map((product, index) => (
               <ProductItem
@@ -131,44 +140,6 @@ export default function AllProducts() {
           </div>
         </div>
       </div>
-
-      {/* Mobile filter drawer */}
-      {mobileFiltersOpen && (
-        <div className="mob-filter-overlay" role="presentation">
-          <button
-            type="button"
-            className="mob-filter-backdrop"
-            aria-label="Close filters"
-            onClick={() => setMobileFiltersOpen(false)}
-          />
-          <aside
-            className="mob-filter-drawer"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="mobile-filter-title"
-          >
-            <div className="mob-filter-header">
-              <span className="eyebrow" id="mobile-filter-title">Filters</span>
-              <button className="mob-filter-close" onClick={() => setMobileFiltersOpen(false)} aria-label="Close filters">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              </button>
-            </div>
-            <div className="mob-filter-body">
-              <div className="fblock">
-                <h4>Price · £</h4>
-                <div className="price-range">
-                  <input type="text" defaultValue="240" readOnly />
-                  <span>—</span>
-                  <input type="text" defaultValue="4,800" readOnly />
-                </div>
-              </div>
-            </div>
-            <div className="mob-filter-footer">
-              <button className="btn btn-primary btn-pill" onClick={() => setMobileFiltersOpen(false)}>Show {products.nodes.length} pieces</button>
-            </div>
-          </aside>
-        </div>
-      )}
     </div>
   );
 }
@@ -243,6 +214,11 @@ const ALL_COLLECTIONS_QUERY = `#graphql
           altText
           width
           height
+        }
+        products(first: 250) {
+          nodes {
+            id
+          }
         }
       }
     }

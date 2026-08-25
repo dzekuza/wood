@@ -35,6 +35,8 @@ export function ProductForm({
   upsellGroupsData,
   selectedUpsells,
   onUpsellChange,
+  quantity,
+  onQuantityChange,
 }: {
   productOptions: MappedProductOptions[];
   selectedVariant: ProductFragment['selectedOrFirstAvailableVariant'];
@@ -45,6 +47,8 @@ export function ProductForm({
   upsellGroupsData: UpsellGroupData[];
   selectedUpsells: Record<string, string>;
   onUpsellChange: (groupId: string, optionKey: string) => void;
+  quantity: number;
+  onQuantityChange: (quantity: number) => void;
 }) {
   const navigate = useNavigate();
   const {open} = useAside();
@@ -291,6 +295,26 @@ export function ProductForm({
       })}
 
       <div className="pdp-cta-row">
+        <div className="pdp-qty">
+          <button
+            type="button"
+            className="pdp-qty-btn"
+            aria-label="Decrease quantity"
+            disabled={quantity <= 1}
+            onClick={() => onQuantityChange(Math.max(1, quantity - 1))}
+          >
+            −
+          </button>
+          <span className="pdp-qty-val">{quantity}</span>
+          <button
+            type="button"
+            className="pdp-qty-btn"
+            aria-label="Increase quantity"
+            onClick={() => onQuantityChange(quantity + 1)}
+          >
+            +
+          </button>
+        </div>
         <div className="pdp-atc-wrap">
           <AddToCartButton
             className="btn btn-primary btn-pill pdp-atc-btn"

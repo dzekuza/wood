@@ -3,12 +3,16 @@
   "configurations": [
     {
       "name": "dev",
-      "runtimeExecutable": "npm",
+      "runtimeExecutable": "npx",
       "runtimeArgs": [
-        "run",
-        "dev"
+        "shopify",
+        "hydrogen",
+        "dev",
+        "--port",
+        "3001",
+        "--disable-version-check"
       ],
-      "port": 5173
+      "port": 3001
     }
   ]
 }

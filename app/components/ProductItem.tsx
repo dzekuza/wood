@@ -35,6 +35,24 @@ function getRatingSummary(metafieldValue?: string | null) {
   return {average, count: ratings.length};
 }
 
+function getSaveAmount(product: ProductCardFragment) {
+  const price = Number(product.priceRange.minVariantPrice.amount);
+  const compareAt = Number(product.compareAtPriceRange?.minVariantPrice?.amount ?? 0);
+  if (!compareAt || compareAt <= price) return null;
+
+  const amount = compareAt - price;
+  const currencyCode = product.priceRange.minVariantPrice.currencyCode;
+  try {
+    return new Intl.NumberFormat(undefined, {
+      style: 'currency',
+      currency: currencyCode,
+      maximumFractionDigits: amount % 1 === 0 ? 0 : 2,
+    }).format(amount);
+  } catch {
+    return null;
+  }
+}
+
 function getSwatches(product: ProductCardFragment) {
   const swatchOption = product.options?.find((option) =>
     option.optionValues.some((value) => value.swatch?.color || value.swatch?.image),
@@ -66,15 +84,22 @@ export function ProductItem({
   const rating = getRatingSummary(('metafield' in product && product.metafield?.value) || null);
   const swatches = getSwatches(product);
   const [isSaved, setIsSaved] = useState(false);
+  const isSoldOut = product.selectedOrFirstAvailableVariant?.availableForSale === false;
+  const saveAmount = isSoldOut ? null : getSaveAmount(product);
 
   return (
     <Link
-      className={className ? `pcard ${className}` : 'pcard'}
+      className={['pcard', isSoldOut && 'is-sold-out', className].filter(Boolean).join(' ')}
       key={product.id}
       prefetch="intent"
       to={variantUrl}
     >
       <div className="pcard-img">
+        {isSoldOut ? (
+          <span className="pbadge pbadge-sold-out">Sold out</span>
+        ) : (
+          saveAmount && <span className="pbadge pbadge-sale">Save {saveAmount}</span>
+        )}
         {image && (
           <img
             src={image.url}

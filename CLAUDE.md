@@ -126,8 +126,7 @@ Skills are invoked via the `Skill` tool. Use the right skill for the task — do
 
 ## Known issues / gotchas
 
-- **4 pre-existing TS errors** in `PaginatedResourceSection.tsx` and `SearchForm.tsx` — not introduced by design work, do not fix unless specifically asked.
-- Hero section right column is a placeholder div (no hero image wired yet).
-- Filter chips on collection pages are visual-only — no actual filtering logic.
+- `npm run typecheck` is currently clean (0 errors) — if you see stale advice elsewhere referencing pre-existing TS errors, re-run typecheck before trusting it.
+- Real filtering exists on `collections.$handle.tsx` (Shopify-native `filters`/`ProductFilter`, see `CollectionFilters`/`collectionFilters.ts`) but **not** on `collections.all.tsx` — the Storefront API's top-level `products` field has no `filters` argument, only `Collection.products` does.
 - `reset.css` applies `margin: 0 1rem 1rem 1rem` to `body > main` — this is overridden in `app.css`. If layout shifts appear, check that override is intact.
 - `tsconfigPaths` alone does not resolve `~` in MiniOxygen's module fetch layer — the explicit `resolve.alias` in `vite.config.ts` is required.

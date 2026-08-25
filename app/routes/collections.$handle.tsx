@@ -1,11 +1,15 @@
-import {redirect, useLoaderData} from 'react-router';
+import {redirect, useLoaderData, Link} from 'react-router';
+import {useState} from 'react';
 import type {Route} from './+types/collections.$handle';
 import {getPaginationVariables, Analytics} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {ProductItem} from '~/components/ProductItem';
+import {SortDropdown} from '~/components/SortDropdown';
+import {CollectionFilters} from '~/components/CollectionFilters';
+import {parseFiltersFromSearchParams} from '~/lib/collectionFilters';
+import {SITE_NAME, shouldHideCollection} from '~/lib/site';
 import type {ProductItemFragment} from 'storefrontapi.generated';
-import {SITE_NAME} from '~/lib/site';
 import type {SortValue} from '~/components/SortDropdown';
 
 export const meta: Route.MetaFunction = ({data}) => {
@@ -26,7 +30,7 @@ export async function loader(args: Route.LoaderArgs) {
  * Load data necessary for rendering content above the fold. This is the critical data
  * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
  */
-const SORT_MAP: Record<SortValue, {sortKey: string; reverse: boolean}> = {
+const SORT_MAP: Record<SortValue, {sortKey: 'CREATED' | 'PRICE'; reverse: boolean}> = {
   newest: {sortKey: 'CREATED', reverse: true},
   'price-high': {sortKey: 'PRICE', reverse: true},
   'price-low': {sortKey: 'PRICE', reverse: false},
@@ -46,11 +50,15 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   const url = new URL(request.url);
   const sortParam = (url.searchParams.get('sort') ?? 'newest') as SortValue;
   const {sortKey, reverse} = SORT_MAP[sortParam] ?? SORT_MAP.newest;
+  const filters = parseFiltersFromSearchParams(url.searchParams);
 
-  const {collection} = await storefront.query(COLLECTION_QUERY, {
-    variables: {handle, ...paginationVariables, sortKey, reverse},
-    cache: storefront.CacheNone(),
-  });
+  const [{collection}, {collections}] = await Promise.all([
+    storefront.query(COLLECTION_QUERY, {
+      variables: {handle, ...paginationVariables, sortKey, reverse, filters},
+      cache: storefront.CacheNone(),
+    }),
+    storefront.query(SIBLING_COLLECTIONS_QUERY, {cache: storefront.CacheShort()}),
+  ]);
 
   if (!collection) {
     throw new Response(`Collection ${handle} not found`, {
@@ -61,8 +69,16 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   // The API handle might be localized, so redirect to the localized handle
   redirectIfHandleIsLocalized(request, {handle, data: collection});
 
+  const siblingCollections = collections.nodes.filter(
+    (node) =>
+      node.handle !== handle &&
+      !shouldHideCollection({handle: node.handle, title: node.title}),
+  );
+
   return {
     collection,
+    siblingCollections,
+    sortParam,
   };
 }
 
@@ -77,7 +93,9 @@ function loadDeferredData({context}: Route.LoaderArgs) {
 
 
 export default function Collection() {
-  const {collection} = useLoaderData<typeof loader>();
+  const {collection, siblingCollections, sortParam} = useLoaderData<typeof loader>();
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const filters = collection.products.filters ?? [];
 
   return (
     <div className="archive-page">
@@ -89,25 +107,117 @@ export default function Collection() {
           {collection.description && (
             <p className="archive-hero-blurb">{collection.description}</p>
           )}
+
+          {siblingCollections.length > 0 && (
+            <div className="category-row">
+              {siblingCollections.slice(0, 4).map((sibling) => (
+                <Link
+                  key={sibling.handle}
+                  to={`/collections/${sibling.handle}`}
+                  className="category-card"
+                >
+                  {sibling.image && (
+                    <span className="category-card-img">
+                      <img
+                        src={sibling.image.url}
+                        alt={sibling.image.altText ?? sibling.title}
+                        loading="lazy"
+                      />
+                    </span>
+                  )}
+                  <span className="category-card-text">
+                    <span className="category-card-name">{sibling.title}</span>
+                    <span className="category-card-count">
+                      {sibling.products.nodes.length}{' '}
+                      {sibling.products.nodes.length === 1 ? 'product' : 'products'}
+                    </span>
+                  </span>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
       <div className="shop-shell">
         <div className="archive-wrap">
-          <PaginatedResourceSection<ProductItemFragment>
-            connection={collection.products}
-            resourcesClassName="pgrid"
-          >
-            {({node: product, index}) => (
-              <ProductItem
-                key={product.id}
-                product={product}
-                loading={index < 8 ? 'eager' : undefined}
-              />
-            )}
-          </PaginatedResourceSection>
+          <div className="shop-layout">
+            <aside className="shop-sidebar">
+              <CollectionFilters filters={filters} />
+            </aside>
+
+            <div>
+              <div className="shop-toolbar">
+                <div className="shop-toolbar-left">
+                  <span className="filter-bar-count">
+                    {collection.products.nodes.length} products
+                  </span>
+                  <button
+                    type="button"
+                    className="filter-mobile-btn"
+                    onClick={() => setMobileFiltersOpen(true)}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="4" y1="6" x2="20" y2="6" /><circle cx="9" cy="6" r="2" fill="currentColor" stroke="none" />
+                      <line x1="4" y1="12" x2="20" y2="12" /><circle cx="15" cy="12" r="2" fill="currentColor" stroke="none" />
+                      <line x1="4" y1="18" x2="20" y2="18" /><circle cx="11" cy="18" r="2" fill="currentColor" stroke="none" />
+                    </svg>
+                    Filters
+                  </button>
+                </div>
+                <div className="shop-toolbar-right">
+                  <SortDropdown current={sortParam} />
+                </div>
+              </div>
+
+              <PaginatedResourceSection<ProductItemFragment>
+                connection={collection.products}
+                resourcesClassName="pgrid"
+              >
+                {({node: product, index}) => (
+                  <ProductItem
+                    key={product.id}
+                    product={product}
+                    loading={index < 8 ? 'eager' : undefined}
+                  />
+                )}
+              </PaginatedResourceSection>
+            </div>
+          </div>
         </div>
       </div>
+
+      {mobileFiltersOpen && (
+        <div className="mob-filter-overlay" role="presentation">
+          <button
+            type="button"
+            className="mob-filter-backdrop"
+            aria-label="Close filters"
+            onClick={() => setMobileFiltersOpen(false)}
+          />
+          <aside
+            className="mob-filter-drawer"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="mobile-filter-title"
+          >
+            <div className="mob-filter-header">
+              <span className="eyebrow" id="mobile-filter-title">Filters</span>
+              <button className="mob-filter-close" onClick={() => setMobileFiltersOpen(false)} aria-label="Close filters">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <div className="mob-filter-body">
+              <CollectionFilters filters={filters} resultCount={collection.products.nodes.length} />
+            </div>
+            <div className="mob-filter-footer">
+              <button className="btn btn-primary btn-pill" onClick={() => setMobileFiltersOpen(false)}>
+                Show {collection.products.nodes.length} products
+              </button>
+            </div>
+          </aside>
+        </div>
+      )}
 
       <Analytics.CollectionView
         data={{
@@ -196,6 +306,7 @@ const COLLECTION_QUERY = `#graphql
     $endCursor: String
     $sortKey: ProductCollectionSortKeys
     $reverse: Boolean
+    $filters: [ProductFilter!]
   ) @inContext(country: $country, language: $language) {
     collection(handle: $handle) {
       id
@@ -208,8 +319,20 @@ const COLLECTION_QUERY = `#graphql
         before: $startCursor,
         after: $endCursor,
         sortKey: $sortKey,
-        reverse: $reverse
+        reverse: $reverse,
+        filters: $filters
       ) {
+        filters {
+          id
+          label
+          type
+          values {
+            id
+            label
+            count
+            input
+          }
+        }
         nodes {
           ...ProductItem
         }
@@ -218,6 +341,30 @@ const COLLECTION_QUERY = `#graphql
           hasNextPage
           endCursor
           startCursor
+        }
+      }
+    }
+  }
+` as const;
+
+const SIBLING_COLLECTIONS_QUERY = `#graphql
+  query SiblingCollections($country: CountryCode, $language: LanguageCode)
+    @inContext(country: $country, language: $language) {
+    collections(first: 20, sortKey: TITLE) {
+      nodes {
+        id
+        title
+        handle
+        image {
+          url
+          altText
+          width
+          height
+        }
+        products(first: 250) {
+          nodes {
+            id
+          }
         }
       }
     }
