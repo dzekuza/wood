@@ -255,6 +255,11 @@
  * Categories grid
  * ------------------------------------------------------- */
 .demo-categories {
+  width: 100%;
+  background: #fff;
+}
+
+.demo-categories-inner {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -262,11 +267,10 @@
   padding: 40px 40px;
   max-width: 1400px;
   margin: 0 auto;
-  background: #fff;
 }
 
 @media (max-width: 780px) {
-  .demo-categories { padding: 40px 20px; }
+  .demo-categories-inner { padding: 40px 20px; }
 }
 
 .demo-categories-head {
@@ -386,12 +390,12 @@
 
 @media (max-width: 1080px) {
   .demo-cat-grid { grid-template-columns: repeat(3, 1fr); }
-  .demo-categories { padding: 40px 32px; }
+  .demo-categories-inner { padding: 40px 32px; }
 }
 
 @media (max-width: 620px) {
   .demo-cat-grid { grid-template-columns: repeat(2, 1fr); }
-  .demo-categories { padding: 32px 20px; }
+  .demo-categories-inner { padding: 32px 20px; }
   .demo-categories-head h2 { font-size: 28px; }
 }
 
@@ -399,6 +403,11 @@
  * Most popular — product grid
  * ------------------------------------------------------- */
 .demo-popular {
+  width: 100%;
+  background: #fff;
+}
+
+.demo-popular-inner {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -406,11 +415,10 @@
   padding: 40px 40px;
   max-width: 1400px;
   margin: 0 auto;
-  background: #fff;
 }
 
 @media (max-width: 780px) {
-  .demo-popular { padding: 40px 20px; }
+  .demo-popular-inner { padding: 40px 20px; }
 }
 
 .demo-popular-heading {
@@ -643,11 +651,11 @@
 
 @media (max-width: 1080px) {
   .demo-product-grid { grid-template-columns: repeat(2, 1fr); }
-  .demo-popular { padding: 40px 32px; }
+  .demo-popular-inner { padding: 40px 32px; }
 }
 
 @media (max-width: 620px) {
-  .demo-popular { padding: 32px 20px; gap: 24px; }
+  .demo-popular-inner { padding: 32px 20px; gap: 24px; }
   .demo-popular-heading { font-size: 28px; }
   .demo-btn-outline-dark { width: 100%; }
 }
@@ -656,6 +664,11 @@
  * Our Textures grid
  * ------------------------------------------------------- */
 .demo-textures {
+  width: 100%;
+  background: #fff;
+}
+
+.demo-textures-inner {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -663,7 +676,6 @@
   padding: 40px 40px 80px;
   max-width: 1400px;
   margin: 0 auto;
-  background: #fff;
 }
 
 .demo-textures-head {
@@ -784,12 +796,12 @@
 
 @media (max-width: 1080px) {
   .demo-tex-grid { grid-template-columns: repeat(3, 1fr); }
-  .demo-textures { padding: 40px 32px 64px; }
+  .demo-textures-inner { padding: 40px 32px 64px; }
 }
 
 @media (max-width: 620px) {
   .demo-tex-grid { grid-template-columns: repeat(2, 1fr); }
-  .demo-textures { padding: 32px 20px 48px; }
+  .demo-textures-inner { padding: 32px 20px 48px; }
   .demo-textures-head h2 { font-size: 28px; }
 }
 

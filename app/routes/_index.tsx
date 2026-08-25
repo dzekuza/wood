@@ -164,21 +164,23 @@ function PopularProductsSection({
 
   return (
     <section className="demo-popular">
-      <h2 className="demo-popular-heading">Most popular</h2>
+      <div className="demo-popular-inner">
+        <h2 className="demo-popular-heading">Most popular</h2>
 
-      <div className="pgrid">
-        {products.map((product, index) => (
-          <ProductItem
-            key={product.id}
-            product={product}
-            loading={index < 4 ? 'eager' : undefined}
-          />
-        ))}
+        <div className="pgrid">
+          {products.map((product, index) => (
+            <ProductItem
+              key={product.id}
+              product={product}
+              loading={index < 4 ? 'eager' : undefined}
+            />
+          ))}
+        </div>
+
+        <Link to="/collections/all" className="demo-btn demo-btn-outline-dark">
+          Explore Collections
+        </Link>
       </div>
-
-      <Link to="/collections/all" className="demo-btn demo-btn-outline-dark">
-        Explore Collections
-      </Link>
     </section>
   );
 }

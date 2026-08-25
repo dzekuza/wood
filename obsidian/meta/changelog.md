@@ -9,6 +9,23 @@ Chronological log of notable changes to the project. Newest first.
 This is a human-curated log — not a mirror of `git log`. Record *why*, not just
 *what*; the diff already covers *what*.
 
+## 2026-08-25 — Categories/Popular/Textures white backgrounds were boxed, not full-bleed
+
+- Flagged as a known caveat in the previous entry, now fixed properly:
+  `.demo-categories`, `.demo-popular`, and `.demo-textures` each carried
+  `max-width: 1400px; margin: 0 auto` directly on the section element
+  itself, so their white background was a centered box with the page's
+  cream showing at the edges above ~1462px viewports — unlike
+  `.demo-process`, which is `width: 100%` and genuinely edge-to-edge.
+  Restructured all three the way `.demo-process` already worked: the
+  `max-width`/`margin`/`padding`/layout moved onto a new inner wrapper
+  (`.demo-categories-inner`, `.demo-popular-inner`, `.demo-textures-inner`)
+  added in `CategoriesGrid.tsx`, the `PopularProductsSection` in
+  `_index.tsx`, and `TexturesGrid.tsx`; the `<section>` itself is now just
+  `width: 100%` + `background: #fff`. Moved each section's responsive
+  padding overrides onto the matching `-inner` selector too. Verified at
+  1920px — all four sections now measure the same full viewport width.
+
 ## 2026-08-25 — Categories/Popular backgrounds white; Textures width matched to other sections; product-card gap investigated (no bug)
 
 - `.demo-categories` and `.demo-popular` backgrounds set to explicit `#fff`
