@@ -42,7 +42,7 @@ export function CraftmanshipProcess() {
           shelves and solid oak accents made to bring warmth, function and
           character to every room.
         </p>
-        <Link to="/collections" className="demo-btn demo-btn-outline-dark">
+        <Link to="/collections" className="demo-btn demo-btn-outline-light">
           Explore Collections
         </Link>
       </div>

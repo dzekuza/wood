@@ -32,6 +32,7 @@
   --cwf-primary-dark: #3a241a;
   --cwf-primary-tint: rgba(74, 47, 31, .06);
   --cwf-accent-hover: #d6b18a;
+  --cwf-card: #f9f4ed;
 
   --aside-width: 420px;
   --cart-aside-summary-height-with-discount: 280px;
@@ -2440,27 +2441,16 @@ section { padding: 0; }
 @media (max-width: 780px) { .archive-wrap { padding: 0 20px; } }
 
 /* ── Product card (pcard) ── */
-.pcard { display: flex; flex-direction: column; gap: 16px; position: relative; transition: transform 200ms ease-out; text-decoration: none; color: inherit; }
+.pcard { display: flex; flex-direction: column; position: relative; background: var(--cwf-card); border-radius: 24px; overflow: hidden; transition: transform 200ms ease-out; text-decoration: none; color: inherit; }
 @media (hover: hover) and (pointer: fine) { .pcard:hover { transform: translateY(-3px); } }
-.pcard-img { position: relative; width: 100%; aspect-ratio: 1 / 1; border-radius: 24px; overflow: hidden; background: var(--cwf-sand); }
-.pcard-img-frame { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 24px; opacity: 0; transition: opacity 450ms ease; }
-.pcard-img-frame.active { opacity: 1; }
-.pcard-dots { position: absolute; left: 0; right: 0; bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 5px; opacity: 0; transition: opacity 150ms ease; z-index: 2; }
-@media (hover: hover) and (pointer: fine) { .pcard:hover .pcard-dots { opacity: 1; } }
-.pcard-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.55); transition: background 150ms, transform 150ms; }
-.pcard-dot.active { background: #fff; transform: scale(1.25); }
-.pcard-rating { position: absolute; bottom: 10px; left: 10px; display: inline-flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.92); backdrop-filter: blur(6px); border-radius: 99px; padding: 4px 10px; font-size: 12px; font-weight: 600; color: var(--cwf-primary); line-height: 1; z-index: 2; pointer-events: none; }
-.pcard-rating-star { color: var(--cwf-accent); font-size: 11px; }
-.pcard-rating-count { color: rgba(74,47,31,.5); font-weight: 400; }
-.pcard-heart { position: absolute; top: 12px; right: 12px; width: 34px; height: 34px; border-radius: 50%; background: rgba(243, 239, 234, .92); display: flex; align-items: center; justify-content: center; color: var(--cwf-primary); font-size: 16px; border: .5px solid var(--cwf-line); transition: background 150ms, color 150ms; cursor: pointer; z-index: 2; }
-@media (hover: hover) and (pointer: fine) { .pcard-heart:hover { background: var(--cwf-primary); color: var(--cwf-surface); } }
-.pcard-heart.saved { background: var(--cwf-primary); color: var(--cwf-surface); border-color: var(--cwf-primary); }
-.pcard-body { display: flex; flex-direction: column; gap: 16px; }
+.pcard-img { position: relative; width: 100%; aspect-ratio: 210 / 211; border-radius: 8px; overflow: hidden; background: var(--cwf-card); }
+.pcard-img-frame { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+.pcard-body { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 12px 24px; text-align: center; }
 .pcard-name {
   font-family: 'Mark Bold', 'Plus Jakarta Sans', sans-serif;
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 1.3;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 24px;
   letter-spacing: -.02em;
   color: var(--cwf-accent-deep);
   margin: 0;
@@ -2468,29 +2458,11 @@ section { padding: 0; }
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  min-height: calc(1.3em * 2);
+  min-height: calc(24px * 2);
 }
-.pcard-swatches { display: flex; align-items: center; gap: 6px; margin-top: -8px; }
-.pcard-swatch {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--cwf-sand);
-  overflow: hidden;
-  flex-shrink: 0;
-  box-shadow: inset 0 0 0 1px rgba(74, 47, 31, .12);
-}
-.pcard-swatch.active { box-shadow: inset 0 0 0 1px #fff, 0 0 0 1.5px rgba(128, 128, 128, .6); }
-.pcard-swatch img { width: 100%; height: 100%; object-fit: cover; }
-.pcard-price-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.pcard-price { display: flex; flex-direction: column; gap: 4px; }
-.pcard-price-eyebrow { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: rgba(74, 47, 31, .45); }
-.pcard-price-value { font-family: 'Mark Bold', 'Plus Jakarta Sans', sans-serif; font-size: 16px; font-weight: 600; color: var(--cwf-primary); display: flex; align-items: baseline; gap: 8px; }
-.pcard-quickadd { width: 32px; height: 32px; border-radius: 16px; background: var(--cwf-primary); color: var(--cwf-surface); display: flex; align-items: center; justify-content: center; font-size: 14px; border: none; cursor: pointer; flex-shrink: 0; transition: background 150ms; }
-@media (hover: hover) and (pointer: fine) { .pcard-quickadd:hover { background: var(--cwf-accent-deep); } }
-.pcard-quickadd:disabled { opacity: .6; cursor: default; }
-.pcard-badge { position: absolute; left: 15px; top: 15px; background: #d14545; color: #fff; font-size: 12px; font-weight: 500; letter-spacing: .02em; text-transform: uppercase; padding: 4px 8px; border-radius: 3px; z-index: 2; display: inline-flex; gap: 4px; }
-.pcard-compare-at { font-weight: 400; font-size: 14px; text-decoration: line-through; color: rgba(115,87,59,.5); }
+.pcard-price-row { display: flex; align-items: baseline; justify-content: center; gap: 8px; }
+.pcard-price-eyebrow { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: rgba(122, 90, 58, .45); }
+.pcard-price-value { font-family: 'Mark Bold', 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 700; color: var(--cwf-accent-deep); }
 .pgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; width: 100%; }
 @media (max-width: 980px) { .pgrid { grid-template-columns: repeat(2, 1fr); gap: 24px; } }
 @media (max-width: 767px) {

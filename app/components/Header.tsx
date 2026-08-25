@@ -1,5 +1,5 @@
-import {Suspense} from 'react';
-import {Await, NavLink, useAsyncValue} from 'react-router';
+import {Suspense, useEffect, useState} from 'react';
+import {Await, NavLink, useAsyncValue, useLocation} from 'react-router';
 import {
   type CartViewPayload,
   useAnalytics,
@@ -20,9 +20,31 @@ interface HeaderProps {
 
 type Viewport = 'desktop' | 'mobile';
 
+// Pages with a full-bleed hero right below the header, where the header
+// should float transparently over it instead of pushing it down.
+const HERO_OVERLAY_ROUTES = new Set(['/', '/landing-oak']);
+
+function useHeaderOverlay() {
+  const {pathname} = useLocation();
+  const isOverlay = HERO_OVERLAY_ROUTES.has(pathname);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    if (!isOverlay) return;
+    setIsScrolled(window.scrollY > 40);
+    function onScroll() {
+      setIsScrolled(window.scrollY > 40);
+    }
+    window.addEventListener('scroll', onScroll, {passive: true});
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [isOverlay]);
+
+  return {isOverlay, isScrolled: isOverlay && isScrolled};
+}
 
 export function Header({header, isLoggedIn, cart, publicStoreDomain}: HeaderProps) {
   const {shop, menu, collections} = header;
+  const {isOverlay, isScrolled} = useHeaderOverlay();
   const categories = (collections?.nodes ?? []).filter(
     (collection) =>
       !shouldHideCollection({
@@ -30,8 +52,16 @@ export function Header({header, isLoggedIn, cart, publicStoreDomain}: HeaderProp
         title: collection.title,
       }),
   );
+  const headerClassName = [
+    'header',
+    isOverlay && 'header--overlay',
+    isScrolled && 'is-scrolled',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
   return (
-    <header className="header">
+    <header className={headerClassName}>
       <div className="header-topbar">
         <NavLink prefetch="intent" to="/" className="header-logo" end>
           <img src="/darkwood.svg" alt={shop.name} />
