@@ -42,6 +42,24 @@ straight to a semantic token with a literal value.
 - Mobile (React Native): every colour/spacing/radius comes from `useAppTheme()`;
   no raw hex or numbers in `StyleSheet.create()`.
 
+## Typography
+
+Two display faces now, not one — see `DESIGN.md` §3 for the full rationale:
+
+- **Outfit Medium** (`/fonts/outfit-medium.ttf`) — real headings only: `h1`/`h2`/`h3`
+  and section-title classes (`.archive-hero-title`, `.shead .title`,
+  `.archive-faq-title`, `.demo-*-head h2`, etc). All of them share one flat
+  size — 56px desktop, 36px mobile — regardless of heading level; hierarchy
+  comes from weight/color/layout, not size.
+- **Mark Bold** (`/fonts/mark-bold.ttf`) — still used, but only for prices,
+  stat numbers, pull-quotes, and repeated card names (product/category card
+  titles) — anything "spoken" that isn't a structural heading.
+- **Plus Jakarta Sans** — unchanged: body, nav, buttons, eyebrows, labels.
+
+Before styling any new heading-like text, check `DESIGN.md` §3's Roles table
+to know which of the three it belongs to — it's easy to reach for Mark Bold
+out of habit since it was the sole display face before this split.
+
 ## Icons
 
 Tabler Icons via `@tabler/icons-webfont` (CDN link in `root.tsx`), used as

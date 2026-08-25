@@ -6,6 +6,7 @@ import {
   getCurrentPriceRange,
   getFilterValueUrl,
   getListAndBooleanFilters,
+  getPriceBounds,
   getPriceFilter,
   getPriceRangeUrl,
   hasActiveFilters,
@@ -42,9 +43,20 @@ function FilterValueRow({
 
 function PriceFilterBlock({priceFilter}: {priceFilter: Filter | undefined}) {
   const [searchParams] = useSearchParams();
+  const bounds = getPriceBounds(priceFilter);
   const current = getCurrentPriceRange(searchParams);
-  const [min, setMin] = useState(current.min);
-  const [max, setMax] = useState(current.max);
+  const [min, setMin] = useState(current.min || String(bounds.min));
+  const [max, setMax] = useState(current.max || String(bounds.max));
+
+  const minNum = Math.min(Math.max(Number(min) || bounds.min, bounds.min), bounds.max);
+  const maxNum = Math.max(Math.min(Number(max) || bounds.max, bounds.max), bounds.min);
+  const span = Math.max(bounds.max - bounds.min, 1);
+  const leftPct = ((minNum - bounds.min) / span) * 100;
+  const rightPct = 100 - ((maxNum - bounds.min) / span) * 100;
+
+  function apply(nextMin: string, nextMax: string) {
+    window.location.href = getPriceRangeUrl(searchParams, {min: nextMin, max: nextMax});
+  }
 
   return (
     <div className="fblock">
@@ -53,26 +65,27 @@ function PriceFilterBlock({priceFilter}: {priceFilter: Filter | undefined}) {
         className="price-range"
         onSubmit={(event) => {
           event.preventDefault();
-          const url = getPriceRangeUrl(searchParams, {min, max});
-          window.location.href = url;
+          apply(min, max);
         }}
       >
         <input
           type="number"
           inputMode="decimal"
-          min={0}
-          placeholder={priceFilter ? 'Min' : '0'}
+          min={bounds.min}
+          placeholder={String(bounds.min)}
           value={min}
           onChange={(event) => setMin(event.target.value)}
+          onBlur={() => apply(min, max)}
         />
         <span>—</span>
         <input
           type="number"
           inputMode="decimal"
-          min={0}
-          placeholder="Max"
+          max={bounds.max}
+          placeholder={String(bounds.max)}
           value={max}
           onChange={(event) => setMax(event.target.value)}
+          onBlur={() => apply(min, max)}
         />
         <button type="submit" className="price-range-apply" aria-label="Apply price range">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -80,6 +93,34 @@ function PriceFilterBlock({priceFilter}: {priceFilter: Filter | undefined}) {
           </svg>
         </button>
       </form>
+
+      <div className="price-slider">
+        <div className="price-slider-track">
+          <div className="price-slider-fill" style={{left: `${leftPct}%`, right: `${rightPct}%`}} />
+        </div>
+        <input
+          type="range"
+          className="price-slider-thumb"
+          min={bounds.min}
+          max={bounds.max}
+          value={minNum}
+          aria-label="Minimum price"
+          onChange={(event) => setMin(String(Math.min(Number(event.target.value), maxNum)))}
+          onMouseUp={() => apply(min, max)}
+          onTouchEnd={() => apply(min, max)}
+        />
+        <input
+          type="range"
+          className="price-slider-thumb"
+          min={bounds.min}
+          max={bounds.max}
+          value={maxNum}
+          aria-label="Maximum price"
+          onChange={(event) => setMax(String(Math.max(Number(event.target.value), minNum)))}
+          onMouseUp={() => apply(min, max)}
+          onTouchEnd={() => apply(min, max)}
+        />
+      </div>
     </div>
   );
 }

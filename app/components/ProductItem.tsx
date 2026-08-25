@@ -81,6 +81,7 @@ export function ProductItem({
 }) {
   const variantUrl = useVariantUrl(product.handle);
   const image = product.featuredImage;
+  const hoverImage = product.images?.nodes?.find((node) => node.id !== image?.id) ?? null;
   const price = product.priceRange.minVariantPrice;
   const rating = getRatingSummary(('metafield' in product && product.metafield?.value) || null);
   const swatches = getSwatches(product);
@@ -106,7 +107,16 @@ export function ProductItem({
             src={image.url}
             alt={image.altText || product.title}
             loading={loading}
-            className="pcard-img-frame active"
+            className="pcard-img-frame pcard-img-frame-primary"
+          />
+        )}
+        {hoverImage && (
+          <img
+            src={hoverImage.url}
+            alt=""
+            aria-hidden
+            loading="lazy"
+            className="pcard-img-frame pcard-img-frame-hover"
           />
         )}
         <button

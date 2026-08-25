@@ -124,7 +124,7 @@
 .demo-hero h1 {
   font-family: 'Outfit', sans-serif;
   font-weight: 500;
-  font-size: clamp(2.25rem, 5vw, 4.833rem);
+  font-size: clamp(2.25rem, 5vw, 56px);
   line-height: 1.05;
   letter-spacing: -0.02em;
   color: #fff;
@@ -284,7 +284,7 @@
 .demo-categories-head h2 {
   font-family: 'Outfit', sans-serif;
   font-weight: 500;
-  font-size: 36px;
+  font-size: 56px;
   letter-spacing: -0.02em;
   color: #352f2a;
   margin: 0;
@@ -442,7 +442,7 @@
 .demo-popular-heading {
   font-family: 'Outfit', sans-serif;
   font-weight: 500;
-  font-size: 36px;
+  font-size: 56px;
   letter-spacing: -0.02em;
   color: #352f2a;
   margin: 0;
@@ -707,7 +707,7 @@
 .demo-textures-head h2 {
   font-family: 'Outfit', sans-serif;
   font-weight: 500;
-  font-size: 36px;
+  font-size: 56px;
   letter-spacing: -0.02em;
   color: #352f2a;
   margin: 0;
@@ -850,7 +850,7 @@
 .demo-testimonials-head h2 {
   font-family: 'Outfit', sans-serif;
   font-weight: 500;
-  font-size: 36px;
+  font-size: 56px;
   letter-spacing: -0.02em;
   color: #352f2a;
   margin: 0;
@@ -1028,7 +1028,7 @@
 .demo-process-head h2 {
   font-family: 'Outfit', sans-serif;
   font-weight: 500;
-  font-size: 36px;
+  font-size: 56px;
   letter-spacing: -0.02em;
   color: #352f2a;
   margin: 0;
@@ -1743,7 +1743,7 @@
 .demo-faq-head h2 {
   font-family: 'Outfit', sans-serif;
   font-weight: 500;
-  font-size: 36px;
+  font-size: 56px;
   letter-spacing: -0.02em;
   margin: 0;
 }

@@ -49,10 +49,11 @@ All colors live as CSS custom properties on `:root` and should be referenced by 
 
 ## 3. Typography
 
-Two families, strict roles.
+Three families, strict roles: one for true headings, one for prices/stats/pull-quotes, one for everything read.
 
 ```css
 @font-face { font-family:'Mark'; font-weight:700; src:url('mark-bold.ttf'); }
+@font-face { font-family:'Outfit'; font-weight:500; src:url('outfit-medium.ttf'); }
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
 ```
 
@@ -60,23 +61,23 @@ Two families, strict roles.
 
 | Family | Use for |
 |---|---|
-| **Mark Bold** | Display headlines, section H2s, bento cell titles, prices, stat numbers, pull-quotes. Anything *spoken*. |
-| **Plus Jakarta Sans** | Body, lede, subheads (H3/H4), nav, buttons, captions, eyebrows. Anything *read*. |
+| **Outfit Medium** | Real headings only — `h1`/`h2`/`h3` and section titles (hero title, `.shead` title, FAQ/newsletter/process/testimonials section heads). One flat size across all of them: 56px desktop (36px mobile). |
+| **Mark Bold** | Bento cell titles, prices, stat numbers, pull-quotes, repeated card names (product/category card titles). Anything *spoken* that isn't a structural heading. |
+| **Plus Jakarta Sans** | Body, lede, subheads (H4/H5), nav, buttons, captions, eyebrows. Anything *read*. |
 
 > ✋ Never use Mark Bold for buttons, navigation, body or anything ≤ 18px. The face is drawn for display only.
+> ✋ Headings don't get a responsive type scale anymore — every real heading is 56px on desktop, 36px on mobile, regardless of hierarchy (h1 vs h2 vs a section title all match). Don't reach for a bigger/smaller size for "more important" headings; use weight, color, or layout for hierarchy instead.
 
 ### Scale
 
 | Role | Class | Family · weight | Size | Tracking | Line-height |
 |---|---|---|---|---|---|
-| Display | `.display` | Mark · 700 | `clamp(54px,7vw,92px)` | -4.5% | .95 |
-| H1 | `.h1` | Mark · 700 | `clamp(40px,5vw,68px)` | -3.5% | 1.02 |
-| H2 | `.h2` | Mark · 700 | `clamp(28px,3.4vw,44px)` | -3% | 1.05 |
+| Heading (h1/h2/h3, section titles) | — | Outfit · 500 | 56px desktop / 36px mobile | -3% | 1.15 |
 | Bento title | `.cell h3` | Mark · 700 | `clamp(28px,2.6vw,36px)` | -3.5% | .96 |
 | Pull-quote | `.tcard q` | Mark · 700 | 22px | -3% | 1.2 |
 | Price | `.pprice` | Mark · 700 | 24px | -3% | 1 |
 | Stat num | `.craft-stats .num` | Mark · 700 | 44px | -4.5% | 1 |
-| H3 (subhead) | — | Jakarta · 600 | 16px | -.5% | 1.2 |
+| H4/H5 (subhead) | — | Jakarta · 600 | 16px | -.5% | 1.2 |
 | Lede | `.lede` | Jakarta · 400 | 17px | -.5% | 1.6 |
 | Body | (default) | Jakarta · 400 | 15px | 0 | 1.7 |
 | Small | — | Jakarta · 400 | 13–14px | 0 | 1.55 |
@@ -86,7 +87,7 @@ Two families, strict roles.
 ### Rules
 
 - Tighter tracking the larger the type. Mark at display sizes needs -4 to -4.5%. Body Jakarta stays at 0 to -0.3%.
-- Line-height ladder: display .95 → headings 1.02–1.2 → body 1.6–1.7 → micro 1.4–1.5.
+- Line-height ladder: headings 1.15 → bento/pull-quote/price .96–1.2 → body 1.6–1.7 → micro 1.4–1.5.
 - Italic is reserved for `<em>` inside hero headlines, where it switches color to `--accent` (oak) — used as an emphasis device, never a stylistic flourish.
 - Numerals: use Mark Bold for prices and stat numbers (it has the warmth). Use Jakarta tabular nums for tables and dense data.
 

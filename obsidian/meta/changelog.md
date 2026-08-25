@@ -9,6 +9,63 @@ Chronological log of notable changes to the project. Newest first.
 This is a human-curated log — not a mirror of `git log`. Record *why*, not just
 *what*; the diff already covers *what*.
 
+## 2026-08-25 — Headings switch to Outfit Medium at a flat 56px/36px scale
+
+Site-wide typography change, requested directly: every real heading (`h1`,
+`h2`, `h3`, plus section-title classes like `.archive-hero-title`,
+`.shead .title`, and the homepage's `.demo-*-head h2`s) now renders in a new
+self-hosted `Outfit Medium` face (`public/fonts/outfit-medium.ttf`,
+`font-weight: 500`) at one flat size — 56px desktop, 36px mobile via
+`@media (max-width: 780px)` — instead of the old per-selector responsive
+`clamp()` scale (h1 64px / h2 44px / hero clamp up to 72px, etc). Mark Bold
+stays exactly where it was for prices, stat numbers, pull-quotes, and
+repeated card names (`.category-card-name`, `.pcard-price-value`,
+`.collection-card-title(-new)`, `.rev-score .big`, etc) — those are
+"spoken" numerals/labels, not structural headings, so they were
+deliberately left out of scope. See `DESIGN.md` §3 for the updated Roles/
+Scale tables — that file is the source of truth other agents should check
+before styling new heading-like text.
+
+One useful discovery mid-change: the homepage's `demo.css` (a separate
+"distinct type system" for `_index.tsx`/`landing-oak.tsx`, loaded via its
+own Google Fonts `Outfit` link) already used `'Outfit'` as a family name
+for its section heads at 36px, and `.demo-benefits-heading` was *already*
+56px — i.e. 56px was already the established "hero-scale" size in that
+system before this change, which is a good sign this size choice fits the
+existing rhythm rather than being arbitrary.
+
+## 2026-08-25 — `/collections/all` filters, filter-styling scope bug, product card hover-swap
+
+- **`/collections/all` ("Products") had no filter sidebar at all.** Unlike
+  `collections.$handle.tsx`, the Storefront API's top-level `products` field
+  has no `filters` argument (only `Collection.products` does — see the
+  gotcha in root `CLAUDE.md`), so there was no server-side facet data to
+  render. Added `buildLocalFilters`/`applyLocalFilters` to
+  `app/lib/collectionFilters.ts`: they compute Availability/Price facets
+  from the already-fetched product set and filter it in JS, shaped as the
+  same `Filter[]`/`ProductFilter` types the real per-collection filters use,
+  so `CollectionFilters` renders identically on both pages with no
+  component changes. The loader now fetches up to 250 products (was 48)
+  since facet computation needs the full catalog, not one page of it.
+- **Filter sidebar styling silently didn't apply in the mobile drawer.**
+  All of `.check`/`.ct`/`li a`/`h4` etc. were scoped to `.shop-sidebar`, but
+  the mobile filter drawer renders the same `<CollectionFilters>` inside
+  `.mob-filter-body`, not `.shop-sidebar` — so on mobile the checkboxes,
+  spacing, and hover states silently never rendered (plain unstyled text).
+  Rescoped those rules from `.shop-sidebar X` to `.filters-content X`
+  (`.filters-content` is the div `CollectionFilters` always renders,
+  regardless of which container it sits in), so desktop sidebar and mobile
+  drawer share one styled implementation. Also added a real dual-thumb price
+  range slider (`.price-slider`, bounds read from the `PRICE_RANGE` filter's
+  `values[0].input`) — previously "Price" was just two bare number inputs.
+- **Product cards didn't swap to a second image on hover.** All three
+  product-card fragments already fetch `images(first: 4)`, but
+  `ProductItem.tsx` only ever rendered `featuredImage`. Added a second
+  absolutely-positioned `<img>` (`product.images.nodes` entry that isn't the
+  featured image) that crossfades in via `.pcard-img:hover
+  .pcard-img-frame-hover`, guarded by the existing `@media (hover: hover)
+  and (pointer: fine)` pattern already used elsewhere on `.pcard`.
+
 ## 2026-08-25 — Card swatches, category carousel, and object-fit crop fixes
 
 Three related "why does this look worse than the PDP" complaints, same root
