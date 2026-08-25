@@ -1,5 +1,6 @@
 import {useState} from 'react';
 import {Link} from 'react-router';
+import {StarFilledIcon} from '~/components/Icons';
 
 export interface HeroSlide {
   image: string;
@@ -7,6 +8,11 @@ export interface HeroSlide {
   blurb: string;
   primaryCta: {label: string; to: string};
   secondaryCta: {label: string; to: string};
+}
+
+export interface HeroRating {
+  average: number;
+  count: number;
 }
 
 const FALLBACK_SLIDES: HeroSlide[] = [
@@ -20,7 +26,13 @@ const FALLBACK_SLIDES: HeroSlide[] = [
   },
 ];
 
-export function HeroCarousel({slides}: {slides?: HeroSlide[]}) {
+export function HeroCarousel({
+  slides,
+  rating,
+}: {
+  slides?: HeroSlide[];
+  rating?: HeroRating;
+}) {
   const activeSlides = slides?.length ? slides : FALLBACK_SLIDES;
   const [active, setActive] = useState(0);
 
@@ -38,6 +50,19 @@ export function HeroCarousel({slides}: {slides?: HeroSlide[]}) {
           aria-hidden={index !== active}
         >
           <div className="demo-hero-content">
+            {rating && (
+              <div className="demo-hero-rating">
+                <span className="demo-hero-stars" aria-hidden>
+                  {Array.from({length: 5}).map((_, i) => (
+                    <StarFilledIcon key={i} />
+                  ))}
+                </span>
+                <span>
+                  {rating.average.toFixed(1)} ({rating.count}) reviews from Etsy customers
+                </span>
+              </div>
+            )}
+
             <h1>
               {slide.heading.map((line, i) => (
                 <span key={i}>

@@ -4,6 +4,7 @@ export interface Category {
   title: string;
   image: string | null;
   to: string;
+  count?: number;
 }
 
 export function CategoriesGrid({categories}: {categories: Category[]}) {
@@ -33,6 +34,11 @@ export function CategoriesGrid({categories}: {categories: Category[]}) {
               </span>
             </span>
             <span className="demo-cat-title">{category.title}</span>
+            {typeof category.count === 'number' && (
+              <span className="demo-cat-count">
+                {category.count} {category.count === 1 ? 'product' : 'products'}
+              </span>
+            )}
           </Link>
         ))}
       </div>

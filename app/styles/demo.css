@@ -116,8 +116,9 @@
   color: #ffa817;
 }
 
-.demo-hero-stars i {
-  font-size: 15px;
+.demo-hero-stars svg {
+  width: 15px;
+  height: 15px;
 }
 
 .demo-hero h1 {
@@ -261,6 +262,7 @@
   padding: 40px 40px;
   max-width: 1400px;
   margin: 0 auto;
+  background: #fff;
 }
 
 @media (max-width: 780px) {
@@ -280,7 +282,7 @@
   font-weight: 500;
   font-size: 36px;
   letter-spacing: -0.02em;
-  color: #61482e;
+  color: #352f2a;
   margin: 0;
 }
 
@@ -353,11 +355,18 @@
   border-radius: 40px;
   background: #fff;
   color: #61482e;
-  transition: transform 200ms ease;
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 200ms ease, transform 200ms ease;
 }
 
 .demo-cat-arrow i { font-size: 15px; }
-.demo-cat-card:hover .demo-cat-arrow { transform: scale(1.08); }
+.demo-cat-card:hover .demo-cat-arrow { opacity: 1; transform: scale(1.08); }
+
+/* Touch devices have no hover state — keep the badge visible */
+@media (hover: none) {
+  .demo-cat-arrow { opacity: 1; transform: scale(1); }
+}
 
 .demo-cat-title {
   font-family: 'Outfit', sans-serif;
@@ -397,6 +406,7 @@
   padding: 40px 40px;
   max-width: 1400px;
   margin: 0 auto;
+  background: #fff;
 }
 
 @media (max-width: 780px) {
@@ -408,7 +418,7 @@
   font-weight: 500;
   font-size: 36px;
   letter-spacing: -0.02em;
-  color: #61482e;
+  color: #352f2a;
   margin: 0;
 }
 
@@ -650,9 +660,10 @@
   flex-direction: column;
   align-items: center;
   gap: 32px;
-  padding: 40px 99px 80px;
+  padding: 40px 40px 80px;
   max-width: 1400px;
   margin: 0 auto;
+  background: #fff;
 }
 
 .demo-textures-head {
@@ -668,7 +679,7 @@
   font-weight: 500;
   font-size: 36px;
   letter-spacing: -0.02em;
-  color: #61482e;
+  color: #352f2a;
   margin: 0;
 }
 
@@ -786,16 +797,16 @@
  * Testimonials marquee
  * ------------------------------------------------------- */
 .demo-testimonials {
-  background: #2d231a;
+  background: #F3EFEA;
   padding: 64px 0;
   overflow: hidden;
 }
 
 .demo-testimonials-head {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
+  text-align: center;
   gap: 12px;
   max-width: 1400px;
   margin: 0 auto;
@@ -811,7 +822,7 @@
   font-weight: 500;
   font-size: 36px;
   letter-spacing: -0.02em;
-  color: #fff;
+  color: #352f2a;
   margin: 0;
 }
 
@@ -822,7 +833,7 @@
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-weight: 600;
   font-size: 13px;
-  color: #fff;
+  color: #352f2a;
 }
 
 .demo-testimonials-stars {
@@ -831,7 +842,7 @@
   color: var(--cwf-accent, #c9a27a);
 }
 
-.demo-testimonials-stars i { font-size: 14px; }
+.demo-testimonials-stars svg { width: 14px; height: 14px; }
 
 .demo-review-rows {
   display: flex;
@@ -884,7 +895,7 @@
   color: var(--cwf-accent, #c9a27a);
 }
 
-.demo-review-stars i { font-size: 13px; }
+.demo-review-stars svg { width: 13px; height: 13px; }
 
 .demo-review-quote {
   font-family: 'Plus Jakarta Sans', sans-serif;
@@ -967,7 +978,7 @@
   align-items: center;
   gap: 48px;
   width: 100%;
-  background: #443c35;
+  background: #fff;
   padding: 80px 40px;
 }
 
@@ -989,7 +1000,7 @@
   font-weight: 500;
   font-size: 36px;
   letter-spacing: -0.02em;
-  color: #ece5df;
+  color: #352f2a;
   margin: 0;
 }
 
@@ -998,8 +1009,13 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 1.5;
-  color: #ece5df;
+  color: #61482e;
   margin: 0;
+}
+
+.demo-process .demo-btn-outline-light {
+  border-color: #352f2a;
+  color: #352f2a;
 }
 
 .demo-process-body {
@@ -1472,7 +1488,13 @@
   white-space: nowrap;
 }
 
-.demo-marquee-item i { font-size: 14px; color: rgba(223, 213, 202, 0.5); }
+.demo-marquee-dot {
+  display: inline-block;
+  height: 4px;
+  width: 4px;
+  border-radius: 50%;
+  background: rgba(223, 213, 202, 0.5);
+}
 
 @media (prefers-reduced-motion: reduce) {
   .demo-marquee-track { animation: none; }

@@ -8,6 +8,7 @@ import {
 } from '@shopify/hydrogen';
 import type {HeaderQuery, CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
+import {AnnouncementBar} from '~/components/AnnouncementBar';
 import {HeaderSearch} from '~/components/HeaderSearch';
 import {FLAGSHIP_PAGE_ROUTES, shouldHideCollection} from '~/lib/site';
 
@@ -22,7 +23,7 @@ type Viewport = 'desktop' | 'mobile';
 
 // Pages with a full-bleed hero right below the header, where the header
 // should float transparently over it instead of pushing it down.
-const HERO_OVERLAY_ROUTES = new Set(['/', '/landing-oak']);
+const HERO_OVERLAY_ROUTES = new Set(['/landing-oak']);
 
 function useHeaderOverlay() {
   const {pathname} = useLocation();
@@ -62,6 +63,7 @@ export function Header({header, isLoggedIn, cart, publicStoreDomain}: HeaderProp
 
   return (
     <header className={headerClassName}>
+      <AnnouncementBar />
       <div className="header-topbar">
         <NavLink prefetch="intent" to="/" className="header-logo" end>
           <img src="/darkwood.svg" alt={shop.name} />

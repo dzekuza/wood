@@ -1,11 +1,12 @@
 import type {ProductReview} from '~/components/ReviewsSection';
+import {StarFilledIcon} from '~/components/Icons';
 
 function ReviewCard({review}: {review: ProductReview}) {
   return (
     <article className="demo-review-card">
       <div className="demo-review-stars" aria-hidden>
         {Array.from({length: review.rating}).map((_, i) => (
-          <i key={i} className="ti ti-star-filled" />
+          <StarFilledIcon key={i} />
         ))}
       </div>
       <p className="demo-review-quote">{review.body}</p>
@@ -54,15 +55,15 @@ export function TestimonialsMarquee({reviews}: {reviews: ProductReview[]}) {
   return (
     <section className="demo-testimonials">
       <div className="demo-testimonials-head">
-        <h2>What our real customers say</h2>
         <div className="demo-testimonials-rating">
           <span className="demo-testimonials-stars" aria-hidden>
             {Array.from({length: 5}).map((_, i) => (
-              <i key={i} className="ti ti-star-filled" />
+              <StarFilledIcon key={i} />
             ))}
           </span>
           <span>{average.toFixed(1)} · {reviews.length} reviews</span>
         </div>
+        <h2>What our customers say</h2>
       </div>
 
       <div className="demo-review-rows">

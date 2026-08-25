@@ -15,7 +15,7 @@ export function ValueMarquee() {
         {items.map((item, i) => (
           <span className="demo-marquee-item" key={i}>
             {item}
-            <i className="ti ti-point-filled" aria-hidden />
+            <span className="demo-marquee-dot" aria-hidden />
           </span>
         ))}
       </div>
