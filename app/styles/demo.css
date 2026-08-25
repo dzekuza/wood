@@ -333,14 +333,19 @@
   height: 206px;
   width: 100%;
   border-radius: 16px;
-  background: #f6f6f6;
+  background: var(--cwf-sand);
   overflow: hidden;
 }
 
 .demo-cat-image img {
   height: 100%;
   width: 100%;
-  object-fit: cover;
+  /* These are transparent product cutouts (same Shopify collection images as
+     .category-card-img on the all-collections page), not lifestyle photos —
+     `cover` crops them unpredictably depending on each image's own padding,
+     and the hover zoom below just made the bad crop more obvious. `contain`
+     matches how the same images are already treated elsewhere. */
+  object-fit: contain;
   display: block;
   transition: transform 400ms ease;
 }
@@ -393,10 +398,23 @@
   .demo-categories-inner { padding: 40px 32px; }
 }
 
+/* Below 620px there isn't room for even a 2-up grid without squashing the
+   206px image, so it becomes a horizontal swipeable carousel instead —
+   same scroll-snap pattern as .category-row on the all-collections page. */
 @media (max-width: 620px) {
-  .demo-cat-grid { grid-template-columns: repeat(2, 1fr); }
   .demo-categories-inner { padding: 32px 20px; }
   .demo-categories-head h2 { font-size: 28px; }
+  .demo-cat-grid {
+    display: flex;
+    grid-template-columns: none;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 12px;
+  }
+  .demo-cat-grid::-webkit-scrollbar { display: none; }
+  .demo-cat-card { flex: 0 0 68%; min-width: 220px; max-width: 280px; scroll-snap-align: start; }
 }
 
 /* -------------------------------------------------------

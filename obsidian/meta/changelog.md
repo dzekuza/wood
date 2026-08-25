@@ -9,6 +9,37 @@ Chronological log of notable changes to the project. Newest first.
 This is a human-curated log — not a mirror of `git log`. Record *why*, not just
 *what*; the diff already covers *what*.
 
+## 2026-08-25 — Card swatches, category carousel, and object-fit crop fixes
+
+Three related "why does this look worse than the PDP" complaints, same root
+cause each time: two places render the same Shopify data with different,
+lower-quality treatment.
+
+- **`.pcard-swatch` (product card grid) looked low-quality vs. the PDP's
+  `.product-swatch`.** `ProductItem.tsx` rendered swatches via
+  `style={{backgroundImage: ...}}` inline styles (a design-system violation —
+  see `design-system.md`) at a tiny 14px, and gave the first swatch a
+  different inset/padding treatment than the rest, which read as "some
+  swatches look worse than others." Extracted the tone-class mapping
+  (`getSwatchTone`, previously private to `ProductForm.tsx`) into
+  `app/lib/swatches.ts`, and switched `ProductItem` to render an actual
+  `<img>` for image swatches — same technique the PDP already used — dropping
+  the inline style entirely and removing the `.is-first` special case so all
+  swatches render uniformly at 18px.
+- **`.demo-cat-image` (homepage "Our Categories") cropped product cutouts on
+  hover.** It used `object-fit: cover` on the same transparent Shopify
+  collection images that `.category-card-img` (the all-collections page)
+  already renders with `object-fit: contain` — see the 2026-08-25
+  category-card entry above for why `contain` is correct for these. `cover`
+  was cropping the product unpredictably even at rest; the existing
+  `scale(1.05)` hover-zoom just made the bad crop more noticeable. Fixed to
+  `contain` + `var(--cwf-sand)` background, matching the established pattern.
+- **`.demo-cat-grid` had no mobile carousel.** Below 620px it degraded to a
+  cramped 2-column grid instead of the horizontal swipeable carousel already
+  used for the equivalent row on `collections.all` (`.category-row`). Gave it
+  the same `overflow-x: auto; scroll-snap-type: x mandatory` treatment so the
+  two behave consistently.
+
 ## 2026-08-25 — Fixed inline "Order now" button text wrap on mobile
 
 The main `.pdp-atc-btn` (inline CTA in `.pdp-cta-row`, not the sticky bar) was

@@ -8,6 +8,7 @@ import type {
 } from 'storefrontapi.generated';
 import {useVariantUrl} from '~/lib/variants';
 import {HeartFilledIcon, StarFilledIcon} from '~/components/Icons';
+import {getSwatchTone} from '~/lib/swatches';
 
 type ProductCardFragment =
   | CollectionItemFragment
@@ -152,15 +153,13 @@ export function ProductItem({
 
           {swatches.length > 0 && (
             <div className="pcard-swatches" aria-hidden>
-              {swatches.map((swatch, index) => (
+              {swatches.map((swatch) => (
                 <span
                   key={swatch.name}
-                  className={`pcard-swatch${index === 0 ? ' is-first' : ''}`}
-                  style={{
-                    backgroundColor: swatch.color ?? undefined,
-                    backgroundImage: swatch.image ? `url(${swatch.image})` : undefined,
-                  }}
-                />
+                  className={`pcard-swatch${swatch.image ? ' pcard-swatch-has-image' : ` ${getSwatchTone(swatch.name, swatch.color)}`}`}
+                >
+                  {swatch.image && <img src={swatch.image} alt="" />}
+                </span>
               ))}
             </div>
           )}

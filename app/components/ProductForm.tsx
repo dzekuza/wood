@@ -12,20 +12,7 @@ import {useUnitSystem} from '~/hooks/useUnitSystem';
 import {UnitToggle} from '~/components/UnitToggle';
 import {formatMeasurement} from '~/lib/units';
 import type {UpsellGroupData} from '~/lib/upsells';
-
-function getSwatchTone(name: string, color?: string | null) {
-  const value = `${name} ${color ?? ''}`.toLowerCase();
-
-  if (value.includes('dark walnut')) return 'product-swatch-tone-dark-walnut';
-  if (value.includes('walnut')) return 'product-swatch-tone-walnut';
-  if (value.includes('oak')) return 'product-swatch-tone-oak';
-  if (value.includes('white') || value.includes('wash')) return 'product-swatch-tone-whitewash';
-  if (value.includes('ebon') || value.includes('#2a2a2a') || value.includes('black')) return 'product-swatch-tone-ebonised';
-  if (value.includes('ash')) return 'product-swatch-tone-ash';
-  if (value.includes('reclaimed')) return 'product-swatch-tone-reclaimed';
-
-  return 'product-swatch-tone-neutral';
-}
+import {getSwatchTone} from '~/lib/swatches';
 
 export function ProductForm({
   productOptions,
