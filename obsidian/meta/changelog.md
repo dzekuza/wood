@@ -25,6 +25,15 @@ instead of 48px. Measured in the browser: 24 / 24 / 48 exactly.
 different colours for the same role. All now use `var(--cwf-ink-strong)`.
 `.demo-contact-heading p` stays light — it sits on the dark panel.
 
+**Card labels.** Same move for `.demo-cat-title` / `.demo-cat-count` and their
+texture twins `.demo-tex-title` / `.demo-tex-count`, all previously #61482e.
+The counts keep `opacity: .7` — that's the intended hierarchy against the
+title, not a second colour.
+
+Still warm brown and deliberately untouched: the `.demo-categories-all` /
+`.demo-textures-all` links. They read as accent links rather than body copy —
+flag if they should join the ink.
+
 ## 2026-08-26 — Price row shares one colour; `--cwf-header-ink` renamed
 
 Both halves of the card price row are now `#352f2a`. The eyebrow was a faded
