@@ -1,5 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 import {Link} from 'react-router';
+import {HOME_CONTENT_DEFAULTS, type HomeSectionHead} from '~/lib/homeContent';
 
 export interface Category {
   title: string;
@@ -8,7 +9,15 @@ export interface Category {
   count?: number;
 }
 
-export function CategoriesGrid({categories}: {categories: Category[]}) {
+export interface CategoriesGridProps {
+  categories: Category[];
+  content?: HomeSectionHead;
+}
+
+export function CategoriesGrid({
+  categories,
+  content = HOME_CONTENT_DEFAULTS.categories,
+}: CategoriesGridProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [page, setPage] = useState(0);
   const [pageCount, setPageCount] = useState(1);
@@ -64,12 +73,10 @@ export function CategoriesGrid({categories}: {categories: Category[]}) {
     <section className="demo-categories">
       <div className="demo-categories-inner">
         <div className="demo-categories-head">
-          <h2>Our Categories</h2>
-          <p className="demo-categories-sub">
-            Delivery in days—not months. Welcome to the new standard.
-          </p>
+          <h2>{content.heading}</h2>
+          <p className="demo-categories-sub">{content.subheading}</p>
           <Link to="/collections" className="demo-categories-all">
-            All Collections <i className="ti ti-arrow-up-right" aria-hidden />
+            {content.linkLabel} <i className="ti ti-arrow-up-right" aria-hidden />
           </Link>
         </div>
 

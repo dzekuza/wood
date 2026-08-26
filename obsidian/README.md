@@ -1,6 +1,6 @@
 ---
 tags: [moc, home]
-updated: 2026-08-25
+updated: 2026-08-26
 ---
 
 # 🧠 wood — Project Brain
@@ -29,6 +29,7 @@ and AI agents (Claude Code, Cursor).
 ### 02 — Frontend
 - [[routing]] — App Router conventions, route → view delegation
 - [[design-system]] — tokens, CSS layers, styling rules
+- [[homepage-content]] — merchant-editable homepage copy & imagery (metaobjects)
 - [[component-conventions]] — how to write & place components
 - [[html-semantics]] — semantic, accessible, SEO-correct markup rules
 - [[components/ui|UI primitives catalog]]
