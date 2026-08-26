@@ -11,6 +11,12 @@ This is a human-curated log — not a mirror of `git log`. Record *why*, not jus
 
 ## 2026-08-26 — Categories show all 6 in one row on desktop again
 
+Mobile (≤620px) now shows **2.2 cards** —
+`flex: 0 0 calc((100% - 2 * 12px) / 2.2)`, giving two full cards plus a sliver
+of the third so the strip reads as swipeable. The old `68%` basis with
+`min-width: 220px` / `max-width: 280px` clamps produced ~1.4-up: at 375px the
+220px minimum overrode the percentage entirely, so the clamps had to go.
+
 `.demo-cat-image` also swaps its fixed `height: 206px` for
 `aspect-ratio: 1 / 1`, so the tile stays square at whatever width the basis
 resolves to instead of getting taller-than-wide as cards narrow.

@@ -484,7 +484,10 @@ button.demo-hero-dot.is-active::after {
     -webkit-overflow-scrolling: touch;
     gap: 12px;
   }
-  .demo-cat-card { flex: 0 0 68%; min-width: 220px; max-width: 280px; }
+  /* 2.2 cards in view: two full plus a sliver of the third, so the strip
+     reads as swipeable. The old min/max width clamps have to go — at 375px a
+     220px minimum forced it back to ~1.4 up. */
+  .demo-cat-card { flex: 0 0 calc((100% - 2 * 12px) / 2.2); }
 }
 
 /* -------------------------------------------------------
