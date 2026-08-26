@@ -106,11 +106,20 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 24px;
+  /* Only one gap here now: copy block -> CTAs. */
+  gap: 48px;
   max-width: 780px;
   margin: 0 auto;
   padding: 0 24px;
   text-align: center;
+}
+
+.demo-hero-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
 }
 
 .demo-hero-rating {
@@ -164,7 +173,6 @@
   justify-content: center;
   gap: 15px;
   flex-wrap: wrap;
-  margin-top: 8px;
 }
 
 .demo-btn {
@@ -294,7 +302,8 @@ button.demo-hero-dot.is-active::after {
 
 @media (max-width: 480px) {
   .demo-hero { height: 480px; }
-  .demo-hero-content { gap: 18px; padding: 0 16px; }
+  .demo-hero-content { gap: 32px; padding: 0 16px; }
+  .demo-hero-copy { gap: 18px; }
   .demo-hero-ctas { gap: 8px; }
   .demo-hero-ctas .demo-btn { padding: 12px 16px; font-size: 15px; }
 }
@@ -347,7 +356,7 @@ button.demo-hero-dot.is-active::after {
 .demo-categories-sub {
   font-family: var(--demo-font-body);
   font-size: 16px;
-  color: #61482e;
+  color: var(--cwf-ink-strong);
   margin: 0;
 }
 
@@ -793,7 +802,7 @@ button.demo-cat-dot.is-active {
   font-weight: 400;
   font-size: 18px;
   line-height: 1.4;
-  color: #474747;
+  color: var(--cwf-ink-strong);
   max-width: 500px;
   margin: 0;
 }
@@ -1107,7 +1116,7 @@ button.demo-cat-dot.is-active {
   font-weight: 400;
   font-size: 16px;
   line-height: 1.5;
-  color: #61482e;
+  color: var(--cwf-ink-strong);
   margin: 0;
 }
 

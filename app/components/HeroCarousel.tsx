@@ -68,32 +68,40 @@ export function HeroCarousel({
             aria-hidden={index !== active}
           >
             <div className="demo-hero-content">
-              {rating && (
-                <div className="demo-hero-rating">
-                  <span className="demo-hero-stars" aria-hidden>
-                    {Array.from({length: 5}).map((_, i) => (
-                      <StarFilledIcon key={i} />
-                    ))}
-                  </span>
-                  <span>
-                    {rating.average.toFixed(1)} ({rating.count}) reviews from Etsy customers
-                  </span>
-                </div>
-              )}
+              {/* Rating, heading and blurb are one block so the 24px rhythm
+                  between them is independent of the 48px gap to the CTAs. */}
+              <div className="demo-hero-copy">
+                {rating && (
+                  <div className="demo-hero-rating">
+                    <span className="demo-hero-stars" aria-hidden>
+                      {Array.from({length: 5}).map((_, i) => (
+                        <StarFilledIcon key={i} />
+                      ))}
+                    </span>
+                    <span>
+                      {rating.average.toFixed(1)} ({rating.count}) reviews from
+                      Etsy customers
+                    </span>
+                  </div>
+                )}
 
-              <h1>
-                {slide.heading.map((line, i) => (
-                  <span key={i}>
-                    {line}
-                    {i < slide.heading.length - 1 && <br />}
-                  </span>
-                ))}
-              </h1>
+                <h1>
+                  {slide.heading.map((line, i) => (
+                    <span key={i}>
+                      {line}
+                      {i < slide.heading.length - 1 && <br />}
+                    </span>
+                  ))}
+                </h1>
 
-              <p className="demo-hero-blurb">{slide.blurb}</p>
+                <p className="demo-hero-blurb">{slide.blurb}</p>
+              </div>
 
               <div className="demo-hero-ctas">
-                <Link to={slide.primaryCta.to} className="demo-btn demo-btn-solid">
+                <Link
+                  to={slide.primaryCta.to}
+                  className="demo-btn demo-btn-solid"
+                >
                   {slide.primaryCta.label}
                 </Link>
                 <Link

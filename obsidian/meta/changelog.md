@@ -9,6 +9,22 @@ Chronological log of notable changes to the project. Newest first.
 This is a human-curated log — not a mirror of `git log`. Record *why*, not just
 *what*; the diff already covers *what*.
 
+## 2026-08-26 — Hero copy grouped; section sub-paragraphs unified on #352f2a
+
+**Hero.** Rating, `h1` and blurb now sit in a `.demo-hero-copy` wrapper with a
+24px internal gap, and `.demo-hero-content` carries a single 48px gap between
+that block and the CTAs. Previously one 24px gap governed all four children, so
+the CTAs couldn't be spaced independently of the copy rhythm.
+
+Removed `margin-top: 8px` from `.demo-hero-ctas` in the same pass — a leftover
+from the old single-gap layout that made the measured copy→CTA distance 56px
+instead of 48px. Measured in the browser: 24 / 24 / 48 exactly.
+
+**Section sub-paragraphs.** `.demo-categories-sub` (#61482e),
+`.demo-textures-sub` (#474747) and `.demo-process-sub` (#61482e) were three
+different colours for the same role. All now use `var(--cwf-ink-strong)`.
+`.demo-contact-heading p` stays light — it sits on the dark panel.
+
 ## 2026-08-26 — Price row shares one colour; `--cwf-header-ink` renamed
 
 Both halves of the card price row are now `#352f2a`. The eyebrow was a faded
