@@ -9,6 +9,25 @@ Chronological log of notable changes to the project. Newest first.
 This is a human-curated log — not a mirror of `git log`. Record *why*, not just
 *what*; the diff already covers *what*.
 
+## 2026-08-27 — Product card titles clamp to one line
+
+`.pcard-name` was `-webkit-line-clamp: 2`, so titles like "Oak Mantle Beam with
+Corbels" took two lines while their neighbours took one, leaving the rating and
+price rows on a grid row out of alignment. Now clamped to 1.
+
+Added `overflow-wrap: anywhere` alongside it so a single unbroken long word
+clips rather than pushing the card wide.
+
+Verified every title renders at one line-height (23px) and every `.pcard-heading`
+is a uniform 41px, on desktop and at 375px, with 2 titles ellipsised on desktop
+and 5 on mobile. `pages.favourites.tsx` shares `.pcard-name` and picks up the
+same clamp.
+
+Note when checking this: `-webkit-box` line clamping wraps the text and then
+clips it, so truncation shows up as `scrollHeight > clientHeight` — a
+`scrollWidth > clientWidth` check (the usual `nowrap` test) reports zero and
+looks like the clamp is not working.
+
 ## 2026-08-26 — PDP shows the side thumbnail gallery on desktop again
 
 The product page rendered the swipeable carousel at every width. The desktop

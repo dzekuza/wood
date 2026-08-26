@@ -2626,10 +2626,14 @@ section { padding: 0; }
   letter-spacing: -0.02em;
   color: var(--cwf-primary);
   margin: 0;
+  /* One line, ellipsised. Product titles here run to ~100 chars, so clamping
+     also keeps every card's heading block the same height and the price rows
+     aligned across a grid row. */
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  overflow-wrap: anywhere;
 }
 
 /* line-height:1 so the row is 14px like Figma. Inheriting body's 22px added
