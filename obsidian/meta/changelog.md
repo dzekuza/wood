@@ -16,7 +16,13 @@ This is a human-curated log — not a mirror of `git log`. Record *why*, not jus
   `.header-topbar`, so the socials and contacts sit on the same vertical lines
   as the logo and cart button directly below them. Verified aligned at 1700px.
 - The mail icon is gone; **Facebook** takes its place, using the
-  designer-supplied `Link.svg` path recoloured to `currentColor`.
+  designer-supplied `Link.svg` path recoloured to `currentColor`. Its viewBox
+  is cropped to the glyph (`4.48 4.98 20.20 20.20`) rather than kept at the
+  30x30 artboard it shipped in — the mark only occupies x 10-19.2 / y 6.7-23.5,
+  so at the original viewBox it inked 9.5px against Instagram's 14.2px in the
+  same 17px box. The crop makes the glyph fill 83.3% of its height, matching
+  Instagram's ratio, and both now measure 14.2px. **Check the inked bounds, not
+  the artboard, when dropping in a supplied SVG next to an existing icon.**
 - Instagram is now solid. Tabler's webfont has no filled glyphs (see
   [[../frontend/design-system]]), so both marks are inline SVGs in
   `Icons.tsx` alongside `StarFilledIcon`/`HeartFilledIcon`. The Instagram mark

@@ -39,7 +39,12 @@ export function HeartFilledIcon({className}: {className?: string}) {
 export function FacebookFilledIcon({className}: {className?: string}) {
   return (
     <svg
-      viewBox="0 0 30 30"
+      // Cropped to the glyph, not the 30x30 artboard it shipped in: the mark
+      // only occupies x 10-19.2 / y 6.7-23.5, so the original viewBox rendered
+      // it visibly smaller than Instagram at the same box size. This box makes
+      // the glyph fill 83.3% of its height — the same ratio as the Instagram
+      // mark — so the two match optically.
+      viewBox="4.48 4.98 20.20 20.20"
       fill="currentColor"
       className={className}
       aria-hidden
