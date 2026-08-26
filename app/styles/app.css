@@ -44,10 +44,11 @@
   /* Neutral tile behind product/collection media. Deliberately not --cwf-card
      or --cwf-sand: the warm beige competed with the oak in the cut-out photos. */
   --cwf-tile: #f6f6f6;
-  /* Header chrome ink — cooler than the warm --cwf-primary used elsewhere.
+  /* The site's strong text/chrome colour — cooler than the warm --cwf-primary.
+     Used by header chrome, the contact panel, demo headings and card prices.
      Alpha variants are mixed off this token, never re-declared as rgba(). */
-  --cwf-header-ink: #352f2a;
-  --cwf-header-ink-hover: #241f1a;
+  --cwf-ink-strong: #352f2a;
+  --cwf-ink-strong-hover: #241f1a;
   /* Rating stars, site-wide. Amber rather than the pale --cwf-accent gold,
      which read as washed-out against light card backgrounds. */
   --cwf-star: #ffa817;
@@ -557,14 +558,14 @@ button.reset > * {
   padding: 16px 28px;
   font-size: 15px;
   font-weight: 500;
-  color: color-mix(in srgb, var(--cwf-header-ink) 65%, transparent);
+  color: color-mix(in srgb, var(--cwf-ink-strong) 65%, transparent);
   border-bottom: .5px solid var(--cwf-line);
   transition: color 150ms, background 150ms;
   letter-spacing: .01em;
 }
 .overlay[data-type="mobile"] .header-menu-item:first-child { border-top: .5px solid var(--cwf-line); }
-.overlay[data-type="mobile"] .header-menu-item:hover { color: var(--cwf-header-ink); background: color-mix(in srgb, var(--cwf-header-ink) 4%, transparent); }
-.overlay[data-type="mobile"] .header-menu-item.active { color: var(--cwf-header-ink); font-weight: 600; }
+.overlay[data-type="mobile"] .header-menu-item:hover { color: var(--cwf-ink-strong); background: color-mix(in srgb, var(--cwf-ink-strong) 4%, transparent); }
+.overlay[data-type="mobile"] .header-menu-item.active { color: var(--cwf-ink-strong); font-weight: 600; }
 
 .header-menu-desktop {
   display: none;
@@ -582,14 +583,14 @@ button.reset > * {
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.8125rem;
   font-weight: 500;
-  color: color-mix(in srgb, var(--cwf-header-ink) 65%, transparent);
+  color: color-mix(in srgb, var(--cwf-ink-strong) 65%, transparent);
   transition: color 150ms;
   white-space: nowrap;
 }
 
 .header-menu-item:hover,
 .header-menu-item.active {
-  color: var(--cwf-header-ink);
+  color: var(--cwf-ink-strong);
 }
 
 /* Dropdown */
@@ -626,11 +627,11 @@ button.reset > * {
   padding: 10px 20px;
   font-size: 13px;
   font-weight: 500;
-  color: color-mix(in srgb, var(--cwf-header-ink) 70%, transparent);
+  color: color-mix(in srgb, var(--cwf-ink-strong) 70%, transparent);
   white-space: nowrap;
   transition: background 120ms, color 120ms;
 }
-.header-dropdown-item:hover { background: color-mix(in srgb, var(--cwf-header-ink) 4%, transparent); color: var(--cwf-header-ink); }
+.header-dropdown-item:hover { background: color-mix(in srgb, var(--cwf-ink-strong) 4%, transparent); color: var(--cwf-ink-strong); }
 
 .header-topbar-ctas {
   align-items: center;
@@ -677,12 +678,12 @@ button.reset > * {
 .header-search-icon {
   display: flex;
   align-items: center;
-  color: color-mix(in srgb, var(--cwf-header-ink) 70%, transparent);
+  color: color-mix(in srgb, var(--cwf-ink-strong) 70%, transparent);
   flex-shrink: 0;
   padding: 0;
   transition: color 150ms;
 }
-.header-search-icon:hover { color: var(--cwf-header-ink); }
+.header-search-icon:hover { color: var(--cwf-ink-strong); }
 .header-search-icon i { font-size: 18px; }
 
 /* Higher specificity than the global input[type='search'] reset */
@@ -696,7 +697,7 @@ button.reset > * {
   padding: 0;
   font-size: 16px;
   font-family: 'Plus Jakarta Sans', sans-serif;
-  color: var(--cwf-header-ink);
+  color: var(--cwf-ink-strong);
   outline: none;
   -webkit-appearance: none;
   appearance: none;
@@ -705,7 +706,7 @@ button.reset > * {
   border: none;
   box-shadow: none;
 }
-.header-search-input::placeholder { color: color-mix(in srgb, var(--cwf-header-ink) 55%, transparent); }
+.header-search-input::placeholder { color: color-mix(in srgb, var(--cwf-ink-strong) 55%, transparent); }
 .header-search-input::-webkit-search-cancel-button,
 .header-search-input::-webkit-search-decoration { display: none; }
 
@@ -732,18 +733,18 @@ button.reset > * {
   height: 50px;
   width: 50px;
   padding: 0;
-  border: 1px solid var(--cwf-header-ink);
+  border: 1px solid var(--cwf-ink-strong);
   border-radius: 999px;
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 15px;
   font-weight: 500;
-  color: var(--cwf-header-ink);
+  color: var(--cwf-ink-strong);
   white-space: nowrap;
   transition: background 150ms, color 150ms;
 }
 .header-account-btn:hover {
-  background: color-mix(in srgb, var(--cwf-header-ink) 4%, transparent);
-  color: var(--cwf-header-ink);
+  background: color-mix(in srgb, var(--cwf-ink-strong) 4%, transparent);
+  color: var(--cwf-ink-strong);
 }
 
 .header-account-btn i { display: inline-flex; font-size: 20px; }
@@ -763,9 +764,9 @@ button.reset > * {
   gap: 10px;
   height: 50px;
   padding: 0 21px;
-  border: 1px solid var(--cwf-header-ink);
+  border: 1px solid var(--cwf-ink-strong);
   border-radius: 30px;
-  background: var(--cwf-header-ink);
+  background: var(--cwf-ink-strong);
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 15px;
   font-weight: 500;
@@ -773,7 +774,7 @@ button.reset > * {
   white-space: nowrap;
   transition: background 150ms, transform 150ms;
 }
-.header-cart-btn:hover { background: var(--cwf-header-ink-hover); color: var(--cwf-surface); }
+.header-cart-btn:hover { background: var(--cwf-ink-strong-hover); color: var(--cwf-surface); }
 .header-cart-btn i { font-size: 20px; }
 
 @media (max-width: 480px) {
@@ -801,15 +802,15 @@ button.reset > * {
     width: 40px;
     border: 1px solid var(--cwf-line);
     border-radius: 999px;
-    color: color-mix(in srgb, var(--cwf-header-ink) 60%, transparent);
+    color: color-mix(in srgb, var(--cwf-ink-strong) 60%, transparent);
     transition: color 150ms, border-color 150ms;
     flex-shrink: 0;
   }
-  .header-icon-link:hover { color: var(--cwf-header-ink); border-color: var(--cwf-accent); }
+  .header-icon-link:hover { color: var(--cwf-ink-strong); border-color: var(--cwf-accent); }
 }
 
-.header-menu-mobile-toggle { color: color-mix(in srgb, var(--cwf-header-ink) 60%, transparent); transition: color 150ms, border-color 150ms; }
-.header-menu-mobile-toggle:hover { color: var(--cwf-header-ink); border-color: var(--cwf-accent); }
+.header-menu-mobile-toggle { color: color-mix(in srgb, var(--cwf-ink-strong) 60%, transparent); transition: color 150ms, border-color 150ms; }
+.header-menu-mobile-toggle:hover { color: var(--cwf-ink-strong); border-color: var(--cwf-accent); }
 
 .unit-toggle {
   display: inline-flex;
@@ -2630,8 +2631,8 @@ section { padding: 0; }
 /* Eyebrow and value share one face — Outfit 600. The self-hosted @font-face
    only covers Outfit 500, so weight 600 comes from the root Google Fonts link;
    without that entry this would render as synthesised faux-bold. */
-.pcard-price-eyebrow { font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: rgba(122, 90, 58, .45); }
-.pcard-price-value { font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif; font-size: 16px; font-weight: 600; color: var(--cwf-primary); }
+.pcard-price-eyebrow { font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--cwf-ink-strong); }
+.pcard-price-value { font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif; font-size: 16px; font-weight: 600; color: var(--cwf-ink-strong); }
 
 .pcard-swatches { display: flex; align-items: center; gap: 4px; }
 .pcard-swatch { height: 18px; width: 18px; border-radius: 50%; border: 1px solid rgba(74, 47, 31, .15); display: inline-flex; align-items: center; justify-content: center; overflow: hidden; background: var(--cwf-sand); flex-shrink: 0; }

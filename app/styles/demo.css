@@ -1212,7 +1212,7 @@ button.demo-cat-dot.is-active {
   justify-content: space-between;
   gap: 48px;
   flex-wrap: wrap;
-  background: var(--cwf-header-ink);
+  background: var(--cwf-ink-strong);
   border-radius: 24px;
   padding: 62px 56px;
   overflow: hidden;

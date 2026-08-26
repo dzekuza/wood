@@ -9,6 +9,23 @@ Chronological log of notable changes to the project. Newest first.
 This is a human-curated log — not a mirror of `git log`. Record *why*, not just
 *what*; the diff already covers *what*.
 
+## 2026-08-26 — Price row shares one colour; `--cwf-header-ink` renamed
+
+Both halves of the card price row are now `#352f2a`. The eyebrow was a faded
+`rgba(122, 90, 58, .45)` and the value the warm `--cwf-primary`.
+
+That colour had been sitting under `--cwf-header-ink`, named for the one place
+it first appeared. It's since spread to the contact panel, the demo headings and
+now card prices, so referencing "header ink" from a product price would have
+been misleading. Renamed to **`--cwf-ink-strong`** (and
+`--cwf-ink-strong-hover`) across all 25 references in `app.css` / `demo.css`;
+zero old references remain, and header nav + cart pill were re-checked in the
+browser after the rename.
+
+Still differing from the supplied reference, left as-is pending a decision: the
+reference renders "From" at the same size and in sentence case as the price,
+where the eyebrow is 11px uppercase with letter-spacing.
+
 ## 2026-08-26 — Product card price row unified on Outfit 600
 
 `.pcard-price-eyebrow` ("FROM") was Plus Jakarta Sans 600 while

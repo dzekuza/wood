@@ -27,8 +27,8 @@ A component references tier 2/3 only. A raw hex or px in a `className` is a bug.
 | Token | Tier | Value | Use for |
 |-------|------|-------|---------|
 | `--cwf-star` | semantic | `#ffa817` | every rating star, site-wide (cards, PDP, testimonials, review lists). Never `--cwf-accent` — that pale gold washes out on light cards |
-| `--cwf-header-ink` | semantic | `#352f2a` | all header chrome — nav, dropdown, search, account/cart pills, mobile toggle. Cooler than `--cwf-primary`; take tints via `color-mix(… N%, transparent)`, never a new `rgba()` |
-| `--cwf-header-ink-hover` | semantic | `#241f1a` | hover fill for the header cart pill |
+| `--cwf-ink-strong` | semantic | `#352f2a` | the strong text/chrome colour: header nav, dropdown, search, account/cart pills, contact panel, demo headings, card prices. Cooler than `--cwf-primary`; take tints via `color-mix(… N%, transparent)`, never a new `rgba()` |
+| `--cwf-ink-strong-hover` | semantic | `#241f1a` | hover fill for the header cart pill |
 | `--cwf-tile` | semantic | `#f6f6f6` | neutral tile behind product/collection media (`.pcard-img`, and via `--demo-tile-bg` the homepage card tiles). Not `--cwf-card`/`--cwf-sand` — the warm beige competes with the oak in cut-out photos |
 
 ## Adding a token
