@@ -1,4 +1,5 @@
 import {useState, useEffect, useCallback} from 'react';
+import {createPortal} from 'react-dom';
 import {Link} from 'react-router';
 import {REVIEWS} from '~/lib/reviews';
 
@@ -31,27 +32,32 @@ function ImageLightbox({src, onClose}: {src: string; onClose: () => void}) {
     };
   }, [onClose]);
 
-  return (
-    <div
-      className="rev-lightbox-backdrop"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-    >
+  // Portalled to <body> on purpose: these cards live inside .rev-marquee-track,
+  // which is animated with `transform`. A transformed ancestor becomes the
+  // containing block for `position: fixed`, so rendering the overlay in place
+  // pinned it to the moving track — it opened ~1600px off-screen.
+  return createPortal(
+    <div className="rev-lightbox-backdrop" role="dialog" aria-modal="true">
+      {/* See Lightbox.tsx — dismissal is a real button behind the content so
+          it's reachable by keyboard, not a handler on the wrapper div. */}
       <button
+        type="button"
+        className="lightbox-backdrop reset"
+        onClick={onClose}
+        aria-label="Close"
+        tabIndex={-1}
+      />
+      <button
+        type="button"
         className="rev-lightbox-close"
         onClick={onClose}
         aria-label="Close image"
       >
         ✕
       </button>
-      <img
-        src={src}
-        alt="Review photo"
-        className="rev-lightbox-img"
-        onClick={(e) => e.stopPropagation()}
-      />
-    </div>
+      <img src={src} alt="Customer review" className="rev-lightbox-img" />
+    </div>,
+    document.body,
   );
 }
 
@@ -73,12 +79,8 @@ function ProductReviewCard({review, ariaHidden}: {review: ProductReview; ariaHid
               tabIndex={ariaHidden ? -1 : 0}
               aria-label={`View review photo ${i + 1}`}
             >
-              <img
-                src={src}
-                alt={`Review photo ${i + 1}`}
-                className="rev-img-thumb"
-                loading="lazy"
-              />
+              {/* Decorative: the wrapping button already carries the label. */}
+              <img src={src} alt="" className="rev-img-thumb" loading="lazy" />
             </button>
           ))}
         </div>

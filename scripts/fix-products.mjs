@@ -62,7 +62,7 @@ function categorize(title) {
   return { type: 'oak-furniture', tags: ['handmade', 'oak', 'rustic'] };
 }
 
-function buildDescription(title, listingId) {
+function buildDescription(title) {
   const t = title.toLowerCase();
   if (t.includes('coat rack')) {
     return `<p>Handcrafted solid oak coat rack, built to last a lifetime. Cast iron hooks add a timeless rustic character to any hallway or entryway. Wall-mounted and ready to install.</p><p>Each piece is individually made by hand from sustainably sourced English oak, oiled for a natural finish.</p>`;
@@ -110,7 +110,7 @@ async function createProduct(etsy) {
   }
 
   const priceVal = parseFloat(etsy.price).toFixed(2);
-  const description = buildDescription(etsy.title, etsy.listing_id);
+  const description = buildDescription(etsy.title);
 
   const input = {
     title: etsy.title,

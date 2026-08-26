@@ -36,12 +36,18 @@ export function Lightbox({
   if (!active) return null;
 
   return (
-    <div
-      className="lightbox"
-      role="dialog"
-      aria-modal="true"
-      onClick={onClose}
-    >
+    <div className="lightbox" role="dialog" aria-modal="true">
+      {/* Click-to-dismiss lives on a real button behind the content rather than
+          on the dialog itself — a click handler on the non-interactive wrapper
+          is unreachable by keyboard (Escape is handled in the effect above). */}
+      <button
+        type="button"
+        className="lightbox-backdrop reset"
+        onClick={onClose}
+        aria-label="Close"
+        tabIndex={-1}
+      />
+
       <button
         type="button"
         className="lightbox-close reset"
@@ -65,12 +71,7 @@ export function Lightbox({
         </button>
       )}
 
-      <img
-        src={active.src}
-        alt={active.alt}
-        className="lightbox-img"
-        onClick={(e) => e.stopPropagation()}
-      />
+      <img src={active.src} alt={active.alt} className="lightbox-img" />
 
       {count > 1 && (
         <button

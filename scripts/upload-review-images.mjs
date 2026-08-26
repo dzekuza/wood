@@ -89,22 +89,6 @@ async function createFile(stagedUploadPath) {
   return data.fileCreate.files[0];
 }
 
-async function pollFileReady(stagedUploadPath, retries = 12) {
-  for (let i = 0; i < retries; i++) {
-    await sleep(2000);
-    const data = await gql(`
-      query { files(first: 5, query: "status:READY") {
-        nodes {
-          ... on MediaImage { image { url } originalSource { url } }
-        }
-      }}
-    `);
-    // Shopify doesn't let us filter by stagedUploadPath, so we create and immediately query
-    // Instead, return the stagedUploadPath itself — we'll patch after all uploads
-    return null; // handled below via separate query
-  }
-}
-
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 async function uploadOne(etsyUrl, idx) {
@@ -118,33 +102,6 @@ async function uploadOne(etsyUrl, idx) {
   // resourceUrl from staged upload IS the final CDN-like path we pass to fileCreate
   const file = await createFile(target.resourceUrl);
   return file;
-}
-
-// Poll until a file with a matching source URL shows as READY
-async function waitForCdnUrl(originalEtsyUrl, maxWait = 30000) {
-  const start = Date.now();
-  while (Date.now() - start < maxWait) {
-    await sleep(2500);
-    const data = await gql(`
-      query {
-        files(first: 250, query: "status:READY") {
-          nodes {
-            ... on MediaImage {
-              image { url }
-              originalSource { url }
-            }
-          }
-        }
-      }
-    `);
-    for (const node of data.files.nodes) {
-      if (node.originalSource?.url?.includes('review-')) {
-        // We can't match by etsy URL, so just grab all ready review images
-        return node.image?.url || null;
-      }
-    }
-  }
-  return null;
 }
 
 async function main() {

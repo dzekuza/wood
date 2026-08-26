@@ -3482,7 +3482,19 @@ section { padding: 0; }
   justify-content: center;
   padding: 40px;
 }
+/* Sits behind the dialog's content and absorbs the click-to-dismiss. Its
+   siblings are positioned/stacked above it by .lightbox's flex layout. */
+.lightbox-backdrop {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  border: none;
+  cursor: zoom-out;
+  padding: 0;
+}
+
 .lightbox-img {
+  position: relative;
   max-width: min(1100px, 100%);
   max-height: 86vh;
   width: auto;
@@ -3739,7 +3751,7 @@ section { padding: 0; }
 
 /* Review lightbox */
 .rev-lightbox-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.88); z-index: 1000; display: flex; align-items: center; justify-content: center; cursor: zoom-out; }
-.rev-lightbox-img { max-width: min(90vw, 900px); max-height: 85vh; object-fit: contain; border-radius: 6px; cursor: default; box-shadow: 0 24px 64px rgba(0,0,0,.5); }
+.rev-lightbox-img { position: relative; max-width: min(90vw, 900px); max-height: 85vh; object-fit: contain; border-radius: 6px; cursor: default; box-shadow: 0 24px 64px rgba(0,0,0,.5); }
 .rev-lightbox-close { position: fixed; top: 20px; right: 24px; background: rgba(255,255,255,.12); border: none; color: #fff; font-size: 22px; line-height: 1; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .15s; z-index: 1001; }
 .rev-lightbox-close:hover { background: rgba(255,255,255,.25); }
 .rev-product-link { color: inherit; text-decoration: none; }

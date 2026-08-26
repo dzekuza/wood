@@ -69,9 +69,6 @@ function extractReviews(html) {
   // We look for the pattern: reviewer name + rating + optional text + optional iap image
   // Strategy: find all review text blocks between rating indicators
 
-  // Extract star ratings (5 out of 5 stars pattern)
-  const ratingPattern = /(\d) out of 5 stars \d+ This item/g;
-
   // Find reviewer sections — each contains name, date, optional text, optional image
   // Regex to find review blocks
   const reviewBlockPattern = /(\d) out of 5 stars \d+ This item[\s\S]*?(?=\d out of 5 stars \d+ This item|View all reviews|Photos from reviews)/g;
@@ -118,7 +115,7 @@ function extractReviews(html) {
 }
 
 async function scrapeListingReviews(listing) {
-  const { listing_id, title, url } = listing;
+  const { listing_id, title } = listing;
 
   // Build a slug from the title so Etsy doesn't 403 bare /listing/{id} URLs
   const slug = (title || '')

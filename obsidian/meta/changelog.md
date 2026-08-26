@@ -9,6 +9,39 @@ Chronological log of notable changes to the project. Newest first.
 This is a human-curated log — not a mirror of `git log`. Record *why*, not just
 *what*; the diff already covers *what*.
 
+## 2026-08-26 — Lint: 19 errors → 0, and a lightbox that opened off-screen
+
+Cleared every ESLint error in the repo (17 warnings remain, all pre-existing
+`react/no-array-index-key` and unused-disable-directive noise).
+
+**Accessibility (`Lightbox.tsx`, `ReviewsSection.tsx`)** — both overlays put
+`onClick={onClose}` on the wrapper `div`, which is unreachable by keyboard.
+Dismissal is now a real `<button class="lightbox-backdrop">` sitting behind the
+content (`position: absolute; inset: 0`, `tabIndex={-1}` since Escape already
+closes). The images no longer need `stopPropagation` — the backdrop is a sibling
+now, not an ancestor. Thumbnail `alt` became `""` (the wrapping button already
+carries the label) and the lightbox image is `alt="Customer review"` — the old
+`"Review photo"` tripped `img-redundant-alt`.
+
+**Dead code in `scripts/`** — removed `pollFileReady` and `waitForCdnUrl`
+(`upload-review-images.mjs`; neither was ever called, and `pollFileReady`
+returned `null` on its first iteration anyway), `shopifyGet`
+(`set-inventory.mjs`), a dead `ratingPattern` regex
+(`etsy-reviews-scraper.mjs`), an unused `mkdir` import, an unused
+`buildDescription(…, listingId)` parameter, and two unused `url` destructures.
+All five scripts still parse (`node --check`).
+
+**The bug this turned up:** verifying the reworked overlay showed the review
+lightbox rendering ~1600px off-screen. `.rev-marquee-track` animates with
+`transform`, and a transformed ancestor becomes the containing block for
+`position: fixed` — so the overlay was pinned to the *moving marquee* rather
+than the viewport. It's now `createPortal`'d to `document.body`. This predates
+today's work; the old wrapper-div click handler masked it, because clicking the
+div closed it wherever the div happened to be.
+
+Noted, not acted on: `app/components/Lightbox.tsx` has no callers anywhere in
+the app.
+
 ## 2026-08-26 — Contact banner panel goes #352f2a
 
 `.demo-contact`'s panel was `#2d231a`; it now uses `var(--cwf-header-ink)`

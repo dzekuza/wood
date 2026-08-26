@@ -15,14 +15,6 @@ function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-async function shopifyGet(endpoint) {
-  const res = await fetch(`${BASE_URL}${endpoint}`, {
-    headers: { 'X-Shopify-Access-Token': ADMIN_TOKEN },
-  });
-  if (!res.ok) throw new Error(`GET ${endpoint} → ${res.status}`);
-  return res.json();
-}
-
 async function shopifyPut(endpoint, body) {
   const res = await fetch(`${BASE_URL}${endpoint}`, {
     method: 'PUT',

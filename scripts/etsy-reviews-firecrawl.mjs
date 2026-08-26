@@ -6,7 +6,6 @@
  */
 
 import { writeFileSync, readFileSync, existsSync } from 'fs';
-import { mkdir } from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -117,7 +116,7 @@ async function main() {
   const results = [];
 
   for (let i = 0; i < products.length; i++) {
-    const { listing_id, title, url } = products[i];
+    const { listing_id, title } = products[i];
     const slug = buildSlug(title);
     const listingUrl = `https://www.etsy.com/listing/${listing_id}/${slug}`;
 
