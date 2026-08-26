@@ -9,6 +9,21 @@ Chronological log of notable changes to the project. Newest first.
 This is a human-curated log — not a mirror of `git log`. Record *why*, not just
 *what*; the diff already covers *what*.
 
+## 2026-08-26 — Product card body split into two blocks
+
+`.pcard-body` was a flat column of four siblings (name, rating, price row,
+swatches). It's now two groups: `.pcard-heading` holds the name + rating,
+`.pcard-bottom-row` already held price + swatches. The card can now space "what
+it is" apart from "what it costs" without touching the rhythm inside either.
+
+Spacing is unchanged. The 20px name-to-rating gap that used to come from
+`.pcard-body`'s 16px gap *plus* a 4px `margin-top` on `.pcard-rating` is now a
+single `gap: 20px` on `.pcard-heading`, and the stray margin is gone — verified
+at 20px/16px on both desktop and 375px.
+
+`pages.favourites.tsx` also uses `.pcard-body`/`.pcard-name` but has no rating or
+bottom row, so it is unaffected.
+
 ## 2026-08-26 — Unrated product cards show 0.0 instead of a blank gap
 
 `.pcard-rating` used to render an empty div with `visibility: hidden` when a
