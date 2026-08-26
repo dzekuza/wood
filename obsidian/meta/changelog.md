@@ -9,6 +9,23 @@ Chronological log of notable changes to the project. Newest first.
 This is a human-curated log — not a mirror of `git log`. Record *why*, not just
 *what*; the diff already covers *what*.
 
+## 2026-08-26 — Hero reduced to a single slide
+
+The hero now shows only the brand slide ("Timeless Oak. Made for Your Home.")
+instead of that plus six per-collection slides.
+
+Done as `HERO_SLIDE_LIMIT = 1` with a `.slice()` at the loader's call site
+rather than by deleting the slide-building code — this was asked for as "for
+now", so `buildHeroSlides` still assembles every collection slide and raising
+the constant (or dropping the slice) restores the full carousel. Deleting it
+would also have left `collectionSlides` unused and tripped lint.
+
+`HeroCarousel` now renders `.demo-hero-nav` only when there's more than one
+slide. With a single slide the arrows would re-render the same content
+(`goTo` is modulo the slide count) and the lone dot reads as a broken carousel.
+Autoplay was already guarded by `activeSlides.length < 2`; confirmed the
+heading doesn't change after 4s.
+
 ## 2026-08-26 — Review photos open a lightbox; process cards pin icon/copy
 
 **Lightbox on the testimonials marquee.** `.demo-review-photo` was an inert

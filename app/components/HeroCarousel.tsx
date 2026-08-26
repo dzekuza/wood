@@ -116,38 +116,42 @@ export function HeroCarousel({
         ))}
       </div>
 
-      <div className="demo-hero-nav">
-        <button
-          type="button"
-          className="demo-hero-arrow reset"
-          onClick={() => goTo(active - 1)}
-          aria-label="Previous slide"
-        >
-          <i className="ti ti-chevron-left" />
-        </button>
+      {/* No controls for a single slide — the arrows would just re-render the
+          same slide and the lone dot reads as a broken carousel. */}
+      {activeSlides.length > 1 && (
+        <div className="demo-hero-nav">
+          <button
+            type="button"
+            className="demo-hero-arrow reset"
+            onClick={() => goTo(active - 1)}
+            aria-label="Previous slide"
+          >
+            <i className="ti ti-chevron-left" />
+          </button>
 
-        <div className="demo-hero-dots">
-          {activeSlides.map((_, index) => (
-            <button
-              key={index}
-              type="button"
-              className={`demo-hero-dot reset${index === active ? ' is-active' : ''}`}
-              onClick={() => goTo(index)}
-              aria-label={`Show slide ${index + 1}`}
-              aria-current={index === active}
-            />
-          ))}
+          <div className="demo-hero-dots">
+            {activeSlides.map((_, index) => (
+              <button
+                key={index}
+                type="button"
+                className={`demo-hero-dot reset${index === active ? ' is-active' : ''}`}
+                onClick={() => goTo(index)}
+                aria-label={`Show slide ${index + 1}`}
+                aria-current={index === active}
+              />
+            ))}
+          </div>
+
+          <button
+            type="button"
+            className="demo-hero-arrow reset"
+            onClick={() => goTo(active + 1)}
+            aria-label="Next slide"
+          >
+            <i className="ti ti-chevron-right" />
+          </button>
         </div>
-
-        <button
-          type="button"
-          className="demo-hero-arrow reset"
-          onClick={() => goTo(active + 1)}
-          aria-label="Next slide"
-        >
-          <i className="ti ti-chevron-right" />
-        </button>
-      </div>
+      )}
     </>
   );
 }

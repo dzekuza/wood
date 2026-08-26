@@ -1,6 +1,9 @@
 import {Link, useLoaderData} from 'react-router';
 import type {Route} from './+types/_index';
-import type {HeroShowcaseQuery, PopularProductsQuery} from 'storefrontapi.generated';
+import type {
+  HeroShowcaseQuery,
+  PopularProductsQuery,
+} from 'storefrontapi.generated';
 import {MockShopNotice} from '~/components/MockShopNotice';
 import {ProductItem} from '~/components/ProductItem';
 import {HeroCarousel, type HeroSlide} from '~/components/HeroCarousel';
@@ -11,7 +14,10 @@ import {CraftmanshipProcess} from '~/components/CraftmanshipProcess';
 import {ContactBanner} from '~/components/ContactBanner';
 import {HOMEPAGE_REVIEWS} from '~/lib/reviews';
 import {SITE_NAME} from '~/lib/site';
-import {EXCLUDE_HIDDEN_PRODUCTS_QUERY, filterHiddenProducts} from '~/lib/upsells';
+import {
+  EXCLUDE_HIDDEN_PRODUCTS_QUERY,
+  filterHiddenProducts,
+} from '~/lib/upsells';
 import demoStyles from '~/styles/demo.css?url';
 
 export const meta: Route.MetaFunction = () => {
@@ -59,6 +65,13 @@ const BRAND_HERO_SLIDE: HeroSlide = {
   secondaryCta: {label: 'Explore Collections', to: '/collections'},
 };
 
+/**
+ * Temporary: the hero shows the brand slide only. The per-collection slides are
+ * still built below — raise this (or drop the slice at the call site) to bring
+ * the full carousel back.
+ */
+const HERO_SLIDE_LIMIT = 1;
+
 function buildHeroSlides(showcase: HeroShowcaseQuery | undefined): HeroSlide[] {
   if (!showcase) return [BRAND_HERO_SLIDE];
   const collections = [
@@ -71,9 +84,13 @@ function buildHeroSlides(showcase: HeroShowcaseQuery | undefined): HeroSlide[] {
   ];
 
   const collectionSlides = collections
-    .filter((collection): collection is NonNullable<typeof collection> => Boolean(collection))
+    .filter((collection): collection is NonNullable<typeof collection> =>
+      Boolean(collection),
+    )
     .map((collection) => {
-      const image = collection.image?.url ?? collection.products.nodes[0]?.featuredImage?.url;
+      const image =
+        collection.image?.url ??
+        collection.products.nodes[0]?.featuredImage?.url;
       return {
         image: image ?? '/demo/hero-1.png',
         heading: [collection.title],
@@ -103,10 +120,15 @@ function buildCategories(showcase: HeroShowcaseQuery | undefined): Category[] {
   ];
 
   return collections
-    .filter((collection): collection is NonNullable<typeof collection> => Boolean(collection))
+    .filter((collection): collection is NonNullable<typeof collection> =>
+      Boolean(collection),
+    )
     .map((collection) => ({
       title: collection.title,
-      image: collection.image?.url ?? collection.products.nodes[0]?.featuredImage?.url ?? null,
+      image:
+        collection.image?.url ??
+        collection.products.nodes[0]?.featuredImage?.url ??
+        null,
       to: `/collections/${collection.handle}`,
       count: collection.products.nodes.length,
     }));
@@ -127,14 +149,16 @@ export async function loader(args: Route.LoaderArgs) {
 
   return {
     isShopLinked: Boolean(context.env.PUBLIC_STORE_DOMAIN),
-    heroSlides: buildHeroSlides(heroShowcase),
+    heroSlides: buildHeroSlides(heroShowcase).slice(0, HERO_SLIDE_LIMIT),
     categories: buildCategories(heroShowcase),
     popularProducts: visiblePopularProducts,
   };
 }
 
 const HERO_RATING = {
-  average: HOMEPAGE_REVIEWS.reduce((sum, r) => sum + r.rating, 0) / HOMEPAGE_REVIEWS.length,
+  average:
+    HOMEPAGE_REVIEWS.reduce((sum, r) => sum + r.rating, 0) /
+    HOMEPAGE_REVIEWS.length,
   count: HOMEPAGE_REVIEWS.length,
 };
 
