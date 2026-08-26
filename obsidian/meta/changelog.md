@@ -9,6 +9,24 @@ Chronological log of notable changes to the project. Newest first.
 This is a human-curated log — not a mirror of `git log`. Record *why*, not just
 *what*; the diff already covers *what*.
 
+## 2026-08-26 — Announcement bar: capped width, Facebook replaces mail, filled Instagram
+
+- The dark band stays full-bleed but its content now lives in
+  `.announcement-bar-inner`, capped at **1400px** — the same as
+  `.header-topbar`, so the socials and contacts sit on the same vertical lines
+  as the logo and cart button directly below them. Verified aligned at 1700px.
+- The mail icon is gone; **Facebook** takes its place, using the
+  designer-supplied `Link.svg` path recoloured to `currentColor`.
+- Instagram is now solid. Tabler's webfont has no filled glyphs (see
+  [[../frontend/design-system]]), so both marks are inline SVGs in
+  `Icons.tsx` alongside `StarFilledIcon`/`HeartFilledIcon`. The Instagram mark
+  is a single `fill-rule="evenodd"` path: the body fills, the lens ring and
+  flash punch back out — no separate mask or nested shapes needed.
+
+`FACEBOOK_URL` in `site.ts` is a **placeholder** (`https://facebook.com`), the
+same as the footer's existing social links. It needs the shop's real page before
+launch.
+
 ## 2026-08-26 — Live homepage showed 4 categories, local showed 6
 
 Not a bug in the code — the deployed `buildCategories`/`TexturesGrid` are

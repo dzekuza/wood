@@ -375,21 +375,29 @@ button.reset > * {
 /* -------------------------------------------------------
  * Announcement bar
  * ------------------------------------------------------- */
-/* Three columns so the rotating message is centred against the viewport, not
-   against whatever space the contact block leaves over. The 1fr side columns
-   are equal by definition, which the old absolute-positioned contact block
-   could never guarantee. */
+/* The band is full-bleed; the inner row is capped to .header-topbar's 1400px
+   so the socials and contacts sit on the same vertical lines as the logo and
+   cart button below them. */
 .announcement-bar {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: 24px;
-  padding: 10px 40px;
   background: var(--cwf-ink);
   color: rgba(243, 239, 234, 0.85);
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 14px;
   letter-spacing: 0.02em;
+}
+
+/* Three columns so the rotating message is centred against the row, not
+   against whatever space the contact block leaves over. The 1fr side columns
+   are equal by definition. */
+.announcement-bar-inner {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 10px 40px;
 }
 
 /* Needs its own font-size: reset.css sets `p { font-size: 1rem }` directly on
@@ -437,7 +445,11 @@ button.reset > * {
   color: var(--cwf-accent);
 }
 
-.announcement-bar-socials i { font-size: 16px; }
+.announcement-bar-socials svg {
+  width: 17px;
+  height: 17px;
+  display: block;
+}
 
 .announcement-bar-contact {
   display: flex;
@@ -465,7 +477,7 @@ button.reset > * {
 }
 
 @media (max-width: 780px) {
-  .announcement-bar { padding: 8px 20px; grid-template-columns: 1fr; }
+  .announcement-bar-inner { padding: 8px 20px; grid-template-columns: 1fr; }
   .announcement-bar-message { font-size: 13px; white-space: normal; }
   .announcement-bar-socials { display: none; }
   .announcement-bar-contact { display: none; }

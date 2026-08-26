@@ -6,6 +6,9 @@ export const CONTACT_PHONE_DISPLAY = '+44 7904 497890';
 export const CONTACT_PHONE_HREF = '+447904497890';
 
 export const INSTAGRAM_URL = 'https://instagram.com';
+/** Placeholder — no real Facebook page URL has been supplied for the shop yet,
+ *  matching the footer's existing placeholder socials. Swap before launch. */
+export const FACEBOOK_URL = 'https://facebook.com';
 
 /** Rotating strings for the top announcement bar, ~4s each.
  *  These are marketing claims — the delivery threshold and any coupon code must
