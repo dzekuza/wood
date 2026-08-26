@@ -1,4 +1,5 @@
 import {useEffect} from 'react';
+import {createPortal} from 'react-dom';
 
 export type LightboxImage = {src: string; alt: string};
 
@@ -35,7 +36,11 @@ export function Lightbox({
   const active = images[index];
   if (!active) return null;
 
-  return (
+  // Portalled to <body>: callers live inside transform-animated marquee tracks,
+  // and a transformed ancestor becomes the containing block for
+  // `position: fixed` — rendering in place pins the overlay to the moving
+  // track instead of the viewport.
+  return createPortal(
     <div className="lightbox" role="dialog" aria-modal="true">
       {/* Click-to-dismiss lives on a real button behind the content rather than
           on the dialog itself — a click handler on the non-interactive wrapper
@@ -92,6 +97,7 @@ export function Lightbox({
           {index + 1} / {count}
         </div>
       )}
-    </div>
+    </div>,
+    document.body,
   );
 }

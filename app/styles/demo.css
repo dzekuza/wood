@@ -1031,13 +1031,24 @@ button.demo-cat-dot.is-active {
   gap: 8px;
 }
 
-.demo-review-photo {
+/* A <button> now, not a <span> — `button.` prefix so it outranks app.css's
+   `button.reset { background: inherit }`. */
+button.demo-review-photo {
   display: block;
   height: 72px;
   width: 78px;
+  padding: 0;
   border-radius: 8px;
   overflow: hidden;
   border: 1px solid var(--cwf-line);
+  background: var(--demo-tile-bg);
+  cursor: zoom-in;
+  transition: border-color 150ms ease, transform 150ms ease;
+}
+
+button.demo-review-photo:hover {
+  border-color: var(--cwf-accent);
+  transform: scale(1.04);
 }
 
 .demo-review-photo img {
@@ -1163,8 +1174,10 @@ button.demo-cat-dot.is-active {
 .demo-process-card {
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  gap: 16px;
+  /* Icon top, copy bottom — the space between them absorbs the difference in
+     copy length so all four cards align on both edges. */
+  justify-content: space-between;
+  gap: 24px;
   background: var(--cwf-surface);
   border-radius: 20px;
   padding: 32px;
@@ -1175,6 +1188,12 @@ button.demo-cat-dot.is-active {
   color: var(--cwf-accent);
   width: 64px;
   height: 64px;
+}
+
+.demo-process-card-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .demo-process-card h3 {

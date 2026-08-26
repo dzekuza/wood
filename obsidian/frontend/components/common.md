@@ -11,6 +11,7 @@ primitives, reused across features.
 | Component | File | Purpose | Status |
 |-----------|------|---------|--------|
 | `Icons` (`StarFilledIcon`, `HeartFilledIcon`) | `app/components/Icons.tsx` | Solid-fill SVG icons — `@tabler/icons-webfont` has no `-filled` glyphs, so any solid star/heart must come from here, not `ti-star-filled` / `ti-heart-filled` | |
+| `Lightbox` | `app/components/Lightbox.tsx` | Shared full-screen image preview: arrows, counter, Escape, backdrop-button dismissal. Portals to `document.body` — required, since callers sit inside transform-animated marquee tracks | |
 | `AnnouncementBar` | `app/components/AnnouncementBar.tsx` | Top strip above the header — tagline + phone/email, rendered inside `Header` | |
 | `TexturesGrid` | `app/components/TexturesGrid.tsx` | "Our Textures" homepage section — same `Category` list as `CategoriesGrid` but renders dedicated wood-grain close-ups from `public/demo/texture-*.jpg` (handle-keyed lookup, falls back to the collection photo) | |
 | `AnnouncementBar` | `app/components/AnnouncementBar.tsx` | Top bar: socials / rotating message / contacts in a `1fr auto 1fr` grid inside `.announcement-bar-inner` (capped at 1400px to match `.header-topbar`; the band itself stays full-bleed). Messages come from `ANNOUNCEMENT_MESSAGES` in `app/lib/site.ts` and rotate every 4s — the copy there is placeholder marketing, confirm before shipping | |

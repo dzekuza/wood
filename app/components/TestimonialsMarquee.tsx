@@ -1,21 +1,41 @@
+import {useState} from 'react';
 import type {ProductReview} from '~/components/ReviewsSection';
 import {StarFilledIcon} from '~/components/Icons';
+import {Lightbox} from '~/components/Lightbox';
 
-function ReviewCard({review}: {review: ProductReview}) {
+function ReviewCard({
+  review,
+  ariaHidden,
+}: {
+  review: ProductReview;
+  ariaHidden?: boolean;
+}) {
+  const photos = review.images ?? [];
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
   return (
-    <article className="demo-review-card">
+    <article className="demo-review-card" aria-hidden={ariaHidden || undefined}>
       <div className="demo-review-stars" aria-hidden>
         {Array.from({length: review.rating}).map((_, i) => (
           <StarFilledIcon key={i} />
         ))}
       </div>
       <p className="demo-review-quote">{review.body}</p>
-      {review.images && review.images.length > 0 && (
+      {photos.length > 0 && (
         <div className="demo-review-photos">
-          {review.images.map((photo) => (
-            <span className="demo-review-photo" key={photo}>
+          {photos.map((photo, i) => (
+            <button
+              type="button"
+              className="demo-review-photo reset"
+              key={photo}
+              onClick={() => setOpenIndex(i)}
+              /* Marquee clones are duplicates of a card that is already in the
+                 a11y tree, so they stay clickable but out of the tab order. */
+              tabIndex={ariaHidden ? -1 : 0}
+              aria-label={`View photo ${i + 1} of ${photos.length} from ${review.author}'s review`}
+            >
               <img src={photo} alt="" loading="lazy" />
-            </span>
+            </button>
           ))}
         </div>
       )}
@@ -27,16 +47,38 @@ function ReviewCard({review}: {review: ProductReview}) {
           )}
         </span>
       </div>
+
+      {openIndex !== null && (
+        <Lightbox
+          images={photos.map((src) => ({
+            src,
+            alt: `Photo from ${review.author}'s review`,
+          }))}
+          index={openIndex}
+          onClose={() => setOpenIndex(null)}
+          onNavigate={setOpenIndex}
+        />
+      )}
     </article>
   );
 }
 
-function MarqueeRow({reviews, reverse}: {reviews: ProductReview[]; reverse?: boolean}) {
+function MarqueeRow({
+  reviews,
+  reverse,
+}: {
+  reviews: ProductReview[];
+  reverse?: boolean;
+}) {
   return (
     <div className={`demo-review-row${reverse ? ' is-reverse' : ''}`}>
       <div className="demo-review-track">
         {[...reviews, ...reviews].map((review, i) => (
-          <ReviewCard review={review} key={`${review.author}-${i}`} />
+          <ReviewCard
+            review={review}
+            ariaHidden={i >= reviews.length}
+            key={`${review.author}-${i}`}
+          />
         ))}
       </div>
     </div>
@@ -46,7 +88,8 @@ function MarqueeRow({reviews, reverse}: {reviews: ProductReview[]; reverse?: boo
 export function TestimonialsMarquee({reviews}: {reviews: ProductReview[]}) {
   if (!reviews.length) return null;
 
-  const average = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+  const average =
+    reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
   const rowSplit = Math.ceil(reviews.length / 2);
   const row1 = reviews.slice(0, rowSplit);
   const row2 = reviews.slice(rowSplit);
@@ -60,7 +103,9 @@ export function TestimonialsMarquee({reviews}: {reviews: ProductReview[]}) {
               <StarFilledIcon key={i} />
             ))}
           </span>
-          <span>{average.toFixed(1)} · {reviews.length} reviews</span>
+          <span>
+            {average.toFixed(1)} · {reviews.length} reviews
+          </span>
         </div>
         <h2>What our customers say</h2>
       </div>

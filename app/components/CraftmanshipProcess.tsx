@@ -56,8 +56,12 @@ export function CraftmanshipProcess() {
           {STEPS.map((step) => (
             <div className="demo-process-card" key={step.title}>
               <step.icon />
-              <h3>{step.title}</h3>
-              <p>{step.description}</p>
+              {/* Title + body are one block so the card can push the icon to
+                  the top and this to the bottom, whatever the copy length. */}
+              <div className="demo-process-card-copy">
+                <h3>{step.title}</h3>
+                <p>{step.description}</p>
+              </div>
             </div>
           ))}
         </div>

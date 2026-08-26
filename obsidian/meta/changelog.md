@@ -9,6 +9,35 @@ Chronological log of notable changes to the project. Newest first.
 This is a human-curated log — not a mirror of `git log`. Record *why*, not just
 *what*; the diff already covers *what*.
 
+## 2026-08-26 — Review photos open a lightbox; process cards pin icon/copy
+
+**Lightbox on the testimonials marquee.** `.demo-review-photo` was an inert
+`<span>`; it's now a `<button>` that opens a full-screen preview.
+
+Reused `app/components/Lightbox.tsx` rather than writing a third overlay — it
+already had arrows, a counter and Escape handling, and was sitting unused (noted
+in the lint cleanup earlier today). Two things it needed first:
+
+- `createPortal` to `document.body`. `.demo-review-track` is
+  transform-animated, and a transformed ancestor becomes the containing block
+  for `position: fixed` — the same trap that had the PDP review lightbox opening
+  ~1600px off-screen. Fixed here *before* wiring it up rather than after.
+- `button.demo-review-photo` styling, `button.`-prefixed so it outranks
+  `button.reset { background: inherit }`.
+
+The marquee renders each row twice for the seamless loop. The clones now get
+`aria-hidden` and `tabIndex={-1}`, so the duplicate photo buttons stay
+mouse-clickable (they're visible) without doubling every tab stop.
+
+Verified: opens portalled to `<body>`, covers the viewport, image centred,
+arrows page 1/2 → 2/2, closes on Escape and on backdrop click.
+
+**Process cards.** Title and body moved into `.demo-process-card-copy`, and the
+card switched from `justify-content: flex-end` to `space-between`. The icon now
+sits at the top, the copy at the bottom, and the gap between absorbs the
+difference in copy length — measured 49px on the short cards and the 24px
+minimum on the long ones, with all four aligned on both edges.
+
 ## 2026-08-26 — Categories show all 6 in one row on desktop again
 
 Mobile (≤620px) now shows **2.2 cards** —
