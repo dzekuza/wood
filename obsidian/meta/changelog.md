@@ -9,6 +9,16 @@ Chronological log of notable changes to the project. Newest first.
 This is a human-curated log — not a mirror of `git log`. Record *why*, not just
 *what*; the diff already covers *what*.
 
+## 2026-08-26 — Review cards drop the avatar placeholder
+
+`ReviewCard` (TestimonialsMarquee) rendered a `.demo-review-avatar` — an empty
+36px circle filled with a beige gradient, standing in for a photo the reviews
+data has never carried. Removed the element, its CSS block, and the 12px gap on
+`.demo-review-author` that only existed to separate it from the name.
+
+Not touched: `.tcard .av` in `app.css` does the same thing on the PDP review
+cards. Same placeholder, different component — left alone as it wasn't in scope.
+
 ## 2026-08-26 — Lint: 19 errors → 0, and a lightbox that opened off-screen
 
 Cleared every ESLint error in the repo (17 warnings remain, all pre-existing

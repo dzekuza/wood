@@ -1035,18 +1035,9 @@ button.demo-cat-dot.is-active {
 .demo-review-author {
   display: flex;
   align-items: center;
-  gap: 12px;
   padding-top: 12px;
   margin-top: auto;
   border-top: 0.5px solid var(--cwf-line);
-}
-
-.demo-review-avatar {
-  height: 36px;
-  width: 36px;
-  border-radius: 18px;
-  flex-shrink: 0;
-  background: linear-gradient(135deg, #e8dfd1, #ddd2c0);
 }
 
 .demo-review-author-text {

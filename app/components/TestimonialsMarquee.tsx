@@ -20,7 +20,6 @@ function ReviewCard({review}: {review: ProductReview}) {
         </div>
       )}
       <div className="demo-review-author">
-        <span className="demo-review-avatar" aria-hidden />
         <span className="demo-review-author-text">
           <span className="demo-review-name">{review.author}</span>
           {review.product && (
