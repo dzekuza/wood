@@ -1,6 +1,6 @@
 ---
 tags: [meta, changelog]
-updated: 2026-08-25
+updated: 2026-08-26
 ---
 
 # Changelog
@@ -8,6 +8,292 @@ updated: 2026-08-25
 Chronological log of notable changes to the project. Newest first.
 This is a human-curated log — not a mirror of `git log`. Record *why*, not just
 *what*; the diff already covers *what*.
+
+## 2026-08-26 — Contact banner panel goes #352f2a
+
+`.demo-contact`'s panel was `#2d231a`; it now uses `var(--cwf-header-ink)`
+rather than a fresh literal, since that token already holds #352f2a from the
+header change earlier today and the two are meant to be the same charcoal.
+
+Its own text colours were already light-on-dark and needed no adjustment.
+
+## 2026-08-26 — Process cards flip to linen with oak icons
+
+`.demo-process-card` went from the dark `#5f5145` tile to `var(--cwf-surface)`
+(#f3efea) with `var(--cwf-accent)` (#c9a27a) icons.
+
+The card copy had to move with it: the title was `#fff` and the body
+`rgba(243, 239, 234, 0.7)` — both effectively invisible on linen. They now use
+the same pair the surrounding section already uses (`#352f2a` title, `#61482e`
+body), so the cards read as part of the section rather than a separate palette.
+
+Also fixed a regression from the announcement-bar rebuild earlier today: between
+620px and ~900px the `1fr auto 1fr` side columns get thin enough that the phone
+number wrapped mid-number across three lines. Contacts now hide below 900px
+(they were only hiding at 620px) and the links carry `white-space: nowrap`. The
+header still exposes the same contacts below that width.
+
+## 2026-08-26 — Rating stars unified on #ffa817
+
+Stars were two colours depending on where you looked: the homepage hero and
+product cards hardcoded `#ffa817`, while the testimonials, review cards, PDP
+rating row, `.tcard`, `.rev-score` and `.tgrid-rating` all used
+`var(--cwf-accent)` (#c9a27a) — the pale gold, which read washed-out on light
+cards. All nine now use a new `--cwf-star: #ffa817` in `app.css`.
+
+`demo.css` references the same token rather than keeping its own literal:
+`app.css` is loaded on every route, so a site-level token is safe there and
+avoids the two files drifting the way they just had.
+
+## 2026-08-26 — Announcement bar: 3-column layout with a rotating message
+
+Rebuilt to the reference layout — social icons left, message centred, phone/email
+right — and the message now cycles through `ANNOUNCEMENT_MESSAGES` (site.ts)
+every 4s with a short fade.
+
+The bar is a `grid-template-columns: 1fr auto 1fr`. That's what finally makes the
+message *actually* centred: yesterday's fix made the contact block a flex item to
+stop it being overlapped, but that only centred the message in the space left
+over. Equal `1fr` side columns center it against the viewport by construction.
+
+Notes:
+
+- **The marketing copy is placeholder.** "Free UK delivery on orders over £250"
+  and any coupon code are commitments to customers — they need confirming
+  against what the shop actually offers before this ships. The comment above the
+  constant says so.
+- The reference shows a Facebook icon; the site has no Facebook URL anywhere, so
+  the bar links mail + Instagram (`INSTAGRAM_URL`, the same destination the
+  footer already uses) rather than inventing one.
+- `aria-live="polite"` on the message so the rotation is announced rather than
+  silently swapped; `prefers-reduced-motion` keeps the rotation but drops the
+  movement.
+- Mobile collapses to a single column — socials and contacts hide, message wraps
+  instead of truncating.
+
+## 2026-08-26 — Header chrome moves off the warm brown to #352f2a
+
+Every brown in the header — nav items, dropdown items, the search icon/input,
+the account circle, the cart pill, the mobile toggle and the mobile aside menu —
+was `--cwf-primary` (#4a2f1f) or a hand-rolled `rgba(74, 47, 31, …)` of it. All
+now resolve from `--cwf-header-ink: #352f2a`, with `--cwf-header-ink-hover:
+#241f1a` for the cart pill's hover (it previously used `--cwf-primary-dark`).
+
+The alpha variants use `color-mix(in srgb, var(--cwf-header-ink) N%,
+transparent)` rather than new `rgba()` literals. The file's existing habit was
+literal rgba, but that's exactly what made this change a nine-site search — the
+mixes keep every tint tied to the token, so the next shift is a one-line edit.
+
+Deliberately not changed:
+
+- `--cwf-primary` itself. The header is the only surface asked for; the token is
+  used all over the site (buttons, PDP, footer), and repointing it would have
+  been a site-wide restyle rather than a header one.
+- The logo. `/darkwood.svg` is an `<img>`, so its colour is baked into the file
+  and CSS can't reach it — it stays the warmer brown. Needs a new asset (or an
+  inline SVG) if it should match.
+
+## 2026-08-26 — Product card media tile goes grey too, behind one shared token
+
+`.pcard-img` was `var(--cwf-card)` (#f9f4ed cream) while the homepage's own card
+tiles had just moved to #f6f6f6 — two different neutrals behind the same kind of
+cut-out photo. `.pcard-img` now uses a new site-level `--cwf-tile: #f6f6f6` in
+`app.css`, and `demo.css`'s `--demo-tile-bg` aliases it rather than repeating
+the literal, so the two stylesheets can't drift.
+
+`.pcard` is site-wide, so this lands on collection pages and search results as
+well as the homepage carousel — that's the intent, it's the same component.
+
+Still on the warm `--cwf-sand` and deliberately untouched (different surface, a
+different page, and not part of the ask): `.pdp-main-img`,
+`.pdp-carousel-slide`, `.pdp-thumb`, `.pdp-model3d`.
+
+## 2026-08-26 — Categories become a paged carousel on desktop
+
+`.demo-cat-grid` was a 6-up CSS grid (3-up under 1080px) that only turned into a
+swipeable strip below 620px. It's now one scroll-snap track at every size, with
+paging controls from 621px up: 4 cards per view on desktop, 3 under 1080px, and
+the existing free-swipe 68%-width cards below 620px (where `.demo-cat-nav` is
+hidden — paging arrows fight the thumb).
+
+`CategoriesGrid` gained the same track-ref/page-state logic as `ProductCarousel`
+rather than a new mechanism. Two things it does differently, both deliberate:
+
+- **Page count is measured, not a constant.** `ProductCarousel` hardcodes
+  `PER_PAGE = 4` while its CSS drops to 2-up and 1.15-up at narrower widths, so
+  its dot count is wrong below desktop. `CategoriesGrid` derives cards-per-view
+  from the measured card width + `columnGap` inside a `ResizeObserver`, so the
+  dots stay right across breakpoints. Worth backporting to `ProductCarousel`.
+- **Cards-per-view, not `scrollWidth / clientWidth`.** The track's trailing gap
+  pushes that ratio just past a whole number — 6 cards at 3-up measures 2.02 —
+  which rounds up to a phantom final page that scrolls 16px. Caught it in the
+  browser showing 3 dots for 2 real pages.
+
+Also fixed in passing: `.demo-popular-dot` had the same invisible-dot bug as the
+hero dots — `button.reset { background: inherit }` in app.css outranks a bare
+class, so the popular carousel's dots were painting transparent too. Both dot
+rules are now `button.`-prefixed. The nav/arrow/dot styles are shared between
+the two carousels via grouped selectors so they can't drift.
+
+One cascade trap worth remembering: `.demo-cat-nav { display: none }` initially
+sat in the 620px media block *above* the shared `.demo-popular-nav,
+.demo-cat-nav { display: flex }` rule. Equal specificity, later rule wins — the
+nav stayed visible on mobile until the hide moved below it.
+
+## 2026-08-26 — Card media tiles go neutral grey (#f6f6f6)
+
+The beige `--cwf-sand` (#e8dfd1) behind card media was competing with the oak in
+the product cut-outs. Replaced with a new `--demo-tile-bg: #f6f6f6` token, used
+by `.demo-cat-image`, `.demo-product-image` and `.demo-tex-swatch`.
+
+It's a token rather than three literals because these three tiles are one visual
+role — if one changes they all should.
+
+Left beige on purpose (they're accents, not media tiles, and weren't part of the
+ask): `.demo-benefit-icon`'s round chip and `.demo-review-avatar`'s
+`#e8dfd1 → #ddd2c0` gradient.
+
+## 2026-08-26 — Announcement bar: 14px, and stop the message overlapping contacts
+
+Two bugs in one strip.
+
+**The declared size wasn't the rendered size.** `.announcement-bar` set
+`font-size: 12px`, but the message rendered at **17px** — `reset.css` has
+`p { font-size: 1rem }`, and `html` is `font-size: 17px`, so 1rem = 17px. A
+rule that targets the element directly always wins over a value inherited from
+an ancestor, regardless of specificity. Any `<p>` in this codebase ignores its
+container's `font-size` unless it sets its own. `.announcement-bar-message` now
+declares `font-size: 14px` explicitly (13px on mobile), and the bar itself is
+14px so the contact links match.
+
+**The message ran under the phone/email.** `.announcement-bar-contact` was
+`position: absolute; right: 40px` while the message was centred by flex — at
+~1050px wide the two overlapped by 100px, printing the Cotswolds line straight
+through the phone number. The contact block is now a normal flex item
+(`flex-shrink: 0`) and the message is `flex: 1; text-align: center`. Trade-off:
+the message is now centred in the space *left of* the contacts rather than
+dead-centre in the viewport — it can no longer collide, which matters more.
+Below the mobile breakpoint the contacts are `display: none`, so the message is
+genuinely centred there.
+
+## 2026-08-26 — Hero h1 raised to 72px / 78px on desktop
+
+`.demo-hero h1` was `clamp(2.25rem, 5vw, 56px)` with `line-height: 1.05`; it is
+now `clamp(2.25rem, 6vw, 72px)` with `line-height: 1.0833` (= 78px at 72px).
+
+The `vw` term went 5 → 6 deliberately: at 5vw the new 72px ceiling would not be
+reached until a 1440px viewport, leaving most laptop widths well short of the
+requested size. 6vw hits it at ~1200px. The 2.25rem (36px) floor is unchanged,
+and leading stays unitless so the fluid mid-range keeps the same ratio instead
+of inheriting a fixed 78px.
+
+Scope: `demo.css` only — `app.css` keeps its flat 56px/36px heading scale.
+
+## 2026-08-26 — Hero carousel: nav moved below the hero, autoplay + progress pill
+
+Three things, from a UI pass on `HeroCarousel`:
+
+**The dots were invisible, and had been.** `.demo-hero-dot` set
+`background: #fff`, but `app.css` has `button.reset { background: inherit }` —
+specificity (0,1,1) vs (0,1,0), so `inherit` won and every dot painted
+transparent against a transparent parent. Only the active pill's *width* hinted
+that anything was there. The dot rules are now written as
+`button.demo-hero-dot` so they outweigh the reset. **Any control that carries
+`.reset` and needs a background has this problem** — write the selector with
+the element to win.
+
+**The nav is now below the hero, not over it.** `.demo-hero-nav` was
+`position: absolute; bottom: 0` inside `.demo-hero`; it's now a sibling of
+`.demo-hero` (JSX wraps both in a fragment) and renders static on a white
+strip. Its controls flipped from white to `#61482e` accordingly — they sit on
+the page surface now, not on a dark photo.
+
+**Autoplay with a visible dwell.** Slides advance every 3s. The active dot
+stretches into a 40px pill whose `::after` fills left-to-right via
+`scaleX` over the same duration, so the pill *is* the progress indicator. Two
+details worth keeping:
+
+- The timer effect is keyed on `active`, so a manual arrow/dot click restarts
+  the full dwell instead of inheriting the remainder of the old one.
+- Duration is declared twice — `--demo-hero-slide-duration` (CSS, drives the
+  fill) and `SLIDE_DURATION_MS` (TS, drives the timer). They must change
+  together; both carry a comment saying so. A CSS custom property can't be read
+  by `setTimeout` without a `getComputedStyle` round-trip, which wasn't worth it
+  for one constant.
+- `prefers-reduced-motion: reduce` disables autoplay entirely and renders the
+  pill filled, so it still reads as "current slide".
+
+Sizing after a review pass: dots 10px, active pill 40px, chevrons 26px in 44px
+hit areas.
+
+## 2026-08-26 — demo.css h2 scale drops to 36px / 42px
+
+Every section `h2` on the homepage/`landing-oak` routes was 56px (inherited
+from the site-wide flat Outfit scale). Requested directly: h2 is 36px with 42px
+leading.
+
+Applied to all seven display heads — `.demo-categories-head h2`,
+`.demo-textures-head h2`, `.demo-testimonials-head h2`, `.demo-process-head h2`,
+`.demo-faq-head h2`, `.demo-popular-heading`, `.demo-benefits-heading` — plus
+`.demo-contact-heading h2`, which was its own 44px Mark Bold treatment and is
+now on the same 36/42 scale (it keeps the Mark Bold face).
+
+Leading is expressed as **`line-height: 1.1667`, not `42px`**: it computes to
+42px at the 36px desktop size while letting the existing mobile steps (28px,
+26px) keep proportional leading instead of inheriting a fixed 42px that would
+be far too airy at those sizes.
+
+Scope: `demo.css` only. `app.css` keeps the flat 56px/36px Outfit heading scale
+from the 2026-08-25 change — the two stylesheets remain separate type systems.
+
+## 2026-08-26 — Button type scale: 18px in the hero, 16px everywhere else
+
+`.demo-btn` was 20px base with a per-modifier drift (`.demo-btn-solid-dark`
+carried its own 18px, `.demo-btn-sm` its own 16px). Requested directly: hero
+buttons 18px, every other button 16px.
+
+- `.demo-btn` base dropped 20px → **16px**; a single
+  `.demo-hero-ctas .demo-btn` rule steps the hero back up to **18px**. The hero
+  is the only place that overrides the base size — keep it that way rather than
+  adding per-section sizes.
+- `.demo-btn-solid-dark` lost its own `font-size: 18px` and now inherits the
+  16px base.
+- The three mobile `.demo-btn` overrides (780/480/400px) were global selectors
+  living inside hero-only media blocks — so they shrank *every* button on
+  mobile as a side effect of scaling the hero. They are now scoped to
+  `.demo-hero-ctas .demo-btn` and re-based off 18px (16/15/14px). Non-hero
+  buttons stay flat at 16px on all widths.
+
+## 2026-08-26 — demo.css body copy is DM Sans Regular, behind type tokens
+
+The homepage/`landing-oak` stylesheet (`app/styles/demo.css`) declared
+`'DM Sans'` on about half its rules and `'Plus Jakarta Sans'` on the rest.
+DM Sans was already being loaded — but only by `_index.tsx` and
+`landing-oak.tsx`'s own route-level `links()`, not by `root.tsx`. It is now
+requested in the root Google Fonts link too, so the face is available to any
+route that later reaches for it rather than being tied to those two.
+
+Three changes, requested directly ("P texts should be DM Sans regular …
+update component style to use everywhere"):
+
+- `root.tsx` now requests `DM+Sans:wght@400;500;600;700` alongside Plus
+  Jakarta Sans in the same Google Fonts stylesheet link.
+- Every `font-family` in `demo.css` (49 declarations) now goes through one of
+  three tokens defined at the top of that file — `--demo-font-display`
+  (Outfit), `--demo-font-body` (DM Sans), `--demo-font-mark` (Mark Bold).
+  The leftover `'Plus Jakarta Sans'` declarations — review quote/name/product,
+  `.demo-process-card p`, `.demo-contact-heading p`, `.demo-contact-etsy`,
+  `.demo-featured-eyebrow`, `.demo-stat-label`, `.demo-testimonials-rating`,
+  `.demo-product-price-label` — all collapsed into the body token, so body
+  copy on those routes is now uniformly DM Sans.
+- Paragraph copy dropped from weight 500 to 400 (`.demo-hero-blurb`,
+  `.demo-textures-sub`, `.demo-process-sub`). UI text that is deliberately
+  medium — buttons, popular-tabs, FAQ questions, the marquee — kept its
+  weight; the ask was about paragraphs, not chrome.
+
+Scope note: this is `demo.css` only. The rest of the site (`app.css`) still
+uses Plus Jakarta Sans for body/UI — the two stylesheets have been separate
+type systems since the Outfit change, and merging them was not part of this.
 
 ## 2026-08-25 — Headings switch to Outfit Medium at a flat 56px/36px scale
 

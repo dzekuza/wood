@@ -4,6 +4,22 @@
  * display headlines, DM Sans for body/UI.
  * ------------------------------------------------------- */
 
+/* Type tokens for this stylesheet — Outfit for display headlines,
+   DM Sans for all body/UI text, Mark Bold for prices and stat numbers. */
+:root {
+  --demo-font-display: 'Outfit', sans-serif;
+  --demo-font-body: 'DM Sans', sans-serif;
+  --demo-font-mark: 'Mark Bold', serif;
+
+  /* Hero autoplay dwell — mirrored by SLIDE_DURATION_MS in HeroCarousel.tsx. */
+  --demo-hero-slide-duration: 3000ms;
+
+  /* Neutral tile behind card media (category, product, texture) — replaced the
+     beige --cwf-sand so cut-out product photos read cleaner. Aliases the
+     site-level token so the two stylesheets can't drift. */
+  --demo-tile-bg: var(--cwf-tile);
+}
+
 /* Header overlaid transparently on the hero, solidifying on scroll.
    Only applied on routes with a full-bleed hero (see HERO_OVERLAY_ROUTES
    in Header.tsx) — those routes are the only ones loading this stylesheet. */
@@ -105,7 +121,7 @@
   row-gap: 4px;
   gap: 6px;
   color: #fff;
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--demo-font-body);
   font-size: 14px;
   font-weight: 400;
 }
@@ -113,7 +129,7 @@
 .demo-hero-stars {
   display: inline-flex;
   gap: 1px;
-  color: #ffa817;
+  color: var(--cwf-star);
 }
 
 .demo-hero-stars svg {
@@ -122,18 +138,20 @@
 }
 
 .demo-hero h1 {
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--demo-font-display);
   font-weight: 500;
-  font-size: clamp(2.25rem, 5vw, 56px);
-  line-height: 1.05;
+  /* 72px / 78px at desktop; unitless leading so the fluid mobile sizes keep
+     the same ratio. 6vw reaches the 72px ceiling at ~1200px wide. */
+  font-size: clamp(2.25rem, 6vw, 72px);
+  line-height: 1.0833;
   letter-spacing: -0.02em;
   color: #fff;
   margin: 0;
 }
 
 .demo-hero-blurb {
-  font-family: 'DM Sans', sans-serif;
-  font-weight: 500;
+  font-family: var(--demo-font-body);
+  font-weight: 400;
   font-size: 18px;
   line-height: 1.4;
   color: #fff;
@@ -155,15 +173,20 @@
   justify-content: center;
   padding: 16px 46px;
   border-radius: 30px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--demo-font-body);
   font-weight: 500;
-  font-size: 20px;
+  font-size: 16px;
   white-space: nowrap;
   transition: transform 150ms ease, opacity 150ms ease;
 }
 
 .demo-btn:hover {
   transform: translateY(-1px);
+}
+
+/* Hero is the only place buttons step up from the 16px base. */
+.demo-hero-ctas .demo-btn {
+  font-size: 18px;
 }
 
 .demo-btn-solid {
@@ -178,77 +201,107 @@
   color: #fff;
 }
 
+/* Sits below the hero on the page surface, not overlaid on the image — so its
+   controls are dark-on-light, unlike the white controls the overlay used. */
 .demo-hero-nav {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 3;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0;
-  padding: 10px 0;
+  padding: 20px 0;
+  background: #fff;
 }
 
 .demo-hero-arrow {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 40px;
-  color: #fff;
-  opacity: 0.8;
+  width: 44px;
+  height: 44px;
+  border-radius: 44px;
+  color: #61482e;
+  opacity: 0.65;
   transition: opacity 150ms ease, background 150ms ease;
 }
 
 .demo-hero-arrow:hover {
   opacity: 1;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(97, 72, 46, 0.08);
 }
 
 .demo-hero-arrow i {
-  font-size: 16px;
+  font-size: 26px;
 }
 
 .demo-hero-dots {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   padding: 0 12px;
 }
 
-.demo-hero-dot {
-  height: 9px;
-  width: 9px;
-  border-radius: 7px;
-  background: #fff;
-  opacity: 0.35;
-  transition: width 200ms ease, opacity 200ms ease;
+button.demo-hero-dot {
+  position: relative;
+  height: 10px;
+  width: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(97, 72, 46, 0.28);
+  transition: width 300ms ease, background 200ms ease;
 }
 
-.demo-hero-dot.is-active {
-  width: 30px;
-  opacity: 1;
+button.demo-hero-dot:hover {
+  background: rgba(97, 72, 46, 0.45);
+}
+
+/* The active dot stretches into a pill and fills left-to-right over the slide's
+   dwell time, so it doubles as the autoplay progress indicator. Duration is
+   mirrored by SLIDE_DURATION_MS in HeroCarousel.tsx — change both together. */
+button.demo-hero-dot.is-active {
+  width: 40px;
+}
+
+button.demo-hero-dot.is-active::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: #61482e;
+  transform-origin: left center;
+  animation: demo-hero-dot-fill var(--demo-hero-slide-duration) linear forwards;
+}
+
+@keyframes demo-hero-dot-fill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* No autoplay in this mode, so the pill just reads as "current slide". */
+  button.demo-hero-dot.is-active::after {
+    animation: none;
+    transform: scaleX(1);
+  }
 }
 
 @media (max-width: 780px) {
   .demo-hero { height: 560px; }
   .demo-hero-ctas { gap: 10px; }
-  .demo-btn { padding: 14px 22px; font-size: 15px; }
+  .demo-hero-ctas .demo-btn { padding: 14px 22px; font-size: 16px; }
 }
 
 @media (max-width: 480px) {
   .demo-hero { height: 480px; }
   .demo-hero-content { gap: 18px; padding: 0 16px; }
   .demo-hero-ctas { gap: 8px; }
-  .demo-btn { padding: 12px 16px; font-size: 13.5px; }
+  .demo-hero-ctas .demo-btn { padding: 12px 16px; font-size: 15px; }
 }
 
 @media (max-width: 400px) {
   .demo-hero-ctas { gap: 6px; }
-  .demo-btn { padding: 10px 12px; font-size: 12px; }
+  .demo-hero-ctas .demo-btn { padding: 10px 12px; font-size: 14px; }
 }
 
 /* -------------------------------------------------------
@@ -282,16 +335,17 @@
 }
 
 .demo-categories-head h2 {
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--demo-font-display);
   font-weight: 500;
-  font-size: 56px;
+  font-size: 36px;
+  line-height: 1.1667;
   letter-spacing: -0.02em;
   color: #352f2a;
   margin: 0;
 }
 
 .demo-categories-sub {
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--demo-font-body);
   font-size: 16px;
   color: #61482e;
   margin: 0;
@@ -302,7 +356,7 @@
   align-items: center;
   gap: 4px;
   margin-top: 4px;
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--demo-font-display);
   font-weight: 500;
   font-size: 14px;
   text-transform: capitalize;
@@ -313,18 +367,28 @@
 .demo-categories-all:hover { opacity: 0.65; }
 .demo-categories-all i { font-size: 13px; }
 
+/* A paged carousel from 621px up (below that it's a free-swipe strip — see the
+   620px block). Cards are sized so exactly N fit the visible width, which is
+   what makes page-by-clientWidth scrolling land cleanly on a card boundary. */
 .demo-cat-grid {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  display: flex;
   gap: 16px;
   width: 100%;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
 }
+
+.demo-cat-grid::-webkit-scrollbar { display: none; }
 
 .demo-cat-card {
   display: flex;
   flex-direction: column;
   gap: 0;
   color: inherit;
+  flex: 0 0 calc((100% - 3 * 16px) / 4);
+  min-width: 0;
+  scroll-snap-align: start;
 }
 
 .demo-cat-image {
@@ -333,7 +397,7 @@
   height: 206px;
   width: 100%;
   border-radius: 16px;
-  background: var(--cwf-sand);
+  background: var(--demo-tile-bg);
   overflow: hidden;
 }
 
@@ -378,7 +442,7 @@
 }
 
 .demo-cat-title {
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--demo-font-display);
   font-weight: 500;
   font-size: 18px;
   color: #61482e;
@@ -386,7 +450,7 @@
 }
 
 .demo-cat-count {
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--demo-font-body);
   font-size: 12.5px;
   color: #61482e;
   opacity: 0.7;
@@ -394,7 +458,7 @@
 }
 
 @media (max-width: 1080px) {
-  .demo-cat-grid { grid-template-columns: repeat(3, 1fr); }
+  .demo-cat-card { flex-basis: calc((100% - 2 * 16px) / 3); }
   .demo-categories-inner { padding: 40px 32px; }
 }
 
@@ -405,16 +469,10 @@
   .demo-categories-inner { padding: 32px 20px; }
   .demo-categories-head h2 { font-size: 28px; }
   .demo-cat-grid {
-    display: flex;
-    grid-template-columns: none;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
     gap: 12px;
   }
-  .demo-cat-grid::-webkit-scrollbar { display: none; }
-  .demo-cat-card { flex: 0 0 68%; min-width: 220px; max-width: 280px; scroll-snap-align: start; }
+  .demo-cat-card { flex: 0 0 68%; min-width: 220px; max-width: 280px; }
 }
 
 /* -------------------------------------------------------
@@ -440,9 +498,10 @@
 }
 
 .demo-popular-heading {
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--demo-font-display);
   font-weight: 500;
-  font-size: 56px;
+  font-size: 36px;
+  line-height: 1.1667;
   letter-spacing: -0.02em;
   color: #352f2a;
   margin: 0;
@@ -465,7 +524,7 @@
   border: 1.25px solid var(--cwf-accent-deep);
   background: transparent;
   color: var(--cwf-accent-deep);
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--demo-font-body);
   font-weight: 500;
   font-size: 16px;
   white-space: nowrap;
@@ -527,7 +586,7 @@
   width: 100%;
   border-radius: 24px;
   overflow: hidden;
-  background: var(--cwf-sand, #e8dfd1);
+  background: var(--demo-tile-bg);
 }
 
 .demo-product-image img {
@@ -567,7 +626,7 @@
 }
 
 .demo-product-title {
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--demo-font-display);
   font-weight: 500;
   font-size: 18px;
   letter-spacing: -0.02em;
@@ -590,7 +649,7 @@
 }
 
 .demo-product-price-label {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--demo-font-body);
   font-weight: 600;
   font-size: 10px;
   letter-spacing: 0.12em;
@@ -599,7 +658,7 @@
 }
 
 .demo-product-price-value {
-  font-family: 'Mark Bold', serif;
+  font-family: var(--demo-font-mark);
   font-size: 16px;
   letter-spacing: -0.03em;
   color: var(--cwf-primary);
@@ -620,13 +679,15 @@
 .demo-product-add:hover { background: var(--cwf-primary-dark, #3a2519); transform: scale(1.06); }
 .demo-product-add i { font-size: 15px; }
 
-.demo-popular-nav {
+.demo-popular-nav,
+.demo-cat-nav {
   display: flex;
   align-items: center;
   gap: 16px;
 }
 
-.demo-popular-arrow {
+.demo-popular-arrow,
+.demo-cat-arrow-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -636,17 +697,22 @@
   transition: opacity 150ms ease;
 }
 
-.demo-popular-arrow:hover { opacity: 0.6; }
-.demo-popular-arrow:disabled { opacity: 0.2; cursor: default; }
-.demo-popular-arrow i { font-size: 18px; }
+.demo-popular-arrow:hover,
+.demo-cat-arrow-btn:hover { opacity: 0.6; }
+.demo-popular-arrow:disabled,
+.demo-cat-arrow-btn:disabled { opacity: 0.2; cursor: default; }
+.demo-popular-arrow i,
+.demo-cat-arrow-btn i { font-size: 18px; }
 
-.demo-popular-dots {
+.demo-popular-dots,
+.demo-cat-dots {
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-.demo-popular-dot {
+button.demo-popular-dot,
+button.demo-cat-dot {
   height: 9px;
   width: 9px;
   border-radius: 7px;
@@ -655,9 +721,17 @@
   transition: width 200ms ease, opacity 200ms ease;
 }
 
-.demo-popular-dot.is-active {
+button.demo-popular-dot.is-active,
+button.demo-cat-dot.is-active {
   width: 30px;
   opacity: 1;
+}
+
+/* Free swipe below 620px — paging controls would fight the thumb. This has to
+   sit after the shared `.demo-cat-nav` rule above, not up in the categories
+   media block, or the later equal-specificity rule wins and it stays visible. */
+@media (max-width: 620px) {
+  .demo-cat-nav { display: none; }
 }
 
 .demo-btn-outline-dark {
@@ -705,17 +779,18 @@
 }
 
 .demo-textures-head h2 {
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--demo-font-display);
   font-weight: 500;
-  font-size: 56px;
+  font-size: 36px;
+  line-height: 1.1667;
   letter-spacing: -0.02em;
   color: #352f2a;
   margin: 0;
 }
 
 .demo-textures-sub {
-  font-family: 'DM Sans', sans-serif;
-  font-weight: 500;
+  font-family: var(--demo-font-body);
+  font-weight: 400;
   font-size: 18px;
   line-height: 1.4;
   color: #474747;
@@ -727,7 +802,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--demo-font-display);
   font-weight: 500;
   font-size: 14px;
   text-transform: capitalize;
@@ -758,7 +833,7 @@
   width: 100%;
   border-radius: 16px;
   overflow: hidden;
-  background: var(--cwf-sand, #e8dfd1);
+  background: var(--demo-tile-bg);
 }
 
 .demo-tex-swatch img {
@@ -797,7 +872,7 @@
 }
 
 .demo-tex-title {
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--demo-font-display);
   font-weight: 500;
   font-size: 16px;
   color: #61482e;
@@ -805,7 +880,7 @@
 }
 
 .demo-tex-count {
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--demo-font-body);
   font-size: 12px;
   color: #61482e;
   opacity: 0.7;
@@ -848,9 +923,10 @@
 }
 
 .demo-testimonials-head h2 {
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--demo-font-display);
   font-weight: 500;
-  font-size: 56px;
+  font-size: 36px;
+  line-height: 1.1667;
   letter-spacing: -0.02em;
   color: #352f2a;
   margin: 0;
@@ -860,7 +936,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--demo-font-body);
   font-weight: 600;
   font-size: 13px;
   color: #352f2a;
@@ -869,7 +945,7 @@
 .demo-testimonials-stars {
   display: inline-flex;
   gap: 1px;
-  color: var(--cwf-accent, #c9a27a);
+  color: var(--cwf-star);
 }
 
 .demo-testimonials-stars svg { width: 14px; height: 14px; }
@@ -922,13 +998,13 @@
 .demo-review-stars {
   display: inline-flex;
   gap: 2px;
-  color: var(--cwf-accent, #c9a27a);
+  color: var(--cwf-star);
 }
 
 .demo-review-stars svg { width: 13px; height: 13px; }
 
 .demo-review-quote {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--demo-font-body);
   font-size: 15px;
   line-height: 1.6;
   color: var(--cwf-primary);
@@ -980,14 +1056,14 @@
 }
 
 .demo-review-name {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--demo-font-body);
   font-weight: 600;
   font-size: 14px;
   color: var(--cwf-primary);
 }
 
 .demo-review-product {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--demo-font-body);
   font-size: 12px;
   color: rgba(74, 47, 31, 0.55);
 }
@@ -1026,17 +1102,18 @@
 }
 
 .demo-process-head h2 {
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--demo-font-display);
   font-weight: 500;
-  font-size: 56px;
+  font-size: 36px;
+  line-height: 1.1667;
   letter-spacing: -0.02em;
   color: #352f2a;
   margin: 0;
 }
 
 .demo-process-sub {
-  font-family: 'DM Sans', sans-serif;
-  font-weight: 500;
+  font-family: var(--demo-font-body);
+  font-weight: 400;
   font-size: 16px;
   line-height: 1.5;
   color: #61482e;
@@ -1082,31 +1159,33 @@
   flex-direction: column;
   justify-content: flex-end;
   gap: 16px;
-  background: #5f5145;
+  background: var(--cwf-surface);
   border-radius: 20px;
   padding: 32px;
-  color: #fff;
+  color: #352f2a;
 }
 
 .demo-process-card svg {
-  color: #fff;
+  color: var(--cwf-accent);
   width: 64px;
   height: 64px;
 }
 
 .demo-process-card h3 {
-  font-family: 'Mark Bold', serif;
+  font-family: var(--demo-font-mark);
   font-size: 22px;
   letter-spacing: -0.02em;
-  color: #fff;
+  color: #352f2a;
   margin: 0;
 }
 
+/* Card copy went light-on-dark to dark-on-light with the background change —
+   the old #fff / rgba(243,239,234,.7) pair was invisible on the linen. */
 .demo-process-card p {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--demo-font-body);
   font-size: 14px;
   line-height: 1.6;
-  color: rgba(243, 239, 234, 0.7);
+  color: #61482e;
   margin: 0;
 }
 
@@ -1142,7 +1221,7 @@
   justify-content: space-between;
   gap: 48px;
   flex-wrap: wrap;
-  background: #2d231a;
+  background: var(--cwf-header-ink);
   border-radius: 24px;
   padding: 62px 56px;
   overflow: hidden;
@@ -1182,23 +1261,23 @@
 }
 
 .demo-contact-heading h2 {
-  font-family: 'Mark Bold', serif;
-  font-size: 44px;
+  font-family: var(--demo-font-mark);
+  font-size: 36px;
   letter-spacing: -0.035em;
-  line-height: 1;
+  line-height: 1.1667;
   color: var(--cwf-surface, #f3efea);
   margin: 0;
 }
 
 .demo-contact-heading p {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--demo-font-body);
   font-size: 15px;
   color: var(--cwf-surface, #f3efea);
   margin: 8px 0 0;
 }
 
 .demo-contact-etsy {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--demo-font-body);
   font-size: 15px;
   color: rgba(243, 239, 234, 0.65);
   text-decoration: underline;
@@ -1231,7 +1310,7 @@
 }
 
 .demo-contact-label {
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--demo-font-body);
   font-size: 16px;
   letter-spacing: 0.02em;
   color: var(--cwf-accent, #c9a27a);
@@ -1241,14 +1320,14 @@
   display: flex;
   flex-direction: column;
   gap: 3px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--demo-font-body);
   font-size: 16px;
   letter-spacing: 0.02em;
   color: #fff;
 }
 
 .demo-contact-address {
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--demo-font-body);
   font-size: 16px;
   letter-spacing: 0.02em;
   line-height: 1.5;
@@ -1326,7 +1405,7 @@
 }
 
 .demo-featured-eyebrow {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--demo-font-body);
   font-weight: 400;
   font-size: 14px;
   letter-spacing: -0.02em;
@@ -1335,7 +1414,7 @@
 }
 
 .demo-featured-title {
-  font-family: 'Mark Bold', serif;
+  font-family: var(--demo-font-mark);
   font-size: 24px;
   letter-spacing: -0.02em;
   color: #f9f4ed;
@@ -1385,7 +1464,7 @@
 }
 
 .demo-benefits-eyebrow {
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--demo-font-body);
   font-weight: 400;
   font-size: 18px;
   color: var(--cwf-accent-deep);
@@ -1393,10 +1472,10 @@
 }
 
 .demo-benefits-heading {
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--demo-font-display);
   font-weight: 500;
-  font-size: 56px;
-  line-height: 1.15;
+  font-size: 36px;
+  line-height: 1.1667;
   letter-spacing: -0.02em;
   color: var(--cwf-accent-deep);
   margin: 0;
@@ -1407,7 +1486,6 @@
   border: 1.25px solid var(--cwf-accent-deep);
   color: #fff;
   padding: 12px 32px;
-  font-size: 18px;
 }
 
 .demo-benefits-grid {
@@ -1444,7 +1522,7 @@
 .demo-benefit-icon i { font-size: 28px; }
 
 .demo-benefit-title {
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--demo-font-display);
   font-weight: 500;
   font-size: 22px;
   letter-spacing: -0.02em;
@@ -1511,7 +1589,7 @@
   display: inline-flex;
   align-items: center;
   gap: 48px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--demo-font-body);
   font-weight: 500;
   font-size: clamp(28px, 4vw, 48px);
   color: #dfd5ca;
@@ -1576,7 +1654,7 @@
 
 .demo-quote-attr {
   margin: 0;
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--demo-font-body);
   font-weight: 600;
   font-size: 13px;
   letter-spacing: 0.04em;
@@ -1592,7 +1670,7 @@
 
 .demo-quote-text {
   margin: 0;
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--demo-font-display);
   font-weight: 500;
   font-size: 22px;
   line-height: 1.35;
@@ -1649,7 +1727,7 @@
 
 .demo-stats-feature-title {
   margin: 0;
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--demo-font-display);
   font-weight: 500;
   font-size: 28px;
   letter-spacing: -0.02em;
@@ -1674,7 +1752,7 @@
 
 .demo-stat-value {
   margin: 0;
-  font-family: 'Mark Bold', serif;
+  font-family: var(--demo-font-mark);
   font-size: 32px;
   letter-spacing: -0.02em;
   color: var(--cwf-accent-deep);
@@ -1682,7 +1760,7 @@
 
 .demo-stat-label {
   margin: 0;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--demo-font-body);
   font-size: 14px;
   color: rgba(97, 72, 46, 0.7);
 }
@@ -1741,15 +1819,16 @@
 }
 
 .demo-faq-head h2 {
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--demo-font-display);
   font-weight: 500;
-  font-size: 56px;
+  font-size: 36px;
+  line-height: 1.1667;
   letter-spacing: -0.02em;
   margin: 0;
 }
 
 .demo-faq-head p {
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--demo-font-body);
   font-size: 16px;
   line-height: 1.5;
   margin: 0;
@@ -1775,7 +1854,7 @@
   width: 100%;
   padding: 24px 28px;
   text-align: left;
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--demo-font-body);
   font-weight: 500;
   font-size: 20px;
   color: var(--cwf-accent-deep);
@@ -1786,7 +1865,7 @@
 .demo-faq-answer {
   margin: 0;
   padding: 0 28px 24px 60px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--demo-font-body);
   font-size: 15px;
   line-height: 1.6;
   color: rgba(97, 72, 46, 0.75);

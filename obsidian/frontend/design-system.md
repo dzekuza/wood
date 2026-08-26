@@ -1,6 +1,6 @@
 ---
 tags: [frontend, wip]
-updated: 2026-08-25
+updated: 2026-08-26
 ---
 
 # Design System
@@ -26,7 +26,10 @@ A component references tier 2/3 only. A raw hex or px in a `className` is a bug.
 
 | Token | Tier | Value | Use for |
 |-------|------|-------|---------|
-| | | | |
+| `--cwf-star` | semantic | `#ffa817` | every rating star, site-wide (cards, PDP, testimonials, review lists). Never `--cwf-accent` — that pale gold washes out on light cards |
+| `--cwf-header-ink` | semantic | `#352f2a` | all header chrome — nav, dropdown, search, account/cart pills, mobile toggle. Cooler than `--cwf-primary`; take tints via `color-mix(… N%, transparent)`, never a new `rgba()` |
+| `--cwf-header-ink-hover` | semantic | `#241f1a` | hover fill for the header cart pill |
+| `--cwf-tile` | semantic | `#f6f6f6` | neutral tile behind product/collection media (`.pcard-img`, and via `--demo-tile-bg` the homepage card tiles). Not `--cwf-card`/`--cwf-sand` — the warm beige competes with the oak in cut-out photos |
 
 ## Adding a token
 
@@ -55,6 +58,55 @@ Two display faces now, not one — see `DESIGN.md` §3 for the full rationale:
   stat numbers, pull-quotes, and repeated card names (product/category card
   titles) — anything "spoken" that isn't a structural heading.
 - **Plus Jakarta Sans** — unchanged: body, nav, buttons, eyebrows, labels.
+
+### `demo.css` is a separate type system
+
+`app/styles/demo.css` (homepage `_index.tsx` + `landing-oak.tsx`) does not use
+the Jakarta body face. It has its own three tokens, defined at the top of that
+file — use these, never a literal font name, when touching those routes:
+
+| Token | Face | Use for |
+|-------|------|---------|
+| `--demo-font-display` | Outfit | `h1`/`h2` and section headings |
+| `--demo-font-body` | DM Sans | all body copy and UI text; paragraphs at weight 400 |
+| `--demo-font-mark` | Mark Bold | prices, stat numbers |
+| `--demo-tile-bg` | `var(--cwf-tile)` | the tile behind card media (category, product, texture); aliases the site token, don't re-literal it |
+| `--demo-hero-slide-duration` | `3000ms` | hero autoplay dwell; mirrored by `SLIDE_DURATION_MS` |
+
+### A `<p>` ignores its container's `font-size`
+
+`reset.css` sets `p { font-size: 1rem; line-height: 1.4 }` — a rule on the
+element itself, which always beats a value inherited from an ancestor no matter
+how specific that ancestor's selector is. With `html { font-size: 17px }`,
+every unstyled `<p>` is 17px. **Setting `font-size` on a wrapper does nothing to
+the paragraphs inside it** — give the paragraph its own rule. This silently made
+the announcement bar 17px where it declared 12px (see
+[[../meta/changelog|changelog]] 2026-08-26).
+
+### `.reset` beats your class
+
+`app.css` has `button.reset { background: inherit; font-size: inherit }`. That
+selector is (0,1,1) — **higher than any single class** — so a plain
+`.my-control { background: … }` on a `<button class="my-control reset">` loses
+silently and paints transparent. This hid the hero carousel's dots completely
+(see [[../meta/changelog|changelog]] 2026-08-26). Write such rules as
+`button.my-control` to win the cascade.
+
+Heading scale there is **not** the site-wide flat 56px. `demo.css` `h2`s are
+36px with `line-height: 1.1667` (= 42px at 36px); the hero `h1` is
+`clamp(2.25rem, 6vw, 72px)` with `line-height: 1.0833` (= 78px at 72px).
+Leading is unitless on purpose in both cases so the fluid/mobile sizes stay
+proportional — don't replace it with a px value.
+
+Button sizing on those routes is equally centralised: `.demo-btn` is **16px**,
+and the *only* override is `.demo-hero-ctas .demo-btn` at **18px**. Don't add a
+per-section button size — if a new button looks wrong at 16px, that's a padding
+or weight question, not a size one.
+
+Both faces are loaded from the single Google Fonts link in `root.tsx` — DM Sans
+sat in `demo.css` for a while without ever being requested there, so it silently
+rendered as the system sans. **If you add a face, add it to that link in the same
+change.**
 
 Before styling any new heading-like text, check `DESIGN.md` §3's Roles table
 to know which of the three it belongs to — it's easy to reach for Mark Bold
