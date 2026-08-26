@@ -33,13 +33,20 @@ per-collection slide creates one and picks the image.
 missing metaobject, an unreachable API or a field the merchant blanked all
 render the previous copy rather than an empty heading.
 
-**Not live yet.** The Storefront API returns `null` for every metaobject on this
-shop — including the pre-existing `specifications` type, which no code consumed,
-so it had never surfaced. Confirmed it is not code or data (Admin API returns
-the values; same `null` across API versions 2025-04→2026-04 and both tokens;
-`buildHomeContent` passes 19/19 assertions against a mocked response). It needs
-**Read metaobjects** enabled on the Headless channel's Storefront API
-permissions in admin — a scope this project's credentials cannot change.
+**Verified live.** The Storefront API serves the entries, both images resolve to
+`cdn.shopify.com`, and an admin edit to `categories_heading` came back changed on
+the next request (reverted after). `buildHomeContent` also passes 19/19
+assertions against a mocked response.
+
+Getting there took a wrong turn worth recording: the definitions and entries were
+first created **on the wrong Shopify store**, because the MCP connector was
+authorized elsewhere and the shop was never verified before writing. The writes
+succeeded, so the only symptom was the Storefront API returning `null` — which
+was then misdiagnosed as a missing `unauthenticated_read_metaobjects` scope on
+the Headless channel, and that wrong conclusion briefly reached this changelog,
+ADR-0004 and PR #3. No scope change was ever needed. See
+[[homepage-content]] § Verify the shop before writing for the tells that were
+missed and the check to run first.
 
 ## 2026-08-26 — Hero reduced to a single slide
 
