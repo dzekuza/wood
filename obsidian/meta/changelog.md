@@ -16,10 +16,18 @@ swatches). It's now two groups: `.pcard-heading` holds the name + rating,
 `.pcard-bottom-row` already held price + swatches. The card can now space "what
 it is" apart from "what it costs" without touching the rhythm inside either.
 
-Spacing is unchanged. The 20px name-to-rating gap that used to come from
-`.pcard-body`'s 16px gap *plus* a 4px `margin-top` on `.pcard-rating` is now a
-single `gap: 20px` on `.pcard-heading`, and the stray margin is gone — verified
-at 20px/16px on both desktop and 375px.
+Spacing then went to Figma (node `250:2911`), which the new structure maps onto
+exactly: name h24 at y0, rating h14 at y28 (**4px** apart), group h42, bottom
+container at y58 (**16px** below). The old flat layout produced 20px above the
+rating — `.pcard-body`'s 16px gap plus a stray 4px `margin-top` — so that is now
+a single `gap: 4px` on `.pcard-heading` and the margin is gone.
+
+`.pcard-rating` also needed `line-height: 1`. It was inheriting `body`'s
+`line-height: 22px`, making the 14px row 22px tall; the ~4px of half-leading sat
+above the text and read as an 8px gap under the name however the `gap` was set.
+Its `min-height: 18px` went with it — that only existed to hold space for the
+hidden empty state, which no longer exists. Measured 4px/16px with a 14px rating
+row against Figma's 4/16/14.
 
 `pages.favourites.tsx` also uses `.pcard-body`/`.pcard-name` but has no rating or
 bottom row, so it is unaffected.

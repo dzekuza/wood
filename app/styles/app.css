@@ -2607,9 +2607,10 @@ section { padding: 0; }
 .pheart.is-active .pheart-filled { display: inline-flex; }
 
 .pcard-body { display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 16px; padding: 4px 0 0; text-align: left; }
-/* Name + rating. The 20px gap reproduces what the old flat layout produced
-   via .pcard-body's 16px gap plus a 4px margin-top on .pcard-rating. */
-.pcard-heading { display: flex; flex-direction: column; align-items: flex-start; gap: 20px; width: 100%; }
+/* Name + rating, 4px apart per Figma (node 250:2911 — name h24 at y0, rating
+   h14 at y28, group h42). The 16px to .pcard-bottom-row is .pcard-body's gap,
+   which matches the same frame's 42 → 58 offset. */
+.pcard-heading { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; width: 100%; }
 .pcard-name {
   font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
   font-weight: 500;
@@ -2624,7 +2625,11 @@ section { padding: 0; }
   overflow: hidden;
 }
 
-.pcard-rating { display: flex; align-items: center; gap: 4px; min-height: 18px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: var(--cwf-accent-deep); }
+/* line-height:1 so the row is 14px like Figma. Inheriting body's 22px added
+   ~4px of half-leading above the text, which read as an 8px gap under the
+   name rather than the intended 4px. min-height is gone with it — it only
+   existed to hold space for the old hidden empty state. */
+.pcard-rating { display: flex; align-items: center; gap: 4px; line-height: 1; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: var(--cwf-accent-deep); }
 /* No reviews yet: the score still renders as 0.0 so the row never collapses,
    but muted — a gold star beside a zero reads as a real rating. */
 .pcard-rating.is-zero { color: color-mix(in srgb, var(--cwf-ink-strong) 45%, transparent); }
