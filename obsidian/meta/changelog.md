@@ -9,6 +9,21 @@ Chronological log of notable changes to the project. Newest first.
 This is a human-curated log — not a mirror of `git log`. Record *why*, not just
 *what*; the diff already covers *what*.
 
+## 2026-08-26 — Categories show all 6 in one row on desktop again
+
+`.demo-cat-card`'s desktop basis goes 4-up → **6-up**
+(`calc((100% - 5 * 16px) / 6)`), so every category is visible without paging —
+207px cards at 1440px.
+
+Nothing else had to change: `CategoriesGrid` measures cards-per-view, so 6
+cards at 6-up computes to a single page and the component simply doesn't render
+`.demo-cat-nav`. Confirmed at 1440px (6 in view, no overflow, no nav) and at
+1000px, where the 3-up rule still applies and paging returns with 2 dots.
+
+This partly reverts the desktop half of the earlier carousel change — the
+carousel now only does work below 1080px, which is where it was actually
+needed.
+
 ## 2026-08-26 — Hero copy grouped; section sub-paragraphs unified on #352f2a
 
 **Hero.** Rating, `h1` and blurb now sit in a `.demo-hero-copy` wrapper with a

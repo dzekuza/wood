@@ -395,7 +395,10 @@ button.demo-hero-dot.is-active::after {
   flex-direction: column;
   gap: 0;
   color: inherit;
-  flex: 0 0 calc((100% - 3 * 16px) / 4);
+  /* 6-up on desktop: all six categories sit in one row, so the carousel
+     resolves to a single page and CategoriesGrid hides its nav. Paging only
+     kicks in once the basis widens at narrower breakpoints. */
+  flex: 0 0 calc((100% - 5 * 16px) / 6);
   min-width: 0;
   scroll-snap-align: start;
 }
