@@ -9,6 +9,26 @@ Chronological log of notable changes to the project. Newest first.
 This is a human-curated log — not a mirror of `git log`. Record *why*, not just
 *what*; the diff already covers *what*.
 
+## 2026-08-26 — Product card price row unified on Outfit 600
+
+`.pcard-price-eyebrow` ("FROM") was Plus Jakarta Sans 600 while
+`.pcard-price-value` was Mark Bold 700 — two faces sitting on the same
+baseline. Both are now Outfit 600.
+
+**This needed a font-loading change, not just a CSS one.** The self-hosted
+`@font-face` for Outfit declares **weight 500 only**
+(`/fonts/outfit-medium.ttf`), and Outfit 600 was requested solely by the
+route-level `links()` in `_index.tsx` / `landing-oak.tsx`. `.pcard` is
+site-wide, so on `/collections/*`, PDPs and search the browser would have
+picked the 500 face and synthesised a faux-bold. `Outfit:wght@400;500;600` is
+now in the **root** Google Fonts link, and `document.fonts.check('600 16px
+Outfit')` returns true on `/collections/all`.
+
+General rule this is the second instance of: **before setting a weight, check
+that the weight actually exists** — the self-hosted faces here cover exactly
+one weight each (Outfit 500, Mark Bold 700), so anything else silently
+synthesises.
+
 ## 2026-08-26 — Announcement bar: capped width, Facebook replaces mail, filled Instagram
 
 - The dark band stays full-bleed but its content now lives in

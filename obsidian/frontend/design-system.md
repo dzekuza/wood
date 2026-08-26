@@ -54,6 +54,14 @@ Two display faces now, not one — see `DESIGN.md` §3 for the full rationale:
   `.archive-faq-title`, `.demo-*-head h2`, etc). All of them share one flat
   size — 56px desktop, 36px mobile — regardless of heading level; hierarchy
   comes from weight/color/layout, not size.
+> [!warning] The self-hosted faces cover ONE weight each
+> `@font-face` in `app.css` declares Outfit at **500** and Mark Bold at **700**
+> — nothing else. Any other weight is synthesised by the browser unless that
+> weight is in the Google Fonts link in `root.tsx` (currently DM Sans
+> 400/500/600/700, Outfit 400/500/600, Plus Jakarta Sans 300-700). Route-level
+> `links()` in `_index.tsx`/`landing-oak.tsx` load fonts for those two routes
+> only — never rely on them for a rule in `app.css`, which applies site-wide.
+
 - **Mark Bold** (`/fonts/mark-bold.ttf`) — still used, but only for prices,
   stat numbers, pull-quotes, and repeated card names (product/category card
   titles) — anything "spoken" that isn't a structural heading.
