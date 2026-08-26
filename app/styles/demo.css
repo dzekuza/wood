@@ -406,7 +406,7 @@ button.demo-hero-dot.is-active::after {
 .demo-cat-image {
   position: relative;
   display: block;
-  height: 206px;
+  aspect-ratio: 1 / 1;
   width: 100%;
   border-radius: 16px;
   background: var(--demo-tile-bg);

@@ -11,6 +11,10 @@ This is a human-curated log — not a mirror of `git log`. Record *why*, not jus
 
 ## 2026-08-26 — Categories show all 6 in one row on desktop again
 
+`.demo-cat-image` also swaps its fixed `height: 206px` for
+`aspect-ratio: 1 / 1`, so the tile stays square at whatever width the basis
+resolves to instead of getting taller-than-wide as cards narrow.
+
 `.demo-cat-card`'s desktop basis goes 4-up → **6-up**
 (`calc((100% - 5 * 16px) / 6)`), so every category is visible without paging —
 207px cards at 1440px.
