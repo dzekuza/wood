@@ -138,6 +138,26 @@ Tabler Icons via `@tabler/icons-webfont` (CDN link in `root.tsx`), used as
   `heart`, `shopping-cart`, `star`, `ruler`, `package`, `certificate`,
   `arrow-right`.
 
+## Product grid breakpoints
+
+`.pgrid` runs 4-up and steps down with width — but it lives in two contexts that
+run out of room at different points, so the steps are not all on `.pgrid` itself.
+
+| Context | ≥1281px | 981–1280px | ≤980px | ≤767px |
+|---|---|---|---|---|
+| Homepage (full `.wrap` width) | 4 | 4 | 2 | 2, tighter gaps |
+| Collection pages (inside `.shop-layout`) | 4 | **3** | 2 | 2, tighter gaps |
+
+Collection pages share the row with the 240px filter sidebar plus a 40px gap, so
+the grid gets ~280px less width than the homepage does at the same viewport. At
+1024px that put 4 columns at ~150px; the homepage at the same width sits at
+218px — exactly the Figma card width (node `250:2911`) — which is why the 3-up
+step is scoped to `.shop-layout .pgrid` rather than applied globally.
+
+The rule is bounded as `(min-width: 981px) and (max-width: 1280px)` on purpose:
+`.shop-layout .pgrid` outranks `.pgrid` on specificity, so an unbounded
+`max-width` would beat the 2-up rule below 980px and never let the grid collapse.
+
 ## Related
 
 [[component-conventions]] · [[components/ui]]

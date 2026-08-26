@@ -9,6 +9,26 @@ Chronological log of notable changes to the project. Newest first.
 This is a human-curated log — not a mirror of `git log`. Record *why*, not just
 *what*; the diff already covers *what*.
 
+## 2026-08-26 — Collection grid goes 3-up on tablets
+
+`.pgrid` jumped straight from 4 columns to 2 at 980px. On collection pages that
+left a landscape tablet showing four ~150px cards, because the grid shares its
+row with the 240px filter sidebar (+40px gap) and gets ~280px less width than the
+homepage does at the same viewport.
+
+Added a 3-up step for 981–1280px, scoped to `.shop-layout .pgrid`. Deliberately
+not global: at 1024px the homepage grid renders 4 cards at 218px, which is exactly
+the Figma card width (node `250:2911`), so it does not need the step and would
+lose a column for nothing. 1280px is where 4-up stops holding that 218px width in
+the sidebar layout.
+
+The media query is bounded at both ends. `.shop-layout .pgrid` outranks `.pgrid`
+on specificity, so an unbounded `max-width: 1280px` would have overridden the
+2-up rule below 980px and stopped the grid collapsing at all — verified 2-up at
+979px, 3-up at 1024/1201, 4-up at 1281.
+
+See [[design-system]] § Product grid breakpoints.
+
 ## 2026-08-26 — Product card body split into two blocks
 
 `.pcard-body` was a flat column of four siblings (name, rating, price row,

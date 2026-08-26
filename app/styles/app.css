@@ -2649,6 +2649,16 @@ section { padding: 0; }
 .pcard-swatch { height: 18px; width: 18px; border-radius: 50%; border: 1px solid rgba(74, 47, 31, .15); display: inline-flex; align-items: center; justify-content: center; overflow: hidden; background: var(--cwf-sand); flex-shrink: 0; }
 .pcard-swatch img { width: 100%; height: 100%; object-fit: cover; }
 .pgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; width: 100%; }
+/* Collection pages only: .pgrid shares its row with the 240px filter sidebar
+   (+40px gap), so it runs out of room ~250px earlier than the full-width
+   homepage grid. 4-up here means ~150px cards on a landscape tablet. 1280px is
+   where 4 columns stop holding the ~218px card width from Figma (node 250:2911).
+   Range is bounded at the bottom so the 2-up rule below still wins once
+   .shop-layout collapses to a single column at 980px — .shop-layout .pgrid
+   outranks .pgrid on specificity, so an unbounded max-width would override it. */
+@media (min-width: 981px) and (max-width: 1280px) {
+  .shop-layout .pgrid { grid-template-columns: repeat(3, 1fr); }
+}
 @media (max-width: 980px) { .pgrid { grid-template-columns: repeat(2, 1fr); gap: 24px; } }
 @media (max-width: 767px) {
   .pgrid { grid-template-columns: repeat(2, 1fr); gap: 12px 14px; }
