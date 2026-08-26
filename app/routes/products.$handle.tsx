@@ -420,7 +420,7 @@ export default function Product() {
                         </span>
                       </>
                     ) : (
-                      <ProductImage image={item.image} />
+                      <ProductImage image={item.image} sizes="88px" />
                     )}
                   </button>
                 ))}

@@ -138,6 +138,47 @@ Tabler Icons via `@tabler/icons-webfont` (CDN link in `root.tsx`), used as
   `heart`, `shopping-cart`, `star`, `ruler`, `package`, `certificate`,
   `arrow-right`.
 
+## PDP gallery: two presentations, one at a time
+
+The product page ships both gallery layouts in the markup and picks by width:
+
+| Width | Shown | Hidden |
+|---|---|---|
+| ≥981px | `.pdp-gallery` — 88px thumbnail rail + large main image (`grid-template-columns: 88px 1fr`) | `.pdp-carousel` |
+| ≤980px | `.pdp-carousel` — swipeable, scroll-snap, dots + arrows | `.pdp-gallery` |
+
+Both read the same `galleryItems` array and handle 3D model entries. `.pdp-gallery`
+tracks its own `activeItem`; `.pdp-carousel` tracks `carouselIndex`.
+
+### Sticky offsets
+
+The sticky `.header` is **133px** at ≥981px (42px announcement bar + 90px topbar
++ hairline). `--cwf-header-h` holds that; anything sticking below the header
+offsets from it, e.g. `top: calc(var(--cwf-header-h) + 16px)`.
+
+**Measure it with webfonts loaded.** The same header reads 117px before Outfit
+swaps in — that pre-font number is how `.pdp-gallery` ended up at `top: 88px`,
+sliding under the header. `.filter-bar` (68px) and `.shop-sidebar` (160px) are
+still on hardcoded guesses and have not been re-checked against this token.
+
+### Keeping the gallery sticky
+
+`.pdp-thumbs` is absolutely positioned inside `.pdp-gallery`, and
+`.pdp-main-img` is pinned to `grid-column: 2`. Both are load-bearing:
+
+- **Absolute rail** — in flow, a product with 10+ images made the rail ~900px
+  taller than the photo, which set the gallery's height and burned its whole
+  sticky range within one screen. Out of flow, the main image sets the height and
+  the rail scrolls inside it (`overflow-y: auto`, scrollbar hidden).
+- **Explicit `grid-column: 2`** — with the rail out of flow the main image is the
+  only in-flow item, so it auto-places into the 88px rail column and collapses to
+  ~92px tall.
+
+`.pdp-gallery` was previously killed outright by a `display: none !important`
+added during unrelated header work, so the carousel ran at every width and the
+desktop thumbnail rail — already fully built — never rendered. If the rail
+disappears again, look for a blanket rule before rewriting the component.
+
 ## Product grid breakpoints
 
 `.pgrid` runs 4-up and steps down with width — but it lives in two contexts that

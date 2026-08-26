@@ -9,6 +9,49 @@ Chronological log of notable changes to the project. Newest first.
 This is a human-curated log — not a mirror of `git log`. Record *why*, not just
 *what*; the diff already covers *what*.
 
+## 2026-08-26 — PDP shows the side thumbnail gallery on desktop again
+
+The product page rendered the swipeable carousel at every width. The desktop
+layout — an 88px thumbnail rail beside a large main image — was already fully
+built (`.pdp-gallery`, `.pdp-thumbs`, `.pdp-main-img`, with `activeItem` state
+and 3D-model handling), but a blanket `.pdp-gallery { display: none !important }`
+disabled it everywhere. It came in with unrelated header work in `eeefa52` and
+sat above the real `display: grid` rule, which `!important` beat.
+
+Removed that line and made the split explicit: `.pdp-gallery` on ≥981px,
+`.pdp-carousel` on ≤980px, exactly one displayed at any width. No component
+changes were needed — the markup was already there.
+
+Fixed a real cost this exposed: the 6 thumbnails inherited `ProductImage`'s
+default `sizes="(min-width: 45em) 50vw, 100vw"` and each downloaded a ~712px
+file for an 88px slot. `ProductImage` now takes an optional `sizes` prop and the
+rail passes `88px` — verified the thumbs load at 88px natural width while the
+main image still resolves to 600px for a 569px render.
+
+Two follow-ups once it was visible:
+
+**Sticky offset.** `.pdp-gallery` stuck at `top: 88px` under a header that is
+actually 133px, so it sat behind the header. Added a `--cwf-header-h` token and
+offset from it. The 88px looks like a measurement taken before webfonts loaded —
+the header reads 117px pre-Outfit, 133px after — so the token's comment says to
+measure with fonts settled. `.filter-bar` (68px) and `.shop-sidebar` (160px) are
+on the same kind of hardcoded guess and were left alone for now.
+
+**The rail was setting the gallery's height.** With 10+ images the thumb column
+ran ~900px past the photo, which also meant the gallery consumed its entire
+sticky range within one screen — the two reports had one cause. `.pdp-thumbs` is
+now absolutely positioned with `overflow-y: auto`, so the main image sets the
+height and the rail scrolls inside it. That required pinning `.pdp-main-img` to
+`grid-column: 2`: as the only in-flow item it had been auto-placing into the 88px
+rail column and collapsing to 92px tall.
+
+Verified 6 thumbs stacked left of the main image, clicking one swaps the main
+image and moves `.active`, carousel hidden on desktop and shown at 375px with 6
+slides and 6 dots, no horizontal overflow at either. Rail height tracks the main
+image exactly (574px) and still does with 14 thumbs (1362px of content, scrolls
+internally). Sticky holds at 149px with 17px clearance from scroll 400 to 1200,
+releasing only when the grid ends.
+
 ## 2026-08-26 — Collection grid goes 3-up on tablets
 
 `.pgrid` jumped straight from 4 columns to 2 at 980px. On collection pages that
