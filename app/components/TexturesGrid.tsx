@@ -1,5 +1,6 @@
 import {Link} from 'react-router';
 import type {Category} from '~/components/CategoriesGrid';
+import {HOME_CONTENT_DEFAULTS, type HomeSectionHead} from '~/lib/homeContent';
 
 const TEXTURE_IMAGES: Record<string, string> = {
   'solid-oak-mantel-beams': '/demo/texture-mantel-beams.jpg',
@@ -15,20 +16,25 @@ function textureImageFor(category: Category) {
   return TEXTURE_IMAGES[handle] ?? category.image;
 }
 
-export function TexturesGrid({categories}: {categories: Category[]}) {
+export interface TexturesGridProps {
+  categories: Category[];
+  content?: HomeSectionHead;
+}
+
+export function TexturesGrid({
+  categories,
+  content = HOME_CONTENT_DEFAULTS.textures,
+}: TexturesGridProps) {
   if (!categories.length) return null;
 
   return (
     <section className="demo-textures">
       <div className="demo-textures-inner">
         <div className="demo-textures-head">
-          <h2>Our Textures</h2>
-          <p className="demo-textures-sub">
-            Handcrafted coat racks, fireplace mantels, shelves and solid oak
-            accents—made to bring warmth, function.
-          </p>
+          <h2>{content.heading}</h2>
+          <p className="demo-textures-sub">{content.subheading}</p>
           <Link to="/collections/all" className="demo-textures-all">
-            All Products <i className="ti ti-arrow-up-right" aria-hidden />
+            {content.linkLabel} <i className="ti ti-arrow-up-right" aria-hidden />
           </Link>
         </div>
 

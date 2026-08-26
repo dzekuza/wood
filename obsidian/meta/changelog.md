@@ -9,6 +9,38 @@ Chronological log of notable changes to the project. Newest first.
 This is a human-curated log — not a mirror of `git log`. Record *why*, not just
 *what*; the diff already covers *what*.
 
+## 2026-08-26 — Homepage copy & imagery moved into metaobjects
+
+Every heading, subheading, button label, hero slide and the workshop photo on
+the homepage is now editable from Shopify Admin instead of living in the source.
+See [[homepage-content]] for the model and field conventions.
+
+Three merchant-owned metaobject definitions (`home_page` singleton,
+`home_hero_slide`, `home_process_step`), created via the Admin API rather than
+`shopify.app.toml` — this is a Hydrogen storefront, not an app, so there is no
+app TOML to declare them in. Seeded with the exact copy that was already live,
+so the rendered page is byte-for-byte what it was.
+
+`HERO_BLURBS`, `BRAND_HERO_SLIDE`, `buildHeroSlides` and `HERO_SLIDE_LIMIT` are
+gone from `_index.tsx`. The single-slide behaviour from earlier today is now
+data, not a constant: one `home_hero_slide` entry exists, and adding a second in
+admin brings the arrows and dots back on its own. The collection-derived slides
+that `HERO_SLIDE_LIMIT` was hiding are not rebuilt — a merchant who wants a
+per-collection slide creates one and picks the image.
+
+`app/lib/homeContent.ts` holds the query, the types and
+`HOME_CONTENT_DEFAULTS` — a complete fallback set merged field-by-field, so a
+missing metaobject, an unreachable API or a field the merchant blanked all
+render the previous copy rather than an empty heading.
+
+**Not live yet.** The Storefront API returns `null` for every metaobject on this
+shop — including the pre-existing `specifications` type, which no code consumed,
+so it had never surfaced. Confirmed it is not code or data (Admin API returns
+the values; same `null` across API versions 2025-04→2026-04 and both tokens;
+`buildHomeContent` passes 19/19 assertions against a mocked response). It needs
+**Read metaobjects** enabled on the Headless channel's Storefront API
+permissions in admin — a scope this project's credentials cannot change.
+
 ## 2026-08-26 — Hero reduced to a single slide
 
 The hero now shows only the brand slide ("Timeless Oak. Made for Your Home.")

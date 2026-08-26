@@ -380,6 +380,129 @@ export type FooterQuery = {
   >;
 };
 
+export type HomeMediaImageFragment = {
+  image?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.Image, 'url' | 'altText' | 'width' | 'height'>
+  >;
+};
+
+export type HomeContentQueryVariables = StorefrontAPI.Exact<{
+  country?: StorefrontAPI.InputMaybe<StorefrontAPI.CountryCode>;
+  language?: StorefrontAPI.InputMaybe<StorefrontAPI.LanguageCode>;
+}>;
+
+export type HomeContentQuery = {
+  home?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.Metaobject, 'id'> & {
+      heroSlides?: StorefrontAPI.Maybe<{
+        references?: StorefrontAPI.Maybe<{
+          nodes: Array<
+            Pick<StorefrontAPI.Metaobject, 'id'> & {
+              image?: StorefrontAPI.Maybe<{
+                reference?: StorefrontAPI.Maybe<{
+                  image?: StorefrontAPI.Maybe<
+                    Pick<
+                      StorefrontAPI.Image,
+                      'url' | 'altText' | 'width' | 'height'
+                    >
+                  >;
+                }>;
+              }>;
+              heading?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'value'>
+              >;
+              blurb?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'value'>
+              >;
+              primaryCtaLabel?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'value'>
+              >;
+              primaryCtaUrl?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'value'>
+              >;
+              secondaryCtaLabel?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'value'>
+              >;
+              secondaryCtaUrl?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'value'>
+              >;
+            }
+          >;
+        }>;
+      }>;
+      categoriesHeading?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'value'>
+      >;
+      categoriesSubheading?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'value'>
+      >;
+      categoriesLinkLabel?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'value'>
+      >;
+      popularHeading?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'value'>
+      >;
+      popularCtaLabel?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'value'>
+      >;
+      testimonialsHeading?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'value'>
+      >;
+      processHeading?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'value'>
+      >;
+      processSubheading?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'value'>
+      >;
+      processCtaLabel?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'value'>
+      >;
+      processImage?: StorefrontAPI.Maybe<{
+        reference?: StorefrontAPI.Maybe<{
+          image?: StorefrontAPI.Maybe<
+            Pick<StorefrontAPI.Image, 'url' | 'altText' | 'width' | 'height'>
+          >;
+        }>;
+      }>;
+      processSteps?: StorefrontAPI.Maybe<{
+        references?: StorefrontAPI.Maybe<{
+          nodes: Array<
+            Pick<StorefrontAPI.Metaobject, 'id'> & {
+              icon?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'value'>
+              >;
+              title?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'value'>
+              >;
+              description?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'value'>
+              >;
+            }
+          >;
+        }>;
+      }>;
+      texturesHeading?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'value'>
+      >;
+      texturesSubheading?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'value'>
+      >;
+      texturesLinkLabel?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'value'>
+      >;
+      contactHeading?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'value'>
+      >;
+      contactSubheading?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'value'>
+      >;
+      contactCtaLabel?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'value'>
+      >;
+    }
+  >;
+};
+
 export type HeroShowcaseCollectionFragment = Pick<
   StorefrontAPI.Collection,
   'id' | 'title' | 'handle'
@@ -2245,6 +2368,10 @@ interface GeneratedQueryTypes {
   '#graphql\n  query Footer(\n    $country: CountryCode\n    $footerMenuHandle: String!\n    $language: LanguageCode\n  ) @inContext(language: $language, country: $country) {\n    menu(handle: $footerMenuHandle) {\n      ...Menu\n    }\n  }\n  #graphql\n  fragment MenuItem on MenuItem {\n    id\n    resourceId\n    tags\n    title\n    type\n    url\n  }\n  fragment ChildMenuItem on MenuItem {\n    ...MenuItem\n  }\n  fragment ParentMenuItem on MenuItem {\n    ...MenuItem\n    items {\n      ...ChildMenuItem\n    }\n  }\n  fragment Menu on Menu {\n    id\n    items {\n      ...ParentMenuItem\n    }\n  }\n\n': {
     return: FooterQuery;
     variables: FooterQueryVariables;
+  };
+  '#graphql\n  #graphql\n  fragment HomeMediaImage on MediaImage {\n    image {\n      url\n      altText\n      width\n      height\n    }\n  }\n\n  query HomeContent($country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    home: metaobject(handle: {type: "home_page", handle: "main"}) {\n      id\n      heroSlides: field(key: "hero_slides") {\n        references(first: 12) {\n          nodes {\n            ... on Metaobject {\n              id\n              image: field(key: "image") {\n                reference { ...HomeMediaImage }\n              }\n              heading: field(key: "heading") { value }\n              blurb: field(key: "blurb") { value }\n              primaryCtaLabel: field(key: "primary_cta_label") { value }\n              primaryCtaUrl: field(key: "primary_cta_url") { value }\n              secondaryCtaLabel: field(key: "secondary_cta_label") { value }\n              secondaryCtaUrl: field(key: "secondary_cta_url") { value }\n            }\n          }\n        }\n      }\n      categoriesHeading: field(key: "categories_heading") { value }\n      categoriesSubheading: field(key: "categories_subheading") { value }\n      categoriesLinkLabel: field(key: "categories_link_label") { value }\n      popularHeading: field(key: "popular_heading") { value }\n      popularCtaLabel: field(key: "popular_cta_label") { value }\n      testimonialsHeading: field(key: "testimonials_heading") { value }\n      processHeading: field(key: "process_heading") { value }\n      processSubheading: field(key: "process_subheading") { value }\n      processCtaLabel: field(key: "process_cta_label") { value }\n      processImage: field(key: "process_image") {\n        reference { ...HomeMediaImage }\n      }\n      processSteps: field(key: "process_steps") {\n        references(first: 12) {\n          nodes {\n            ... on Metaobject {\n              id\n              icon: field(key: "icon") { value }\n              title: field(key: "title") { value }\n              description: field(key: "description") { value }\n            }\n          }\n        }\n      }\n      texturesHeading: field(key: "textures_heading") { value }\n      texturesSubheading: field(key: "textures_subheading") { value }\n      texturesLinkLabel: field(key: "textures_link_label") { value }\n      contactHeading: field(key: "contact_heading") { value }\n      contactSubheading: field(key: "contact_subheading") { value }\n      contactCtaLabel: field(key: "contact_cta_label") { value }\n    }\n  }\n': {
+    return: HomeContentQuery;
+    variables: HomeContentQueryVariables;
   };
   '#graphql\n  query HeroShowcase($country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    doorStops: collection(handle: "solid-oak-door-stops") {\n      ...HeroShowcaseCollection\n    }\n    shelves: collection(handle: "solid-oak-shelves") {\n      ...HeroShowcaseCollection\n    }\n    mantelBeams: collection(handle: "solid-oak-mantel-beams") {\n      ...HeroShowcaseCollection\n    }\n    coatRacks: collection(handle: "solid-oak-coat-racks") {\n      ...HeroShowcaseCollection\n    }\n    surroundMantels: collection(handle: "solid-oak-fireplace-surrounds") {\n      ...HeroShowcaseCollection\n    }\n    cubeBlocks: collection(handle: "solid-oak-cube-blocks") {\n      ...HeroShowcaseCollection\n    }\n  }\n  #graphql\n  fragment HeroShowcaseCollectionLandingOak on Collection {\n    id\n    title\n    handle\n    image {\n      url\n      altText\n      width\n      height\n    }\n    products(first: 8) {\n      nodes {\n        ...PopularProductItemLandingOak\n      }\n    }\n  }\n  #graphql\n  fragment MoneyPopularProductLandingOak on MoneyV2 {\n    amount\n    currencyCode\n  }\n  fragment PopularProductItemLandingOak on Product {\n    id\n    handle\n    title\n    options {\n      name\n      optionValues {\n        name\n        swatch {\n          color\n          image {\n            previewImage {\n              url\n            }\n          }\n        }\n      }\n    }\n    selectedOrFirstAvailableVariant(selectedOptions: [], ignoreUnknownOptions: true) {\n      id\n      availableForSale\n    }\n    featuredImage {\n      id\n      altText\n      url\n      width\n      height\n    }\n    images(first: 4) {\n      nodes {\n        id\n        url\n        altText\n        width\n        height\n      }\n    }\n    priceRange {\n      minVariantPrice { ...MoneyPopularProductLandingOak }\n      maxVariantPrice { ...MoneyPopularProductLandingOak }\n    }\n    compareAtPriceRange {\n      minVariantPrice { ...MoneyPopularProductLandingOak }\n    }\n    metafield(namespace: "reviews", key: "product_reviews") {\n      value\n    }\n  }\n\n\n': {
     return: HeroShowcaseQuery;

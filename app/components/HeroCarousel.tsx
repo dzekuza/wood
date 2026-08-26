@@ -1,14 +1,9 @@
 import {useEffect, useState} from 'react';
 import {Link} from 'react-router';
 import {StarFilledIcon} from '~/components/Icons';
+import {HOME_CONTENT_DEFAULTS, type HomeHeroSlide} from '~/lib/homeContent';
 
-export interface HeroSlide {
-  image: string;
-  heading: string[];
-  blurb: string;
-  primaryCta: {label: string; to: string};
-  secondaryCta: {label: string; to: string};
-}
+export type HeroSlide = HomeHeroSlide;
 
 export interface HeroRating {
   average: number;
@@ -19,16 +14,9 @@ export interface HeroRating {
  *  in demo.css, which drives the active dot's fill animation. */
 const SLIDE_DURATION_MS = 3000;
 
-const FALLBACK_SLIDES: HeroSlide[] = [
-  {
-    image: '/demo/hero-1.png',
-    heading: ['Timeless Oak.', 'Made for Your Home.'],
-    blurb:
-      'Handcrafted coat racks, fireplace mantels, shelves and solid oak accents—made to bring warmth, function and character to every room.',
-    primaryCta: {label: 'Shop All Products', to: '/collections/all'},
-    secondaryCta: {label: 'Explore Collections', to: '/collections'},
-  },
-];
+/** Slides come from the `home_page` metaobject; this only covers a storefront
+ *  that has not been seeded yet. */
+const FALLBACK_SLIDES: HeroSlide[] = HOME_CONTENT_DEFAULTS.heroSlides;
 
 export function HeroCarousel({
   slides,

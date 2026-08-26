@@ -1,6 +1,6 @@
 ---
 tags: [meta, decision]
-updated: 2026-08-25
+updated: 2026-08-26
 ---
 
 # Decisions Log (ADRs)
@@ -87,3 +87,33 @@ called out in [[../../CLAUDE.md|CLAUDE.md]]'s Known issues section so it isn't
 "fixed" by someone assuming it was missed.
 
 ---
+
+---
+
+## ADR-0004 — Homepage content lives in metaobjects, with defaults kept in code
+
+- **Status:** Accepted
+- **Date:** 2026-08-26
+
+**Context.** Homepage copy and the hero image were hardcoded in `_index.tsx` and
+in each section component, so changing a heading or the hero photo meant a code
+change and a deploy. The shop owner could not touch any of it.
+
+**Decision.** Homepage content moves into three merchant-owned Shopify
+metaobjects (`home_page`, `home_hero_slide`, `home_process_step`), queried once
+in the homepage loader. Definitions are created through the Admin API, not
+`shopify.app.toml` — this repo is a Hydrogen storefront, not a Shopify app, so
+the TOML route the `shopify-custom-data` guidance prefers does not apply.
+
+Critically, **the previous hardcoded values stay in the repo** as
+`HOME_CONTENT_DEFAULTS` and are merged under the fetched values field by field.
+An empty field, a missing metaobject, or a storefront that cannot read
+metaobjects at all degrades to the last-known-good copy.
+
+**Consequences.** Content edits no longer need a deploy, and the hero slide count
+becomes a merchant decision rather than a constant. The cost is two sources for
+the same string: the defaults will drift from admin over time and are explicitly
+*not* the source of truth once the metaobject resolves — [[homepage-content]]
+says so at the top of the defaults block. The alternative, failing loudly on
+missing content, would have made the homepage hostage to a single API call and
+to a scope toggle that turned out not to be enabled.

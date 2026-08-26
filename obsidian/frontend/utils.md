@@ -1,6 +1,6 @@
 ---
 tags: [frontend, catalog, wip]
-updated: 2026-08-25
+updated: 2026-08-26
 ---
 
 # Utils Catalog
@@ -13,6 +13,8 @@ with I/O or client state belongs in `lib/` or a hook instead.
 | `parseFiltersFromSearchParams` / `getFilterValueUrl` / `getPriceRangeUrl` / `getClearFiltersUrl` / `isFilterValueActive` / `hasActiveFilters` / `getPriceBounds` | `app/lib/collectionFilters.ts` | `(searchParams: URLSearchParams, ...) => ...` | Round-trips Shopify's native `Filter`/`ProductFilter` shape through `?filter=`/`price_min`/`price_max` URL params — see [[components/common\|CollectionFilters]]. `getPriceBounds` reads a `PRICE_RANGE` filter's `values[0].input` for the slider's min/max |
 | `buildLocalFilters` / `applyLocalFilters` | `app/lib/collectionFilters.ts` | `(products: T[]) => Filter[]` / `(products: T[], searchParams) => T[]` | Used only by `collections.all.tsx` — computes Availability/Price facets and filters the fetched product array in JS, since the top-level `products` Storefront query has no server-side `filters` argument. Shaped as the same `Filter[]`/`ProductFilter` types the real per-collection filters use so `CollectionFilters` doesn't need to know which page it's on |
 | `getSwatchTone` | `app/lib/swatches.ts` | `(name: string, color?: string \| null) => string` | Maps a variant option's name/color to a `.product-swatch-tone-*` CSS class for swatches with no image. Shared by `ProductForm` (PDP option picker) and `ProductItem` (card grid) so both render color-only swatches identically — extracted from a PDP-only helper when the card grid needed the same logic |
+
+| `buildHomeContent` | `app/lib/homeContent.ts` | `(data: HomeContentQuery \| undefined) => HomeContent` | Merges the homepage `home_page` metaobject response over `HOME_CONTENT_DEFAULTS`, field by field — see [[homepage-content]]. Blank and missing fields both fall back (`text()` trims, so clearing a field in admin restores the coded default rather than rendering an empty heading); multi-line headings split on `\n`; an unrecognised process-icon key falls back to that step's positional default. Pure and covered by an assertion pass over a mocked response |
 
 ## Related
 

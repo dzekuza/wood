@@ -6,8 +6,15 @@ import {
   WORKSHOP_LOCATION,
   WORKSHOP_VISIT_NOTE,
 } from '~/lib/site';
+import {HOME_CONTENT_DEFAULTS, type HomeContent} from '~/lib/homeContent';
 
-export function ContactBanner() {
+export interface ContactBannerProps {
+  content?: HomeContent['contact'];
+}
+
+export function ContactBanner({
+  content = HOME_CONTENT_DEFAULTS.contact,
+}: ContactBannerProps) {
   return (
     <section className="demo-contact-wrap">
       <div className="demo-contact">
@@ -16,11 +23,11 @@ export function ContactBanner() {
         <div className="demo-contact-left">
           <div className="demo-contact-heading">
             <span className="demo-contact-divider" aria-hidden />
-            <h2>Contact us</h2>
-            <p>Have a question? Let&rsquo;s reach us</p>
+            <h2>{content.heading}</h2>
+            <p>{content.subheading}</p>
           </div>
           <Link to="/contact" className="demo-contact-etsy">
-            Contact the workshop
+            {content.ctaLabel}
           </Link>
         </div>
 

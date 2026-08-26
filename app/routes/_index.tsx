@@ -6,13 +6,18 @@ import type {
 } from 'storefrontapi.generated';
 import {MockShopNotice} from '~/components/MockShopNotice';
 import {ProductItem} from '~/components/ProductItem';
-import {HeroCarousel, type HeroSlide} from '~/components/HeroCarousel';
+import {HeroCarousel} from '~/components/HeroCarousel';
 import {CategoriesGrid, type Category} from '~/components/CategoriesGrid';
 import {TexturesGrid} from '~/components/TexturesGrid';
 import {TestimonialsMarquee} from '~/components/TestimonialsMarquee';
 import {CraftmanshipProcess} from '~/components/CraftmanshipProcess';
 import {ContactBanner} from '~/components/ContactBanner';
 import {HOMEPAGE_REVIEWS} from '~/lib/reviews';
+import {
+  buildHomeContent,
+  HOME_CONTENT_QUERY,
+  type HomeContent,
+} from '~/lib/homeContent';
 import {SITE_NAME} from '~/lib/site';
 import {
   EXCLUDE_HIDDEN_PRODUCTS_QUERY,
@@ -39,73 +44,6 @@ export function links() {
       href: 'https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&family=DM+Sans:wght@400;500&display=swap',
     },
   ];
-}
-
-const HERO_BLURBS: Record<string, string> = {
-  'solid-oak-mantel-beams':
-    'Precision-cut oak mantel beams, hand-finished to match your fireplace surround.',
-  'solid-oak-coat-racks':
-    'Solid oak coat racks with cast iron hooks — a lasting first impression for any hallway.',
-  'solid-oak-door-stops':
-    'Weighty, hand-finished oak door stops with twisted jute rope detailing.',
-  'solid-oak-shelves':
-    'Floating oak shelves, oiled and ready to install, built to hold real weight.',
-  'solid-oak-fireplace-surrounds':
-    'Hand-finished oak fireplace surrounds, cut to size for a perfect fit.',
-  'solid-oak-cube-blocks':
-    'Solid oak cube blocks — rustic side tables and stands, hand-finished.',
-};
-
-const BRAND_HERO_SLIDE: HeroSlide = {
-  image: '/demo/hero-1.png',
-  heading: ['Timeless Oak.', 'Made for Your Home.'],
-  blurb:
-    'Handcrafted coat racks, fireplace mantels, shelves and solid oak accents—made to bring warmth, function and character to every room.',
-  primaryCta: {label: 'Shop All Products', to: '/collections/all'},
-  secondaryCta: {label: 'Explore Collections', to: '/collections'},
-};
-
-/**
- * Temporary: the hero shows the brand slide only. The per-collection slides are
- * still built below — raise this (or drop the slice at the call site) to bring
- * the full carousel back.
- */
-const HERO_SLIDE_LIMIT = 1;
-
-function buildHeroSlides(showcase: HeroShowcaseQuery | undefined): HeroSlide[] {
-  if (!showcase) return [BRAND_HERO_SLIDE];
-  const collections = [
-    showcase.mantelBeams,
-    showcase.coatRacks,
-    showcase.doorStops,
-    showcase.surroundMantels,
-    showcase.cubeBlocks,
-    showcase.shelves,
-  ];
-
-  const collectionSlides = collections
-    .filter((collection): collection is NonNullable<typeof collection> =>
-      Boolean(collection),
-    )
-    .map((collection) => {
-      const image =
-        collection.image?.url ??
-        collection.products.nodes[0]?.featuredImage?.url;
-      return {
-        image: image ?? '/demo/hero-1.png',
-        heading: [collection.title],
-        blurb:
-          HERO_BLURBS[collection.handle] ??
-          'Handcrafted solid oak furniture, made to bring warmth and character to every room.',
-        primaryCta: {
-          label: `Shop ${collection.title}`,
-          to: `/collections/${collection.handle}`,
-        },
-        secondaryCta: {label: 'Explore Collections', to: '/collections'},
-      };
-    });
-
-  return [BRAND_HERO_SLIDE, ...collectionSlides];
 }
 
 function buildCategories(showcase: HeroShowcaseQuery | undefined): Category[] {
@@ -136,11 +74,12 @@ function buildCategories(showcase: HeroShowcaseQuery | undefined): Category[] {
 
 export async function loader(args: Route.LoaderArgs) {
   const {context} = args;
-  const [heroShowcase, popularProducts] = await Promise.all([
+  const [heroShowcase, popularProducts, homeContent] = await Promise.all([
     context.storefront.query(HERO_SHOWCASE_QUERY),
     context.storefront.query(POPULAR_PRODUCTS_QUERY, {
       variables: {query: EXCLUDE_HIDDEN_PRODUCTS_QUERY},
     }),
+    context.storefront.query(HOME_CONTENT_QUERY),
   ]);
 
   const visiblePopularProducts = filterHiddenProducts<
@@ -149,7 +88,7 @@ export async function loader(args: Route.LoaderArgs) {
 
   return {
     isShopLinked: Boolean(context.env.PUBLIC_STORE_DOMAIN),
-    heroSlides: buildHeroSlides(heroShowcase).slice(0, HERO_SLIDE_LIMIT),
+    content: buildHomeContent(homeContent),
     categories: buildCategories(heroShowcase),
     popularProducts: visiblePopularProducts,
   };
@@ -164,32 +103,44 @@ const HERO_RATING = {
 
 export default function Homepage() {
   const data = useLoaderData<typeof loader>();
+  const {content} = data;
 
   return (
     <div className="demo-page">
       {data.isShopLinked ? null : <MockShopNotice />}
-      <HeroCarousel slides={data.heroSlides} rating={HERO_RATING} />
-      <CategoriesGrid categories={data.categories} />
-      <PopularProductsSection products={data.popularProducts} />
-      <TestimonialsMarquee reviews={HOMEPAGE_REVIEWS} />
-      <CraftmanshipProcess />
-      <TexturesGrid categories={data.categories} />
-      <ContactBanner />
+      <HeroCarousel slides={content.heroSlides} rating={HERO_RATING} />
+      <CategoriesGrid
+        categories={data.categories}
+        content={content.categories}
+      />
+      <PopularProductsSection
+        products={data.popularProducts}
+        content={content.popular}
+      />
+      <TestimonialsMarquee
+        reviews={HOMEPAGE_REVIEWS}
+        heading={content.testimonials.heading}
+      />
+      <CraftmanshipProcess content={content.process} />
+      <TexturesGrid categories={data.categories} content={content.textures} />
+      <ContactBanner content={content.contact} />
     </div>
   );
 }
 
 function PopularProductsSection({
   products,
+  content,
 }: {
   products: PopularProductsQuery['products']['nodes'];
+  content: HomeContent['popular'];
 }) {
   if (!products.length) return null;
 
   return (
     <section className="demo-popular">
       <div className="demo-popular-inner">
-        <h2 className="demo-popular-heading">Most popular</h2>
+        <h2 className="demo-popular-heading">{content.heading}</h2>
 
         <div className="pgrid">
           {products.map((product, index) => (
@@ -202,7 +153,7 @@ function PopularProductsSection({
         </div>
 
         <Link to="/collections/all" className="demo-btn demo-btn-outline-dark">
-          Explore Collections
+          {content.ctaLabel}
         </Link>
       </div>
     </section>

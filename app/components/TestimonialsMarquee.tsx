@@ -2,6 +2,7 @@ import {useState} from 'react';
 import type {ProductReview} from '~/components/ReviewsSection';
 import {StarFilledIcon} from '~/components/Icons';
 import {Lightbox} from '~/components/Lightbox';
+import {HOME_CONTENT_DEFAULTS} from '~/lib/homeContent';
 
 function ReviewCard({
   review,
@@ -85,7 +86,15 @@ function MarqueeRow({
   );
 }
 
-export function TestimonialsMarquee({reviews}: {reviews: ProductReview[]}) {
+export interface TestimonialsMarqueeProps {
+  reviews: ProductReview[];
+  heading?: string;
+}
+
+export function TestimonialsMarquee({
+  reviews,
+  heading = HOME_CONTENT_DEFAULTS.testimonials.heading,
+}: TestimonialsMarqueeProps) {
   if (!reviews.length) return null;
 
   const average =
@@ -107,7 +116,7 @@ export function TestimonialsMarquee({reviews}: {reviews: ProductReview[]}) {
             {average.toFixed(1)} · {reviews.length} reviews
           </span>
         </div>
-        <h2>What our customers say</h2>
+        <h2>{heading}</h2>
       </div>
 
       <div className="demo-review-rows">
