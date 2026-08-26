@@ -53,6 +53,13 @@
      which read as washed-out against light card backgrounds. */
   --cwf-star: #ffa817;
 
+  /* Height of the sticky .header at >=981px: 42px announcement bar + 90px topbar
+     + hairline border. Measure this with webfonts loaded — the same header reads
+     117px before Outfit swaps in, which is how .pdp-gallery ended up sticking at
+     88px and sliding under the header. Anything that sticks below the header
+     should offset from this token rather than hardcoding a guess. */
+  --cwf-header-h: 133px;
+
   --aside-width: 420px;
   --cart-aside-summary-height-with-discount: 280px;
   --cart-aside-summary-height: 200px;
@@ -2607,6 +2614,10 @@ section { padding: 0; }
 .pheart.is-active .pheart-filled { display: inline-flex; }
 
 .pcard-body { display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 16px; padding: 4px 0 0; text-align: left; }
+/* Name + rating, 4px apart per Figma (node 250:2911 — name h24 at y0, rating
+   h14 at y28, group h42). The 16px to .pcard-bottom-row is .pcard-body's gap,
+   which matches the same frame's 42 → 58 offset. */
+.pcard-heading { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; width: 100%; }
 .pcard-name {
   font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
   font-weight: 500;
@@ -2621,8 +2632,15 @@ section { padding: 0; }
   overflow: hidden;
 }
 
-.pcard-rating { display: flex; align-items: center; gap: 4px; margin-top: 4px; min-height: 18px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: var(--cwf-accent-deep); }
-.pcard-rating.is-empty { visibility: hidden; }
+/* line-height:1 so the row is 14px like Figma. Inheriting body's 22px added
+   ~4px of half-leading above the text, which read as an 8px gap under the
+   name rather than the intended 4px. min-height is gone with it — it only
+   existed to hold space for the old hidden empty state. */
+.pcard-rating { display: flex; align-items: center; gap: 4px; line-height: 1; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: var(--cwf-accent-deep); }
+/* No reviews yet: the score still renders as 0.0 so the row never collapses,
+   but muted — a gold star beside a zero reads as a real rating. */
+.pcard-rating.is-zero { color: color-mix(in srgb, var(--cwf-ink-strong) 45%, transparent); }
+.pcard-rating.is-zero svg { color: color-mix(in srgb, var(--cwf-ink-strong) 25%, transparent); }
 .pcard-rating svg { width: 13px; height: 13px; color: var(--cwf-star); }
 .pcard-rating-count { opacity: 0.8; }
 
@@ -2638,6 +2656,16 @@ section { padding: 0; }
 .pcard-swatch { height: 18px; width: 18px; border-radius: 50%; border: 1px solid rgba(74, 47, 31, .15); display: inline-flex; align-items: center; justify-content: center; overflow: hidden; background: var(--cwf-sand); flex-shrink: 0; }
 .pcard-swatch img { width: 100%; height: 100%; object-fit: cover; }
 .pgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; width: 100%; }
+/* Collection pages only: .pgrid shares its row with the 240px filter sidebar
+   (+40px gap), so it runs out of room ~250px earlier than the full-width
+   homepage grid. 4-up here means ~150px cards on a landscape tablet. 1280px is
+   where 4 columns stop holding the ~218px card width from Figma (node 250:2911).
+   Range is bounded at the bottom so the 2-up rule below still wins once
+   .shop-layout collapses to a single column at 980px — .shop-layout .pgrid
+   outranks .pgrid on specificity, so an unbounded max-width would override it. */
+@media (min-width: 981px) and (max-width: 1280px) {
+  .shop-layout .pgrid { grid-template-columns: repeat(3, 1fr); }
+}
 @media (max-width: 980px) { .pgrid { grid-template-columns: repeat(2, 1fr); gap: 24px; } }
 @media (max-width: 767px) {
   .pgrid { grid-template-columns: repeat(2, 1fr); gap: 12px 14px; }
@@ -2664,8 +2692,11 @@ section { padding: 0; }
 .pdp-grid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 64px; align-items: start; }
 @media (max-width: 980px) { .pdp-grid { grid-template-columns: 1fr; gap: 40px; } }
 /* Mobile carousel */
-.pdp-carousel { display: block; position: sticky; top: 88px; z-index: 10; }
-@media (max-width: 980px) { .pdp-carousel { position: static; } }
+/* Two presentations of the same gallery: side thumbnails + a large main
+   image on desktop (.pdp-gallery), a swipeable carousel below 980px
+   (.pdp-carousel). Exactly one is displayed at any width. */
+.pdp-carousel { display: none; position: sticky; top: calc(var(--cwf-header-h) + 16px); z-index: 10; }
+@media (max-width: 980px) { .pdp-carousel { display: block; position: static; } }
 .pdp-carousel-stage { position: relative; }
 .pdp-carousel-track { display: flex; overflow-x: scroll; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; border-radius: 16px; }
 .pdp-carousel-track::-webkit-scrollbar { display: none; }
@@ -2679,7 +2710,6 @@ section { padding: 0; }
 .pdp-carousel-arrow { width: 36px; height: 36px; border-radius: 50%; background: rgba(243,239,234,.92); border: .5px solid var(--cwf-line); color: var(--cwf-primary); display: flex; align-items: center; justify-content: center; cursor: pointer; pointer-events: auto; transition: background 150ms, opacity 150ms; }
 .pdp-carousel-arrow:hover { background: #fff; }
 .pdp-carousel-arrow:disabled { opacity: .25; cursor: default; }
-.pdp-gallery { display: none !important; }
 @media (max-width: 767px) {
   .pdp-wrap { padding: 0 16px; }
   .pdp-price-big { margin-top: 8px; }
@@ -2694,13 +2724,22 @@ section { padding: 0; }
   .pdp-assure { grid-template-columns: 1fr; gap: 8px; margin-top: 20px; }
 }
 
-.pdp-gallery { display: grid; grid-template-columns: 88px 1fr; gap: 14px; position: sticky; top: 88px; }
-.pdp-thumbs { display: flex; flex-direction: column; gap: 10px; }
+.pdp-gallery { display: grid; grid-template-columns: 88px 1fr; gap: 14px; position: sticky; top: calc(var(--cwf-header-h) + 16px); }
+/* Absolute so the rail never sets the gallery's height — the main image does.
+   With 10+ images the rail was running ~900px past the photo, which also burned
+   through the sticky range in one screen. The 88px column still reserves its
+   width because the track is a fixed size. */
+.pdp-thumbs { position: absolute; top: 0; left: 0; bottom: 0; width: 88px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
+.pdp-thumbs::-webkit-scrollbar { display: none; }
+.pdp-thumb { flex: 0 0 auto; }
 .pdp-thumb { width: 88px; aspect-ratio: 1/1; border-radius: 12px; overflow: hidden; border: 1.5px solid transparent; background: var(--cwf-sand); position: relative; cursor: pointer; transition: border-color .15s; padding: 0; }
 .pdp-thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 0; }
 .pdp-thumb.active { border-color: var(--cwf-primary); }
-.pdp-main-img { position: relative; aspect-ratio: 1/1.05; background: var(--cwf-sand); border-radius: 18px; overflow: hidden; border: .5px solid var(--cwf-line); }
+/* Explicit column: the thumb rail is absolutely positioned, so without this the
+   main image auto-places into the 88px rail column and collapses. */
+.pdp-main-img { grid-column: 2; position: relative; aspect-ratio: 1/1.05; background: var(--cwf-sand); border-radius: 18px; overflow: hidden; border: .5px solid var(--cwf-line); }
 .pdp-main-img img { width: 100%; height: 100%; object-fit: cover; border-radius: 0; }
+@media (max-width: 980px) { .pdp-gallery { display: none; } }
 .pdp-ribbon { position: absolute; top: 18px; left: 18px; background: var(--cwf-primary); color: #f3efea; font-size: 10px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; padding: 6px 12px; border-radius: 99px; }
 
 .pdp-model3d { width: 100%; height: 100%; position: relative; background: var(--cwf-sand); }

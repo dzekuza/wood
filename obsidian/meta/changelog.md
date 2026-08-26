@@ -9,6 +9,110 @@ Chronological log of notable changes to the project. Newest first.
 This is a human-curated log — not a mirror of `git log`. Record *why*, not just
 *what*; the diff already covers *what*.
 
+## 2026-08-26 — PDP shows the side thumbnail gallery on desktop again
+
+The product page rendered the swipeable carousel at every width. The desktop
+layout — an 88px thumbnail rail beside a large main image — was already fully
+built (`.pdp-gallery`, `.pdp-thumbs`, `.pdp-main-img`, with `activeItem` state
+and 3D-model handling), but a blanket `.pdp-gallery { display: none !important }`
+disabled it everywhere. It came in with unrelated header work in `eeefa52` and
+sat above the real `display: grid` rule, which `!important` beat.
+
+Removed that line and made the split explicit: `.pdp-gallery` on ≥981px,
+`.pdp-carousel` on ≤980px, exactly one displayed at any width. No component
+changes were needed — the markup was already there.
+
+Fixed a real cost this exposed: the 6 thumbnails inherited `ProductImage`'s
+default `sizes="(min-width: 45em) 50vw, 100vw"` and each downloaded a ~712px
+file for an 88px slot. `ProductImage` now takes an optional `sizes` prop and the
+rail passes `88px` — verified the thumbs load at 88px natural width while the
+main image still resolves to 600px for a 569px render.
+
+Two follow-ups once it was visible:
+
+**Sticky offset.** `.pdp-gallery` stuck at `top: 88px` under a header that is
+actually 133px, so it sat behind the header. Added a `--cwf-header-h` token and
+offset from it. The 88px looks like a measurement taken before webfonts loaded —
+the header reads 117px pre-Outfit, 133px after — so the token's comment says to
+measure with fonts settled. `.filter-bar` (68px) and `.shop-sidebar` (160px) are
+on the same kind of hardcoded guess and were left alone for now.
+
+**The rail was setting the gallery's height.** With 10+ images the thumb column
+ran ~900px past the photo, which also meant the gallery consumed its entire
+sticky range within one screen — the two reports had one cause. `.pdp-thumbs` is
+now absolutely positioned with `overflow-y: auto`, so the main image sets the
+height and the rail scrolls inside it. That required pinning `.pdp-main-img` to
+`grid-column: 2`: as the only in-flow item it had been auto-placing into the 88px
+rail column and collapsing to 92px tall.
+
+Verified 6 thumbs stacked left of the main image, clicking one swaps the main
+image and moves `.active`, carousel hidden on desktop and shown at 375px with 6
+slides and 6 dots, no horizontal overflow at either. Rail height tracks the main
+image exactly (574px) and still does with 14 thumbs (1362px of content, scrolls
+internally). Sticky holds at 149px with 17px clearance from scroll 400 to 1200,
+releasing only when the grid ends.
+
+## 2026-08-26 — Collection grid goes 3-up on tablets
+
+`.pgrid` jumped straight from 4 columns to 2 at 980px. On collection pages that
+left a landscape tablet showing four ~150px cards, because the grid shares its
+row with the 240px filter sidebar (+40px gap) and gets ~280px less width than the
+homepage does at the same viewport.
+
+Added a 3-up step for 981–1280px, scoped to `.shop-layout .pgrid`. Deliberately
+not global: at 1024px the homepage grid renders 4 cards at 218px, which is exactly
+the Figma card width (node `250:2911`), so it does not need the step and would
+lose a column for nothing. 1280px is where 4-up stops holding that 218px width in
+the sidebar layout.
+
+The media query is bounded at both ends. `.shop-layout .pgrid` outranks `.pgrid`
+on specificity, so an unbounded `max-width: 1280px` would have overridden the
+2-up rule below 980px and stopped the grid collapsing at all — verified 2-up at
+979px, 3-up at 1024/1201, 4-up at 1281.
+
+See [[design-system]] § Product grid breakpoints.
+
+## 2026-08-26 — Product card body split into two blocks
+
+`.pcard-body` was a flat column of four siblings (name, rating, price row,
+swatches). It's now two groups: `.pcard-heading` holds the name + rating,
+`.pcard-bottom-row` already held price + swatches. The card can now space "what
+it is" apart from "what it costs" without touching the rhythm inside either.
+
+Spacing then went to Figma (node `250:2911`), which the new structure maps onto
+exactly: name h24 at y0, rating h14 at y28 (**4px** apart), group h42, bottom
+container at y58 (**16px** below). The old flat layout produced 20px above the
+rating — `.pcard-body`'s 16px gap plus a stray 4px `margin-top` — so that is now
+a single `gap: 4px` on `.pcard-heading` and the margin is gone.
+
+`.pcard-rating` also needed `line-height: 1`. It was inheriting `body`'s
+`line-height: 22px`, making the 14px row 22px tall; the ~4px of half-leading sat
+above the text and read as an 8px gap under the name however the `gap` was set.
+Its `min-height: 18px` went with it — that only existed to hold space for the
+hidden empty state, which no longer exists. Measured 4px/16px with a 14px rating
+row against Figma's 4/16/14.
+
+`pages.favourites.tsx` also uses `.pcard-body`/`.pcard-name` but has no rating or
+bottom row, so it is unaffected.
+
+## 2026-08-26 — Unrated product cards show 0.0 instead of a blank gap
+
+`.pcard-rating` used to render an empty div with `visibility: hidden` when a
+product had no reviews — the row reserved its 18px but showed nothing, so cards
+looked like the rating had failed to load rather than like the product had no
+reviews yet.
+
+It now always renders the score: `0.0 ★ (0 reviews)`. `getRatingSummary` still
+returns `null` for "no data" — that stays an honest signal — and the zero is a
+presentation fallback in the JSX, not a fake summary object.
+
+The star is muted on `.is-zero` (`color-mix` off `--cwf-ink-strong`, per the
+"alpha variants are mixed off the token, never re-declared as rgba()" rule).
+A full-strength gold star next to 0.0 reads as a real rating at a glance.
+
+Also dropped the `aria-hidden` that used to sit on the empty state — "0.0, 0
+reviews" is real information, so screen readers should get it.
+
 ## 2026-08-26 — Homepage copy & imagery moved into metaobjects
 
 Every heading, subheading, button label, hero slide and the workshop photo on
@@ -33,13 +137,20 @@ per-collection slide creates one and picks the image.
 missing metaobject, an unreachable API or a field the merchant blanked all
 render the previous copy rather than an empty heading.
 
-**Not live yet.** The Storefront API returns `null` for every metaobject on this
-shop — including the pre-existing `specifications` type, which no code consumed,
-so it had never surfaced. Confirmed it is not code or data (Admin API returns
-the values; same `null` across API versions 2025-04→2026-04 and both tokens;
-`buildHomeContent` passes 19/19 assertions against a mocked response). It needs
-**Read metaobjects** enabled on the Headless channel's Storefront API
-permissions in admin — a scope this project's credentials cannot change.
+**Verified live.** The Storefront API serves the entries, both images resolve to
+`cdn.shopify.com`, and an admin edit to `categories_heading` came back changed on
+the next request (reverted after). `buildHomeContent` also passes 19/19
+assertions against a mocked response.
+
+Getting there took a wrong turn worth recording: the definitions and entries were
+first created **on the wrong Shopify store**, because the MCP connector was
+authorized elsewhere and the shop was never verified before writing. The writes
+succeeded, so the only symptom was the Storefront API returning `null` — which
+was then misdiagnosed as a missing `unauthenticated_read_metaobjects` scope on
+the Headless channel, and that wrong conclusion briefly reached this changelog,
+ADR-0004 and PR #3. No scope change was ever needed. See
+[[homepage-content]] § Verify the shop before writing for the tells that were
+missed and the check to run first.
 
 ## 2026-08-26 — Hero reduced to a single slide
 

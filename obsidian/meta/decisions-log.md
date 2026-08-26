@@ -53,6 +53,13 @@ Shopify store do.
 exchange, the store owner always approves what becomes publicly visible before it
 goes live, rather than discovering it after the fact.
 
+**Amended 2026-08-26.** Confirming *intent* is not enough — the agent must also
+confirm *which shop it is talking to* before any Admin API write. The homepage
+metaobject work (ADR-0004) was written to an entirely different store because the
+MCP connector was authorized elsewhere and nothing checked. Run `get-shop-info`
+and spot-check `shop { id }` against `102713426262` plus a product title first;
+see [[homepage-content]] § Verify the shop before writing.
+
 ---
 
 ## ADR-0003 — Collection filters use Shopify's native `filters`/`ProductFilter`, not a fake UI
@@ -115,5 +122,9 @@ becomes a merchant decision rather than a constant. The cost is two sources for
 the same string: the defaults will drift from admin over time and are explicitly
 *not* the source of truth once the metaobject resolves — [[homepage-content]]
 says so at the top of the defaults block. The alternative, failing loudly on
-missing content, would have made the homepage hostage to a single API call and
-to a scope toggle that turned out not to be enabled.
+missing content, would have made the homepage hostage to a single API call.
+
+That safety net earned itself immediately: the metaobjects were first created on
+the wrong Shopify store, so for several hours the homepage was fetching content
+that did not exist. It rendered correctly the whole time. A design that treated
+missing content as an error would have taken the homepage down instead.

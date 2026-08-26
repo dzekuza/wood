@@ -10,9 +10,10 @@ Every heading, blurb, button label and image on the homepage is editable from
 full set of fallbacks, so an unreachable or unseeded metaobject renders exactly
 the page that shipped before this change.
 
-> [!warning] Not live yet
-> The Storefront API currently returns `null` for every metaobject on this shop.
-> See [[#The blocker: storefront metaobject scope]] — one admin toggle away.
+> [!success] Live
+> Verified end-to-end on `wood-123252` (shop `102713426262`): the Storefront API
+> serves the entries, images come off `cdn.shopify.com`, and an admin edit reaches
+> the page on the next uncached load.
 
 ## The model
 
@@ -58,30 +59,22 @@ Components take content via props (per [[component-conventions]]'s "content via
 props, never hardcoded"), each defaulting to its slice of
 `HOME_CONTENT_DEFAULTS` so they still render standalone.
 
-## The blocker: storefront metaobject scope
+## Verified working
 
-The definitions are created with `access: {storefront: PUBLIC_READ}` and every
-entry is `ACTIVE`, but the Storefront API still returns `null`/`[]` for
-**every** metaobject on this shop — including the pre-existing `specifications`
-type, which no code ever consumed, so this was never noticed before.
+Confirmed on the real store, not just in theory:
 
-Verified it is not a code, data or query problem:
-
-- Admin API returns the entries with correct values.
-- Same `null` on API versions 2025-04 → 2026-04, with both the public and the
-  private storefront token.
-- `metaobjects(type:)` returns `[]` rather than an error — the field is
-  *allowed*, so the token has the query but sees no rows.
+- Storefront API returns the `home_page` entry with all fields, both image
+  references resolving to `cdn.shopify.com` URLs.
+- The rendered page pulls the hero background and workshop photo from the CDN,
+  not the `/demo/*` fallbacks.
+- Changing `categories_heading` in admin came back changed from the Storefront
+  API on the next request (reverted afterwards).
 - `buildHomeContent()` parses a mocked response correctly (19/19 assertions).
 
-**The fix is admin-UI only:** Shopify admin → the Headless/Hydrogen channel →
-Storefront API permissions → enable **Read metaobjects**
-(`unauthenticated_read_metaobjects`). The credentials this project holds cannot
-read or change channel scopes — `appInstallations` returns `access denied`, the
-same class of gap as the publications one in [[storefront-environments]].
-
-Until that toggle is on, the homepage renders `HOME_CONTENT_DEFAULTS` and
-admin edits have no visible effect.
+**No Storefront API scope change was needed.** An earlier version of this note
+claimed metaobjects were blocked by a missing `unauthenticated_read_metaobjects`
+scope on the Headless channel — that was wrong; see
+[[#Verify the shop before writing]].
 
 ## Gotchas
 
@@ -90,9 +83,36 @@ admin edits have no visible effect.
   later lands existing entries in **DRAFT** — they must then be set `ACTIVE`
   explicitly, which is easy to miss because admin shows the content fine either
   way.
-- **Production is a different storefront** ([[storefront-environments]]). The
-  metaobjects are shop-level so they exist for both, but the scope toggle above
-  has to be set on whichever channel each environment's token belongs to.
+- **Metaobjects are shop-level**, so they exist for both the local and the
+  production storefront ([[storefront-environments]]) with no per-channel setup.
+  Unlike collections, there is nothing to publish to a sales channel.
+- **The dev server caches the loader's Storefront query.** After editing a
+  metaobject, a browser reload can still show the old value — restart
+  `shopify hydrogen dev` to see the change. This is Hydrogen's sub-request cache
+  doing its job, not a bug, and it is why a first check after seeding can look
+  like the data never arrived.
+
+## Verify the shop before writing
+
+The first attempt at this feature created all three definitions, six entries and
+two image uploads **on the wrong Shopify store** — the MCP connector was
+authorized to a different shop. Nothing errored; the writes succeeded, and the
+Storefront API returned `null` simply because the data was somewhere else. That
+`null` got misdiagnosed as a missing storefront scope, and the wrong conclusion
+reached the docs and a PR before it was caught.
+
+Tells that were visible and ignored:
+
+- The shop's only metaobject definition was `specifications` with fields like
+  `floor_area`, `wall_construction`, `roof_pitch`, `snow_load` — a garden-building
+  schema, on a shop that supposedly sells oak furniture.
+- The publications list contained a channel named `ohubodev`.
+- The staged-upload path was scoped to shop `76806357159`, not `102713426262`.
+
+**Before any Admin API write, confirm the shop.** `get-shop-info` plus a
+`shop { id }` and a product-title spot check. The right store is
+`wood-123252.myshopify.com`, shop id **`102713426262`** (it also appears in
+`PUBLIC_CUSTOMER_ACCOUNT_API_URL`), ~37 oak products.
 
 ## Related
 
