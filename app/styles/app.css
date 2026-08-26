@@ -2622,7 +2622,10 @@ section { padding: 0; }
 }
 
 .pcard-rating { display: flex; align-items: center; gap: 4px; margin-top: 4px; min-height: 18px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: var(--cwf-accent-deep); }
-.pcard-rating.is-empty { visibility: hidden; }
+/* No reviews yet: the score still renders as 0.0 so the row never collapses,
+   but muted — a gold star beside a zero reads as a real rating. */
+.pcard-rating.is-zero { color: color-mix(in srgb, var(--cwf-ink-strong) 45%, transparent); }
+.pcard-rating.is-zero svg { color: color-mix(in srgb, var(--cwf-ink-strong) 25%, transparent); }
 .pcard-rating svg { width: 13px; height: 13px; color: var(--cwf-star); }
 .pcard-rating-count { opacity: 0.8; }
 

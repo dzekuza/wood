@@ -138,19 +138,15 @@ export function ProductItem({
       <div className="pcard-body">
         <p className="pcard-name">{product.title}</p>
 
-        <div
-          className={`pcard-rating${rating ? '' : ' is-empty'}`}
-          aria-hidden={rating ? undefined : true}
-        >
-          {rating && (
-            <>
-              <span>{rating.average.toFixed(1)}</span>
-              <StarFilledIcon />
-              <span className="pcard-rating-count">
-                ({rating.count} {rating.count === 1 ? 'review' : 'reviews'})
-              </span>
-            </>
-          )}
+        {/* A product with no reviews shows an explicit 0.0 (0 reviews) rather
+            than a blank gap — the star is muted so a filled gold star never
+            sits next to a zero score. */}
+        <div className={`pcard-rating${rating ? '' : ' is-zero'}`}>
+          <span>{(rating?.average ?? 0).toFixed(1)}</span>
+          <StarFilledIcon />
+          <span className="pcard-rating-count">
+            ({rating?.count ?? 0} {rating?.count === 1 ? 'review' : 'reviews'})
+          </span>
         </div>
 
         <div className="pcard-bottom-row">

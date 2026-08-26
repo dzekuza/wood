@@ -9,6 +9,24 @@ Chronological log of notable changes to the project. Newest first.
 This is a human-curated log — not a mirror of `git log`. Record *why*, not just
 *what*; the diff already covers *what*.
 
+## 2026-08-26 — Unrated product cards show 0.0 instead of a blank gap
+
+`.pcard-rating` used to render an empty div with `visibility: hidden` when a
+product had no reviews — the row reserved its 18px but showed nothing, so cards
+looked like the rating had failed to load rather than like the product had no
+reviews yet.
+
+It now always renders the score: `0.0 ★ (0 reviews)`. `getRatingSummary` still
+returns `null` for "no data" — that stays an honest signal — and the zero is a
+presentation fallback in the JSX, not a fake summary object.
+
+The star is muted on `.is-zero` (`color-mix` off `--cwf-ink-strong`, per the
+"alpha variants are mixed off the token, never re-declared as rgba()" rule).
+A full-strength gold star next to 0.0 reads as a real rating at a glance.
+
+Also dropped the `aria-hidden` that used to sit on the empty state — "0.0, 0
+reviews" is real information, so screen readers should get it.
+
 ## 2026-08-26 — Homepage copy & imagery moved into metaobjects
 
 Every heading, subheading, button label, hero slide and the workshop photo on
