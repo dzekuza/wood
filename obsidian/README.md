@@ -39,6 +39,7 @@ and AI agents (Claude Code, Cursor).
 ### 03 — Backend
 - [[backend/README|Backend overview]]
 - [[api-architecture]] — route-handler / server-action convention & secret handling
+- [[storefront-environments]] — local and production are two different Shopify storefronts; why collections can vanish on live
 - [[database]] — schema, RLS, migrations
 
 ### 04 — Workflows

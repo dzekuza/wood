@@ -9,6 +9,26 @@ Chronological log of notable changes to the project. Newest first.
 This is a human-curated log — not a mirror of `git log`. Record *why*, not just
 *what*; the diff already covers *what*.
 
+## 2026-08-26 — Live homepage showed 4 categories, local showed 6
+
+Not a bug in the code — the deployed `buildCategories`/`TexturesGrid` are
+byte-identical to local. **Local dev and production use two different headless
+storefronts on the same shop**, and `solid-oak-fireplace-surrounds` and
+`solid-oak-cube-blocks` are published to the local one only. The Storefront API
+returns `null` for an unpublished collection and `buildCategories` filters nulls
+out, so the section silently renders fewer cards.
+
+Proved by querying the same six handles with each token:
+local 6/6 visible, production 4/6.
+
+Fix is in the Shopify admin (publish both collections, and their products, to
+the production storefront's channel) — the API credentials this project holds
+lack `read_publications`/`write_publications`, so it can't be scripted.
+
+Written up in [[../backend/storefront-environments]], including the env keys
+that differ and the diagnostic. Worth reading before debugging any future
+"works locally, missing on live" report.
+
 ## 2026-08-26 — Review cards drop the avatar placeholder
 
 `ReviewCard` (TestimonialsMarquee) rendered a `.demo-review-avatar` — an empty
