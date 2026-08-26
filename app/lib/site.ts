@@ -5,6 +5,17 @@ export const CONTACT_EMAIL = 'hello@craftwoodfurniture.co.uk';
 export const CONTACT_PHONE_DISPLAY = '+44 7904 497890';
 export const CONTACT_PHONE_HREF = '+447904497890';
 
+export const INSTAGRAM_URL = 'https://instagram.com';
+
+/** Rotating strings for the top announcement bar, ~4s each.
+ *  These are marketing claims — the delivery threshold and any coupon code must
+ *  be confirmed against what the shop actually offers before going live. */
+export const ANNOUNCEMENT_MESSAGES = [
+  'Handcrafted solid oak furniture, made to order in the Cotswolds',
+  'Free UK delivery on orders over £250',
+  'Every piece cut, joined and finished in our own workshop',
+];
+
 export const WORKSHOP_LOCATION = 'Aldsworth workshop, Cotswolds';
 export const WORKSHOP_VISIT_NOTE = 'By appointment only';
 export const WORKSHOP_HOURS = [
