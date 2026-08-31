@@ -2,6 +2,7 @@ import {useState, useRef} from 'react';
 import {useNavigate, useSearchParams} from 'react-router';
 
 export const SORT_OPTIONS = [
+  {value: 'featured', label: 'Featured'},
   {value: 'newest', label: 'Newest First'},
   {value: 'price-high', label: 'Price: High to Low'},
   {value: 'price-low', label: 'Price: Low to High'},
@@ -16,7 +17,7 @@ export function SortDropdown({current}: {current: SortValue}) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const currentLabel = SORT_OPTIONS.find((o) => o.value === current)?.label ?? 'Newest First';
+  const currentLabel = SORT_OPTIONS.find((o) => o.value === current)?.label ?? 'Featured';
 
   function toggle() {
     if (!open && btnRef.current) {

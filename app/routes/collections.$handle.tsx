@@ -32,7 +32,11 @@ export async function loader(args: Route.LoaderArgs) {
  * Load data necessary for rendering content above the fold. This is the critical data
  * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
  */
-const SORT_MAP: Record<SortValue, {sortKey: 'CREATED' | 'PRICE'; reverse: boolean}> = {
+// 'featured' passes no explicit sortKey to the Storefront API, which defaults
+// to `COLLECTION_DEFAULT` — i.e. whatever sort order (manual, best-selling,
+// etc.) the merchant configured for this collection in Shopify Admin.
+const SORT_MAP: Record<SortValue, {sortKey: 'COLLECTION_DEFAULT' | 'CREATED' | 'PRICE'; reverse: boolean}> = {
+  featured: {sortKey: 'COLLECTION_DEFAULT', reverse: false},
   newest: {sortKey: 'CREATED', reverse: true},
   'price-high': {sortKey: 'PRICE', reverse: true},
   'price-low': {sortKey: 'PRICE', reverse: false},
@@ -50,8 +54,8 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   }
 
   const url = new URL(request.url);
-  const sortParam = (url.searchParams.get('sort') ?? 'newest') as SortValue;
-  const {sortKey, reverse} = SORT_MAP[sortParam] ?? SORT_MAP.newest;
+  const sortParam = (url.searchParams.get('sort') ?? 'featured') as SortValue;
+  const {sortKey, reverse} = SORT_MAP[sortParam] ?? SORT_MAP.featured;
   const filters = parseFiltersFromSearchParams(url.searchParams);
 
   const [{collection}, {collections}] = await Promise.all([

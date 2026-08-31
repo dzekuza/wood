@@ -22,7 +22,12 @@ export async function loader(args: Route.LoaderArgs) {
   return criticalData;
 }
 
-const SORT_MAP: Record<SortValue, {sortKey: 'CREATED_AT' | 'PRICE'; reverse: boolean}> = {
+// This page aggregates the whole catalog via the top-level `products` field,
+// not a single collection, so there's no merchant-configured manual order to
+// fall back on — 'featured' maps to BEST_SELLING as the closest equivalent,
+// same as Shopify's own default themes use for a catalog-wide view.
+const SORT_MAP: Record<SortValue, {sortKey: 'BEST_SELLING' | 'CREATED_AT' | 'PRICE'; reverse: boolean}> = {
+  featured: {sortKey: 'BEST_SELLING', reverse: false},
   newest: {sortKey: 'CREATED_AT', reverse: true},
   'price-high': {sortKey: 'PRICE', reverse: true},
   'price-low': {sortKey: 'PRICE', reverse: false},
@@ -36,8 +41,8 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
   const paginationVariables = getPaginationVariables(request, {pageBy: 250});
 
   const url = new URL(request.url);
-  const sortParam = (url.searchParams.get('sort') ?? 'newest') as SortValue;
-  const {sortKey, reverse} = SORT_MAP[sortParam] ?? SORT_MAP.newest;
+  const sortParam = (url.searchParams.get('sort') ?? 'featured') as SortValue;
+  const {sortKey, reverse} = SORT_MAP[sortParam] ?? SORT_MAP.featured;
 
   const [{products}, {collections}] = await Promise.all([
     storefront.query(CATALOG_QUERY, {variables: {...paginationVariables, sortKey, reverse, query: EXCLUDE_HIDDEN_PRODUCTS_QUERY}, cache: storefront.CacheNone()}),
