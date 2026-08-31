@@ -1,8 +1,10 @@
-import {Link, useLoaderData} from 'react-router';
+import {useLoaderData} from 'react-router';
 import type {Route} from './+types/blogs.$blogHandle._index';
-import {Image, getPaginationVariables} from '@shopify/hydrogen';
+import {getPaginationVariables} from '@shopify/hydrogen';
 import type {ArticleItemFragment} from 'storefrontapi.generated';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
+import {Breadcrumbs} from '~/components/Breadcrumbs';
+import {ArticleCard} from '~/components/ArticleCard';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 
 export const meta: Route.MetaFunction = ({data}) => {
@@ -66,6 +68,12 @@ export default function Blog() {
 
   return (
     <div className="archive-page">
+      <Breadcrumbs
+        items={[
+          {label: 'Journal', to: '/blogs'},
+          {label: blog.title},
+        ]}
+      />
       <div className="archive-hero">
         <div className="archive-wrap">
           <div className="archive-hero-inner">
@@ -77,7 +85,7 @@ export default function Blog() {
         <div className="blog-articles-grid">
           <PaginatedResourceSection<ArticleItemFragment> connection={articles}>
             {({node: article, index}) => (
-              <ArticleItem
+              <ArticleCard
                 article={article}
                 key={article.id}
                 loading={index < 3 ? 'eager' : 'lazy'}
@@ -87,44 +95,6 @@ export default function Blog() {
         </div>
       </div>
     </div>
-  );
-}
-
-function ArticleItem({
-  article,
-  loading,
-}: {
-  article: ArticleItemFragment;
-  loading?: HTMLImageElement['loading'];
-}) {
-  const publishedAt = new Intl.DateTimeFormat('en-GB', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  }).format(new Date(article.publishedAt!));
-  return (
-    <Link
-      className="art-card"
-      to={`/blogs/${article.blog.handle}/${article.handle}`}
-      prefetch="intent"
-    >
-      {article.image && (
-        <div className="art-card-img">
-          <Image
-            alt={article.image.altText || article.title}
-            aspectRatio="16/9"
-            data={article.image}
-            loading={loading}
-            sizes="(min-width: 768px) 33vw, 100vw"
-          />
-        </div>
-      )}
-      <div className="art-card-body">
-        <div className="art-card-date">{publishedAt}</div>
-        <h3 className="art-card-title">{article.title}</h3>
-        <span className="art-card-cta">Read more <i className="ti ti-arrow-right" /></span>
-      </div>
-    </Link>
   );
 }
 

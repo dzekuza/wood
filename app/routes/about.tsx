@@ -1,5 +1,6 @@
 import {Link} from 'react-router';
 import type {Route} from './+types/about';
+import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {SITE_NAME, WORKSHOP_LOCATION} from '~/lib/site';
 
 const ABOUT_PILLARS = [
@@ -35,6 +36,7 @@ export const meta: Route.MetaFunction = () => [
 export default function AboutPage() {
   return (
     <div className="archive-page">
+      <Breadcrumbs items={[{label: 'About'}]} />
       <div className="archive-hero">
         <div className="archive-wrap">
           <div className="archive-hero-inner">

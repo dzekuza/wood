@@ -3,6 +3,7 @@ import type {Route} from './+types/search';
 import {getPaginationVariables, Analytics} from '@shopify/hydrogen';
 import {SearchForm} from '~/components/SearchForm';
 import {SearchResults} from '~/components/SearchResults';
+import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {
   type RegularSearchReturn,
   type PredictiveSearchReturn,
@@ -44,6 +45,7 @@ export default function SearchPage() {
 
   return (
     <div className="archive-page">
+      <Breadcrumbs items={[{label: 'Search'}]} />
       <div className="archive-hero">
         <div className="archive-wrap">
           <div className="archive-hero-inner">

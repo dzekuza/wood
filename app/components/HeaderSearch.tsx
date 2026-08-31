@@ -1,16 +1,27 @@
 import {Link} from 'react-router';
 import {useEffect, useRef, useState} from 'react';
+import type {SearchSuggestionsQuery} from 'storefrontapi.generated';
 import {
   SEARCH_ENDPOINT,
   SearchFormPredictive,
 } from '~/components/SearchFormPredictive';
 import {SearchResultsPredictive} from '~/components/SearchResultsPredictive';
+import {SearchSuggestions} from '~/components/SearchSuggestions';
+
+type Category = {id: string; title: string; handle: string};
 
 /**
  * Inline predictive search bar for the header top row.
- * Renders a results dropdown while the input is focused and has a term.
+ * Renders a results dropdown while the input is focused: popular
+ * collections/best sellers before a term is typed, matches after.
  */
-export function HeaderSearch() {
+export function HeaderSearch({
+  categories,
+  searchSuggestions,
+}: {
+  categories: Category[];
+  searchSuggestions: Promise<SearchSuggestionsQuery | null>;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement | null>(null);
 
@@ -70,7 +81,15 @@ export function HeaderSearch() {
                 return <div className="predictive-search-loading">Loading...</div>;
               }
 
-              if (!term.current) return null;
+              if (!term.current) {
+                return (
+                  <SearchSuggestions
+                    categories={categories}
+                    searchSuggestions={searchSuggestions}
+                    onNavigate={() => setIsOpen(false)}
+                  />
+                );
+              }
 
               if (!total) {
                 return <SearchResultsPredictive.Empty term={term} />;

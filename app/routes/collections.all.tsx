@@ -1,12 +1,14 @@
 import type {Route} from './+types/collections.all';
-import {useLoaderData, Link} from 'react-router';
+import {useLoaderData} from 'react-router';
 import {useState} from 'react';
 import {getPaginationVariables} from '@shopify/hydrogen';
 import {ProductItem} from '~/components/ProductItem';
 import {SortDropdown} from '~/components/SortDropdown';
 import {CollectionFilters} from '~/components/CollectionFilters';
+import {CollectionCategoryNav} from '~/components/CollectionCategoryNav';
+import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {applyLocalFilters, buildLocalFilters} from '~/lib/collectionFilters';
-import {SITE_NAME} from '~/lib/site';
+import {SITE_NAME, shouldHideCollection} from '~/lib/site';
 import type {SortValue} from '~/components/SortDropdown';
 import type {CollectionItemFragment} from 'storefrontapi.generated';
 import {EXCLUDE_HIDDEN_PRODUCTS_QUERY, filterHiddenProducts} from '~/lib/upsells';
@@ -47,10 +49,23 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
   const filters = buildLocalFilters(allProducts);
   const filteredProducts = applyLocalFilters(allProducts, url.searchParams);
 
+  const sidebarCategories = collections.nodes
+    .filter(
+      (node) => !shouldHideCollection({handle: node.handle, title: node.title}),
+    )
+    .slice(0, 8)
+    .map((node) => ({
+      id: node.id,
+      handle: node.handle,
+      title: node.title,
+      image: node.image,
+      count: node.products.nodes.length,
+    }));
+
   return {
     products: {...products, nodes: filteredProducts},
     filters,
-    collections: collections.nodes,
+    sidebarCategories,
     sortParam,
   };
 }
@@ -81,40 +96,17 @@ const FAQ_ITEMS = [
 // ── page ──────────────────────────────────────────────────────────────────────
 
 export default function AllProducts() {
-  const {products, filters, collections, sortParam} = useLoaderData<typeof loader>();
+  const {products, filters, sidebarCategories, sortParam} = useLoaderData<typeof loader>();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   return (
     <div className="archive-page">
+      <Breadcrumbs items={[{label: 'All Products'}]} />
       <div className="archive-hero">
         <div className="archive-wrap">
           <div className="archive-hero-inner">
             <h1 className="archive-hero-title">Products</h1>
           </div>
-
-          {collections.length > 0 && (
-            <div className="category-row">
-              {collections.slice(0, 4).map((col) => {
-                const image = (col as {image?: {url: string; altText: string | null}}).image;
-                const count = (col as {products?: {nodes: {id: string}[]}}).products?.nodes.length ?? 0;
-                return (
-                  <Link key={col.handle} to={`/collections/${col.handle}`} className="category-card">
-                    {image && (
-                      <span className="category-card-img">
-                        <img src={image.url} alt={image.altText ?? col.title} loading="lazy" />
-                      </span>
-                    )}
-                    <span className="category-card-text">
-                      <span className="category-card-name">{col.title}</span>
-                      <span className="category-card-count">
-                        {count} {count === 1 ? 'product' : 'products'}
-                      </span>
-                    </span>
-                  </Link>
-                );
-              })}
-            </div>
-          )}
         </div>
       </div>
 
@@ -122,7 +114,10 @@ export default function AllProducts() {
         <div className="archive-wrap">
           <div className="shop-layout">
             <aside className="shop-sidebar">
-              <CollectionFilters filters={filters} />
+              <CollectionFilters
+                filters={filters}
+                categoriesSlot={<CollectionCategoryNav categories={sidebarCategories} />}
+              />
             </aside>
 
             <div>
@@ -182,7 +177,11 @@ export default function AllProducts() {
               </button>
             </div>
             <div className="mob-filter-body">
-              <CollectionFilters filters={filters} resultCount={products.nodes.length} />
+              <CollectionFilters
+                filters={filters}
+                resultCount={products.nodes.length}
+                categoriesSlot={<CollectionCategoryNav categories={sidebarCategories} />}
+              />
             </div>
             <div className="mob-filter-footer">
               <button className="btn btn-primary btn-pill" onClick={() => setMobileFiltersOpen(false)}>

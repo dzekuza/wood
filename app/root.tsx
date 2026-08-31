@@ -14,6 +14,8 @@ import {
 } from 'react-router';
 import type {Route} from './+types/root';
 import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
+import {SEARCH_SUGGESTIONS_QUERY} from '~/lib/searchSuggestions';
+import {EXCLUDE_HIDDEN_PRODUCTS_QUERY} from '~/lib/upsells';
 import tablerStyles from '@tabler/icons-webfont/dist/tabler-icons.min.css?url';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
@@ -154,10 +156,24 @@ function loadDeferredData({context}: Route.LoaderArgs) {
       console.error(error);
       return null;
     });
+
+  // deferred so it never blocks time to first byte — only needed once a
+  // shopper focuses the header search field
+  const searchSuggestions = storefront
+    .query(SEARCH_SUGGESTIONS_QUERY, {
+      cache: storefront.CacheLong(),
+      variables: {query: EXCLUDE_HIDDEN_PRODUCTS_QUERY},
+    })
+    .catch((error: Error) => {
+      console.error(error);
+      return null;
+    });
+
   return {
     cart: cart.get(),
     isLoggedIn: customerAccount.isLoggedIn(),
     footer,
+    searchSuggestions,
   };
 }
 

@@ -19,6 +19,7 @@ import {useAside} from '~/components/Aside';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {SITE_NAME} from '~/lib/site';
 import {ProductItem} from '~/components/ProductItem';
+import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {ReviewsSection, type ProductReview} from '~/components/ReviewsSection';
 import {UPSELL_GROUPS, resolveUpsellGroupsForProduct} from '~/lib/upsells';
 import {Reveal} from '~/components/animate-ui/Reveal';
@@ -318,18 +319,12 @@ export default function Product() {
 
   return (
     <div className="archive-page">
-      {/* Breadcrumb */}
-      <div className="crumbbar">
-        <div className="archive-wrap">
-          <div className="crumb">
-            <Link to="/">Home</Link>
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-            <Link to="/collections/all">Collections</Link>
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-            <span className="crumb-here">{title}</span>
-          </div>
-        </div>
-      </div>
+      <Breadcrumbs
+        items={[
+          {label: 'Collections', to: '/collections/all'},
+          {label: title},
+        ]}
+      />
 
       {/* PDP */}
       <section className="pdp">

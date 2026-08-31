@@ -1,61 +1,43 @@
-import {Link, useLoaderData} from 'react-router';
+import {useLoaderData} from 'react-router';
 import type {Route} from './+types/blogs._index';
-import {getPaginationVariables} from '@shopify/hydrogen';
-import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
-import type {BlogsQuery} from 'storefrontapi.generated';
+import {Breadcrumbs} from '~/components/Breadcrumbs';
+import {ArticleCard} from '~/components/ArticleCard';
 import {SITE_NAME} from '~/lib/site';
-
-type BlogNode = BlogsQuery['blogs']['nodes'][0];
 
 export const meta: Route.MetaFunction = () => {
   return [{title: `Journal | ${SITE_NAME}`}];
 };
 
 export async function loader(args: Route.LoaderArgs) {
-  // Start fetching non-critical data without blocking time to first byte
-  const deferredData = loadDeferredData(args);
-
-  // Await the critical data required to render initial state of the page
   const criticalData = await loadCriticalData(args);
-
-  return {...deferredData, ...criticalData};
+  return criticalData;
 }
 
 /**
  * Load data necessary for rendering content above the fold. This is the critical data
  * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
  */
-async function loadCriticalData({context, request}: Route.LoaderArgs) {
-  const paginationVariables = getPaginationVariables(request, {
-    pageBy: 10,
-  });
+async function loadCriticalData({context}: Route.LoaderArgs) {
+  const {blogs} = await context.storefront.query(BLOGS_QUERY);
 
-  const [{blogs}] = await Promise.all([
-    context.storefront.query(BLOGS_QUERY, {
-      variables: {
-        ...paginationVariables,
-      },
-    }),
-    // Add other queries here, so that they are loaded in parallel
-  ]);
+  // Flatten every blog's articles into one feed, newest first — the store
+  // only has one editorial blog ("News") today, but this holds up if a
+  // second is added without needing a code change.
+  const articles = blogs.nodes
+    .flatMap((blog) => blog.articles.nodes)
+    .sort(
+      (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
+    );
 
-  return {blogs};
-}
-
-/**
- * Load data for rendering content below the fold. This data is deferred and will be
- * fetched after the initial page load. If it's unavailable, the page should still 200.
- * Make sure to not throw any errors here, as it will cause the page to 500.
- */
-function loadDeferredData({context}: Route.LoaderArgs) {
-  return {};
+  return {articles};
 }
 
 export default function Blogs() {
-  const {blogs} = useLoaderData<typeof loader>();
+  const {articles} = useLoaderData<typeof loader>();
 
   return (
     <div className="archive-page">
+      <Breadcrumbs items={[{label: 'Journal'}]} />
       <div className="archive-hero">
         <div className="archive-wrap">
           <div className="archive-hero-inner">
@@ -64,23 +46,16 @@ export default function Blogs() {
           <p className="archive-hero-blurb">Finish notes, workshop process, and interiors that are meant to age well.</p>
         </div>
       </div>
-      <section className="collections-index-shell">
+      <section className="blog-index-section">
         <div className="archive-wrap">
-          <div className="blog-index-grid">
-            <PaginatedResourceSection<BlogNode> connection={blogs}>
-              {({node: blog}) => (
-                <Link
-                  className="blog-index-card"
-                  key={blog.handle}
-                  prefetch="intent"
-                  to={`/blogs/${blog.handle}`}
-                >
-                  <span className="eyebrow">Editorial series</span>
-                  <h2>{blog.title}</h2>
-                  <span className="blog-index-cta">Open journal <i className="ti ti-arrow-right" /></span>
-                </Link>
-              )}
-            </PaginatedResourceSection>
+          <div className="blog-articles-grid">
+            {articles.map((article, index) => (
+              <ArticleCard
+                key={article.id}
+                article={article}
+                loading={index < 3 ? 'eager' : 'lazy'}
+              />
+            ))}
           </div>
         </div>
       </section>
@@ -90,32 +65,31 @@ export default function Blogs() {
 
 // NOTE: https://shopify.dev/docs/api/storefront/latest/objects/blog
 const BLOGS_QUERY = `#graphql
-  query Blogs(
-    $country: CountryCode
-    $endCursor: String
-    $first: Int
-    $language: LanguageCode
-    $last: Int
-    $startCursor: String
-  ) @inContext(country: $country, language: $language) {
-    blogs(
-      first: $first,
-      last: $last,
-      before: $startCursor,
-      after: $endCursor
-    ) {
-      pageInfo {
-        hasNextPage
-        hasPreviousPage
-        startCursor
-        endCursor
-      }
+  fragment JournalArticle on Article {
+    id
+    handle
+    title
+    publishedAt
+    image {
+      id
+      altText
+      url
+      width
+      height
+    }
+    blog {
+      handle
+    }
+  }
+  query Blogs($country: CountryCode, $language: LanguageCode)
+    @inContext(country: $country, language: $language) {
+    blogs(first: 10) {
       nodes {
-        title
         handle
-        seo {
-          title
-          description
+        articles(first: 50, sortKey: PUBLISHED_AT, reverse: true) {
+          nodes {
+            ...JournalArticle
+          }
         }
       }
     }

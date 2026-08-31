@@ -1,9 +1,392 @@
 ---
 tags: [meta, changelog]
-updated: 2026-08-26
+updated: 2026-08-31
 ---
 
-# Changelog
+## 2026-08-31 — `.art-card` was using undefined CSS variables, not tokens
+
+The article card (`.art-card`/`.art-card-img`/`.art-card-title`) predates
+the CWF token system and referenced bare `var(--line)`, `var(--sand)`, and
+`var(--primary)` — none of which are defined anywhere in `app.css` (the
+project's tokens are all `--cwf-*`-prefixed; `--primary`/`--accent` only
+exist inside an unrelated shadcn/ui `oklch()` block much further down the
+file, for a different component family entirely). An undefined custom
+property makes the property it's used in invalid, so `border: 1px solid
+var(--line)` computed to no border at all — combined with the card's `#fff`
+background sitting on the page's near-white `--cwf-surface`, the card read
+as bg-less, which is what the user saw. Fixed:
+- `border: 1px solid var(--line)` → `.5px solid var(--cwf-line)` (matching
+  the border weight/token every other card in the site uses)
+- `.art-card-img`'s `background: var(--sand)` → `var(--cwf-sand)`
+- `.art-card-title`'s `color: var(--primary)` → `var(--cwf-primary)`
+- `.art-card-date`/`.art-card-cta` were also on `var(--cwf-accent-deep)`
+  (this one *was* a real token, just the wrong one per the dark-not-brown
+  direction running through today's other entries) → `var(--cwf-ink-strong)`
+
+Also `.blog-articles-grid`: `gap: 2rem` → `1rem`, and dropped
+`margin-top: 3rem; margin-bottom: 4rem` — redundant with `.blog-index-section`
+(the grid's actual container on both `blogs._index.tsx` and
+`blogs.$blogHandle._index.tsx`) already providing `padding-top: 36px;
+padding-bottom: 72px`, so the extra margins were compounding into oversized
+gaps above/below and between cards.
+
+## 2026-08-31 — "You may also like" on articles; `/blogs` shows articles directly
+
+- **New `ArticleCard.tsx`** ([[components/common]]) extracted from the
+  `ArticleItem` function that used to live only in
+  `blogs.$blogHandle._index.tsx`, so it could be reused in two new places
+  without duplicating the `.art-card` JSX.
+- **`blogs.$blogHandle.$articleHandle.tsx`** (the article page) now has a
+  "You may also like" section below the body: `ARTICLE_QUERY` additionally
+  fetches `blog.articles(first: 5, sortKey: PUBLISHED_AT, reverse: true)`
+  (new `RelatedArticle` fragment), the loader filters out the current
+  article and caps at 3, rendered via `ArticleCard` in the same
+  `.blog-articles-grid` used elsewhere.
+- **`blogs._index.tsx`** ("Journal") rewritten: it used to list one card per
+  *blog* (a "News" card with an "Open journal" button hiding the actual
+  articles behind a click) — the user wanted articles themselves visible
+  here, since the store only really has one editorial blog. New loader
+  fetches `blogs(first: 10) { articles(first: 50, sortKey: PUBLISHED_AT,
+  reverse: true) }`, flattens every blog's articles into one array, sorts
+  newest-first client-side, and renders them directly via `ArticleCard` in
+  `.blog-articles-grid` — same layout as `blogs.$blogHandle._index.tsx`'s
+  per-blog listing. Holds up if a second blog is ever added (articles from
+  both blogs interleave by date) without further code changes.
+- Deleted now-dead `.blog-index-grid`/`.blog-index-card`/`.blog-index-cta`
+  CSS (the blog-card grid `blogs._index.tsx` no longer renders) and their
+  entry in the `@media (max-width: 980px)` block — confirmed no other route
+  referenced these classes before removing.
+
+## 2026-08-31 — Article page: image and body capped at 800px
+
+`.article-page-image` (the hero image on a blog article) had no width cap —
+it filled the full `.archive-wrap` (1320px+), while `.article-body`
+underneath was already capped at 820px, so the image visibly overhung the
+text column below it. Set `.article-page-image` to `max-width: 800px;
+margin: 0 auto` (plus `display: block`, since a bare `<img>` is inline by
+default and won't auto-center) and tightened `.article-body` from 820px to
+800px to match exactly. Both now form one consistent 800px reading column.
+
+## 2026-08-31 — CMS/article rich-text body: bullets, sizing, dark text
+
+`.cms-page-body` (Shopify page/article `dangerouslySetInnerHTML` content —
+`pages.$handle`, `policies.$handle`, and article pages via `.article-body`)
+had three bugs surfaced by a merchant-added blog article and policy page:
+- **Bullets were invisible.** `reset.css`'s global `ul { list-style: none;
+  padding: 0 }` (there for nav/UI lists site-wide) also flattened real
+  `<ul>/<li>` prose lists from Shopify's rich-text editor. Restored
+  `list-style`/`padding-left` scoped to `.cms-page-body ul`/`ol`.
+- **`<p>`/`<li>` text rendered at 17px, not 16px** — same root cause as the
+  contact-card entry above: `.cms-page-body` sets `font-size: 16px` on the
+  container, but reset.css's bare `p { font-size: 1rem }` (1rem = the site's
+  17px root) out-specifies the inherited value on `<p>` tags specifically.
+  Added explicit `.cms-page-body p, .cms-page-body li { font-size: 16px }`.
+- **Body text was brown** — `color: rgba(74,47,31,.78)` hardcoded, same
+  pattern as the PDP audit two entries below; switched to `color-mix(in
+  srgb, var(--cwf-ink-strong) 78%, transparent)`.
+
+Also added `.cms-page-body h1`/`h2`/`h3` scoped sizing (`clamp()`, same
+approach as the contact-card entry) — merchant content occasionally opens
+with its own `<h1>`, which would otherwise inherit the sitewide 56px h1/h2/h3
+rule and blow out the column width. `strong` gets `var(--cwf-primary)` +
+bold (was inheriting default browser bold with body's muted color, low
+contrast) — an emphasis token, not touched per the "headings/emphasis stay
+walnut" precedent.
+
+## 2026-08-31 — Contact card heading was oversized
+
+`.contact-primary-card`'s `<h2 className="title">No ticket desk, no
+chatbot, no fake form.</h2>` had no scoped size, so it inherited the bare
+`h2` rule's `56px` — fine for a full-width section head, but this h2 sits in
+a ~540px boxed card (`.contact-primary-card`) and wrapped to 3 oversized
+lines. Added `.contact-primary-card .title { font-size: clamp(24px, 3vw,
+32px); line-height: 1.25; }` in `app.css`; now sits on one line at a size
+proportionate to the card.
+
+## 2026-08-31 — Breadcrumbs everywhere, `.btn-primary` dark, PDP/contact polish
+
+- **`.btn-primary` (sitewide filled CTA) is now dark, not walnut.** The user
+  pasted the exact rule after the PDP audit above and said it "still not
+  updated" — this is a deliberate escalation past the two prior entries'
+  "leave branded CTAs walnut" calls. `background`/`border-color` and the
+  `:hover` state moved from `--cwf-primary`/`--cwf-primary-dark` to
+  `--cwf-ink-strong`/`--cwf-ink-strong-hover` (the same pair already used by
+  `.header-cart-btn:hover` and, from the entry above, the option-picker
+  buttons). Affects every `.btn.btn-primary` site-wide — "Order now" on PDP,
+  "Email the workshop" on Contact, etc. **Not** touched: `.demo-btn-solid`
+  (homepage hero "Shop All Products" — a different, orange-accent button
+  class, not `.btn-primary`) and `.pdp-sticky-bar .pdp-atc-btn`'s inverted
+  cream-bg/walnut-text variant (not raised).
+- **New `Breadcrumbs.tsx`** ([[components/common]]) extracted from the
+  hand-written markup that only existed on `products.$handle.tsx`, and
+  mounted on every other content route per "place crumbs on all pages except
+  landing[s]": `collections.$handle`, `collections.all`, `collections._index`,
+  `blogs._index`, `blogs.$blogHandle._index`, `blogs.$blogHandle.$articleHandle`,
+  `contact`, `about`, `pages.$handle`, `policies.$handle`, `search`. Skipped
+  `policies._index` (still an unstyled scaffold page, no `.archive-page` to
+  anchor it in — needs its own redesign pass first) and, per "except
+  landing[s]", `_index` (homepage), `landing-oak`, `coming-soon`, plus
+  `account.*`/`cart.*` (transactional flows, not content pages).
+- **`.crumb` text is default case, not caps**: removed
+  `text-transform: uppercase` and its `.08em` letter-spacing (wide tracking
+  reads wrong on mixed-case text) from `.crumb` in `app.css`; bumped
+  `font-size` 12px → 13px since caps-tracking was partly compensating for
+  legibility at the smaller size.
+- **`.pdp-main-img` aspect-ratio**: `1/1.05` → `1/1` (was very slightly
+  taller than square, visible as a small vertical crop on the main PDP
+  image).
+- **Contact page's "Get in touch" card**: `.contact-channel-label`/
+  `.contact-note-label` ("EMAIL", "PHONE", "WORKSHOP HOURS", "VISIT THE
+  WORKSHOP") went `--cwf-accent-deep` → `--cwf-ink-strong`; the description
+  text under each channel and the note paragraphs
+  (`.contact-channel span:last-child`, `.contact-note p`) went from
+  hardcoded `rgba(74,47,31,.7)` to `color-mix(in srgb, var(--cwf-ink-strong)
+  70%, transparent)` (same audit pattern as the PDP entry below) **and**
+  gained an explicit `font-size: 16px` — they had none before, so they
+  inherited `html,body`'s `font-size: 17px` (`app.css` sets the site's rem
+  base to 17px, not the browser default 16px) rather than the 16px other
+  pages set explicitly. `.contact-channel strong` (email/phone values) and
+  `.contact-channel-icon` (icon color) were left on `--cwf-primary`/
+  `--cwf-accent-deep` — not raised, same emphasis/icon-accent reasoning as
+  elsewhere.
+
+## 2026-08-31 — PDP full color audit: every remaining brown text/hardcoded rgb
+
+The user flagged `.pdp-sub` (description paragraph) and `.pdp-acc-body`
+(accordion body) still reading brown, plus asked for a full re-audit of the
+page (not just the classes already touched) and a check for hardcoded colors.
+Root cause: `.pdp-sub`/`.pdp-acc-body` and most other PDP muted/secondary
+text used `rgba(74, 47, 31, X)` — the raw decomposed RGB of `--cwf-primary`
+(#4a2f1f) — hardcoded directly rather than referencing a token, so none of
+this turn's earlier `var(--cwf-accent-deep) → var(--cwf-ink-strong)` sweeps
+ever touched it (different property value entirely, same visual "brown").
+
+Audited every `.pdp-*`/`.product-opt*`/`.crumb*`/`.rev-*`/`.tcard`/`.tgrid*`/
+`.unit-toggle*` rule actually rendered on the product page (cross-checked
+route + component `className`s against `app.css`, not just grepped by
+prefix — this surfaced dead CSS like `.rcard`/`.rev-score`/`.rev-card` that
+looked PDP-related but is never rendered, since `ReviewsSection.tsx` and the
+related-products block actually use `.tcard`/`.tgrid-*` and `.pgrid`/
+`ProductItem` respectively). For every rule that renders real body/label
+text, replaced the hardcoded `rgba(74, 47, 31, X)` with
+`color-mix(in srgb, var(--cwf-ink-strong) X%, transparent)` — same opacity,
+now a token instead of a raw triplet:
+- `.pdp-sub`, `.pdp-acc-body` (the two the user pointed at directly)
+- `.pdp-price-from`, `.pdp-price-vat`, `.pdp-rating-row`, `.pdp-rating-sep`
+- `.pdp-guarantee`, `.pdp-guarantee-sep`, `.pdp-assure-small`, `.pdp-spec-sub`
+- `.crumb` (the HOME / COLLECTIONS / … breadcrumb text)
+- `.tcard .rl` and `.tgrid-count` (→ flat `var(--cwf-ink-strong)`, no
+  transparency needed there) — the actual review-marquee/rating-summary
+  classes `ReviewsSection.tsx` renders on the PDP
+- `.unit-toggle-opt` (the in/cm toggle) — text was `--cwf-accent-deep`; also
+  changed `.unit-toggle-opt.is-active`'s background from `--cwf-primary`
+  walnut to `--cwf-ink-strong`, matching the option-button precedent set two
+  entries below
+
+**Deliberately left alone** (confirmed each is either non-text or
+intentionally not in scope):
+- Border-colors and background tints at low opacity
+  (`rgba(74,47,31,.2–.25)` borders, `.03` background tints on
+  `.pdp-carousel-dot`, `.pdp-wish-btn`, `.pdp-qty`, `.product-opt-select`,
+  `.product-optn`, `.product-opt-progress-step`, table zebra-striping) —
+  these are structural/decorative, not readable text
+- `.pdp-info h1`, `.pdp-price-big`, `.pdp-highlight-item`,
+  `.pdp-assure-strong`, `.pdp-acc summary`, `.pdp-spec-val`,
+  `.crumb-here`/`.rev-score .big`/`.rev-card .headline`/`.tcard q`/`.tcard
+  .nm` (dead code aside) — all `var(--cwf-primary)` walnut used for
+  headings/emphasis/price, the brand's intended use of that token, not
+  incidental brown body text
+- `.pdp-viewing`/`.pdp-urgency` (hardcoded amber/orange, not
+  `--cwf-accent-deep` or the primary-rgb pattern) — intentional
+  urgency/social-proof accent colors, same reasoning as leaving the star
+  icon gold
+- `.pdp-maker`/`.maker` section and its `rgba(243,239,234,X)` — light text on
+  a dark (`--cwf-dark`) background, not brown-on-white
+- `.rcard`, `.rev-score`, `.rev-card`, `.pdp-reviews .rhead` — confirmed dead
+  CSS (no component renders these classNames); left as-is rather than
+  scope-creeping into a cleanup pass
+- Non-PDP selectors that also use `--cwf-accent-deep`/raw primary-rgb
+  (`.page-header`/`.page-breadcrumb` on collection pages, `.eyebrow` used
+  homepage-wide, `.hero-showcase-*`, `.sale-carousel-*`, etc.) — out of
+  scope, this audit was PDP-only per the request
+
+No inline `style={{color: ...}}` or other hardcoded-color `style` props
+found on any PDP-rendered component (`products.$handle.tsx`, `ProductForm`,
+`ReviewsSection`, `ProductPrice`, `UnitToggle`, `ProductModel3D`,
+`ProductImage`) — the two `style={{}}` usages that exist are dynamic
+layout percentages (progress-bar fill/step position), not colors.
+
+## 2026-08-31 — PDP option buttons: dark instead of walnut brown (user override)
+
+The entry below deliberately left `.product-optn` (unselected option-button
+text) and `.product-optn[data-selected="true"]` (selected button's
+background/border) on `var(--cwf-primary)` walnut, reasoning it was a
+branded button fill like the "Order now" CTA. The user explicitly asked for
+these too, overriding that call — changed both to `var(--cwf-ink-strong)`:
+unselected text, the hover border, and the selected state's
+background+border (selected text stays `#f3efea` cream, unchanged, still
+reads correctly on the now-charcoal fill instead of walnut).
+
+`.pdp-atc-btn`/"Order now" CTA was **not** touched — the user's correction
+was scoped to the option-picker buttons (`Sanded`/`Standard`/etc.), not
+raised against the CTA.
+
+## 2026-08-31 — PDP option values: dark instead of walnut brown
+
+Follow-up to the entry below: after the eyebrow/label fixes, the *values*
+next to those labels still read brown — `.product-opt-picked` (the "Sanded",
+"Standard", "Clear + Black" text at the right of each option row) and
+`.product-opt-select` (the Size dropdown's own text) were colored
+`var(--cwf-primary)` (#4a2f1f, walnut), not `--cwf-accent-deep` — a
+different, darker brown that the earlier pass didn't touch since it's the
+same token used for h1s and primary CTAs, i.e. treated as "already dark".
+Against the now-ink-strong labels beside them the walnut still reads warm,
+so switched both to `var(--cwf-ink-strong)`. Also recolored the native
+`<select>`'s inline SVG chevron from `#4A2F1F` to `#352f2a` (ink-strong's
+hex — CSS custom properties don't work inside a `background-image` data URI)
+to match.
+
+Deliberately **left unchanged**: `.product-optn[data-selected="true"]`'s
+walnut background and the "Order now" CTA — those are branded button fills
+(same convention as the site's other primary buttons), not incidental body
+text, so they stay walnut on purpose.
+
+## 2026-08-31 — PDP labels/links: dark instead of brown
+
+Same dark-not-brown direction as the two entries below, applied across the
+product page (`products.$handle.tsx` + `ProductForm.tsx`). Changed
+`color: var(--cwf-accent-deep)` → `var(--cwf-ink-strong)` in `app.css` for:
+- `.pdp-info .eyebrow`, `.pdp-specs-head .eyebrow`, `.pdp-related-head .eyebrow`,
+  `.pdp-reviews .rhead .ey`, `.pdp-related .related-head .ey` — the small
+  uppercase eyebrow labels above PDP section headings
+- `.pdp-rating-link` ("See reviews"), `.pdp-sub-toggle` ("Show more")
+- `.product-opt-label` (UNITS / SIZE / OIL COLOUR + HOOKS COLOUR / WORKING
+  TYPE / HEIGHT ALLOWANCE — the variant-option row labels)
+- `.product-opt-progress-label`, `.product-opt-note` (length-slider step
+  labels and the small helper note under an option row)
+- `.pdp-spec-label` (spec-grid labels lower on the page)
+
+Deliberately **left unchanged**: `.pdp-viewing` ("N viewing now", `#a05c2a`)
+and `.pdp-urgency` (the "Made to order · N slots left" amber banner,
+`#92400e`/`#fef3c7`) — these are intentional urgency/social-proof accent
+colors, not generic label text, same reasoning as leaving the star icon gold
+in the product-card-rating entry below. The sitewide `.eyebrow` class (used
+on non-PDP pages — homepage section headers, etc.) was **not** touched; only
+the PDP-scoped selectors that override it.
+
+## 2026-08-31 — Product card rating text: dark instead of brown
+
+`.pcard-rating` (the "4.0 ★ (4 reviews)" line under a product card's name)
+was colored `var(--cwf-accent-deep)` (brown/oak) for both the number and
+review count. Changed to `var(--cwf-ink-strong)` (dark charcoal), matching
+the same dark-not-brown direction as the filter headings below. The star
+icon itself is untouched — it keeps `var(--cwf-star)` (gold) via its own
+`.pcard-rating svg` rule, since that's the intended accent, not incidental
+brown text.
+
+## 2026-08-31 — Filter headings: no divider, dark instead of brown
+
+Follow-up to the Categories-heading tweak below: the same request now
+applies to every sidebar filter heading, not just Categories. Changed the
+shared `.filters-content h4` rule directly (`app.css`) instead of adding more
+one-off overrides:
+- Removed `border-bottom` and `margin-bottom` — `padding-bottom: 12px` alone
+  now supplies the gap to the content below, so Price/Categories/Availability
+  all look identical to what `.category-nav h4`'s override produced.
+- Color changed `var(--cwf-accent-deep)` (brown/oak) → `var(--cwf-ink-strong)`
+  (dark charcoal, `#352f2a` — same token the header nav text uses).
+
+Since the base rule no longer has a border/margin to strip, the now-redundant
+`.category-nav h4 { border-bottom: none; margin-bottom: 0; }` override (added
+in the entry below) was deleted.
+
+## 2026-08-31 — Collection sidebar filter order: Price, Categories, Availability
+
+`CollectionFilters.tsx` used to render Availability/other list filters first,
+then Price, with `CollectionCategoryNav` rendered as a separate sibling above
+it (order: Categories, Availability, Price). Requested order is Price,
+Categories, Availability instead.
+
+Rather than reorder three independently-rendered pieces at each of the four
+call sites (desktop sidebar + mobile drawer, on both `collections.$handle.tsx`
+and `collections.all.tsx`), `CollectionFilters` now takes an optional
+`categoriesSlot: ReactNode` prop and owns the fixed order internally: Price →
+`categoriesSlot` → Availability/list filters → Clear all. `CollectionCategoryNav`
+no longer renders its own `.filters-content` wrapper (it's always nested
+inside `CollectionFilters`'s one now) — just the `.fblock`. See
+[[components/common]].
+
+Follow-up: the shared `.filters-content h4` rule (used by every filter block
+heading — Price, Availability, etc.) gives each heading a bottom border and
+14px margin as a divider from its own content below. `.category-nav` already
+carries a border-bottom + margin below the whole block for separation from
+what follows, so that same divider under just the "Categories" heading text
+read as a duplicate line. Added `.category-nav h4 { border-bottom: none;
+margin-bottom: 0; }` to `app.css` to strip it — scoped to `.category-nav`
+only, so Price/Availability headings keep their divider.
+
+## 2026-08-31 — Collection sidebar: categories moved from top row into filters
+
+- `collections.$handle.tsx` and `collections.all.tsx`: the horizontal
+  "Console Tables / Cube Blocks / …" category-card row that sat above the
+  product grid (`.category-row`/`.category-card`, deleted as dead CSS once
+  unused) is gone. Collections now render as a "Categories" block at the top
+  of the sidebar (`.shop-sidebar` desktop, `.mob-filter-body` mobile),
+  above Availability/Price — new shared `CollectionCategoryNav.tsx`
+  ([[components/common]]).
+- `collections.$handle.tsx`: loader var renamed `siblingCollections` →
+  `sidebarCategories`; the current collection is now **included** in the
+  list (was excluded) so it can render highlighted via `activeHandle`,
+  matching how a sidebar category nav conventionally shows "you are here".
+  Query renamed `SIBLING_COLLECTIONS_QUERY` → `SIDEBAR_CATEGORIES_QUERY` to
+  match.
+- Both routes cap the sidebar list at 8 collections (`.slice(0, 8)`,
+  filtered through `shouldHideCollection` same as before) — the full
+  catalog only has 7, so nothing is currently cut off, but a future
+  9th+ collection would need a "show more" if this becomes a real limit.
+
+## 2026-08-31 — Product card image gallery nav + header search suggestions
+
+- `ProductItem.tsx`: the crossfade-on-hover two-image swap (`featuredImage` +
+  one other) is now a full gallery scrubber. Hovering a `.pcard` reveals
+  chevron arrows and progress dots overlaid on the image (styled after
+  `HeroCarousel`'s `.demo-hero-nav`/`.demo-hero-dot`, but white-on-dark since
+  the card has no strip below the image to host it in) — up to 5 images,
+  clickable without triggering the card's outer `Link` navigation. New CSS:
+  `.pcard-img-nav`, `.pcard-img-arrow`, `.pcard-img-dots`, `.pcard-img-dot` in
+  `app.css`.
+- Header/aside search no longer opens to an empty panel. New
+  `app/components/SearchSuggestions.tsx` renders "Popular Search" tags (real
+  collection titles from `header.collections`, already fetched by
+  `HEADER_QUERY`) and a "Featured Products" row while the search field is
+  focused but has no term yet, used by both `HeaderSearch.tsx` (inline
+  desktop dropdown) and `PageLayout.tsx`'s `SearchAside` (mobile aside).
+- Added `app/lib/searchSuggestions.ts` — `SEARCH_SUGGESTIONS_QUERY` (best
+  sellers, `EXCLUDE_HIDDEN_PRODUCTS_QUERY`-filtered like the homepage) plus
+  `buildFeaturedSearchProducts`. Fetched in `root.tsx`'s `loadDeferredData`
+  (cached long, deferred so it never blocks TTFB) and threaded through
+  `PageLayout` → `Header`/`SearchAside` as a promise, resolved with
+  `<Await>`/`<Suspense>` inside `SearchSuggestions`.
+
+## 2026-08-27 — catalog: Figma hero images + status cleanup (Shopify data only)
+
+Store-side change (no repo code touched), done via the Shopify Admin API.
+
+- Pulled the 11 product renders from Figma file `rofOs7HDouBaGx36STSZuP`,
+  section `256:1992` ("Section 2", items 2–12), as 1254×1254 PNGs and added
+  each as new product media, moved to position 0 so it is the featured image.
+- Products updated (all now ACTIVE): Oak Mantle Beam with Corbels, Oak Mantle
+  Beam Flamed, Oak Fireplace Surround, Coat Rack with Shelf, Coat Rack,
+  Coat Rack (Set of 2), Solid Oak Shelf with Brackets, Solid Oak Floating
+  Shelf, Oak Doorstop, Console Table with Hairpin Legs, Solid Oak Block.
+- `Solid Oak Shelf with Brackets` and `Console Table with Hairpin Legs` were
+  also published to the **Wood Headless** channel (publication `342742139222`)
+  — they were ACTIVE but unpublished, so they would not have rendered.
+- Every other product (23: the legacy `- Part 1` Etsy imports plus
+  `Mantle Beam`, `Oak Mantle Beam`, `Solid Oak Fireplace Beam Mantel …`) set
+  to DRAFT. `Oak Mantle Beam (Copy)` left ARCHIVED.
+- `Height Allowance Surcharge` and `Working Type Surcharge` deliberately left
+  ACTIVE — they are checkout add-on line items, not catalog products.
 
 Chronological log of notable changes to the project. Newest first.
 This is a human-curated log — not a mirror of `git log`. Record *why*, not just

@@ -2,6 +2,7 @@ import {useLoaderData} from 'react-router';
 import type {Route} from './+types/pages.$handle';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {getFlagshipPagePath, SITE_NAME} from '~/lib/site';
+import {Breadcrumbs} from '~/components/Breadcrumbs';
 
 export const meta: Route.MetaFunction = ({data}) => {
   const title = data?.page.seo?.title || data?.page.title;
@@ -76,6 +77,7 @@ export default function Page() {
 
   return (
     <div className="archive-page">
+      <Breadcrumbs items={[{label: page.title}]} />
       <div className="archive-hero">
         <div className="archive-wrap">
           <div className="archive-hero-inner">

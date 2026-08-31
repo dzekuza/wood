@@ -4,6 +4,7 @@ import type {
   CartApiQueryFragment,
   FooterQuery,
   HeaderQuery,
+  SearchSuggestionsQuery,
 } from 'storefrontapi.generated';
 import {Aside} from '~/components/Aside';
 import {Footer} from '~/components/Footer';
@@ -14,6 +15,8 @@ import {
   SearchFormPredictive,
 } from '~/components/SearchFormPredictive';
 import {SearchResultsPredictive} from '~/components/SearchResultsPredictive';
+import {SearchSuggestions} from '~/components/SearchSuggestions';
+import {shouldHideCollection} from '~/lib/site';
 
 interface PageLayoutProps {
   cart: Promise<CartApiQueryFragment | null>;
@@ -21,6 +24,7 @@ interface PageLayoutProps {
   header: HeaderQuery;
   isLoggedIn: Promise<boolean>;
   publicStoreDomain: string;
+  searchSuggestions: Promise<SearchSuggestionsQuery | null>;
   children?: React.ReactNode;
 }
 
@@ -31,11 +35,12 @@ export function PageLayout({
   header,
   isLoggedIn,
   publicStoreDomain,
+  searchSuggestions,
 }: PageLayoutProps) {
   return (
     <Aside.Provider>
       <CartAside cart={cart} />
-      <SearchAside />
+      <SearchAside header={header} searchSuggestions={searchSuggestions} />
       <MobileMenuAside header={header} publicStoreDomain={publicStoreDomain} />
       {header && (
         <Header
@@ -43,6 +48,7 @@ export function PageLayout({
           cart={cart}
           isLoggedIn={isLoggedIn}
           publicStoreDomain={publicStoreDomain}
+          searchSuggestions={searchSuggestions}
         />
       )}
       <main>{children}</main>
@@ -80,7 +86,21 @@ function CartAside({cart}: {cart: PageLayoutProps['cart']}) {
   );
 }
 
-function SearchAside() {
+function SearchAside({
+  header,
+  searchSuggestions,
+}: {
+  header: PageLayoutProps['header'];
+  searchSuggestions: PageLayoutProps['searchSuggestions'];
+}) {
+  const categories = (header.collections?.nodes ?? []).filter(
+    (collection) =>
+      !shouldHideCollection({
+        handle: collection.handle,
+        title: collection.title,
+      }),
+  );
+
   return (
     <Aside type="search" heading="SEARCH">
       <div className="predictive-search">
@@ -113,6 +133,16 @@ function SearchAside() {
 
             if (state === 'loading' && term.current) {
               return <div>Loading...</div>;
+            }
+
+            if (!term.current) {
+              return (
+                <SearchSuggestions
+                  categories={categories}
+                  searchSuggestions={searchSuggestions}
+                  onNavigate={closeSearch}
+                />
+              );
             }
 
             if (!total) {

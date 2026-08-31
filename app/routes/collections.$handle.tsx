@@ -1,4 +1,4 @@
-import {redirect, useLoaderData, Link} from 'react-router';
+import {redirect, useLoaderData} from 'react-router';
 import {useState} from 'react';
 import type {Route} from './+types/collections.$handle';
 import {getPaginationVariables, Analytics} from '@shopify/hydrogen';
@@ -7,6 +7,8 @@ import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {ProductItem} from '~/components/ProductItem';
 import {SortDropdown} from '~/components/SortDropdown';
 import {CollectionFilters} from '~/components/CollectionFilters';
+import {CollectionCategoryNav} from '~/components/CollectionCategoryNav';
+import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {parseFiltersFromSearchParams} from '~/lib/collectionFilters';
 import {SITE_NAME, shouldHideCollection} from '~/lib/site';
 import type {ProductItemFragment} from 'storefrontapi.generated';
@@ -57,7 +59,7 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
       variables: {handle, ...paginationVariables, sortKey, reverse, filters},
       cache: storefront.CacheNone(),
     }),
-    storefront.query(SIBLING_COLLECTIONS_QUERY, {cache: storefront.CacheShort()}),
+    storefront.query(SIDEBAR_CATEGORIES_QUERY, {cache: storefront.CacheShort()}),
   ]);
 
   if (!collection) {
@@ -69,15 +71,22 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   // The API handle might be localized, so redirect to the localized handle
   redirectIfHandleIsLocalized(request, {handle, data: collection});
 
-  const siblingCollections = collections.nodes.filter(
-    (node) =>
-      node.handle !== handle &&
-      !shouldHideCollection({handle: node.handle, title: node.title}),
-  );
+  const sidebarCategories = collections.nodes
+    .filter(
+      (node) => !shouldHideCollection({handle: node.handle, title: node.title}),
+    )
+    .slice(0, 8)
+    .map((node) => ({
+      id: node.id,
+      handle: node.handle,
+      title: node.title,
+      image: node.image,
+      count: node.products.nodes.length,
+    }));
 
   return {
     collection,
-    siblingCollections,
+    sidebarCategories,
     sortParam,
   };
 }
@@ -93,12 +102,18 @@ function loadDeferredData({context}: Route.LoaderArgs) {
 
 
 export default function Collection() {
-  const {collection, siblingCollections, sortParam} = useLoaderData<typeof loader>();
+  const {collection, sidebarCategories, sortParam} = useLoaderData<typeof loader>();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const filters = collection.products.filters ?? [];
 
   return (
     <div className="archive-page">
+      <Breadcrumbs
+        items={[
+          {label: 'Collections', to: '/collections/all'},
+          {label: collection.title},
+        ]}
+      />
       <div className="archive-hero">
         <div className="archive-wrap">
           <div className="archive-hero-inner">
@@ -107,35 +122,6 @@ export default function Collection() {
           {collection.description && (
             <p className="archive-hero-blurb">{collection.description}</p>
           )}
-
-          {siblingCollections.length > 0 && (
-            <div className="category-row">
-              {siblingCollections.slice(0, 4).map((sibling) => (
-                <Link
-                  key={sibling.handle}
-                  to={`/collections/${sibling.handle}`}
-                  className="category-card"
-                >
-                  {sibling.image && (
-                    <span className="category-card-img">
-                      <img
-                        src={sibling.image.url}
-                        alt={sibling.image.altText ?? sibling.title}
-                        loading="lazy"
-                      />
-                    </span>
-                  )}
-                  <span className="category-card-text">
-                    <span className="category-card-name">{sibling.title}</span>
-                    <span className="category-card-count">
-                      {sibling.products.nodes.length}{' '}
-                      {sibling.products.nodes.length === 1 ? 'product' : 'products'}
-                    </span>
-                  </span>
-                </Link>
-              ))}
-            </div>
-          )}
         </div>
       </div>
 
@@ -143,7 +129,15 @@ export default function Collection() {
         <div className="archive-wrap">
           <div className="shop-layout">
             <aside className="shop-sidebar">
-              <CollectionFilters filters={filters} />
+              <CollectionFilters
+                filters={filters}
+                categoriesSlot={
+                  <CollectionCategoryNav
+                    categories={sidebarCategories}
+                    activeHandle={collection.handle}
+                  />
+                }
+              />
             </aside>
 
             <div>
@@ -208,7 +202,16 @@ export default function Collection() {
               </button>
             </div>
             <div className="mob-filter-body">
-              <CollectionFilters filters={filters} resultCount={collection.products.nodes.length} />
+              <CollectionFilters
+                filters={filters}
+                resultCount={collection.products.nodes.length}
+                categoriesSlot={
+                  <CollectionCategoryNav
+                    categories={sidebarCategories}
+                    activeHandle={collection.handle}
+                  />
+                }
+              />
             </div>
             <div className="mob-filter-footer">
               <button className="btn btn-primary btn-pill" onClick={() => setMobileFiltersOpen(false)}>
@@ -347,7 +350,7 @@ const COLLECTION_QUERY = `#graphql
   }
 ` as const;
 
-const SIBLING_COLLECTIONS_QUERY = `#graphql
+const SIDEBAR_CATEGORIES_QUERY = `#graphql
   query SiblingCollections($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
     collections(first: 20, sortKey: TITLE) {

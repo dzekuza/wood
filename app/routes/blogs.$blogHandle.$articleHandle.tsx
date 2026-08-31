@@ -1,6 +1,8 @@
 import {useLoaderData} from 'react-router';
 import type {Route} from './+types/blogs.$blogHandle.$articleHandle';
 import {Image} from '@shopify/hydrogen';
+import {Breadcrumbs} from '~/components/Breadcrumbs';
+import {ArticleCard} from '~/components/ArticleCard';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {SITE_NAME} from '~/lib/site';
 
@@ -54,7 +56,13 @@ async function loadCriticalData({context, request, params}: Route.LoaderArgs) {
 
   const article = blog.articleByHandle;
 
-  return {article};
+  // Other articles from the same blog, newest first, excluding this one —
+  // capped at 3 for the "You may also like" strip.
+  const relatedArticles = blog.articles.nodes
+    .filter((node) => node.handle !== articleHandle)
+    .slice(0, 3);
+
+  return {article, relatedArticles};
 }
 
 /**
@@ -67,7 +75,7 @@ function loadDeferredData({context}: Route.LoaderArgs) {
 }
 
 export default function Article() {
-  const {article} = useLoaderData<typeof loader>();
+  const {article, relatedArticles} = useLoaderData<typeof loader>();
   const {title, image, contentHtml, author} = article;
 
   const publishedDate = new Intl.DateTimeFormat('en-US', {
@@ -78,6 +86,12 @@ export default function Article() {
 
   return (
     <div className="archive-page">
+      <Breadcrumbs
+        items={[
+          {label: 'Journal', to: '/blogs'},
+          {label: title},
+        ]}
+      />
       <div className="archive-hero">
         <div className="archive-wrap">
           <div className="archive-hero-inner">
@@ -95,12 +109,44 @@ export default function Article() {
           />
         </div>
       </article>
+
+      {relatedArticles.length > 0 && (
+        <div className="archive-wrap blog-index-section">
+          <div className="shead">
+            <div>
+              <span className="eyebrow">Journal</span>
+              <h2 className="title">You may also like</h2>
+            </div>
+          </div>
+          <div className="blog-articles-grid">
+            {relatedArticles.map((related) => (
+              <ArticleCard key={related.id} article={related} loading="lazy" />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 // NOTE: https://shopify.dev/docs/api/storefront/latest/objects/blog#field-blog-articlebyhandle
 const ARTICLE_QUERY = `#graphql
+  fragment RelatedArticle on Article {
+    id
+    handle
+    title
+    publishedAt
+    image {
+      id
+      altText
+      url
+      width
+      height
+    }
+    blog {
+      handle
+    }
+  }
   query Article(
     $articleHandle: String!
     $blogHandle: String!
@@ -127,6 +173,11 @@ const ARTICLE_QUERY = `#graphql
         seo {
           description
           title
+        }
+      }
+      articles(first: 5, sortKey: PUBLISHED_AT, reverse: true) {
+        nodes {
+          ...RelatedArticle
         }
       }
     }

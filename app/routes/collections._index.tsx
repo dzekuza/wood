@@ -3,6 +3,7 @@ import type {Route} from './+types/collections._index';
 import {getPaginationVariables, Image} from '@shopify/hydrogen';
 import type {CollectionFragment} from 'storefrontapi.generated';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
+import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {shouldHideCollection} from '~/lib/site';
 
 export async function loader(args: Route.LoaderArgs) {
@@ -59,6 +60,7 @@ export default function Collections() {
 
   return (
     <div className="archive-page">
+      <Breadcrumbs items={[{label: 'Collections'}]} />
       {/* Hero */}
       <div className="archive-hero">
         <div className="archive-wrap">

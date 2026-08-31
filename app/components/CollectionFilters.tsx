@@ -128,19 +128,29 @@ function PriceFilterBlock({priceFilter}: {priceFilter: Filter | undefined}) {
 export function CollectionFilters({
   filters,
   resultCount,
+  categoriesSlot,
 }: {
   filters: Filter[];
   resultCount?: number;
+  /** "Categories" block (`CollectionCategoryNav`), rendered between Price and
+   *  Availability per the sidebar's fixed order: Price, Categories,
+   *  Availability. Passed in rather than imported here so this component
+   *  doesn't need to know about collections/routing. */
+  categoriesSlot?: React.ReactNode;
 }) {
   const [searchParams] = useSearchParams();
   const listFilters = getListAndBooleanFilters(filters);
   const priceFilter = getPriceFilter(filters);
   const showClear = hasActiveFilters(searchParams);
 
-  if (listFilters.length === 0 && !priceFilter) return null;
+  if (listFilters.length === 0 && !priceFilter && !categoriesSlot) return null;
 
   return (
     <div className="filters-content">
+      <PriceFilterBlock priceFilter={priceFilter} />
+
+      {categoriesSlot}
+
       {listFilters.map((filter) => (
         <div className="fblock" key={filter.id}>
           <h4>{filter.label}</h4>
@@ -151,8 +161,6 @@ export function CollectionFilters({
           </ul>
         </div>
       ))}
-
-      <PriceFilterBlock priceFilter={priceFilter} />
 
       {showClear && (
         <Link to={getClearFiltersUrl(searchParams)} replace preventScrollReset className="filter-clear-btn">

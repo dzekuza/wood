@@ -6,7 +6,11 @@ import {
   useOptimisticCart,
   Money,
 } from '@shopify/hydrogen';
-import type {HeaderQuery, CartApiQueryFragment} from 'storefrontapi.generated';
+import type {
+  HeaderQuery,
+  CartApiQueryFragment,
+  SearchSuggestionsQuery,
+} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
 import {AnnouncementBar} from '~/components/AnnouncementBar';
 import {HeaderSearch} from '~/components/HeaderSearch';
@@ -17,6 +21,7 @@ interface HeaderProps {
   cart: Promise<CartApiQueryFragment | null>;
   isLoggedIn: Promise<boolean>;
   publicStoreDomain: string;
+  searchSuggestions: Promise<SearchSuggestionsQuery | null>;
 }
 
 type Viewport = 'desktop' | 'mobile';
@@ -43,7 +48,13 @@ function useHeaderOverlay() {
   return {isOverlay, isScrolled: isOverlay && isScrolled};
 }
 
-export function Header({header, isLoggedIn, cart, publicStoreDomain}: HeaderProps) {
+export function Header({
+  header,
+  isLoggedIn,
+  cart,
+  publicStoreDomain,
+  searchSuggestions,
+}: HeaderProps) {
   const {shop, menu, collections} = header;
   const {isOverlay, isScrolled} = useHeaderOverlay();
   const categories = (collections?.nodes ?? []).filter(
@@ -77,7 +88,7 @@ export function Header({header, isLoggedIn, cart, publicStoreDomain}: HeaderProp
           categories={categories}
         />
 
-        <HeaderSearch />
+        <HeaderSearch categories={categories} searchSuggestions={searchSuggestions} />
 
         <div className="header-topbar-ctas">
           <HeaderMenuMobileToggle />

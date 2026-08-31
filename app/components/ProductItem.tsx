@@ -81,13 +81,27 @@ export function ProductItem({
 }) {
   const variantUrl = useVariantUrl(product.handle);
   const image = product.featuredImage;
-  const hoverImage = product.images?.nodes?.find((node) => node.id !== image?.id) ?? null;
+  // Featured image first, then the rest of the gallery (deduped) — this is
+  // the set the hover nav scrubs through, capped so the dots stay compact.
+  const galleryImages = [
+    image,
+    ...(product.images?.nodes?.filter((node) => node.id !== image?.id) ?? []),
+  ]
+    .filter((node): node is NonNullable<typeof node> => Boolean(node))
+    .slice(0, 5);
   const price = product.priceRange.minVariantPrice;
   const rating = getRatingSummary(('metafield' in product && product.metafield?.value) || null);
   const swatches = getSwatches(product);
   const [isSaved, setIsSaved] = useState(false);
+  const [activeImage, setActiveImage] = useState(0);
   const isSoldOut = product.selectedOrFirstAvailableVariant?.availableForSale === false;
   const saveAmount = isSoldOut ? null : getSaveAmount(product);
+
+  function goToImage(event: React.MouseEvent, index: number) {
+    event.preventDefault();
+    event.stopPropagation();
+    setActiveImage((index + galleryImages.length) % galleryImages.length);
+  }
 
   return (
     <Link
@@ -102,22 +116,49 @@ export function ProductItem({
         ) : (
           saveAmount && <span className="pbadge pbadge-sale">Save {saveAmount}</span>
         )}
-        {image && (
+        {galleryImages.map((node, index) => (
           <img
-            src={image.url}
-            alt={image.altText || product.title}
-            loading={loading}
-            className="pcard-img-frame pcard-img-frame-primary"
+            key={node.id}
+            src={node.url}
+            alt={index === 0 ? node.altText || product.title : ''}
+            aria-hidden={index !== 0}
+            loading={index === 0 ? loading : 'lazy'}
+            className={`pcard-img-frame${index === activeImage ? ' is-active' : ''}`}
           />
-        )}
-        {hoverImage && (
-          <img
-            src={hoverImage.url}
-            alt=""
-            aria-hidden
-            loading="lazy"
-            className="pcard-img-frame pcard-img-frame-hover"
-          />
+        ))}
+        {galleryImages.length > 1 && (
+          <div className="pcard-img-nav">
+            <button
+              type="button"
+              className="pcard-img-arrow reset"
+              onClick={(event) => goToImage(event, activeImage - 1)}
+              aria-label="Previous image"
+            >
+              <i className="ti ti-chevron-left" aria-hidden />
+            </button>
+
+            <div className="pcard-img-dots">
+              {galleryImages.map((node, index) => (
+                <button
+                  key={node.id}
+                  type="button"
+                  className={`pcard-img-dot reset${index === activeImage ? ' is-active' : ''}`}
+                  onClick={(event) => goToImage(event, index)}
+                  aria-label={`Show image ${index + 1}`}
+                  aria-current={index === activeImage}
+                />
+              ))}
+            </div>
+
+            <button
+              type="button"
+              className="pcard-img-arrow reset"
+              onClick={(event) => goToImage(event, activeImage + 1)}
+              aria-label="Next image"
+            >
+              <i className="ti ti-chevron-right" aria-hidden />
+            </button>
+          </div>
         )}
         <button
           type="button"

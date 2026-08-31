@@ -1,6 +1,7 @@
 import {Link, useLoaderData} from 'react-router';
 import type {Route} from './+types/policies.$handle';
 import {type Shop} from '@shopify/hydrogen/storefront-api-types';
+import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {SITE_NAME} from '~/lib/site';
 
 type SelectedPolicies = keyof Pick<
@@ -47,6 +48,12 @@ export default function Policy() {
 
   return (
     <div className="archive-page">
+      <Breadcrumbs
+        items={[
+          {label: 'Policies', to: '/policies'},
+          {label: policy.title},
+        ]}
+      />
       <div className="archive-hero">
         <div className="archive-wrap">
           <div className="archive-hero-inner">

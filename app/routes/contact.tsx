@@ -1,4 +1,5 @@
 import type {Route} from './+types/contact';
+import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {
   CONTACT_EMAIL,
   CONTACT_PHONE_DISPLAY,
@@ -44,6 +45,7 @@ export const meta: Route.MetaFunction = () => [
 export default function ContactPage() {
   return (
     <div className="archive-page">
+      <Breadcrumbs items={[{label: 'Contact'}]} />
       <div className="archive-hero">
         <div className="archive-wrap">
           <div className="archive-hero-inner">
