@@ -3,6 +3,19 @@ tags: [meta, changelog]
 updated: 2026-08-31
 ---
 
+## 2026-08-31 — Per-blog article listing (`/blogs/news`) was stacked instead of a grid
+
+`blogs.$blogHandle._index.tsx` wrapped `<PaginatedResourceSection>` in
+`<div className="blog-articles-grid">` instead of passing
+`resourcesClassName="blog-articles-grid"` to the component itself.
+`PaginatedResourceSection` renders its own outer `<div>` (Previous link +
+items + Next link), so the grid class landed on the wrapper's only child —
+a non-grid `<div>` — and the `ArticleCard`s inside it just stacked in
+block flow instead of laying out 3-up. Fixed by passing
+`resourcesClassName` directly, matching the pattern `collections.$handle.tsx`
+already used correctly with `resourcesClassName="pgrid"`. Verified live:
+`.blog-articles-grid` now computes `display: grid` with 3 equal columns.
+
 ## 2026-08-31 — Unified the review-photo lightbox, added thumbnail strip, lightened backdrop
 
 The product page (`ReviewsSection`) had its own single-image `ImageLightbox`

@@ -82,17 +82,18 @@ export default function Blog() {
         </div>
       </div>
       <div className="archive-wrap blog-index-section">
-        <div className="blog-articles-grid">
-          <PaginatedResourceSection<ArticleItemFragment> connection={articles}>
-            {({node: article, index}) => (
-              <ArticleCard
-                article={article}
-                key={article.id}
-                loading={index < 3 ? 'eager' : 'lazy'}
-              />
-            )}
-          </PaginatedResourceSection>
-        </div>
+        <PaginatedResourceSection<ArticleItemFragment>
+          connection={articles}
+          resourcesClassName="blog-articles-grid"
+        >
+          {({node: article, index}) => (
+            <ArticleCard
+              article={article}
+              key={article.id}
+              loading={index < 3 ? 'eager' : 'lazy'}
+            />
+          )}
+        </PaginatedResourceSection>
       </div>
     </div>
   );
