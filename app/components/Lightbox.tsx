@@ -93,6 +93,26 @@ export function Lightbox({
       )}
 
       {count > 1 && (
+        <div className="lightbox-thumbs">
+          {images.map((image, i) => (
+            <button
+              key={image.src + i}
+              type="button"
+              className={`lightbox-thumb reset${i === index ? ' is-active' : ''}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                onNavigate(i);
+              }}
+              aria-label={`Go to image ${i + 1}`}
+              aria-current={i === index}
+            >
+              <img src={image.src} alt="" />
+            </button>
+          ))}
+        </div>
+      )}
+
+      {count > 1 && (
         <div className="lightbox-count">
           {index + 1} / {count}
         </div>

@@ -3,6 +3,21 @@ tags: [meta, changelog]
 updated: 2026-08-31
 ---
 
+## 2026-08-31 — Unified the review-photo lightbox, added thumbnail strip, lightened backdrop
+
+The product page (`ReviewsSection`) had its own single-image `ImageLightbox`
+with no next/prev navigation, while the homepage (`TestimonialsMarquee`)
+used the shared `Lightbox` component with arrows/counter. Per user request,
+unified both onto `Lightbox.tsx`: deleted `ImageLightbox` and the dead
+`.rev-lightbox-backdrop`/`.rev-lightbox-img`/`.rev-lightbox-close` CSS.
+Added a click-to-jump thumbnail strip (`.lightbox-thumbs`) between the
+image and the `N / total` counter. Backdrop opacity dropped from `.92` to
+`.5` (`rgba(28,28,28,.5)`) — supersedes the standalone `.rev-lightbox-*`
+opacity tweak from earlier today, which is now moot since that class is
+gone. Added a box-shadow to `.lightbox-img` for separation against the
+now-lighter backdrop. Verified live on both the homepage testimonials and
+a product page's review photos — same backdrop, same thumbnail strip.
+
 ## 2026-08-31 — Category pages default to Shopify's collection order (see [[../meta/decisions-log|ADR-0007]])
 
 `collections.$handle.tsx` defaulted `sort` to `newest` (`CREATED`,

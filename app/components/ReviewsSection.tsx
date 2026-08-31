@@ -1,7 +1,7 @@
-import {useState, useEffect, useCallback} from 'react';
-import {createPortal} from 'react-dom';
+import {useState} from 'react';
 import {Link} from 'react-router';
 import {REVIEWS} from '~/lib/reviews';
+import {Lightbox} from '~/components/Lightbox';
 
 export type ProductReview = {
   author: string;
@@ -19,63 +19,21 @@ function StarRow({rating}: {rating: number}) {
   );
 }
 
-function ImageLightbox({src, onClose}: {src: string; onClose: () => void}) {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', onKey);
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = '';
-    };
-  }, [onClose]);
-
-  // Portalled to <body> on purpose: these cards live inside .rev-marquee-track,
-  // which is animated with `transform`. A transformed ancestor becomes the
-  // containing block for `position: fixed`, so rendering the overlay in place
-  // pinned it to the moving track — it opened ~1600px off-screen.
-  return createPortal(
-    <div className="rev-lightbox-backdrop" role="dialog" aria-modal="true">
-      {/* See Lightbox.tsx — dismissal is a real button behind the content so
-          it's reachable by keyboard, not a handler on the wrapper div. */}
-      <button
-        type="button"
-        className="lightbox-backdrop reset"
-        onClick={onClose}
-        aria-label="Close"
-        tabIndex={-1}
-      />
-      <button
-        type="button"
-        className="rev-lightbox-close"
-        onClick={onClose}
-        aria-label="Close image"
-      >
-        ✕
-      </button>
-      <img src={src} alt="Customer review" className="rev-lightbox-img" />
-    </div>,
-    document.body,
-  );
-}
-
 function ProductReviewCard({review, ariaHidden}: {review: ProductReview; ariaHidden?: boolean}) {
-  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
-  const close = useCallback(() => setLightboxSrc(null), []);
+  const photos = review.images ?? [];
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
     <div className="tcard rev-marquee-card" aria-hidden={ariaHidden || undefined}>
       <StarRow rating={review.rating} />
       <q>{review.body}</q>
-      {review.images && review.images.length > 0 && (
+      {photos.length > 0 && (
         <div className="rev-images">
-          {review.images.slice(0, 4).map((src, i) => (
+          {photos.slice(0, 4).map((src, i) => (
             <button
               key={i}
               className="rev-img-btn"
-              onClick={() => !ariaHidden && setLightboxSrc(src)}
+              onClick={() => !ariaHidden && setOpenIndex(i)}
               tabIndex={ariaHidden ? -1 : 0}
               aria-label={`View review photo ${i + 1}`}
             >
@@ -104,8 +62,16 @@ function ProductReviewCard({review, ariaHidden}: {review: ProductReview; ariaHid
           </div>
         </div>
       </div>
-      {lightboxSrc && !ariaHidden && (
-        <ImageLightbox src={lightboxSrc} onClose={close} />
+      {openIndex !== null && !ariaHidden && (
+        <Lightbox
+          images={photos.slice(0, 4).map((src) => ({
+            src,
+            alt: `Photo from ${review.author}'s review`,
+          }))}
+          index={openIndex}
+          onClose={() => setOpenIndex(null)}
+          onNavigate={setOpenIndex}
+        />
       )}
     </div>
   );
