@@ -19,10 +19,7 @@ import {
   type HomeContent,
 } from '~/lib/homeContent';
 import {SITE_NAME} from '~/lib/site';
-import {
-  EXCLUDE_HIDDEN_PRODUCTS_QUERY,
-  filterHiddenProducts,
-} from '~/lib/upsells';
+import {filterHiddenProducts} from '~/lib/upsells';
 import demoStyles from '~/styles/demo.css?url';
 
 export const meta: Route.MetaFunction = () => {
@@ -76,15 +73,13 @@ export async function loader(args: Route.LoaderArgs) {
   const {context} = args;
   const [heroShowcase, popularProducts, homeContent] = await Promise.all([
     context.storefront.query(HERO_SHOWCASE_QUERY),
-    context.storefront.query(POPULAR_PRODUCTS_QUERY, {
-      variables: {query: EXCLUDE_HIDDEN_PRODUCTS_QUERY},
-    }),
+    context.storefront.query(POPULAR_PRODUCTS_QUERY),
     context.storefront.query(HOME_CONTENT_QUERY),
   ]);
 
   const visiblePopularProducts = filterHiddenProducts<
-    PopularProductsQuery['products']['nodes'][number]
-  >(popularProducts.products.nodes).slice(0, 8);
+    NonNullable<PopularProductsQuery['collection']>['products']['nodes'][number]
+  >(popularProducts.collection?.products.nodes ?? []).slice(0, 8);
 
   return {
     isShopLinked: Boolean(context.env.PUBLIC_STORE_DOMAIN),
@@ -132,7 +127,7 @@ function PopularProductsSection({
   products,
   content,
 }: {
-  products: PopularProductsQuery['products']['nodes'];
+  products: NonNullable<PopularProductsQuery['collection']>['products']['nodes'];
   content: HomeContent['popular'];
 }) {
   if (!products.length) return null;
@@ -272,11 +267,12 @@ const POPULAR_PRODUCTS_QUERY = `#graphql
   query PopularProducts(
     $country: CountryCode
     $language: LanguageCode
-    $query: String
   ) @inContext(country: $country, language: $language) {
-    products(first: 16, sortKey: BEST_SELLING, query: $query) {
-      nodes {
-        ...PopularProductItem
+    collection(handle: "most-popular") {
+      products(first: 16) {
+        nodes {
+          ...PopularProductItem
+        }
       }
     }
   }

@@ -1,12 +1,12 @@
 import {Link} from 'react-router';
-import type {PopularProductsQuery} from 'storefrontapi.generated';
+import type {PopularProductItemLandingOakFragment} from 'storefrontapi.generated';
 
 const THEMES = ['sage', 'oak', 'walnut'] as const;
 
 export function FeaturedPicks({
   products,
 }: {
-  products: PopularProductsQuery['products']['nodes'];
+  products: PopularProductItemLandingOakFragment[];
 }) {
   if (!products.length) return null;
 

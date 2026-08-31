@@ -1,14 +1,14 @@
 import {useEffect, useRef, useState} from 'react';
 import {Link} from 'react-router';
 import {ProductItem} from '~/components/ProductItem';
-import type {PopularProductsQuery} from 'storefrontapi.generated';
+import type {PopularProductItemLandingOakFragment} from 'storefrontapi.generated';
 
 const PER_PAGE = 4;
 
 export interface ProductCarouselTab {
   key: string;
   label: string;
-  products: PopularProductsQuery['products']['nodes'];
+  products: PopularProductItemLandingOakFragment[];
 }
 
 export function ProductCarousel({
