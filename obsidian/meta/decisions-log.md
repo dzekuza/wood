@@ -128,3 +128,122 @@ That safety net earned itself immediately: the metaobjects were first created on
 the wrong Shopify store, so for several hours the homepage was fetching content
 that did not exist. It rendered correctly the whole time. A design that treated
 missing content as an error would have taken the homepage down instead.
+
+---
+
+## ADR-0005 — Header nav is driven entirely by Shopify's `main-menu`, not hardcoded links
+
+- **Status:** Accepted
+- **Date:** 2026-08-31
+
+**Context.** `Header.tsx`'s `HeaderMenu` hardcoded every nav link in JSX
+("All Products", a "By Category" dropdown built from `header.collections`,
+"Journal", "Contact"), even though `root.tsx`'s loader already fetched
+`header.menu` from the Storefront API's `menu(handle: "main-menu")` — a
+standard Hydrogen skeleton query that was simply never wired up. Any nav
+change (add a link, reorder, add a category to the dropdown) needed a code
+change and a deploy, and the shop owner had no way to touch it.
+
+**Decision.** `HeaderMenu` now renders `header.menu.items` directly. A
+top-level item with nested `items` becomes a `.header-dropdown` on desktop
+(hover-reveal) and an indented flat list on mobile — matching Shopify's own
+nav editor, which only supports one level of nesting. `resolveMenuItemUrl()`
+strips the item's absolute URL (myshopify or primary domain) down to a path
+so `NavLink` still does client-side routing. The store's `main-menu` was
+then populated in Shopify Admin (Settings → Navigation) to mirror the old
+hardcoded structure: All products, a "By category" dropdown listing the 7
+active collections, News (→ the store's real "news" blog), Contact.
+
+**Consequences.** Nav edits — add/remove/reorder a link, add a collection to
+the dropdown — now happen entirely in Shopify Admin, no deploy. The
+`categories` list computed in `Header()` from `header.collections` is no
+longer used for nav; it survives only as input to `HeaderSearch`'s "Popular
+Search" tags, which is unrelated. The one gotcha: menu items authored in
+Shopify Admin point at generic resources (e.g. a "Contact" `PAGE` item
+resolves to `/pages/contact`), which may not match a route this app has
+customized (`/contact` is a bespoke contact-form page, not the generic
+`pages.$handle` renderer) — this repo already had a redirect
+(`pages.contact.tsx` → `/contact`) covering that case, but a *new* menu item
+pointing at a Shopify Page with a bespoke-route collision would need the
+same treatment.
+
+---
+
+## ADR-0006 — Homepage "Most popular" reads the merchant-curated `most-popular` collection, not an algorithmic best-sellers query
+
+- **Status:** Accepted
+- **Date:** 2026-08-31
+
+**Context.** `_index.tsx`'s `POPULAR_PRODUCTS_QUERY` queried the top-level
+`products(first: 16, sortKey: BEST_SELLING, query: $query)` — Shopify's
+lifetime sales-count ranking across the whole catalog, filtered by a
+hidden-handles exclusion string — then sliced to 8. Meanwhile the store
+already has a real `most-popular` collection (handle `most-popular`,
+`sortOrder: MANUAL`, 11 products) that the merchant curates by hand in
+Shopify Admin, entirely disconnected from what the homepage showed.
+
+**Decision.** The query now fetches `collection(handle: "most-popular")
+{ products(first: 16) { nodes {...} } }` with **no `sortKey` argument** —
+omitting it defaults to `COLLECTION_DEFAULT`, which respects whatever
+`sortOrder` the collection is configured with (`MANUAL` here), so the
+homepage section renders in exactly the order set by dragging products in
+Shopify Admin's collection editor. `filterHiddenProducts()` (client-side
+`.filter()`, order-preserving) stays as a safety net, though the query arg
+that fed it (`EXCLUDE_HIDDEN_PRODUCTS_QUERY`) is no longer needed since
+`Collection.products` has no free-text `query` argument.
+
+**Gotcha hit while making this change:** `ProductCarousel.tsx` and
+`FeaturedPicks.tsx` (both only used by the separate `landing-oak.tsx` demo
+route, fed by its own `PopularProductsLandingOakQuery`) were typing their
+`products` prop against `PopularProductsQuery['products']['nodes']` —
+reaching into *this* file's query purely because the shape happened to
+match structurally, not because of any real relationship. Changing this
+query's shape broke both, with no import connecting them to make that
+obvious. Retyped both against the fragment-level
+`PopularProductItemLandingOakFragment[]` instead of a sibling route's
+top-level query type — a shared shape should come from a shared fragment,
+never from another route's query result.
+
+**Consequences.** The homepage "Most popular" section is now merchant-owned
+exactly like nav (ADR-0005): reorder or swap products in the
+`most-popular` collection in Shopify Admin, no deploy. The tradeoff is that
+an empty or unpublished `most-popular` collection means an empty section —
+there is no algorithmic fallback anymore, matching the fail-quiet posture
+`PopularProductsSection` already had (`if (!products.length) return null`).
+
+---
+
+## ADR-0007 — Category pages default to Shopify's collection order ("Featured"), not `CREATED`
+
+- **Status:** Accepted
+- **Date:** 2026-08-31
+
+**Context.** `collections.$handle.tsx` defaulted its `sort` param to
+`newest`, which mapped to `sortKey: CREATED, reverse: true` — every category
+page ignored the collection's own configured sort order (manual drag order,
+best-selling, etc. — same class of problem as ADR-0006's "Most popular"
+section) and instead always showed newest-first.
+
+**Decision.** Added a `featured` option to the shared `SORT_OPTIONS` /
+`SortValue` (`SortDropdown.tsx`) and made it the default on both collection
+routes:
+- `collections.$handle.tsx` maps `featured` → `sortKey: COLLECTION_DEFAULT`
+  (no explicit sort key would do the same, but the enum literal makes the
+  intent explicit) — this defers entirely to the collection's own
+  `sortOrder` field in Shopify Admin (manual, best-selling, etc.).
+- `collections.all.tsx` has no single collection to defer to (it aggregates
+  the whole catalog through the top-level `products` field), so `featured`
+  maps to `sortKey: BEST_SELLING` there instead — the closest analog to a
+  merchant-curated "default" view for a catalog-wide listing.
+
+Both routes still default their `sort` search param to `'featured'` instead
+of `'newest'`, and the dropdown now lists **Featured** first.
+
+**Consequences.** A category page's default view now matches what's dragged
+into place in Shopify Admin's collection editor, same as ADR-0006 did for
+the homepage. `newest`/`price-high`/`price-low` remain available as
+explicit shopper-chosen sorts via the dropdown, unaffected. Since
+`SortValue` is a shared type across both route files, adding `featured`
+required a mapping in both `SORT_MAP` records — the type system caught this
+immediately (`Record<SortValue, ...>` failed to compile until both were
+updated).

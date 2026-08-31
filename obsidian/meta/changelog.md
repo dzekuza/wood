@@ -3,6 +3,95 @@ tags: [meta, changelog]
 updated: 2026-08-31
 ---
 
+## 2026-08-31 — Category pages default to Shopify's collection order (see [[../meta/decisions-log|ADR-0007]])
+
+`collections.$handle.tsx` defaulted `sort` to `newest` (`CREATED`,
+descending) instead of the collection's actual configured order. Added a
+`featured` option to `SortDropdown.tsx`'s shared `SORT_OPTIONS`, made it the
+new default on both `collections.$handle.tsx` (→ `sortKey:
+COLLECTION_DEFAULT`, defers to the collection's manual/best-selling
+`sortOrder` set in Shopify Admin) and `collections.all.tsx` (→ `sortKey:
+BEST_SELLING`, since that route has no single collection to defer to).
+Verified `/collections/solid-oak-coat-racks` now renders in the exact
+manual order set in admin ("Coat Rack (Set of 2)", "Coat Rack", "Coat Rack
+with Shelf") with no `?sort=` param.
+
+## 2026-08-31 — Homepage "Most popular" now reads the real `most-popular` collection (see [[../meta/decisions-log|ADR-0006]])
+
+`_index.tsx`'s `POPULAR_PRODUCTS_QUERY` was ranking the whole catalog by
+`BEST_SELLING` instead of using the store's actual `most-popular` collection
+(manual sort order, 11 curated products). Switched to
+`collection(handle: "most-popular") { products(first: 16) {...} }` with no
+`sortKey`, so it inherits the collection's `MANUAL` order set in Shopify
+Admin — verified the first 8 rendered products match the admin order
+exactly. Also fixed `ProductCarousel.tsx`/`FeaturedPicks.tsx` (unrelated,
+`landing-oak.tsx`-only components) which had been typed against this
+query's result shape by coincidence; retyped against the proper
+`PopularProductItemLandingOakFragment`.
+
+## 2026-08-31 — Header nav now reads from Shopify's `main-menu` (see [[../meta/decisions-log|ADR-0005]])
+
+`Header.tsx`'s `HeaderMenu` rendered every nav link as hardcoded JSX even
+though the loader already fetched `header.menu` from the Storefront API's
+`main-menu` handle. Rewrote it to render `header.menu.items` generically —
+a `resolveMenuItemUrl()` helper strips the item's absolute Shopify URL down
+to a path, top-level items with nested `items` become a `.header-dropdown`
+on desktop / indented list on mobile. Removed the now-dead `categories`
+prop from `HeaderMenu` (it still feeds `HeaderSearch`'s tags, just not nav).
+Also seeded the store's `main-menu` in Shopify Admin (via the
+`claude.ai Shopify` connector, confirmed with the user first) to match the
+old hardcoded structure: All products, a "By category" dropdown (7
+collections), News, Contact — so nothing changed visually. Nav is now
+editable from Settings → Navigation with no deploy.
+
+## 2026-08-31 — Review lightbox backdrop lightened
+
+`.rev-lightbox-backdrop` (`app/styles/app.css`) opacity dropped from `.88`
+to `.7` per user request, so the review-photo lightbox background is more
+transparent.
+
+## 2026-08-31 — Product/collection pages loading slow: unsized `<img>` pulling full-res Shopify sources
+
+Investigated via Chrome DevTools network + DOM inspection on the PDP and
+`/collections/all`. Three components rendered product images as plain
+`<img src={node.url}>` instead of Hydrogen's `<Image>` component, so the
+browser downloaded Shopify's *full source resolution* file (PNG sources up
+to ~2.9MB, ~230–270KB even after Shopify's automatic webp re-encode) for
+every thumbnail-sized slot, with no `srcset`/`sizes` to let the browser
+pick something smaller:
+
+- `ProductItem.tsx` (product cards — collection grids, "Recommended for
+  you", search results) — up to 5 gallery frames per card, all unsized.
+- `SearchSuggestions.tsx` (header search-dropdown "Featured Products") —
+  rendered (though visually hidden) on every single page load site-wide,
+  so this was firing on every route, not just search.
+- `CollectionCategoryNav.tsx` (40px sidebar category thumbnails on
+  `/collections/$handle` and `/collections/all`) — same full-res pull for
+  a 40×40 icon.
+
+All three already had `width`/`height` on their GraphQL image fields, so
+the fix was swapping the raw `<img>` for `@shopify/hydrogen`'s `<Image>`
+(`aspectRatio="1/1"` + a `sizes` matching the actual rendered slot —
+`120px` for search suggestions, `40px` for the sidebar icons, viewport
+fractions for the responsive card grid). Verified via
+`evaluate_script` reading `img.srcset`/`img.src` post-fix: requests now
+carry `?width=&height=&crop=center` and land in the 100–600px range
+instead of full source size. See `ProductImage.tsx` for the pattern this
+follows (PDP main gallery was already correct).
+
+## 2026-08-31 — CSP `img-src` missing, blocking inline `data:` SVGs
+
+`app/entry.server.tsx`'s `createContentSecurityPolicy()` call defined
+`scriptSrc`, `workerSrc`, `styleSrc`, `fontSrc` but never `imgSrc` — so
+`img-src` fell back to `default-src` (`'self' cdn.shopify.com shopify.com
+http://localhost:*`), which has no `data:` scheme. Any inline
+`data:image/svg+xml;...` background image (e.g. a select/chevron icon
+authored as an inline SVG data URI) was silently blocked by the browser
+with a CSP violation in the console — the icon rendered as nothing, no
+thrown error. Added an explicit `imgSrc: ["'self'", 'data:',
+'https://cdn.shopify.com', 'https://shopify.com', 'http://localhost:*']`.
+Requires a dev-server restart to pick up.
+
 ## 2026-08-31 — `.art-card` was using undefined CSS variables, not tokens
 
 The article card (`.art-card`/`.art-card-img`/`.art-card-title`) predates
