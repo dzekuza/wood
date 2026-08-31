@@ -14,7 +14,34 @@ import type {
 import {useAside} from '~/components/Aside';
 import {AnnouncementBar} from '~/components/AnnouncementBar';
 import {HeaderSearch} from '~/components/HeaderSearch';
-import {FLAGSHIP_PAGE_ROUTES, shouldHideCollection} from '~/lib/site';
+import {shouldHideCollection} from '~/lib/site';
+
+/**
+ * Shopify menu item `url` fields come back as fully-qualified URLs (the
+ * shop's myshopify.com domain or its primary domain) — strip that down to a
+ * path so `<NavLink to>` matches client-side routes instead of doing a full
+ * page navigation. Anything else (an external link, or already-relative)
+ * passes through unchanged.
+ */
+function resolveMenuItemUrl(
+  url: string | null | undefined,
+  primaryDomainUrl: string,
+  publicStoreDomain: string,
+) {
+  if (!url) return null;
+  if (
+    url.includes('myshopify.com') ||
+    url.includes(publicStoreDomain) ||
+    url.includes(primaryDomainUrl)
+  ) {
+    try {
+      return new URL(url).pathname;
+    } catch {
+      return url;
+    }
+  }
+  return url;
+}
 
 interface HeaderProps {
   header: HeaderQuery;
@@ -85,7 +112,6 @@ export function Header({
           viewport="desktop"
           primaryDomainUrl={header.shop.primaryDomain.url}
           publicStoreDomain={publicStoreDomain}
-          categories={categories}
         />
 
         <HeaderSearch categories={categories} searchSuggestions={searchSuggestions} />
@@ -101,64 +127,105 @@ export function Header({
   );
 }
 
-type Category = {id: string; title: string; handle: string};
-
 export function HeaderMenu({
   menu,
   primaryDomainUrl,
   viewport,
   publicStoreDomain,
-  categories = [],
 }: {
   menu: HeaderProps['header']['menu'];
   primaryDomainUrl: HeaderProps['header']['shop']['primaryDomain']['url'];
   viewport: Viewport;
   publicStoreDomain: HeaderProps['publicStoreDomain'];
-  categories?: Category[];
 }) {
   const {close} = useAside();
+  const items = menu?.items ?? [];
 
   if (viewport === 'mobile') {
     return (
       <nav className="header-menu-mobile" role="navigation">
-        <NavLink end onClick={close} prefetch="intent" to="/" className="header-menu-item">Home</NavLink>
-        <NavLink onClick={close} prefetch="intent" to="/collections/all" className={({isActive}) => `header-menu-item${isActive ? ' active' : ''}`}>All Products</NavLink>
-        {categories.map((c) => (
-          <NavLink key={c.id} onClick={close} prefetch="intent" to={`/collections/${c.handle}`} className={({isActive}) => `header-menu-item${isActive ? ' active' : ''}`}>
-            {c.title}
-          </NavLink>
-        ))}
-        <NavLink onClick={close} prefetch="intent" to={FLAGSHIP_PAGE_ROUTES.contact} className={({isActive}) => `header-menu-item${isActive ? ' active' : ''}`}>Contact</NavLink>
-        <NavLink onClick={close} prefetch="intent" to="/blogs" className={({isActive}) => `header-menu-item${isActive ? ' active' : ''}`}>Journal</NavLink>
+        {items.map((item) => {
+          const url = resolveMenuItemUrl(item.url, primaryDomainUrl, publicStoreDomain);
+          if (!url) return null;
+          return (
+            <div key={item.id}>
+              <NavLink
+                end={url === '/'}
+                onClick={close}
+                prefetch="intent"
+                to={url}
+                className={({isActive}) => `header-menu-item${isActive ? ' active' : ''}`}
+              >
+                {item.title}
+              </NavLink>
+              {item.items?.map((child) => {
+                const childUrl = resolveMenuItemUrl(child.url, primaryDomainUrl, publicStoreDomain);
+                if (!childUrl) return null;
+                return (
+                  <NavLink
+                    key={child.id}
+                    onClick={close}
+                    prefetch="intent"
+                    to={childUrl}
+                    className={({isActive}) => `header-menu-item header-menu-item--child${isActive ? ' active' : ''}`}
+                  >
+                    {child.title}
+                  </NavLink>
+                );
+              })}
+            </div>
+          );
+        })}
       </nav>
     );
   }
 
   return (
     <nav className="header-menu-desktop" role="navigation">
-      <NavLink prefetch="intent" to="/collections/all" className={({isActive}) => `header-menu-item${isActive ? ' active' : ''}`}>
-        All Products
-      </NavLink>
-      {categories.length > 0 && (
-        <div className="header-dropdown">
-          <span className="header-menu-item header-dropdown-toggle">
-            By Category <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-          </span>
-          <div className="header-dropdown-menu">
-            {categories.map((c) => (
-              <NavLink key={c.id} prefetch="intent" to={`/collections/${c.handle}`} className="header-dropdown-item">
-                {c.title}
+      {items.map((item) => {
+        const url = resolveMenuItemUrl(item.url, primaryDomainUrl, publicStoreDomain);
+        if (!url) return null;
+        const children = item.items ?? [];
+
+        if (children.length > 0) {
+          return (
+            <div className="header-dropdown" key={item.id}>
+              <NavLink
+                end={url === '/'}
+                prefetch="intent"
+                to={url}
+                className={({isActive}) => `header-menu-item header-dropdown-toggle${isActive ? ' active' : ''}`}
+              >
+                {item.title}
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
               </NavLink>
-            ))}
-          </div>
-        </div>
-      )}
-      <NavLink prefetch="intent" to="/blogs" className={({isActive}) => `header-menu-item${isActive ? ' active' : ''}`}>
-        Journal
-      </NavLink>
-      <NavLink prefetch="intent" to={FLAGSHIP_PAGE_ROUTES.contact} className={({isActive}) => `header-menu-item${isActive ? ' active' : ''}`}>
-        Contact
-      </NavLink>
+              <div className="header-dropdown-menu">
+                {children.map((child) => {
+                  const childUrl = resolveMenuItemUrl(child.url, primaryDomainUrl, publicStoreDomain);
+                  if (!childUrl) return null;
+                  return (
+                    <NavLink key={child.id} prefetch="intent" to={childUrl} className="header-dropdown-item">
+                      {child.title}
+                    </NavLink>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        }
+
+        return (
+          <NavLink
+            key={item.id}
+            end={url === '/'}
+            prefetch="intent"
+            to={url}
+            className={({isActive}) => `header-menu-item${isActive ? ' active' : ''}`}
+          >
+            {item.title}
+          </NavLink>
+        );
+      })}
     </nav>
   );
 }

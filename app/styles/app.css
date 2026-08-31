@@ -573,6 +573,7 @@ button.reset > * {
 .overlay[data-type="mobile"] .header-menu-item:first-child { border-top: .5px solid var(--cwf-line); }
 .overlay[data-type="mobile"] .header-menu-item:hover { color: var(--cwf-ink-strong); background: color-mix(in srgb, var(--cwf-ink-strong) 4%, transparent); }
 .overlay[data-type="mobile"] .header-menu-item.active { color: var(--cwf-ink-strong); font-weight: 600; }
+.overlay[data-type="mobile"] .header-menu-item--child { padding-left: 44px; font-size: 14px; font-weight: 400; }
 
 .header-menu-desktop {
   display: none;
