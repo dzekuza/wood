@@ -30,6 +30,7 @@ export default async function handleRequest(
     ],
     styleSrc: ["'self'", "'unsafe-inline'", 'https://cdn.shopify.com', 'https://fonts.googleapis.com', 'http://localhost:*'],
     fontSrc: ["'self'", 'https://fonts.gstatic.com', 'https://cdn.shopify.com'],
+    imgSrc: ["'self'", 'data:', 'https://cdn.shopify.com', 'https://shopify.com', 'http://localhost:*'],
   });
 
   const body = await renderToReadableStream(
