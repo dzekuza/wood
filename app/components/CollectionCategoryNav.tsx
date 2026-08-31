@@ -1,11 +1,12 @@
 import {Link} from 'react-router';
+import {Image} from '@shopify/hydrogen';
 
 export type SidebarCategory = {
   id: string;
   handle: string;
   title: string;
   count: number;
-  image?: {url: string; altText?: string | null} | null;
+  image?: {url: string; altText?: string | null; width?: number | null; height?: number | null} | null;
 };
 
 /**
@@ -40,9 +41,11 @@ export function CollectionCategoryNav({
           >
             {category.image && (
               <span className="sidebar-category-img">
-                <img
-                  src={category.image.url}
+                <Image
+                  data={category.image}
                   alt={category.image.altText ?? category.title}
+                  aspectRatio="1/1"
+                  sizes="40px"
                   loading="lazy"
                 />
               </span>

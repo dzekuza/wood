@@ -1,6 +1,6 @@
 import {Await, Link} from 'react-router';
 import {Suspense} from 'react';
-import {Money} from '@shopify/hydrogen';
+import {Image, Money} from '@shopify/hydrogen';
 import type {SearchSuggestionsQuery} from 'storefrontapi.generated';
 import {buildFeaturedSearchProducts} from '~/lib/searchSuggestions';
 
@@ -74,9 +74,11 @@ export function SearchSuggestions({
                             </span>
                           )}
                           {product.featuredImage && (
-                            <img
-                              src={product.featuredImage.url}
+                            <Image
+                              data={product.featuredImage}
                               alt={product.featuredImage.altText || product.title}
+                              aspectRatio="1/1"
+                              sizes="120px"
                               loading="lazy"
                             />
                           )}

@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {Link} from 'react-router';
-import {Money} from '@shopify/hydrogen';
+import {Image, Money} from '@shopify/hydrogen';
 import type {
   ProductItemFragment,
   CollectionItemFragment,
@@ -117,11 +117,13 @@ export function ProductItem({
           saveAmount && <span className="pbadge pbadge-sale">Save {saveAmount}</span>
         )}
         {galleryImages.map((node, index) => (
-          <img
+          <Image
             key={node.id}
-            src={node.url}
+            data={node}
             alt={index === 0 ? node.altText || product.title : ''}
             aria-hidden={index !== 0}
+            aspectRatio="1/1"
+            sizes="(min-width: 980px) 25vw, (min-width: 640px) 33vw, 50vw"
             loading={index === 0 ? loading : 'lazy'}
             className={`pcard-img-frame${index === activeImage ? ' is-active' : ''}`}
           />
