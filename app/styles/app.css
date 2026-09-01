@@ -664,18 +664,24 @@ button.reset > * {
   .header-search { display: none; }
 }
 
+/* Same family as the CTA buttons to its right: 40px tall, hairline
+   `--cwf-line` border, fully rounded, muted ink resolving on hover. */
 .header-search-form {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
   max-width: none;
-  height: 50px;
+  height: 40px;
   border: 1px solid var(--cwf-line);
-  border-radius: 30px;
-  padding: 0 20px;
+  border-radius: 999px;
+  padding: 0 18px;
   background: transparent;
   transition: border-color .18s ease, box-shadow .18s ease;
+}
+
+.header-search-form:hover {
+  border-color: var(--cwf-accent);
 }
 
 .header-search-form:focus-within {
@@ -686,7 +692,7 @@ button.reset > * {
 .header-search-icon {
   display: flex;
   align-items: center;
-  color: color-mix(in srgb, var(--cwf-ink-strong) 70%, transparent);
+  color: color-mix(in srgb, var(--cwf-ink-strong) 60%, transparent);
   flex-shrink: 0;
   padding: 0;
   transition: color 150ms;
@@ -703,7 +709,10 @@ button.reset > * {
   border: none;
   border-radius: 0;
   padding: 0;
-  font-size: 16px;
+  /* 15px matches the currency label. Safe below the 16px iOS zoom-on-focus
+     threshold only because this bar is desktop-only — it is hidden under
+     960px, where the search aside takes over. */
+  font-size: 15px;
   font-family: 'Plus Jakarta Sans', sans-serif;
   color: var(--cwf-ink-strong);
   outline: none;

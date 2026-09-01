@@ -79,6 +79,13 @@ menu toggle and search icon already used. The cart keeps its filled
 `--cwf-ink-strong` fill as the row's one primary action, but drops to 40px with
 it, so every control shares a baseline and a height.
 
+The desktop search bar joined the same family: 50px → 40px, `border-radius`
+30px → 999px, padding 20px → 18px, its icon muted to the row's 60% ink, and a
+hover border that resolves to oak like every button beside it. Its input text
+went 16px → 15px to match the currency label — safe below the 16px iOS
+zoom-on-focus threshold only because this bar is desktop-only, hidden under
+960px where the search aside takes over.
+
 Icons went 20px → 18px to match the smaller circles, and the per-breakpoint
 480px size overrides for account and cart are gone — they only existed to shrink
 50px controls to 40px, which is now the only size.
