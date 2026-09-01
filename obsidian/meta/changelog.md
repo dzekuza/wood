@@ -3,6 +3,29 @@ tags: [meta, changelog]
 updated: 2026-09-01
 ---
 
+## 2026-09-01 — Edit toolbar: dev bypass, and codegen stops choking on it
+
+Two follow-ups after the toolbar shipped.
+
+**Everyone is an admin in local dev.** `isAdminCustomer` short-circuits on
+`import.meta.env.DEV`, so the toolbar works without a Customer Account login
+(which needs an https tunnel on localhost). Vite replaces the flag with `false`
+when building for Oxygen, so the branch does not exist in production and no env
+var or header can bring it back.
+
+**Codegen was failing with 5 errors.** Its `default` project globs all of
+`app/**` and validates every `#graphql`-tagged document against the
+*Storefront* schema — so the Admin API operations ("Cannot query field
+`metaobjectByHandle`") and the Customer Account query ("Cannot query field
+`emailAddress` on type Customer") both blew up. The Admin documents are now
+untagged, and the customer query moved to
+`app/graphql/customer-account/CustomerEmailQuery.ts`, which the `customer`
+project globs — so it keeps real validation, and that validation confirms the
+query shape was right all along.
+
+Verified against the running dev server: `GET /api/page-content?slug=index`
+returns `isAdmin: true` and the stored draft, and `ensure-draft` succeeds.
+
 ## 2026-09-01 — Fix: landing page failed to hydrate, so no toolbar appeared
 
 `LANDING_SLUG` was exported from `pageContent.server.ts` and read by the

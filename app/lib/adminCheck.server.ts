@@ -1,18 +1,10 @@
+import {CUSTOMER_EMAIL_QUERY} from '~/graphql/customer-account/CustomerEmailQuery';
+
 /**
  * "Admin" is not a separate login — it is a logged-in Shopify Customer Account
  * (`account_.login`) whose email is listed in `ADMIN_ALLOWLIST_EMAILS`. The
  * check re-runs per request, so removing an email revokes access immediately.
  */
-const CUSTOMER_EMAIL_QUERY = `#graphql
-  query CustomerEmailForAdminCheck {
-    customer {
-      emailAddress {
-        emailAddress
-      }
-    }
-  }
-` as const;
-
 interface CustomerEmailQueryResult {
   customer?: {
     emailAddress?: {emailAddress?: string} | null;
@@ -36,6 +28,14 @@ export interface AdminCheckContext {
 export async function isAdminCustomer(
   context: AdminCheckContext,
 ): Promise<boolean> {
+  // Local dev: everyone is an admin, so the toolbar can be worked on without a
+  // Customer Account login (which needs a tunnel to work on localhost anyway).
+  // `import.meta.env.DEV` is statically replaced with `false` in a production
+  // build, so this branch is dead code on Oxygen — it cannot be flipped on by
+  // an env var or a header. It does mean anyone who can reach your dev server
+  // can edit: don't run `--host` on an untrusted network.
+  if (import.meta.env.DEV) return true;
+
   const allowlist = (context.env.ADMIN_ALLOWLIST_EMAILS ?? '')
     .split(',')
     .map((email) => email.trim().toLowerCase())

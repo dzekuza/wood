@@ -40,7 +40,11 @@ interface LoaderLikeContext extends AdminCheckContext {
   waitUntil?: (promise: Promise<unknown>) => void;
 }
 
-const GET_QUERY = `#graphql
+// No `#graphql` tag on either document: codegen's `default` project validates
+// every tagged document in `app/**` against the **Storefront** schema, and
+// these are Admin API operations. Untagged, they are ignored by codegen —
+// there is no local Admin schema to check them against.
+const GET_QUERY = `
   query PageContent($handle: MetaobjectHandleInput!) {
     metaobjectByHandle(handle: $handle) {
       publishedData: field(key: "published_data") { value }
@@ -50,7 +54,7 @@ const GET_QUERY = `#graphql
   }
 ` as const;
 
-const UPSERT_MUTATION = `#graphql
+const UPSERT_MUTATION = `
   mutation UpsertPageContent(
     $handle: MetaobjectHandleInput!
     $metaobject: MetaobjectUpsertInput!

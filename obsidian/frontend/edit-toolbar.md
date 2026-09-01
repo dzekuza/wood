@@ -105,7 +105,8 @@ missing allowlist means nobody is an admin.
 | `app/lib/pageContent.ts` | Shared types + `fieldId()`. Client-safe |
 | `app/lib/pageContent.server.ts` | Metaobject read/write, `loadPageContentState()` |
 | `app/lib/shopifyAdmin.server.ts` | Admin GraphQL client; `adminCredentials()` returns null when unconfigured |
-| `app/lib/adminCheck.server.ts` | `isAdminCustomer()` |
+| `app/lib/adminCheck.server.ts` | `isAdminCustomer()` — plus the dev bypass |
+| `app/graphql/customer-account/CustomerEmailQuery.ts` | The email lookup, placed where codegen validates it against the right schema |
 | `app/routes/api.page-content.tsx` | Write endpoint + admin-only refetch |
 | `app/components/EditToolbarProvider.tsx` | Draft state, autosave, publish/reset |
 | `app/components/EditToolbar.tsx` | The floating bar |
@@ -134,6 +135,24 @@ missing allowlist means nobody is an admin.
    the app, not in `.env`.
 4. Log in at `/account/login` with an allowlisted email, open `/`, and the
    toolbar appears bottom-right.
+
+> [!info] In local dev, everyone is an admin
+> `isAdminCustomer` returns `true` immediately when `import.meta.env.DEV`, so
+> the toolbar can be worked on without a Customer Account login — which needs
+> an https tunnel to work on localhost at all. Vite statically replaces that
+> flag with `false` in a production build, so the branch is dead code on
+> Oxygen; it cannot be re-enabled by an env var or a header. It does mean
+> anyone who can reach your dev server can edit and publish live copy, so don't
+> run `--host` on an untrusted network.
+
+> [!warning] Admin API documents must not carry a `#graphql` tag
+> Codegen's `default` project globs **all** of `app/**` and validates every
+> tagged document against the **Storefront** schema. The `page_content`
+> operations are Admin API, so tagging them fails the build with
+> "Cannot query field metaobjectByHandle on type QueryRoot" and friends. They
+> are deliberately untagged. The Customer Account query is the opposite case —
+> it lives in `app/graphql/customer-account/CustomerEmailQuery.ts`, which *is*
+> globbed by the `customer` project, so it keeps real validation.
 
 > [!danger] Never import a `.server` module from anything a component touches
 > `LANDING_SLUG` briefly lived in `pageContent.server.ts` and was read by both
