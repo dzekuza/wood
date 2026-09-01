@@ -69,6 +69,19 @@ recorded in [[decisions-log|ADR-0010]].
 > this works on a deployed build. Steps in
 > [[../frontend/edit-toolbar|edit-toolbar]].
 
+## 2026-09-01 — Currency switcher matches the account button
+
+The header currency control was text-only, deliberately, so it would not read
+as a third circular icon. Client preference went the other way: it now wears
+the same outlined pill as `.header-account-btn` next to it — 50px tall, 1px
+ink border, 999px radius, same hover wash — just wider, since its label is
+text rather than an icon. Focus moved from a border-colour change (invisible
+now the border is always there) to the standard oak focus ring.
+
+The `.header-currency-value` variant — shown when the store has a single
+presentment currency, which is the case today — stays borderless: an outlined
+pill that does nothing reads as a broken button.
+
 ## 2026-09-01 — The "Categories" rename also had to happen in Admin
 
 Renaming the strings in `HOME_CONTENT_DEFAULTS` changed nothing on the live
