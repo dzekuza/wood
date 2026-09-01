@@ -27,7 +27,8 @@ import {
   SITE_NAME,
 } from '~/lib/site';
 import {filterHiddenProducts} from '~/lib/upsells';
-import {LANDING_SLUG, loadPageContentState} from '~/lib/pageContent.server';
+import {LANDING_SLUG} from '~/lib/pageContent';
+import {loadPageContentState} from '~/lib/pageContent.server';
 import demoStyles from '~/styles/demo.css?url';
 
 export const meta: Route.MetaFunction = () => {

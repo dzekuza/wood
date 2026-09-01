@@ -3,6 +3,19 @@ tags: [meta, changelog]
 updated: 2026-09-01
 ---
 
+## 2026-09-01 — Fix: landing page failed to hydrate, so no toolbar appeared
+
+`LANDING_SLUG` was exported from `pageContent.server.ts` and read by the
+component tree as well as the loader. React Router only strips server code from
+`loader`/`action`/`middleware`/`headers`, so Vite rejected the route with
+*"Server-only module referenced by client"* — the homepage still server-rendered
+but never hydrated, and the toolbar never mounted for an admin. The constant
+moved to the client-safe `pageContent.ts`.
+
+Worth remembering: `npm run typecheck` was clean throughout. This is a Vite /
+React Router bundling rule, not a type error — only the dev server's output
+showed it.
+
 ## 2026-09-01 — Inline copy editing on the landing page
 
 An allowlisted admin browsing the live site can now flip **Edit on**, retype any

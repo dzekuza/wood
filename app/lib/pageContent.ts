@@ -28,6 +28,15 @@ export const EMPTY_PAGE_CONTENT: PageContentState = {
   isAdmin: false,
 };
 
+/**
+ * Slug of the landing page's `page_content` entry. Lives here, not in
+ * `pageContent.server.ts`: the component tree names it too
+ * (`<EditToolbarProvider slug={LANDING_SLUG}>`), and React Router only strips
+ * server code from `loader`/`action`/`middleware`/`headers` — a value a
+ * *component* imports drags its whole module into the client bundle.
+ */
+export const LANDING_SLUG = 'index';
+
 /** Builds a stable dotted field id — `fieldId('hero', 0, 'blurb')`. */
 export function fieldId(...parts: Array<string | number>): string {
   return parts.join('.');

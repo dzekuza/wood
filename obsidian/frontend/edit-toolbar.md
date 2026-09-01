@@ -135,6 +135,19 @@ missing allowlist means nobody is an admin.
 4. Log in at `/account/login` with an allowlisted email, open `/`, and the
    toolbar appears bottom-right.
 
+> [!danger] Never import a `.server` module from anything a component touches
+> `LANDING_SLUG` briefly lived in `pageContent.server.ts` and was read by both
+> the loader *and* `<EditToolbarProvider slug={LANDING_SLUG}>`. React Router
+> only strips server code from `loader` / `action` / `middleware` / `headers`,
+> so a value a **component** imports drags the whole server module — Admin
+> token and all — toward the client bundle, and Vite refuses with
+> *"Server-only module referenced by client"*. The route then fails to hydrate:
+> the page renders but no client JS runs, so the toolbar never appears. It now
+> lives in the client-safe `pageContent.ts`.
+>
+> `npm run typecheck` does **not** catch this — it is a Vite/React Router build
+> rule, not a type error. Watch the dev server output.
+
 > [!warning] A missing metaobject scope reads as *empty*, not as an error
 > Querying `metaobjectDefinitions` with a token that lacks
 > `read_metaobject_definitions` returns HTTP 200 and an empty list — no

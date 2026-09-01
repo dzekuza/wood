@@ -23,8 +23,6 @@ import {
  */
 const METAOBJECT_TYPE = 'page_content';
 
-export const LANDING_SLUG = 'index';
-
 export interface ActionResult {
   success: boolean;
   error?: string;
