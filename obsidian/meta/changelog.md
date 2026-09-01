@@ -69,6 +69,23 @@ recorded in [[decisions-log|ADR-0010]].
 > this works on a deployed build. Steps in
 > [[../frontend/edit-toolbar|edit-toolbar]].
 
+## 2026-09-01 — Header CTA row unified on the 40px hairline treatment
+
+The row was three different button languages: menu/search as 40px hairline
+circles, account as a 50px ink-bordered circle, cart as a 50px filled pill.
+Now it is one family — **40px tall, 1px `--cwf-line` border, muted ink that
+resolves to full ink with an oak border on hover** — the treatment the mobile
+menu toggle and search icon already used. The cart keeps its filled
+`--cwf-ink-strong` fill as the row's one primary action, but drops to 40px with
+it, so every control shares a baseline and a height.
+
+Icons went 20px → 18px to match the smaller circles, and the per-breakpoint
+480px size overrides for account and cart are gone — they only existed to shrink
+50px controls to 40px, which is now the only size.
+
+The hero-overlay rules in `demo.css` gained the currency control, since it has a
+visible border now and would otherwise stay dark against the photo.
+
 ## 2026-09-01 — Currency switcher matches the account button
 
 The header currency control was text-only, deliberately, so it would not read

@@ -55,12 +55,20 @@
 
 .header--overlay:not(.is-scrolled) .header-account-btn,
 .header--overlay:not(.is-scrolled) .header-icon-link,
+.header--overlay:not(.is-scrolled) .header-currency-select,
+.header--overlay:not(.is-scrolled) .header-currency-value,
 .header--overlay:not(.is-scrolled) .header-menu-mobile-toggle {
   border-color: rgba(255, 255, 255, 0.4);
   color: #fff;
 }
-.header--overlay:not(.is-scrolled) .header-account-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
+/* The `-value` variant is a label, not a control — no border over the hero
+   either, same as on the solid header. */
+.header--overlay:not(.is-scrolled) .header-currency-value {
+  border-color: transparent;
+}
+.header--overlay:not(.is-scrolled) .header-account-btn:hover,
+.header--overlay:not(.is-scrolled) .header-currency-select:hover {
+  border-color: rgba(255, 255, 255, 0.8);
   color: #fff;
 }
 

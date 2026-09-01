@@ -837,70 +837,66 @@ button.reset > * {
   color: rgba(74,47,31,.45);
 }
 
-/* Account / Cart pill buttons */
+/* Account / Cart buttons.
+   The whole CTA row is one family: 40px tall, hairline `--cwf-line` border,
+   muted ink that resolves on hover with an oak border — the treatment the
+   mobile menu toggle and search icon already used. The cart is the single
+   filled exception, since it is the row's primary action. */
 .header-account-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 50px;
-  width: 50px;
+  height: 40px;
+  width: 40px;
   padding: 0;
-  border: 1px solid var(--cwf-ink-strong);
+  border: 1px solid var(--cwf-line);
   border-radius: 999px;
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 15px;
   font-weight: 500;
-  color: var(--cwf-ink-strong);
+  color: color-mix(in srgb, var(--cwf-ink-strong) 60%, transparent);
   white-space: nowrap;
-  transition: background 150ms, color 150ms;
+  transition: color 150ms, border-color 150ms;
 }
 .header-account-btn:hover {
-  background: color-mix(in srgb, var(--cwf-ink-strong) 4%, transparent);
   color: var(--cwf-ink-strong);
+  border-color: var(--cwf-accent);
 }
 
-.header-account-btn i { display: inline-flex; font-size: 20px; }
+.header-account-btn i { display: inline-flex; font-size: 18px; }
 .header-account-label { display: none; }
 
-@media (max-width: 480px) {
-  .header-account-btn {
-    height: 40px;
-    width: 40px;
-  }
-  .header-account-btn i { font-size: 18px; }
-}
-
-/* Currency switcher — same outlined pill as `.header-account-btn` beside it:
-   same 50px height, same 1px ink border, same hover wash. It is a wider pill
-   rather than a 50px circle because the label is text ("GBP"), not an icon. */
+/* Currency switcher — the same hairline pill as the account and search
+   buttons, just wider: its label is text ("GBP"), not an icon, so a 40px
+   circle would either clip it or shrink it out of the row. */
 .header-currency {
   display: inline-flex;
   align-items: center;
-  height: 50px;
+  height: 40px;
 }
 
 .header-currency-select,
 .header-currency-value {
   appearance: none;
-  height: 50px;
-  padding: 0 18px;
+  height: 40px;
+  padding: 0 14px;
   border: 1px solid transparent;
   border-radius: 999px;
   background: transparent;
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 15px;
   font-weight: 500;
-  line-height: 48px;
-  color: var(--cwf-ink-strong);
+  line-height: 38px;
+  color: color-mix(in srgb, var(--cwf-ink-strong) 60%, transparent);
   cursor: pointer;
-  transition: background 150ms, border-color 150ms;
+  transition: color 150ms, border-color 150ms;
 }
 
 /* Only the real control is outlined. The `-value` variant renders when the
    store has a single presentment currency — an outlined pill that does
    nothing would read as a broken button. */
 .header-currency-select {
-  border-color: var(--cwf-ink-strong);
+  border-color: var(--cwf-line);
 }
 
 .header-currency-value {
@@ -908,7 +904,8 @@ button.reset > * {
 }
 
 .header-currency-select:hover {
-  background: color-mix(in srgb, var(--cwf-ink-strong) 4%, transparent);
+  color: var(--cwf-ink-strong);
+  border-color: var(--cwf-accent);
 }
 
 .header-currency-select:focus-visible {
@@ -921,44 +918,39 @@ button.reset > * {
 }
 
 @media (max-width: 480px) {
-  .header-currency { height: 40px; }
   .header-currency-select,
   .header-currency-value {
-    height: 40px;
-    padding: 0 12px;
+    padding: 0 10px;
     font-size: 14px;
-    line-height: 38px;
   }
 }
 
 .header-cart-btn {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  height: 50px;
-  padding: 0 21px;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
   border: 1px solid var(--cwf-ink-strong);
-  border-radius: 30px;
+  border-radius: 999px;
   background: var(--cwf-ink-strong);
   font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--cwf-surface);
   white-space: nowrap;
   transition: background 150ms, transform 150ms;
 }
 .header-cart-btn:hover { background: var(--cwf-ink-strong-hover); color: var(--cwf-surface); }
-.header-cart-btn i { font-size: 20px; }
+.header-cart-btn i { font-size: 18px; }
 
 @media (max-width: 480px) {
   .header-cart-btn {
-    height: 40px;
     width: 40px;
     padding: 0;
     gap: 0;
     justify-content: center;
   }
-  .header-cart-btn i { font-size: 18px; }
   .header-cart-amount { display: none; }
 }
 
