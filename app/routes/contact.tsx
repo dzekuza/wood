@@ -2,12 +2,7 @@ import type {Route} from './+types/contact';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {
   CONTACT_EMAIL,
-  CONTACT_PHONE_DISPLAY,
-  CONTACT_PHONE_HREF,
   SITE_NAME,
-  WORKSHOP_HOURS,
-  WORKSHOP_LOCATION,
-  WORKSHOP_VISIT_NOTE,
 } from '~/lib/site';
 
 const CONTACT_CHANNELS = [
@@ -18,19 +13,12 @@ const CONTACT_CHANNELS = [
     value: CONTACT_EMAIL,
     copy: 'Best for commissions, lead times, and trade enquiries.',
   },
-  {
-    icon: 'ti-phone',
-    label: 'Phone',
-    href: `tel:${CONTACT_PHONE_HREF}`,
-    value: CONTACT_PHONE_DISPLAY,
-    copy: 'Call during workshop hours for quick availability questions.',
-  },
 ];
 
 const CONTACT_STEPS = [
   'Share the room, piece, or dimension you are considering.',
   'We will reply with lead time, timber options, and next best steps.',
-  'Appointments for workshop visits and bespoke reviews are arranged directly.',
+  'Bespoke commissions are quoted and reviewed over email before anything is cut.',
 ];
 
 export const meta: Route.MetaFunction = () => [
@@ -38,7 +26,7 @@ export const meta: Route.MetaFunction = () => [
   {
     name: 'description',
     content:
-      'Speak with Craft Wood Furniture about commissions, workshop visits, lead times, and solid-timber pieces currently in production.',
+      'Speak with Craft Wood Furniture about commissions, lead times, and solid-timber pieces currently in production.',
   },
 ];
 
@@ -54,8 +42,8 @@ export default function ContactPage() {
             </h1>
           </div>
           <p className="archive-hero-blurb">
-            We handle enquiries directly from the workshop. Use email for detailed project notes, or call
-            for a quick conversation about lead time, timber, or arranging a visit to {WORKSHOP_LOCATION}.
+            We handle enquiries directly from the workshop. Email us your project notes — the room, the
+            piece, or the dimension you have in mind — and we will come back with lead time and options.
           </p>
         </div>
       </div>
@@ -73,9 +61,6 @@ export default function ContactPage() {
                 <a href={`mailto:${CONTACT_EMAIL}`} className="btn btn-primary btn-pill">
                   Email the workshop <i className="ti ti-arrow-right" />
                 </a>
-                <a href={`tel:${CONTACT_PHONE_HREF}`} className="btn btn-line btn-pill">
-                  Call {CONTACT_PHONE_DISPLAY}
-                </a>
               </div>
             </div>
 
@@ -92,16 +77,6 @@ export default function ContactPage() {
                   </span>
                 </a>
               ))}
-              <div className="contact-note">
-                <div className="contact-note-label">Workshop hours</div>
-                <p>{WORKSHOP_HOURS[0]}</p>
-                <p>{WORKSHOP_HOURS[1]}</p>
-              </div>
-              <div className="contact-note">
-                <div className="contact-note-label">Visit the workshop</div>
-                <p>{WORKSHOP_LOCATION}</p>
-                <p>{WORKSHOP_VISIT_NOTE}</p>
-              </div>
             </aside>
           </div>
         </div>

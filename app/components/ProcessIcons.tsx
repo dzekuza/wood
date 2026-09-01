@@ -58,35 +58,3 @@ export function DrawnMarkedIcon() {
   );
 }
 
-export function JointedByHandIcon() {
-  return (
-    <IconBase>
-      <path d="M58.6667 16H5.33333" stroke="currentColor" strokeWidth="1.33" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M58.6667 48H5.33333" stroke="currentColor" strokeWidth="1.33" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M16 5.33333V58.6667" stroke="currentColor" strokeWidth="1.33" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M48 5.33333V58.6667" stroke="currentColor" strokeWidth="1.33" strokeLinecap="round" strokeLinejoin="round" />
-    </IconBase>
-  );
-}
-
-export function OiledFinishedIcon() {
-  return (
-    <IconBase>
-      <path d="M38.992 47.7253L10.512 39.9573" stroke="currentColor" strokeWidth="1.33" strokeLinecap="round" strokeLinejoin="round" />
-      <path
-        d="M49.0027 6.992C49.5283 6.46636 50.1523 6.0494 50.8391 5.76493C51.5259 5.48046 52.262 5.33404 53.0053 5.33404C53.7487 5.33404 54.4848 5.48046 55.1716 5.76493C55.8583 6.0494 56.4824 6.46636 57.008 6.992C57.5336 7.51764 57.9506 8.14166 58.2351 8.82844C58.5195 9.51522 58.666 10.2513 58.666 10.9947C58.666 11.738 58.5195 12.4741 58.2351 13.1609C57.9506 13.8477 57.5336 14.4717 57.008 14.9973L46.2933 25.7147C46.0434 25.9647 45.9029 26.3038 45.9029 26.6573C45.9029 27.0109 46.0434 27.35 46.2933 27.6L48.8107 30.1173C50.0157 31.3225 50.6927 32.957 50.6927 34.6613C50.6927 36.3656 50.0157 38.0001 48.8107 39.2053L46.2933 41.7227C46.0433 41.9726 45.7042 42.1131 45.3507 42.1131C44.9971 42.1131 44.658 41.9726 44.408 41.7227L22.2773 19.5947C22.0274 19.3446 21.8869 19.0056 21.8869 18.652C21.8869 18.2984 22.0274 17.9594 22.2773 17.7093L24.7947 15.192C25.9999 13.987 27.6344 13.31 29.3387 13.31C31.043 13.31 32.6775 13.987 33.8827 15.192L36.4 17.7093C36.65 17.9593 36.9891 18.0997 37.3427 18.0997C37.6962 18.0997 38.0353 17.9593 38.2853 17.7093L49.0027 6.992Z"
-        stroke="currentColor"
-        strokeWidth="1.33"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M24 21.3333C19.1893 28.56 13.4133 30.56 6.44533 31.8613C6.21418 31.9035 5.99801 32.0053 5.81815 32.1565C5.63829 32.3077 5.50094 32.5031 5.41964 32.7236C5.33835 32.9441 5.31591 33.1819 5.35455 33.4137C5.3932 33.6455 5.49158 33.8632 5.64 34.0453L25.16 57.7333C25.5565 58.1544 26.0791 58.4352 26.6491 58.5333C27.2191 58.6315 27.8055 58.5416 28.32 58.2773C33.96 54.4133 42.6667 44.7787 42.6667 40"
-        stroke="currentColor"
-        strokeWidth="1.33"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </IconBase>
-  );
-}

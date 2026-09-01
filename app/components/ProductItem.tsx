@@ -9,32 +9,12 @@ import type {
 import {useVariantUrl} from '~/lib/variants';
 import {HeartFilledIcon, StarFilledIcon} from '~/components/Icons';
 import {getSwatchTone} from '~/lib/swatches';
+import {getRatingSummary} from '~/lib/reviewStats';
 
 type ProductCardFragment =
   | CollectionItemFragment
   | ProductItemFragment
   | NonNullable<ProductRecommendationsQuery['productRecommendations']>[number];
-
-type ParsedReview = {rating?: number};
-
-function getRatingSummary(metafieldValue?: string | null) {
-  if (!metafieldValue) return null;
-  let reviews: ParsedReview[];
-  try {
-    reviews = JSON.parse(metafieldValue) as ParsedReview[];
-  } catch {
-    return null;
-  }
-  if (!Array.isArray(reviews) || reviews.length === 0) return null;
-
-  const ratings = reviews
-    .map((review) => review.rating)
-    .filter((rating): rating is number => typeof rating === 'number');
-  if (!ratings.length) return null;
-
-  const average = ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length;
-  return {average, count: ratings.length};
-}
 
 function getSaveAmount(product: ProductCardFragment) {
   const price = Number(product.priceRange.minVariantPrice.amount);

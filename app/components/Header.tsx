@@ -13,6 +13,7 @@ import type {
 } from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
 import {AnnouncementBar} from '~/components/AnnouncementBar';
+import {CurrencySwitcher} from '~/components/CurrencySwitcher';
 import {HeaderSearch} from '~/components/HeaderSearch';
 import {shouldHideCollection} from '~/lib/site';
 
@@ -82,7 +83,7 @@ export function Header({
   publicStoreDomain,
   searchSuggestions,
 }: HeaderProps) {
-  const {shop, menu, collections} = header;
+  const {shop, menu, collections, localization} = header;
   const {isOverlay, isScrolled} = useHeaderOverlay();
   const categories = (collections?.nodes ?? []).filter(
     (collection) =>
@@ -120,7 +121,11 @@ export function Header({
           <HeaderMenuMobileToggle />
           <SearchToggle />
           <AccountLink isLoggedIn={isLoggedIn} />
-          <CartToggle cart={cart} />
+          <CurrencySwitcher localization={localization} />
+          <CartToggle
+            cart={cart}
+            currencyCode={localization?.country.currency.isoCode ?? 'GBP'}
+          />
         </div>
       </div>
     </header>
@@ -267,9 +272,12 @@ function SearchToggle() {
 function CartBadge({
   count,
   subtotal,
+  currencyCode,
 }: {
   count: number;
   subtotal?: {amount?: string; currencyCode?: string};
+  /** Currency for the empty-cart zero — an empty cart carries no cost of its own. */
+  currencyCode: string;
 }) {
   const {open} = useAside();
   const {publish, shop, cart, prevCart} = useAnalytics();
@@ -287,33 +295,39 @@ function CartBadge({
     >
       <i className="ti ti-shopping-cart" aria-hidden />
       <span className="header-cart-amount">
-        {subtotal?.amount && subtotal.currencyCode ? (
-          <Money data={{amount: subtotal.amount, currencyCode: subtotal.currencyCode as CartApiQueryFragment['cost']['subtotalAmount']['currencyCode']}} />
-        ) : (
-          '$0.00'
-        )}
+        <Money
+          data={{
+            amount: subtotal?.amount ?? '0.0',
+            currencyCode: (subtotal?.currencyCode ??
+              currencyCode) as CartApiQueryFragment['cost']['subtotalAmount']['currencyCode'],
+          }}
+        />
       </span>
     </a>
   );
 }
 
-function CartToggle({cart}: Pick<HeaderProps, 'cart'>) {
+function CartToggle({
+  cart,
+  currencyCode,
+}: Pick<HeaderProps, 'cart'> & {currencyCode: string}) {
   return (
-    <Suspense fallback={<CartBadge count={0} />}>
+    <Suspense fallback={<CartBadge count={0} currencyCode={currencyCode} />}>
       <Await resolve={cart}>
-        <CartBanner />
+        <CartBanner currencyCode={currencyCode} />
       </Await>
     </Suspense>
   );
 }
 
-function CartBanner() {
+function CartBanner({currencyCode}: {currencyCode: string}) {
   const originalCart = useAsyncValue() as CartApiQueryFragment | null;
   const cart = useOptimisticCart(originalCart);
   return (
     <CartBadge
       count={cart?.totalQuantity ?? 0}
       subtotal={cart?.cost?.subtotalAmount}
+      currencyCode={currencyCode}
     />
   );
 }

@@ -1,7 +1,7 @@
 import {Link} from 'react-router';
 import type {Route} from './+types/about';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
-import {SITE_NAME, WORKSHOP_LOCATION} from '~/lib/site';
+import {SITE_NAME} from '~/lib/site';
 
 const ABOUT_PILLARS = [
   {
@@ -45,7 +45,7 @@ export default function AboutPage() {
             </h1>
           </div>
           <p className="archive-hero-blurb">
-            Craft Wood Furniture is a small workshop in {WORKSHOP_LOCATION}. We build solid-timber
+            Craft Wood Furniture is a small workshop. We build solid-timber
             furniture the old way: careful stock selection, visible joinery, and finishes meant to age
             well in lived-in rooms.
           </p>

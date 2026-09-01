@@ -14,10 +14,6 @@ const FAQS = [
     a: "Because everything is made to order, most pieces ship within 2–3 weeks. Larger commissions and fireplace surrounds can take a little longer — we'll confirm a timeline when you order.",
   },
   {
-    q: "What's covered by the 25-year guarantee?",
-    a: "Every joint and frame we build is covered for 25 years against structural faults. If something isn't right, we'll repair or replace it.",
-  },
-  {
     q: 'How do I care for my oak furniture?',
     a: 'A light re-oil once or twice a year keeps the finish looking its best. Avoid direct heat sources and standing water — full care guides are on our Care page.',
   },

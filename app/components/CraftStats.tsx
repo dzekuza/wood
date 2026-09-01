@@ -4,7 +4,7 @@ const STATS = [
   {value: '27+', label: 'Years of craft', theme: 'sand'},
   {value: '4', label: 'Person workshop', theme: 'cream'},
   {value: '4.9★', label: 'Average rating', theme: 'sage'},
-  {value: '25-Yr', label: 'Repair guarantee', theme: 'peach'},
+  {value: '100%', label: 'Solid oak, no veneer', theme: 'peach'},
 ] as const;
 
 export function CraftStats() {

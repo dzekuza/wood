@@ -1,7 +1,6 @@
 const VALUE_PROPS = [
   'Solid European Oak',
-  'Handcrafted Since 1998',
-  '25-Year Repair Guarantee',
+  'Handcrafted Since 2014',
   'Free UK Delivery',
   'Made in the Cotswolds',
 ];

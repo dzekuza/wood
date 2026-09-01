@@ -1,6 +1,8 @@
 import {createHydrogenContext} from '@shopify/hydrogen';
+import type {CountryCode} from '@shopify/hydrogen/storefront-api-types';
 import {AppSession} from '~/lib/session';
 import {CART_QUERY_FRAGMENT} from '~/lib/fragments';
+import {COUNTRY_SESSION_KEY, DEFAULT_COUNTRY} from '~/lib/localization';
 
 // Define the additional context object
 const additionalContext = {
@@ -47,8 +49,15 @@ export async function createHydrogenRouterContext(
       cache,
       waitUntil,
       session,
-      // Or detect from URL path based on locale subpath, cookies, or any other strategy
-      i18n: {language: 'EN', country: 'GB'},
+      // The buyer's country drives pricing currency through `@inContext`. It
+      // comes from the session so the header currency switcher can change it
+      // (see `routes/localization.tsx`); until the shopper picks, GB applies.
+      i18n: {
+        language: 'EN',
+        country:
+          (session.get(COUNTRY_SESSION_KEY) as CountryCode | undefined) ??
+          DEFAULT_COUNTRY,
+      },
       cart: {
         queryFragment: CART_QUERY_FRAGMENT,
       },

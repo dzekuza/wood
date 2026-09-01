@@ -768,152 +768,6 @@ button.demo-cat-dot.is-active {
 }
 
 /* -------------------------------------------------------
- * Our Textures grid
- * ------------------------------------------------------- */
-.demo-textures {
-  width: 100%;
-  background: #fff;
-}
-
-.demo-textures-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 32px;
-  padding: 40px 40px 80px;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-.demo-textures-head {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 16px;
-}
-
-.demo-textures-head h2 {
-  font-family: var(--demo-font-display);
-  font-weight: 500;
-  font-size: 36px;
-  line-height: 1.1667;
-  letter-spacing: -0.02em;
-  color: #352f2a;
-  margin: 0;
-}
-
-.demo-textures-sub {
-  font-family: var(--demo-font-body);
-  font-weight: 400;
-  font-size: 18px;
-  line-height: 1.4;
-  color: var(--cwf-ink-strong);
-  max-width: 500px;
-  margin: 0;
-}
-
-.demo-textures-all {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-family: var(--demo-font-display);
-  font-weight: 500;
-  font-size: 14px;
-  text-transform: capitalize;
-  color: #61482e;
-  transition: opacity 150ms ease;
-}
-
-.demo-textures-all:hover { opacity: 0.65; }
-.demo-textures-all i { font-size: 13px; }
-
-.demo-tex-grid {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 24px;
-  width: 100%;
-}
-
-.demo-tex-card {
-  display: flex;
-  flex-direction: column;
-  color: inherit;
-}
-
-.demo-tex-swatch {
-  position: relative;
-  display: block;
-  height: 104px;
-  width: 100%;
-  border-radius: 16px;
-  overflow: hidden;
-  background: var(--demo-tile-bg);
-}
-
-.demo-tex-swatch img {
-  height: 100%;
-  width: 100%;
-  object-fit: cover;
-  display: block;
-  transition: transform 400ms ease;
-}
-
-.demo-tex-card:hover .demo-tex-swatch img { transform: scale(1.06); }
-
-.demo-tex-arrow {
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 32px;
-  width: 32px;
-  border-radius: 32px;
-  background: #fff;
-  color: #61482e;
-  opacity: 0;
-  transform: scale(0.9);
-  transition: opacity 200ms ease, transform 200ms ease;
-}
-
-.demo-tex-arrow i { font-size: 13px; }
-.demo-tex-card:hover .demo-tex-arrow { opacity: 1; transform: scale(1); }
-
-/* Touch devices have no hover state — keep the badge visible */
-@media (hover: none) {
-  .demo-tex-arrow { opacity: 1; transform: scale(1); }
-}
-
-.demo-tex-title {
-  font-family: var(--demo-font-display);
-  font-weight: 500;
-  font-size: 16px;
-  color: var(--cwf-ink-strong);
-  margin-top: 12px;
-}
-
-.demo-tex-count {
-  font-family: var(--demo-font-body);
-  font-size: 12px;
-  color: var(--cwf-ink-strong);
-  opacity: 0.7;
-  margin-top: 2px;
-}
-
-@media (max-width: 1080px) {
-  .demo-tex-grid { grid-template-columns: repeat(3, 1fr); }
-  .demo-textures-inner { padding: 40px 32px 64px; }
-}
-
-@media (max-width: 620px) {
-  .demo-tex-grid { grid-template-columns: repeat(2, 1fr); }
-  .demo-textures-inner { padding: 32px 20px 48px; }
-  .demo-textures-head h2 { font-size: 28px; }
-}
-
-/* -------------------------------------------------------
  * Testimonials marquee
  * ------------------------------------------------------- */
 .demo-testimonials {
@@ -1165,9 +1019,12 @@ button.demo-review-photo:hover {
   display: block;
 }
 
+/* Single column: the section is down to two steps, and a 2x1 row left them
+   short and wide next to the full-height workshop photo. Stacked, each card
+   spans the column and the pair matches the photo's height. */
 .demo-process-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 16px;
 }
 

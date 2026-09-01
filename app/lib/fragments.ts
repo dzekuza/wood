@@ -231,6 +231,27 @@ export const HEADER_QUERY = `#graphql
         handle
       }
     }
+    # Drives the header currency switcher. Piggy-backs on this already-cached
+    # query rather than adding a request; the cache key includes $country, so
+    # each market gets its own entry.
+    localization {
+      country {
+        isoCode
+        name
+        currency {
+          isoCode
+          symbol
+        }
+      }
+      availableCountries {
+        isoCode
+        name
+        currency {
+          isoCode
+          symbol
+        }
+      }
+    }
   }
   ${MENU_FRAGMENT}
 ` as const;
