@@ -31,11 +31,15 @@ export interface HomeHeroSlide {
   secondaryCta: HomeCta;
 }
 
-export type ProcessIconKey =
-  | 'rough-cut'
-  | 'drawn-marked'
-  | 'jointed-by-hand'
-  | 'oiled-finished';
+/**
+ * The process steps the shop actually performs. Retiring a step means removing
+ * it here — `parseProcessSteps` then drops any metaobject entry still using the
+ * old key, so the page is correct before someone gets round to deleting the
+ * entry in Admin. `jointed-by-hand` and `oiled-finished` were retired
+ * 2026-09-01: the shop does no hand-jointing, and the oiling card carried a
+ * guarantee claim that is no longer made.
+ */
+export type ProcessIconKey = 'rough-cut' | 'drawn-marked';
 
 export interface HomeProcessStep {
   icon: ProcessIconKey;
@@ -61,7 +65,6 @@ export interface HomeContent {
     image: HomeImage;
     steps: HomeProcessStep[];
   };
-  textures: HomeSectionHead;
   contact: {heading: string; subheading: string; ctaLabel: string};
 }
 
@@ -77,21 +80,21 @@ export const HOME_CONTENT_DEFAULTS: HomeContent = {
       blurb:
         'Handcrafted coat racks, fireplace mantels, shelves and solid oak accents—made to bring warmth, function and character to every room.',
       primaryCta: {label: 'Shop All Products', to: '/collections/all'},
-      secondaryCta: {label: 'Explore Collections', to: '/collections'},
+      secondaryCta: {label: 'Explore Categories', to: '/collections'},
     },
   ],
   categories: {
     heading: 'Our Categories',
     subheading: 'Delivery in days—not months. Welcome to the new standard.',
-    linkLabel: 'All Collections',
+    linkLabel: 'All Categories',
   },
-  popular: {heading: 'Most popular', ctaLabel: 'Explore Collections'},
+  popular: {heading: 'Most popular', ctaLabel: 'Explore Categories'},
   testimonials: {heading: 'What our customers say'},
   process: {
     heading: 'Craft wood Furniture',
     subheading:
       'We are working since 2014. Handcrafted coat racks, fireplace mantels, shelves and solid oak accents made to bring warmth, function and character to every room.',
-    ctaLabel: 'Explore Collections',
+    ctaLabel: 'Explore Categories',
     image: {
       url: '/demo/workshop.jpg',
       altText: 'Craftsman shaping timber in the workshop',
@@ -109,25 +112,7 @@ export const HOME_CONTENT_DEFAULTS: HomeContent = {
         description:
           'Tom draws each joint by hand before a single cut is made — no two pieces are ever identical.',
       },
-      {
-        icon: 'jointed-by-hand',
-        title: 'Jointed by hand',
-        description:
-          "Iris cuts and fits every joint on the bench, the same way it's been done for generations.",
-      },
-      {
-        icon: 'oiled-finished',
-        title: 'Oiled & finished',
-        description:
-          'Sam hand-oils each piece, backed by our 25-year repair guarantee.',
-      },
     ],
-  },
-  textures: {
-    heading: 'Our Textures',
-    subheading:
-      'Handcrafted coat racks, fireplace mantels, shelves and solid oak accents—made to bring warmth, function.',
-    linkLabel: 'All Products',
   },
   contact: {
     heading: 'Contact us',
@@ -136,12 +121,7 @@ export const HOME_CONTENT_DEFAULTS: HomeContent = {
   },
 };
 
-const PROCESS_ICON_KEYS: ProcessIconKey[] = [
-  'rough-cut',
-  'drawn-marked',
-  'jointed-by-hand',
-  'oiled-finished',
-];
+const PROCESS_ICON_KEYS: ProcessIconKey[] = ['rough-cut', 'drawn-marked'];
 
 /* ─── Parsing ───────────────────────────────────────────────────────────────
  * Metaobject fields come back as `{value: string} | null`. A field the merchant
@@ -194,17 +174,34 @@ function parseHeroSlides(home: HomeMetaobject): HomeHeroSlide[] {
 function parseProcessSteps(home: HomeMetaobject): HomeProcessStep[] {
   const nodes = home.processSteps?.references?.nodes ?? [];
 
-  const steps = nodes.map((node, index) => {
-    const iconValue = node.icon?.value ?? undefined;
+  const steps = nodes.flatMap<HomeProcessStep>((node, index) => {
+    const iconValue = node.icon?.value?.trim() || undefined;
     const fallback =
       HOME_CONTENT_DEFAULTS.process.steps[index] ??
       HOME_CONTENT_DEFAULTS.process.steps[0];
 
-    return {
-      icon: isProcessIcon(iconValue) ? iconValue : fallback.icon,
-      title: text(node.title, fallback.title),
-      description: text(node.description, fallback.description),
-    };
+    let icon: ProcessIconKey | undefined;
+    if (iconValue) {
+      // A named-but-unknown icon is a step this codebase has retired. Drop it
+      // rather than rendering it under a borrowed icon — metaobject entries
+      // outlive the code that knows what to do with them, and the page should
+      // be right the moment the code says so, not once someone tidies Admin.
+      if (!isProcessIcon(iconValue)) return [];
+      icon = iconValue;
+    } else {
+      // A blank icon is a merchant omission, not a retirement: keep the step
+      // and borrow the positional default.
+      icon = fallback?.icon;
+    }
+    if (!icon) return [];
+
+    return [
+      {
+        icon,
+        title: text(node.title, fallback?.title ?? ''),
+        description: text(node.description, fallback?.description ?? ''),
+      },
+    ];
   });
 
   return steps.length ? steps : HOME_CONTENT_DEFAULTS.process.steps;
@@ -245,11 +242,6 @@ export function buildHomeContent(
         altText: processImage?.altText ?? defaults.process.image.altText,
       },
       steps: parseProcessSteps(home),
-    },
-    textures: {
-      heading: text(home.texturesHeading, defaults.textures.heading),
-      subheading: text(home.texturesSubheading, defaults.textures.subheading),
-      linkLabel: text(home.texturesLinkLabel, defaults.textures.linkLabel),
     },
     contact: {
       heading: text(home.contactHeading, defaults.contact.heading),
@@ -320,9 +312,6 @@ export const HOME_CONTENT_QUERY = `#graphql
           }
         }
       }
-      texturesHeading: field(key: "textures_heading") { value }
-      texturesSubheading: field(key: "textures_subheading") { value }
-      texturesLinkLabel: field(key: "textures_link_label") { value }
       contactHeading: field(key: "contact_heading") { value }
       contactSubheading: field(key: "contact_subheading") { value }
       contactCtaLabel: field(key: "contact_cta_label") { value }

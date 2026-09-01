@@ -321,7 +321,7 @@ export default function Product() {
     <div className="archive-page">
       <Breadcrumbs
         items={[
-          {label: 'Collections', to: '/collections/all'},
+          {label: 'Categories', to: '/collections/all'},
           {label: title},
         ]}
       />
@@ -459,7 +459,7 @@ export default function Product() {
                 </span>
                 <span className="pdp-highlight-item">
                   <i className="ti ti-certificate" aria-hidden="true" />
-                  25-year joinery guarantee
+                  Hand-cut joinery
                 </span>
                 <span className="pdp-highlight-item">
                   <i className="ti ti-package" aria-hidden="true" />
@@ -526,7 +526,7 @@ export default function Product() {
                 <div className="pdp-assure-item">
                   <svg className="pdp-assure-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
                   <div>
-                    <strong className="pdp-assure-strong">25-yr guarantee</strong>
+                    <strong className="pdp-assure-strong">Made by hand</strong>
                     <small className="pdp-assure-small">Joints and frame</small>
                   </div>
                 </div>
@@ -564,10 +564,10 @@ export default function Product() {
                 </details>
                 <details className="pdp-acc">
                   <summary>
-                    Care &amp; Warranty <svg className="pdp-acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Care &amp; Finish <svg className="pdp-acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                   </summary>
                   <div className="pdp-acc-body">
-                    Wipe with a soft cloth; re-oil every 18 months. 25-year guarantee on joinery and frame. We&rsquo;ll re-cover any piece for cost of materials only, for life.
+                    Wipe with a soft cloth; re-oil every 18 months. Keep away from direct heat and standing water and the oak will only look better with age.
                   </div>
                 </details>
               </div>

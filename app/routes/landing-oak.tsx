@@ -71,7 +71,7 @@ function buildHeroSlides(showcase: HeroShowcaseLandingOakQuery | undefined): Her
           label: `Shop ${collection.title}`,
           to: `/collections/${collection.handle}`,
         },
-        secondaryCta: {label: 'Explore Collections', to: '/collections'},
+        secondaryCta: {label: 'Explore Categories', to: '/collections'},
       };
     });
 }

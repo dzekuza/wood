@@ -15,7 +15,7 @@ import type {ProductItemFragment} from 'storefrontapi.generated';
 import type {SortValue} from '~/components/SortDropdown';
 
 export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `${data?.collection.title ?? 'Collection'} | ${SITE_NAME}`}];
+  return [{title: `${data?.collection.title ?? 'Category'} | ${SITE_NAME}`}];
 };
 
 export async function loader(args: Route.LoaderArgs) {
@@ -114,7 +114,7 @@ export default function Collection() {
     <div className="archive-page">
       <Breadcrumbs
         items={[
-          {label: 'Collections', to: '/collections/all'},
+          {label: 'Categories', to: '/collections/all'},
           {label: collection.title},
         ]}
       />

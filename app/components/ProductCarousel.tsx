@@ -118,7 +118,7 @@ export function ProductCarousel({
       )}
 
       <Link to={exploreTo} className="demo-btn demo-btn-outline-dark">
-        Explore Collections
+        Explore Categories
       </Link>
     </section>
   );

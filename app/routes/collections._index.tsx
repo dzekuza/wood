@@ -60,13 +60,13 @@ export default function Collections() {
 
   return (
     <div className="archive-page">
-      <Breadcrumbs items={[{label: 'Collections'}]} />
+      <Breadcrumbs items={[{label: 'Categories'}]} />
       {/* Hero */}
       <div className="archive-hero">
         <div className="archive-wrap">
           <div className="archive-hero-inner">
             <h1 className="archive-hero-title">
-              Browse <em>Collections</em>
+              Browse <em>Categories</em>
             </h1>
           </div>
           <p className="archive-hero-blurb">

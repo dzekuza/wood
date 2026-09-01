@@ -115,7 +115,7 @@ function SearchAside({
                 name="q"
                 onChange={fetchResults}
                 onFocus={fetchResults}
-                placeholder="Search products, collections…"
+                placeholder="Search products, categories…"
                 ref={inputRef}
                 type="search"
               />
