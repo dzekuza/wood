@@ -10,6 +10,76 @@ consequences. Use [[templates/adr-note]] for new entries. Newest first.
 
 ---
 
+## ADR-0010 — Inline copy editing stores in Shopify, and loads in the route loader
+
+- **Status:** Accepted
+- **Date:** 2026-09-01
+
+**Context.** The landing page needed an on-site editor so copy can be changed
+without a deploy or a trip into Admin. The `edittoolbar` kit
+(`~/Desktop/projects/edittoolbar`) ships two adapters: Next.js + Supabase, and
+Hydrogen + Shopify Metaobjects.
+
+**Decision.** Take the Hydrogen adapter — content in a `page_content`
+metaobject via the Admin API, "admin" = a Customer Account email allowlist — so
+the storefront needs no second database and no second login. Two deliberate
+deviations from the kit:
+
+1. **State comes from the route loader, not a client-side fetch.** The kit
+   fetches `/api/page-content` after mount, which means every visitor makes an
+   extra request and every visitor sees a flash. Here `loadPageContentState()`
+   runs in `_index`'s loader, shoppers' reads go through `CacheShort()`, and the
+   API route is admin-only — it exists for mutations and the post-publish
+   refetch. Admins bypass the cache, so a Publish lands on the next load.
+2. **Project CSS classes, not the kit's Tailwind utility dumps.** `.edit-toolbar-*`
+   and `.confirm-dialog-*` live in `app.css` on brand tokens, per the repo's UI
+   rules.
+
+`EditableText` also takes the *resolved* value as `children` rather than a
+literal default, which is what layers this cleanly on top of the existing
+`home_page` metaobject ([[../frontend/homepage-content|homepage-content]])
+instead of competing with it.
+
+**Consequences.** Unpublish is not implemented (the kit ships it as a
+`console.warn`; shipping dead UI is worse than omitting it). The Admin token
+bypasses Shopify's own visibility rules, so `isAdminCustomer` is the only thing
+standing between a stranger and unpublished copy — any future route touching
+this metaobject has to repeat that check. And a published field stops tracking
+`home_page` for that field until its override is cleared.
+
+---
+
+## ADR-0009 — Buyer country lives in the session, not the URL
+
+- **Status:** Accepted
+- **Date:** 2026-09-01
+
+**Context.** The header needed a currency switcher. On Shopify, currency is not
+selectable on its own — it follows the buyer's country through the Storefront
+API's `@inContext` directive. Hydrogen's own docs offer two routes: encode the
+locale in a URL path prefix (`/en-gb/...`, the `($locale)` route pattern), or
+persist the choice server-side.
+
+**Decision.** The chosen country is stored in the session under
+`countryCode` (`lib/localization.ts`), read back in `lib/context.ts` when the
+Storefront client is built, and mirrored onto the cart's buyer identity by
+`routes/localization.tsx` so checkout settles in the currency the shopper was
+quoted. No URL prefix, no `($locale)` route.
+
+**Consequences.** Every existing route keeps its path — a locale prefix would
+have meant re-nesting the entire `app/routes/` tree and rewriting every internal
+`<Link to>`. The cost is that a locale is not shareable or crawlable by URL:
+SEO bots and cold visitors always get the default (`GB`). That is the right
+trade while the shop sells into one market; if it ever needs per-locale
+indexing, this decision has to be revisited in favour of path prefixes.
+
+The switcher validates the posted country against
+`localization.availableCountries` before storing it. An unsupported market makes
+*every* subsequent Storefront query throw, so an unvalidated value would take
+the whole site down, not just the switcher.
+
+---
+
 ## ADR-0001 — Documentation lives in an in-repo Obsidian vault
 
 - **Status:** Accepted

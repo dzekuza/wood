@@ -1,6 +1,6 @@
 ---
 tags: [frontend, shopify, content, wip]
-updated: 2026-08-26
+updated: 2026-09-01
 ---
 
 # Homepage content (metaobject-driven)
@@ -19,7 +19,7 @@ the page that shipped before this change.
 
 | Metaobject type | Handle | What it holds |
 |---|---|---|
-| `home_page` | `main` | Singleton. Every section's heading/subheading/button label, plus references to the two lists below. |
+| `home_page` | `main` | Singleton. Every section's heading/subheading/button label, plus references to the two lists below. The `textures_heading` / `textures_subheading` / `textures_link_label` fields are no longer read — the "Our Textures" section was removed 2026-08-31; the fields can stay in Admin, they are simply ignored. |
 | `home_hero_slide` | one per slide | Background image, heading, blurb, both CTAs. |
 | `home_process_step` | one per card | Icon key, title, description. |
 
@@ -44,6 +44,29 @@ adding a second hero slide is what re-enables the carousel arrows and dots.
 - **A blank field is the same as a missing one.** `text()` trims and treats `''`
   as absent, so clearing a field in admin restores the coded default rather than
   rendering an empty heading.
+
+> [!info] One layer sits above this one
+> Copy published through the [[edit-toolbar]] is stored in a separate
+> `page_content` metaobject and overrides whatever `home_page` resolves to for
+> that field. An untouched field still follows `home_page`; a published one
+> stops tracking it until the override is cleared.
+
+> [!warning] The metaobject wins — code defaults do not
+> Removing a sentence from `HOME_CONTENT_DEFAULTS` does **not** change the live
+> page while the metaobject supplies a value: `buildHomeContent()` only falls
+> back when a field or reference is absent.
+>
+> **Process steps are the one exception**, since 2026-09-01. `ProcessIconKey` is
+> the list of steps the shop actually performs, and `parseProcessSteps` drops any
+> metaobject entry whose `icon` names a key that is no longer in it. So retiring
+> a step is a code change that takes effect immediately; deleting the Admin entry
+> afterwards is tidying, not a prerequisite. A *blank* icon still means "merchant
+> omission" and borrows the positional default, so this cannot silently eat a
+> half-filled entry.
+>
+> Still pending in Admin from the 2026-08-31 round: the stale `home_process_step`
+> entries for "Jointed by hand" and "Oiled & finished" (both now ignored by the
+> code, so this is cleanup only).
 
 ## The code
 

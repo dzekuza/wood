@@ -1,7 +1,230 @@
 ---
 tags: [meta, changelog]
-updated: 2026-08-31
+updated: 2026-09-01
 ---
+
+## 2026-09-01 — Inline copy editing on the landing page
+
+An allowlisted admin browsing the live site can now flip **Edit on**, retype any
+headline, blurb or button label on the homepage in place, and **Publish** it —
+or **Reset** the draft. Adapted from the `edittoolbar` kit's Hydrogen adapter.
+
+Copy lives in a `page_content` metaobject read through the **Admin** API
+(Shopify's storefront visibility is whole-type, so a public `published_data`
+would drag `draft_data` public with it). "Admin" is a logged-in Customer
+Account whose email is in `ADMIN_ALLOWLIST_EMAILS` — no second login system.
+
+It layers on top of the existing `home_page` metaobject rather than replacing
+it: `EditableText` receives the value that metaobject (or the coded default)
+resolved to, and shows an override only once one is published.
+
+New: `lib/pageContent.ts`, `lib/pageContent.server.ts`, `lib/shopifyAdmin.server.ts`,
+`lib/adminCheck.server.ts`, `routes/api.page-content.tsx`, `EditToolbarProvider`,
+`EditToolbar`, `EditableText`, `ConfirmDialog`,
+`scripts/setup-page-content-metaobject.mjs`. Two deviations from the kit are
+recorded in [[decisions-log|ADR-0010]].
+
+> [!success] Backend live on `wood-123252`
+> Same day: the `page_content` definition was created (via the Shopify MCP),
+> the "prices" custom app behind `SHOPIFY_ADMIN_TOKEN` was granted the four
+> metaobject scopes, and `ADMIN_ALLOWLIST_EMAILS` was set locally. The full
+> read → draft → publish → delete cycle was verified with the storefront's own
+> token. Remaining: `ADMIN_ALLOWLIST_EMAILS` in the Oxygen environment before
+> this works on a deployed build. Steps in
+> [[../frontend/edit-toolbar|edit-toolbar]].
+
+## 2026-09-01 — Storefront copy says "Categories", not "Collections"
+
+Every user-visible "Collections" label is now "Categories": the search
+placeholder and predictive-search group heading, the homepage/landing
+`Explore Categories` CTAs and `All Categories` link (`HOME_CONTENT_DEFAULTS`),
+the `ProductCarousel` explore button, the collections-index breadcrumb and
+`Browse Categories` hero, and the PDP/collection breadcrumb crumb. The
+`/collections/*` URLs, GraphQL names, and component/type names are unchanged —
+Shopify's resource is still a Collection; only the shopper-facing noun moved.
+
+Two singular-catalog phrasings were deliberately left alone: "Search the
+collection" on the search page and "Browse our collection" on favourites both
+mean the whole catalogue, not the nav concept.
+
+## 2026-09-01 — Process section down to two stacked steps
+
+"Jointed by hand" (an operation the shop does not perform) and "Oiled &
+finished" are gone, leaving Rough-cut and Drawn & marked.
+
+The interesting part is *how*. Deleting them from `HOME_CONTENT_DEFAULTS` alone
+would have changed nothing — the `home_process_step` metaobjects still supply
+four entries, and defaults only apply when a reference is absent. Rather than
+leave the site wrong until someone edits Admin, `ProcessIconKey` is now the
+authoritative list of steps the shop performs, and `parseProcessSteps` **drops**
+any entry whose `icon` names a key not in it. Retiring a step is a code change
+that takes effect on the next load; deleting the Admin entry is cleanup.
+
+A blank icon still means "merchant omission" and borrows the positional
+default — only a *named but unknown* key counts as retired, so a half-filled
+entry is never silently eaten.
+
+- `homeContent.ts` — `ProcessIconKey` narrowed to `'rough-cut' | 'drawn-marked'`;
+  `parseProcessSteps` rewritten as a `flatMap` that can drop entries.
+- `CraftmanshipProcess.tsx` — `PROCESS_ICONS` trimmed to the two survivors.
+- `ProcessIcons.tsx` — `JointedByHandIcon` / `OiledFinishedIcon` deleted, now
+  unreferenced.
+- `demo.css` — `.demo-process-grid` goes `1fr 1fr` → `1fr`. Two cards in a 2x1
+  row read short and wide beside the full-height workshop photo; stacked, the
+  pair measures 569px against the photo's 569px.
+
+Verified on the running site: two cards, single column (`grid-template-columns:
+652px`), both at the same x, grid height matching the photo.
+
+## 2026-09-01 — Homepage review numbers now cover the whole catalogue
+
+The hero badge and the testimonials heading both advertised "17 reviews". That
+number was computed, not typed — but from `HOMEPAGE_REVIEWS`, the 17 hand-copied
+Etsy reviews in `lib/reviews.ts`. The store's real review data has been live all
+along in each product's `reviews.product_reviews` metafield, driving the product
+cards and the PDP: **166 reviews across 9 products, averaging 4.88.** The
+homepage was under-reporting by roughly ten times.
+
+- `lib/reviewStats.ts` (new) — `getRatingSummary` moved here from a private copy
+  inside `ProductItem`, joined by `aggregateRatings` for the store-wide figure.
+  One parser for the metafield now, so a card and the homepage headline cannot
+  drift apart.
+- `_index.tsx` — new `STORE_REVIEWS_QUERY` (ids + the metafield only, so it stays
+  light while walking the catalogue), aggregated in the loader with hidden
+  products filtered out via `filterHiddenProducts`, and passed to both the hero
+  and the marquee. The module-scope `HERO_RATING` constant is gone.
+- `TestimonialsMarquee` gained an optional `rating` prop; it falls back to
+  summarising its own cards so the component still stands alone.
+
+**The marquee still shows the same 17 curated cards** — they are the ones with
+customer photos, which is the point of that section. Only the numbers changed.
+Verified on the running site: hero `4.9 (166) reviews`, heading `4.9 · 166
+reviews`, 17 cards (34 DOM nodes — the marquee clones each row for the loop),
+product cards unchanged at their own per-product counts.
+
+Because the figures come from metafields, importing more reviews updates the
+homepage with no deploy.
+
+## 2026-09-01 — Header currency switcher (and the real cause of the "$" bug)
+
+Added a currency control between the account and cart buttons in the header.
+
+- `lib/localization.ts` — session key, default country (`GB`), and helpers that
+  collapse `availableCountries` down to one entry per **currency** (this shop's
+  GB and LT markets both settle in EUR, so listing countries would show EUR
+  twice).
+- `routes/localization.tsx` — resource route action: validates the posted
+  country against `availableCountries`, stores it in the session, mirrors it
+  onto the cart's buyer identity, and redirects back. Rejects absolute and
+  protocol-relative `redirectTo` values so the switcher can't be used as an
+  open redirect.
+- `lib/context.ts` — `i18n.country` now reads the session instead of being
+  hardcoded to `GB`.
+- `HEADER_QUERY` gained a `localization` block. It piggy-backs on a query that
+  was already fetched and `CacheLong`-cached on every route, so this costs no
+  extra request; `$country` is part of the cache key, so each market caches
+  separately.
+- `CurrencySwitcher.tsx` + `.header-currency*` rules in `app.css`.
+
+See [[decisions-log|ADR-0009]] for why the country lives in the session rather
+than a `($locale)` URL prefix.
+
+> [!warning] The switcher has nothing to switch between yet
+> `wood-123252` has exactly **one** enabled presentment currency: EUR.
+> `paymentSettings.enabledPresentmentCurrencies` is `['EUR']`, and both markets
+> (GB and LT) resolve to it. The component therefore renders as a static "EUR"
+> label, not a dropdown — it becomes a real `<select>` the moment a second
+> currency is enabled in **Admin → Settings → Markets**, with no code change.
+> For a `.co.uk` shop advertising "Free UK delivery", GBP is presumably the one
+> to add.
+
+### Corrected from the 2026-08-31 audit
+
+The `$0.00` in the header was reported there as a Shopify store-currency
+setting. That was only half right: the store currency is EUR, but the header's
+empty-cart fallback was the **hardcoded string `'$0.00'`** in `Header.tsx` —
+a literal dollar amount on a store that has never traded in dollars. It now
+renders `<Money>` with a zero in the active currency (`€0.00` today).
+
+## 2026-08-31 — Client comment round (2026-08-31 PDF): unverifiable claims and dead links removed
+
+Acting on the annotated homepage PDF (`2026 08 31 Komentarai.pdf`). This pass
+covers only the items that needed no further decision from the client; the
+rest are listed under "Still open" below.
+
+- **Announcement bar copy** (`lib/site.ts`) — "made to order in the Cotswolds"
+  → "made at CraftWood Furniture"; the £250 free-delivery threshold is gone
+  (delivery is free on everything). The third line was approved as-is.
+- **Socials unified.** The bar advertised Facebook+Instagram while the footer
+  hardcoded Instagram+Pinterest+YouTube, none of which matched the two accounts
+  the shop actually runs. Both now render the new `SocialLinks` component off a
+  single `SOCIAL_LINKS` list (Facebook + Pinterest). **The two URLs are still
+  placeholders** — `https://facebook.com` / `https://pinterest.com`.
+- **Footer links pruned.** `FOOTER_COLS` linked to twelve routes that 404:
+  `/pages/{materials,process,bespoke,showroom,guarantee,delivery,trial,care,repairs,trade}`,
+  `/collections/{study,storage}` and `/products/gift-card`. Only routes that
+  resolve remain. This was a live bug, not just a copy issue.
+- **No physical location.** The shop has no UK workshop or showroom to visit, so
+  the address/appointment block came out of `ContactBanner`, the "Visit us"
+  footer link, the workshop hours + "Visit the workshop" notes on `/contact`,
+  `WORKSHOP_LOCATION`/`WORKSHOP_VISIT_NOTE`/`WORKSHOP_HOURS` in `lib/site.ts`,
+  and "est. 1998 · Aldsworth, Cotswolds" in the footer copyright. "Made in our
+  own workshop" as a *claim* stays — the client explicitly approved it.
+- **25-year guarantee removed everywhere** ("labai cia slidi tema"): the
+  homepage process step, the PDP highlight pill / assurance tile / Care
+  accordion (now "Care & Finish"), the `/landing-oak` FAQ entry, and the
+  `CraftStats` tile (→ "100% solid oak, no veneer").
+- **"Our Textures" section deleted.** It re-rendered the same six categories as
+  `CategoriesGrid` with wood-swatch photos. `TexturesGrid.tsx`, its ~145 lines
+  of `.demo-textures`/`.demo-tex-*` CSS, and the three `textures_*` metaobject
+  fields in `homeContent.ts` all went with it.
+- **Categories are data-driven now.** `HERO_SHOWCASE_QUERY` aliased exactly six
+  collection handles, so a seventh category needed a code change. It now reads
+  `collections(first: 20)`, filters through `shouldHideCollection`, and orders
+  by `HOMEPAGE_CATEGORY_ORDER` — a new collection appears with no deploy.
+- **Footer tagline** no longer claims "a four-person workshop in the Cotswolds
+  since 1998" (it contradicted the process section's "working since 2014").
+
+### Second pass — client answers applied same day
+
+- **Phone removed everywhere.** `CONTACT_PHONE_DISPLAY`/`_HREF` deleted; the
+  `tel:` links are gone from the announcement bar, `ContactBanner`, the
+  `/contact` channel list and its "Call …" button. Email is the only channel.
+  Verified: no `tel:` anywhere in the rendered DOM.
+- **Founding year is 2014.** `ValueMarquee`'s "Handcrafted Since 1998" → 2014
+  (its "25-Year Repair Guarantee" item went too, with the rest of the guarantee
+  copy).
+- **"Jointed by hand" dropped** from `HOME_CONTENT_DEFAULTS.process.steps` —
+  three steps now. ⚠️ **The live page still shows four.** Steps come from the
+  `home_process_step` metaobjects, and defaults only apply when the metaobject
+  is missing, so the entry must also be deleted in **Admin → Content →
+  Metaobjects**. The same applies to the "backed by our 25-year repair
+  guarantee" sentence in the "Oiled & finished" step — the code default is
+  clean, the metaobject is not. See [[homepage-content]].
+- **`most-popular` hidden from the category grid.** The new data-driven query
+  surfaced it as an eighth "category" alongside the real ones — it is a curated
+  merchandising list that drives the "Most popular" row, so it is now in
+  `HIDDEN_COLLECTION_HANDLES`.
+- **The 7th category already exists.** A `console-tables` collection is live in
+  the store; the data-driven grid picked it up with no code change, which is the
+  whole point of the change. Added to `HOMEPAGE_CATEGORY_ORDER` so it sits
+  seventh deliberately rather than by fallback. Verified: 7 cards, ending
+  "Console Tables | 1 product".
+- **Footer social icons** were rendering at 35px inside their 36px chip — the
+  old inline markup carried `width="16"`, which `SocialLinks` does not. Sized
+  via `.footer-social-btn svg` in `app.css` instead of per-icon attributes.
+
+### Still open
+
+The two real social URLs (still `https://facebook.com` / `https://pinterest.com`);
+the two metaobject edits above; and the remaining "Cotswolds" copy on `/about`,
+`/landing-oak` and the FAQ.
+
+### Not a code issue
+
+`$`/`€` instead of `£` is the Shopify store currency — `lib/context.ts` already
+requests `country: 'GB'`. The `hello@` mailbox is a DNS/hosting task. Hero and
+workshop photography is metaobject-editable, no deploy needed.
 
 ## 2026-08-31 — Per-blog article listing (`/blogs/news`) was stacked instead of a grid
 

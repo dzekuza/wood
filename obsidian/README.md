@@ -30,6 +30,7 @@ and AI agents (Claude Code, Cursor).
 - [[routing]] — App Router conventions, route → view delegation
 - [[design-system]] — tokens, CSS layers, styling rules
 - [[homepage-content]] — merchant-editable homepage copy & imagery (metaobjects)
+- [[edit-toolbar]] — admin-only inline copy editing on the live landing page
 - [[component-conventions]] — how to write & place components
 - [[html-semantics]] — semantic, accessible, SEO-correct markup rules
 - [[components/ui|UI primitives catalog]]

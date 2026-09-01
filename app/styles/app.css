@@ -870,6 +870,60 @@ button.reset > * {
   .header-account-btn i { font-size: 18px; }
 }
 
+/* Currency switcher — pill-height to line up with the account and cart
+   buttons either side of it, but text-only so it reads as a control rather
+   than a third circular icon. */
+.header-currency {
+  display: inline-flex;
+  align-items: center;
+  height: 50px;
+}
+
+.header-currency-select,
+.header-currency-value {
+  appearance: none;
+  height: 40px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 40px;
+  color: var(--cwf-ink-strong);
+  cursor: pointer;
+  transition: background 150ms, border-color 150ms;
+}
+
+.header-currency-value {
+  cursor: default;
+}
+
+.header-currency-select:hover {
+  background: color-mix(in srgb, var(--cwf-ink-strong) 4%, transparent);
+}
+
+.header-currency-select:focus-visible {
+  outline: none;
+  border-color: var(--cwf-ink-strong);
+}
+
+.header-currency-submit {
+  margin-left: 6px;
+}
+
+@media (max-width: 480px) {
+  .header-currency { height: 40px; }
+  .header-currency-select,
+  .header-currency-value {
+    height: 32px;
+    padding: 0 6px;
+    font-size: 14px;
+    line-height: 32px;
+  }
+}
+
 .header-cart-btn {
   display: inline-flex;
   align-items: center;
@@ -1036,6 +1090,13 @@ button.reset > * {
   color: rgba(243,239,234,0.55);
   transition: color 150ms, border-color 150ms;
   text-decoration: none;
+}
+
+/* The icons come from `SocialLinks`, which renders bare `<svg>` with no width
+   attribute — size them here rather than hardcoding dimensions per icon. */
+.footer-social-btn svg {
+  width: 16px;
+  height: 16px;
 }
 
 .footer-social-btn:hover {
@@ -4577,4 +4638,171 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
   margin-top: 10px;
   font-size: 13px;
   color: #e08a6a;
+}
+/* -------------------------------------------------------
+ * Edit toolbar — admin-only inline copy editing
+ *
+ * Only ever rendered for an allowlisted Customer Account (see
+ * `EditToolbar`), so none of this reaches a shopper's page. Deliberately
+ * chrome-coloured rather than brand-coloured: it sits *on top of* the design,
+ * it is not part of it.
+ * ------------------------------------------------------- */
+.edit-toolbar {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 6px 6px 16px;
+  border-radius: 999px;
+  background: rgba(28, 28, 28, 0.92);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(8px);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.edit-toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 12px;
+  border-right: 1px solid var(--cwf-line-dark);
+}
+
+.edit-toolbar-group.is-last {
+  padding-right: 0;
+  border-right: 0;
+}
+
+.edit-toolbar-status {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(243, 239, 234, 0.4);
+}
+
+.edit-toolbar-status.is-saving {
+  background: var(--cwf-star);
+}
+
+.edit-toolbar-status.is-saved {
+  background: #5fae7f;
+}
+
+.edit-toolbar-action {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: rgba(243, 239, 234, 0.88);
+  cursor: pointer;
+  transition: color 150ms, opacity 150ms;
+}
+
+.edit-toolbar-action:hover {
+  color: var(--cwf-surface);
+}
+
+.edit-toolbar-action:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.edit-toolbar-action.is-danger {
+  color: #e08a6a;
+}
+
+.edit-toolbar-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--cwf-surface);
+  color: var(--cwf-ink);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* The affordance on an editable string while Edit is on. Outline rather than
+   border or padding so turning Edit on cannot reflow the page being edited. */
+.is-editable-field {
+  outline: 1px dashed var(--cwf-accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+  cursor: text;
+}
+
+.is-editable-field:focus {
+  outline: 2px solid var(--cwf-accent-deep);
+}
+
+/* -------------------------------------------------------
+ * Confirm dialog
+ * ------------------------------------------------------- */
+.confirm-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(28, 28, 28, 0.5);
+}
+
+.confirm-dialog-scrim {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  background: none;
+  cursor: default;
+}
+
+.confirm-dialog {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  padding: 24px;
+  border-radius: 12px;
+  background: var(--cwf-card);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+.confirm-dialog-title {
+  margin: 0;
+  font-family: 'Mark Bold', sans-serif;
+  font-size: 20px;
+  color: var(--cwf-primary);
+}
+
+.confirm-dialog-body {
+  margin: 8px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--cwf-accent-deep);
+}
+
+.confirm-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.confirm-dialog-confirm {
+  background: var(--cwf-ink-strong);
+  border-color: var(--cwf-ink-strong);
+  color: var(--cwf-surface);
+}
+
+.confirm-dialog-confirm.is-destructive {
+  background: #b4472e;
+  border-color: #b4472e;
 }

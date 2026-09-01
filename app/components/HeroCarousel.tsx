@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react';
 import {Link} from 'react-router';
 import {StarFilledIcon} from '~/components/Icons';
+import {EditableText} from '~/components/EditableText';
 import {HOME_CONTENT_DEFAULTS, type HomeHeroSlide} from '~/lib/homeContent';
 
 export type HeroSlide = HomeHeroSlide;
@@ -23,7 +24,7 @@ export function HeroCarousel({
   rating,
 }: {
   slides?: HeroSlide[];
-  rating?: HeroRating;
+  rating?: HeroRating | null;
 }) {
   const activeSlides = slides?.length ? slides : FALLBACK_SLIDES;
   const [active, setActive] = useState(0);
@@ -76,13 +77,21 @@ export function HeroCarousel({
                 <h1>
                   {slide.heading.map((line, i) => (
                     <span key={i}>
-                      {line}
+                      <EditableText field={`hero.${index}.heading.${i}`}>
+                        {line}
+                      </EditableText>
                       {i < slide.heading.length - 1 && <br />}
                     </span>
                   ))}
                 </h1>
 
-                <p className="demo-hero-blurb">{slide.blurb}</p>
+                <EditableText
+                  as="p"
+                  className="demo-hero-blurb"
+                  field={`hero.${index}.blurb`}
+                >
+                  {slide.blurb}
+                </EditableText>
               </div>
 
               <div className="demo-hero-ctas">
@@ -90,13 +99,17 @@ export function HeroCarousel({
                   to={slide.primaryCta.to}
                   className="demo-btn demo-btn-solid"
                 >
-                  {slide.primaryCta.label}
+                  <EditableText field={`hero.${index}.cta.primary`}>
+                    {slide.primaryCta.label}
+                  </EditableText>
                 </Link>
                 <Link
                   to={slide.secondaryCta.to}
                   className="demo-btn demo-btn-outline"
                 >
-                  {slide.secondaryCta.label}
+                  <EditableText field={`hero.${index}.cta.secondary`}>
+                    {slide.secondaryCta.label}
+                  </EditableText>
                 </Link>
               </div>
             </div>

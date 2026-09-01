@@ -1,5 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 import {Link} from 'react-router';
+import {EditableText} from '~/components/EditableText';
 import {HOME_CONTENT_DEFAULTS, type HomeSectionHead} from '~/lib/homeContent';
 
 export interface Category {
@@ -73,10 +74,21 @@ export function CategoriesGrid({
     <section className="demo-categories">
       <div className="demo-categories-inner">
         <div className="demo-categories-head">
-          <h2>{content.heading}</h2>
-          <p className="demo-categories-sub">{content.subheading}</p>
+          <EditableText as="h2" field="categories.heading">
+            {content.heading}
+          </EditableText>
+          <EditableText
+            as="p"
+            className="demo-categories-sub"
+            field="categories.subheading"
+          >
+            {content.subheading}
+          </EditableText>
           <Link to="/collections" className="demo-categories-all">
-            {content.linkLabel} <i className="ti ti-arrow-up-right" aria-hidden />
+            <EditableText field="categories.linkLabel">
+              {content.linkLabel}
+            </EditableText>{' '}
+            <i className="ti ti-arrow-up-right" aria-hidden />
           </Link>
         </div>
 

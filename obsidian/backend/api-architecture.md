@@ -25,7 +25,10 @@ type ApiResponse<T> = { data: T } | { error: { message: string; code?: string } 
 
 | Route | Method | Input | Output | Auth |
 |-------|--------|-------|--------|------|
-| | | | | |
+| `/api/page-content` | `GET` | `?slug=` | `{publishedData, draftData, draftStatus, isAdmin}` | Admin only (`isAdminCustomer`) — 401 otherwise. Pages read their own copy in their loader, so this is only the toolbar's post-mutation refetch |
+| `/api/page-content` | `POST` | `{intent: 'ensure-draft'\|'save'\|'publish'\|'reset', slug, patch?}` | `{success, error?}` | Admin only (`isAdminCustomer`) — the **only** gate on unpublished copy |
+
+Both live in `app/routes/api.page-content.tsx`. See [[../frontend/edit-toolbar|edit-toolbar]].
 
 ## Server actions
 

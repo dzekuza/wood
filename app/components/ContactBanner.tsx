@@ -1,11 +1,6 @@
 import {Link} from 'react-router';
-import {
-  CONTACT_EMAIL,
-  CONTACT_PHONE_DISPLAY,
-  CONTACT_PHONE_HREF,
-  WORKSHOP_LOCATION,
-  WORKSHOP_VISIT_NOTE,
-} from '~/lib/site';
+import {EditableText} from '~/components/EditableText';
+import {CONTACT_EMAIL} from '~/lib/site';
 import {HOME_CONTENT_DEFAULTS, type HomeContent} from '~/lib/homeContent';
 
 export interface ContactBannerProps {
@@ -23,11 +18,17 @@ export function ContactBanner({
         <div className="demo-contact-left">
           <div className="demo-contact-heading">
             <span className="demo-contact-divider" aria-hidden />
-            <h2>{content.heading}</h2>
-            <p>{content.subheading}</p>
+            <EditableText as="h2" field="contact.heading">
+              {content.heading}
+            </EditableText>
+            <EditableText as="p" field="contact.subheading">
+              {content.subheading}
+            </EditableText>
           </div>
           <Link to="/contact" className="demo-contact-etsy">
-            {content.ctaLabel}
+            <EditableText field="contact.ctaLabel">
+              {content.ctaLabel}
+            </EditableText>
           </Link>
         </div>
 
@@ -37,19 +38,7 @@ export function ContactBanner({
               <span className="demo-contact-label">General inquiries</span>
               <div className="demo-contact-lines">
                 <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
-                <a href={`tel:${CONTACT_PHONE_HREF}`}>{CONTACT_PHONE_DISPLAY}</a>
               </div>
-            </div>
-          </div>
-
-          <div className="demo-contact-col">
-            <div className="demo-contact-block">
-              <span className="demo-contact-label">Workshop</span>
-              <p className="demo-contact-address">
-                {WORKSHOP_LOCATION}
-                <br />
-                {WORKSHOP_VISIT_NOTE}
-              </p>
             </div>
           </div>
         </div>

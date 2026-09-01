@@ -1,11 +1,7 @@
 import type {ComponentType} from 'react';
 import {Link} from 'react-router';
-import {
-  RoughCutIcon,
-  DrawnMarkedIcon,
-  JointedByHandIcon,
-  OiledFinishedIcon,
-} from '~/components/ProcessIcons';
+import {EditableText} from '~/components/EditableText';
+import {RoughCutIcon, DrawnMarkedIcon} from '~/components/ProcessIcons';
 import {
   HOME_CONTENT_DEFAULTS,
   type HomeContent,
@@ -18,8 +14,6 @@ import {
 const PROCESS_ICONS: Record<ProcessIconKey, ComponentType> = {
   'rough-cut': RoughCutIcon,
   'drawn-marked': DrawnMarkedIcon,
-  'jointed-by-hand': JointedByHandIcon,
-  'oiled-finished': OiledFinishedIcon,
 };
 
 export interface CraftmanshipProcessProps {
@@ -32,10 +26,18 @@ export function CraftmanshipProcess({
   return (
     <section className="demo-process">
       <div className="demo-process-head">
-        <h2>{content.heading}</h2>
-        <p className="demo-process-sub">{content.subheading}</p>
+        <EditableText as="h2" field="process.heading">
+          {content.heading}
+        </EditableText>
+        <EditableText
+          as="p"
+          className="demo-process-sub"
+          field="process.subheading"
+        >
+          {content.subheading}
+        </EditableText>
         <Link to="/collections" className="demo-btn demo-btn-outline-light">
-          {content.ctaLabel}
+          <EditableText field="process.ctaLabel">{content.ctaLabel}</EditableText>
         </Link>
       </div>
 
@@ -45,7 +47,7 @@ export function CraftmanshipProcess({
         </div>
 
         <div className="demo-process-grid">
-          {content.steps.map((step) => {
+          {content.steps.map((step, index) => {
             const Icon = PROCESS_ICONS[step.icon];
             return (
               <div className="demo-process-card" key={step.title}>
@@ -53,8 +55,15 @@ export function CraftmanshipProcess({
                 {/* Title + body are one block so the card can push the icon to
                     the top and this to the bottom, whatever the copy length. */}
                 <div className="demo-process-card-copy">
-                  <h3>{step.title}</h3>
-                  <p>{step.description}</p>
+                  <EditableText as="h3" field={`process.steps.${index}.title`}>
+                    {step.title}
+                  </EditableText>
+                  <EditableText
+                    as="p"
+                    field={`process.steps.${index}.description`}
+                  >
+                    {step.description}
+                  </EditableText>
                 </div>
               </div>
             );

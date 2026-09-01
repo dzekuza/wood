@@ -1,8 +1,10 @@
 import {useState} from 'react';
 import type {ProductReview} from '~/components/ReviewsSection';
 import {StarFilledIcon} from '~/components/Icons';
+import {EditableText} from '~/components/EditableText';
 import {Lightbox} from '~/components/Lightbox';
 import {HOME_CONTENT_DEFAULTS} from '~/lib/homeContent';
+import type {RatingSummary} from '~/lib/reviewStats';
 
 function ReviewCard({
   review,
@@ -88,17 +90,28 @@ function MarqueeRow({
 
 export interface TestimonialsMarqueeProps {
   reviews: ProductReview[];
+  /**
+   * Headline rating for the section. Covers the whole catalogue, so it is
+   * deliberately *not* derived from `reviews` — those are a curated handful
+   * chosen for their photos. Falls back to summarising the cards when a caller
+   * has no store-wide figure.
+   */
+  rating?: RatingSummary | null;
   heading?: string;
 }
 
 export function TestimonialsMarquee({
   reviews,
+  rating,
   heading = HOME_CONTENT_DEFAULTS.testimonials.heading,
 }: TestimonialsMarqueeProps) {
   if (!reviews.length) return null;
 
-  const average =
-    reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+  const summary = rating ?? {
+    average:
+      reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length,
+    count: reviews.length,
+  };
   const rowSplit = Math.ceil(reviews.length / 2);
   const row1 = reviews.slice(0, rowSplit);
   const row2 = reviews.slice(rowSplit);
@@ -113,10 +126,12 @@ export function TestimonialsMarquee({
             ))}
           </span>
           <span>
-            {average.toFixed(1)} · {reviews.length} reviews
+            {summary.average.toFixed(1)} · {summary.count} reviews
           </span>
         </div>
-        <h2>{heading}</h2>
+        <EditableText as="h2" field="testimonials.heading">
+          {heading}
+        </EditableText>
       </div>
 
       <div className="demo-review-rows">

@@ -5,21 +5,29 @@ import type {
   PopularProductsQuery,
 } from 'storefrontapi.generated';
 import {MockShopNotice} from '~/components/MockShopNotice';
+import {EditableText} from '~/components/EditableText';
+import {EditToolbar} from '~/components/EditToolbar';
+import {EditToolbarProvider} from '~/components/EditToolbarProvider';
 import {ProductItem} from '~/components/ProductItem';
 import {HeroCarousel} from '~/components/HeroCarousel';
 import {CategoriesGrid, type Category} from '~/components/CategoriesGrid';
-import {TexturesGrid} from '~/components/TexturesGrid';
 import {TestimonialsMarquee} from '~/components/TestimonialsMarquee';
 import {CraftmanshipProcess} from '~/components/CraftmanshipProcess';
 import {ContactBanner} from '~/components/ContactBanner';
 import {HOMEPAGE_REVIEWS} from '~/lib/reviews';
+import {aggregateRatings} from '~/lib/reviewStats';
 import {
   buildHomeContent,
   HOME_CONTENT_QUERY,
   type HomeContent,
 } from '~/lib/homeContent';
-import {SITE_NAME} from '~/lib/site';
+import {
+  homepageCategoryRank,
+  shouldHideCollection,
+  SITE_NAME,
+} from '~/lib/site';
 import {filterHiddenProducts} from '~/lib/upsells';
+import {LANDING_SLUG, loadPageContentState} from '~/lib/pageContent.server';
 import demoStyles from '~/styles/demo.css?url';
 
 export const meta: Route.MetaFunction = () => {
@@ -44,19 +52,18 @@ export function links() {
 }
 
 function buildCategories(showcase: HeroShowcaseQuery | undefined): Category[] {
-  if (!showcase) return [];
-  const collections = [
-    showcase.mantelBeams,
-    showcase.coatRacks,
-    showcase.doorStops,
-    showcase.surroundMantels,
-    showcase.cubeBlocks,
-    showcase.shelves,
-  ];
+  const collections = showcase?.collections.nodes ?? [];
 
   return collections
-    .filter((collection): collection is NonNullable<typeof collection> =>
-      Boolean(collection),
+    .filter(
+      (collection) =>
+        !shouldHideCollection({
+          handle: collection.handle,
+          title: collection.title,
+        }),
+    )
+    .sort(
+      (a, b) => homepageCategoryRank(a.handle) - homepageCategoryRank(b.handle),
     )
     .map((collection) => ({
       title: collection.title,
@@ -70,56 +77,76 @@ function buildCategories(showcase: HeroShowcaseQuery | undefined): Category[] {
 }
 
 export async function loader(args: Route.LoaderArgs) {
-  const {context} = args;
-  const [heroShowcase, popularProducts, homeContent] = await Promise.all([
+  const {context, request} = args;
+  const [
+    heroShowcase,
+    popularProducts,
+    homeContent,
+    storeReviews,
+    pageContent,
+  ] = await Promise.all([
     context.storefront.query(HERO_SHOWCASE_QUERY),
     context.storefront.query(POPULAR_PRODUCTS_QUERY),
     context.storefront.query(HOME_CONTENT_QUERY),
+    context.storefront.query(STORE_REVIEWS_QUERY),
+    // Inline copy overrides, read here rather than client-side so the copy a
+    // shopper sees is server-rendered and the toolbar does not flash in.
+    loadPageContentState(context, request, LANDING_SLUG),
   ]);
 
   const visiblePopularProducts = filterHiddenProducts<
     NonNullable<PopularProductsQuery['collection']>['products']['nodes'][number]
   >(popularProducts.collection?.products.nodes ?? []).slice(0, 8);
 
+  // Headline rating covers the whole catalogue, not the curated marquee cards —
+  // hidden products are excluded so the number matches what is actually for sale.
+  const reviewStats = aggregateRatings(
+    filterHiddenProducts(storeReviews.products?.nodes ?? []),
+  );
+
   return {
     isShopLinked: Boolean(context.env.PUBLIC_STORE_DOMAIN),
     content: buildHomeContent(homeContent),
     categories: buildCategories(heroShowcase),
     popularProducts: visiblePopularProducts,
+    reviewStats,
+    pageContent,
   };
 }
-
-const HERO_RATING = {
-  average:
-    HOMEPAGE_REVIEWS.reduce((sum, r) => sum + r.rating, 0) /
-    HOMEPAGE_REVIEWS.length,
-  count: HOMEPAGE_REVIEWS.length,
-};
 
 export default function Homepage() {
   const data = useLoaderData<typeof loader>();
   const {content} = data;
 
   return (
-    <div className="demo-page">
-      {data.isShopLinked ? null : <MockShopNotice />}
-      <HeroCarousel slides={content.heroSlides} rating={HERO_RATING} />
-      <CategoriesGrid
-        categories={data.categories}
-        content={content.categories}
-      />
-      <PopularProductsSection
-        products={data.popularProducts}
-        content={content.popular}
-      />
-      <TestimonialsMarquee
-        reviews={HOMEPAGE_REVIEWS}
-        heading={content.testimonials.heading}
-      />
-      <CraftmanshipProcess content={content.process} />
-      <TexturesGrid categories={data.categories} content={content.textures} />
-      <ContactBanner content={content.contact} />
-    </div>
+    <EditToolbarProvider
+      slug={LANDING_SLUG}
+      initialState={data.pageContent}
+      label="Homepage copy"
+    >
+      <div className="demo-page">
+        {data.isShopLinked ? null : <MockShopNotice />}
+        <HeroCarousel slides={content.heroSlides} rating={data.reviewStats} />
+        <CategoriesGrid
+          categories={data.categories}
+          content={content.categories}
+        />
+        <PopularProductsSection
+          products={data.popularProducts}
+          content={content.popular}
+        />
+        {/* Cards stay curated (they are the ones with customer photos); the
+          headline numbers come from every product's review metafield. */}
+        <TestimonialsMarquee
+          reviews={HOMEPAGE_REVIEWS}
+          rating={data.reviewStats}
+          heading={content.testimonials.heading}
+        />
+        <CraftmanshipProcess content={content.process} />
+        <ContactBanner content={content.contact} />
+      </div>
+      <EditToolbar />
+    </EditToolbarProvider>
   );
 }
 
@@ -127,7 +154,9 @@ function PopularProductsSection({
   products,
   content,
 }: {
-  products: NonNullable<PopularProductsQuery['collection']>['products']['nodes'];
+  products: NonNullable<
+    PopularProductsQuery['collection']
+  >['products']['nodes'];
   content: HomeContent['popular'];
 }) {
   if (!products.length) return null;
@@ -135,7 +164,13 @@ function PopularProductsSection({
   return (
     <section className="demo-popular">
       <div className="demo-popular-inner">
-        <h2 className="demo-popular-heading">{content.heading}</h2>
+        <EditableText
+          as="h2"
+          className="demo-popular-heading"
+          field="popular.heading"
+        >
+          {content.heading}
+        </EditableText>
 
         <div className="pgrid">
           {products.map((product, index) => (
@@ -148,7 +183,9 @@ function PopularProductsSection({
         </div>
 
         <Link to="/collections/all" className="demo-btn demo-btn-outline-dark">
-          {content.ctaLabel}
+          <EditableText field="popular.ctaLabel">
+            {content.ctaLabel}
+          </EditableText>
         </Link>
       </div>
     </section>
@@ -184,23 +221,10 @@ const HERO_SHOWCASE_COLLECTION_FIELDS = `#graphql
 const HERO_SHOWCASE_QUERY = `#graphql
   query HeroShowcase($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    doorStops: collection(handle: "solid-oak-door-stops") {
-      ...HeroShowcaseCollection
-    }
-    shelves: collection(handle: "solid-oak-shelves") {
-      ...HeroShowcaseCollection
-    }
-    mantelBeams: collection(handle: "solid-oak-mantel-beams") {
-      ...HeroShowcaseCollection
-    }
-    coatRacks: collection(handle: "solid-oak-coat-racks") {
-      ...HeroShowcaseCollection
-    }
-    surroundMantels: collection(handle: "solid-oak-fireplace-surrounds") {
-      ...HeroShowcaseCollection
-    }
-    cubeBlocks: collection(handle: "solid-oak-cube-blocks") {
-      ...HeroShowcaseCollection
+    collections(first: 20) {
+      nodes {
+        ...HeroShowcaseCollection
+      }
     }
   }
   ${HERO_SHOWCASE_COLLECTION_FIELDS}
@@ -258,6 +282,23 @@ const POPULAR_PRODUCT_ITEM_FRAGMENT = `#graphql
     }
     metafield(namespace: "reviews", key: "product_reviews") {
       value
+    }
+  }
+` as const;
+
+/** Ratings only — no images, prices or options, so this stays a light request
+ *  even though it walks the whole catalogue. */
+const STORE_REVIEWS_QUERY = `#graphql
+  query StoreReviews($country: CountryCode, $language: LanguageCode)
+    @inContext(country: $country, language: $language) {
+    products(first: 250) {
+      nodes {
+        id
+        handle
+        metafield(namespace: "reviews", key: "product_reviews") {
+          value
+        }
+      }
     }
   }
 ` as const;
