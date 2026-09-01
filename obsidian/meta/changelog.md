@@ -69,6 +69,25 @@ recorded in [[decisions-log|ADR-0010]].
 > this works on a deployed build. Steps in
 > [[../frontend/edit-toolbar|edit-toolbar]].
 
+## 2026-09-01 — The "Categories" rename also had to happen in Admin
+
+Renaming the strings in `HOME_CONTENT_DEFAULTS` changed nothing on the live
+homepage: the `home_page` metaobject supplies those fields, and the metaobject
+always wins ([[../frontend/homepage-content|homepage-content]]). Four values
+still read "Collections" and were updated in Admin:
+
+| Metaobject | Field | Now |
+|---|---|---|
+| `home_hero_slide/brand-slide` | `secondary_cta_label` | Explore Categories |
+| `home_page/main` | `categories_link_label` | All Categories |
+| `home_page/main` | `popular_cta_label` | Explore Categories |
+| `home_page/main` | `process_cta_label` | Explore Categories |
+
+The lesson generalises: **any copy change to a metaobject-backed field is a
+two-place change** — the coded fallback for an unseeded storefront, and the
+metaobject for this one. A code-only change looks correct in the diff and does
+nothing to the site.
+
 ## 2026-09-01 — Storefront copy says "Categories", not "Collections"
 
 Every user-visible "Collections" label is now "Categories": the search

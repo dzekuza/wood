@@ -51,6 +51,13 @@ adding a second hero slide is what re-enables the carousel arrows and dots.
 > that field. An untouched field still follows `home_page`; a published one
 > stops tracking it until the override is cleared.
 
+> [!tip] Renaming copy? Change it in both places
+> Editing a string in `HOME_CONTENT_DEFAULTS` has **no effect** on this
+> storefront while the metaobject supplies that field. The 2026-09-01
+> Collections→Categories rename shipped looking complete and changed nothing
+> live until four `home_page` / `home_hero_slide` fields were edited in Admin
+> too. Grep the metaobject values, not just the repo.
+
 > [!warning] The metaobject wins — code defaults do not
 > Removing a sentence from `HOME_CONTENT_DEFAULTS` does **not** change the live
 > page while the metaobject supplies a value: `buildHomeContent()` only falls
