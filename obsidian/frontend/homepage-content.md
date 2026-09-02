@@ -1,6 +1,6 @@
 ---
 tags: [frontend, shopify, content, wip]
-updated: 2026-09-01
+updated: 2026-09-02
 ---
 
 # Homepage content (metaobject-driven)
@@ -19,7 +19,7 @@ the page that shipped before this change.
 
 | Metaobject type | Handle | What it holds |
 |---|---|---|
-| `home_page` | `main` | Singleton. Every section's heading/subheading/button label, plus references to the two lists below. The `textures_heading` / `textures_subheading` / `textures_link_label` fields are no longer read — the "Our Textures" section was removed 2026-08-31; the fields can stay in Admin, they are simply ignored. |
+| `home_page` | `main` | Singleton. Every section's heading/subheading/button label, plus references to the two lists below. Includes the `textures_heading` / `textures_subheading` / `textures_link_label` fields — the "Our Textures" section was removed 2026-08-31 and restored 2026-09-02, and the fields were never deleted in Admin, so they drive it again with no re-seeding. |
 | `home_hero_slide` | one per slide | Background image, heading, blurb, both CTAs. |
 | `home_process_step` | one per card | Icon key, title, description. |
 

@@ -1,6 +1,6 @@
 ---
 tags: [meta, decision]
-updated: 2026-08-26
+updated: 2026-09-02
 ---
 
 # Decisions Log (ADRs)
@@ -46,6 +46,34 @@ bypasses Shopify's own visibility rules, so `isAdminCustomer` is the only thing
 standing between a stranger and unpublished copy — any future route touching
 this metaobject has to repeat that check. And a published field stops tracking
 `home_page` for that field until its override is cleared.
+
+---
+
+## ADR-0010 — The homepage review *count* is a signed-off constant; only the average is derived
+
+**Context.** `aggregateRatings()` reads every product's
+`reviews.product_reviews` metafield and produced both halves of the homepage
+headline — `4.9 · 166 reviews` in the testimonials head and `4.9 (166) reviews
+from Etsy customers` in the hero badge. 166 is the number of reviews that were
+*synced onto products*, not the shop's lifetime Etsy total (~1.4k). The badge
+says "from Etsy customers", so 166 reads as an understatement of the shop's
+whole trading history, not as a catalogue statistic.
+
+**Decision.** Split the two halves of the summary. The **average** stays
+derived from the metafield — it is a real, checkable number and must keep
+matching the per-product stars on the cards and the PDP. The **count** comes
+from `STORE_REVIEW_COUNT` in `lib/site.ts` (1400), applied once in `_index.tsx`'s
+loader so the hero badge and the testimonials heading can never disagree.
+`formatReviewCount()` in `reviewStats.ts` renders it compactly — `1.4k`, with a
+round thousand dropping the `.0`.
+
+**Consequences.** Per-product ratings, the PDP and the review cards are
+untouched: only the homepage headline count changed. The constant is a claim
+about the business, not about data the storefront holds, so it needs re-signing
+by the shop when it moves — that is why it sits in `site.ts` beside the other
+merchant-signed copy rather than being inferred anywhere. `aggregateRatings()`
+still returns the real count; `_index.tsx` overrides it, and a catalogue with no
+reviews at all still renders no badge rather than a bare 1.4k.
 
 ---
 

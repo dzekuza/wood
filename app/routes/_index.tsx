@@ -11,6 +11,7 @@ import {EditToolbarProvider} from '~/components/EditToolbarProvider';
 import {ProductItem} from '~/components/ProductItem';
 import {HeroCarousel} from '~/components/HeroCarousel';
 import {CategoriesGrid, type Category} from '~/components/CategoriesGrid';
+import {TexturesGrid} from '~/components/TexturesGrid';
 import {TestimonialsMarquee} from '~/components/TestimonialsMarquee';
 import {CraftmanshipProcess} from '~/components/CraftmanshipProcess';
 import {ContactBanner} from '~/components/ContactBanner';
@@ -25,6 +26,7 @@ import {
   homepageCategoryRank,
   shouldHideCollection,
   SITE_NAME,
+  STORE_REVIEW_COUNT,
 } from '~/lib/site';
 import {filterHiddenProducts} from '~/lib/upsells';
 import {LANDING_SLUG} from '~/lib/pageContent';
@@ -101,9 +103,14 @@ export async function loader(args: Route.LoaderArgs) {
 
   // Headline rating covers the whole catalogue, not the curated marquee cards —
   // hidden products are excluded so the number matches what is actually for sale.
-  const reviewStats = aggregateRatings(
+  const ratings = aggregateRatings(
     filterHiddenProducts(storeReviews.products?.nodes ?? []),
   );
+  // The average is the metafield's; the count is the store-wide Etsy figure —
+  // see `STORE_REVIEW_COUNT` for why the two come from different places.
+  const reviewStats = ratings
+    ? {average: ratings.average, count: STORE_REVIEW_COUNT}
+    : null;
 
   return {
     isShopLinked: Boolean(context.env.PUBLIC_STORE_DOMAIN),
@@ -144,6 +151,7 @@ export default function Homepage() {
           heading={content.testimonials.heading}
         />
         <CraftmanshipProcess content={content.process} />
+        <TexturesGrid categories={data.categories} content={content.textures} />
         <ContactBanner content={content.contact} />
       </div>
       <EditToolbar />

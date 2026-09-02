@@ -3,6 +3,7 @@ import {Link} from 'react-router';
 import {StarFilledIcon} from '~/components/Icons';
 import {EditableText} from '~/components/EditableText';
 import {HOME_CONTENT_DEFAULTS, type HomeHeroSlide} from '~/lib/homeContent';
+import {formatReviewCount} from '~/lib/reviewStats';
 
 export type HeroSlide = HomeHeroSlide;
 
@@ -68,8 +69,9 @@ export function HeroCarousel({
                       ))}
                     </span>
                     <span>
-                      {rating.average.toFixed(1)} ({rating.count}) reviews from
-                      Etsy customers
+                      {rating.average.toFixed(1)} (
+                      {formatReviewCount(rating.count)}) reviews from Etsy
+                      customers
                     </span>
                   </div>
                 )}

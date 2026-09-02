@@ -1,14 +1,10 @@
 import {useEffect, useRef, useState} from 'react';
 import {Link} from 'react-router';
 import {EditableText} from '~/components/EditableText';
+import {CategoryCard, type Category} from '~/components/CategoryCard';
 import {HOME_CONTENT_DEFAULTS, type HomeSectionHead} from '~/lib/homeContent';
 
-export interface Category {
-  title: string;
-  image: string | null;
-  to: string;
-  count?: number;
-}
+export type {Category};
 
 export interface CategoriesGridProps {
   categories: Category[];
@@ -94,22 +90,7 @@ export function CategoriesGrid({
 
         <div className="demo-cat-grid" ref={trackRef} onScroll={handleScroll}>
           {categories.map((category) => (
-            <Link key={category.title} to={category.to} className="demo-cat-card">
-              <span className="demo-cat-image">
-                {category.image && (
-                  <img src={category.image} alt={category.title} loading="lazy" />
-                )}
-                <span className="demo-cat-arrow" aria-hidden>
-                  <i className="ti ti-arrow-up-right" />
-                </span>
-              </span>
-              <span className="demo-cat-title">{category.title}</span>
-              {typeof category.count === 'number' && (
-                <span className="demo-cat-count">
-                  {category.count} {category.count === 1 ? 'product' : 'products'}
-                </span>
-              )}
-            </Link>
+            <CategoryCard key={category.title} category={category} />
           ))}
         </div>
 

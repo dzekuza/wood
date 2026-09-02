@@ -65,6 +65,7 @@ export interface HomeContent {
     image: HomeImage;
     steps: HomeProcessStep[];
   };
+  textures: HomeSectionHead;
   contact: {heading: string; subheading: string; ctaLabel: string};
 }
 
@@ -113,6 +114,12 @@ export const HOME_CONTENT_DEFAULTS: HomeContent = {
           'Tom draws each joint by hand before a single cut is made — no two pieces are ever identical.',
       },
     ],
+  },
+  textures: {
+    heading: 'Our Textures',
+    subheading:
+      'Handcrafted coat racks, fireplace mantels, shelves and solid oak accents—made to bring warmth, function.',
+    linkLabel: 'All Products',
   },
   contact: {
     heading: 'Contact us',
@@ -243,6 +250,11 @@ export function buildHomeContent(
       },
       steps: parseProcessSteps(home),
     },
+    textures: {
+      heading: text(home.texturesHeading, defaults.textures.heading),
+      subheading: text(home.texturesSubheading, defaults.textures.subheading),
+      linkLabel: text(home.texturesLinkLabel, defaults.textures.linkLabel),
+    },
     contact: {
       heading: text(home.contactHeading, defaults.contact.heading),
       subheading: text(home.contactSubheading, defaults.contact.subheading),
@@ -312,6 +324,9 @@ export const HOME_CONTENT_QUERY = `#graphql
           }
         }
       }
+      texturesHeading: field(key: "textures_heading") { value }
+      texturesSubheading: field(key: "textures_subheading") { value }
+      texturesLinkLabel: field(key: "textures_link_label") { value }
       contactHeading: field(key: "contact_heading") { value }
       contactSubheading: field(key: "contact_subheading") { value }
       contactCtaLabel: field(key: "contact_cta_label") { value }

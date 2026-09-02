@@ -60,14 +60,14 @@ All design decisions follow `DESIGN.md` (source of truth). Key rules for coding:
 
 ### CSS tokens (always use these, never raw hex)
 ```css
---primary: #4A2F1F      /* walnut — headings, CTAs on light */
+--primary: #352F2A      /* headings, CTAs on light (was #4A2F1F walnut) */
 --accent: #C9A27A       /* oak — icons, borders, hover */
 --accent-deep: #7A5A3A  /* darker oak — eyebrows, secondary text */
 --surface: #F3EFEA      /* linen — page bg */
 --sand: #E8DFD1         /* secondary surfaces */
 --dark: #2A2A2A         /* charcoal — dark sections */
 --ink: #1C1C1C          /* footer, marquee */
---line: rgba(74,47,31,.12)
+--line: rgba(53,47,42,.12)
 --line-dark: rgba(201,162,122,.18)
 ```
 

@@ -1,10 +1,19 @@
-import {useLoaderData, Link} from 'react-router';
+import {useLoaderData} from 'react-router';
 import type {Route} from './+types/collections._index';
-import {getPaginationVariables, Image} from '@shopify/hydrogen';
+import {getPaginationVariables} from '@shopify/hydrogen';
 import type {CollectionFragment} from 'storefrontapi.generated';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
+import {CategoryCard} from '~/components/CategoryCard';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {shouldHideCollection} from '~/lib/site';
+import demoStyles from '~/styles/demo.css?url';
+
+/** The cards are `.demo-cat-card`, which lives in `demo.css` — the homepage's
+ *  stylesheet, route-scoped rather than global, so this route has to ask for it
+ *  too or the tiles render unstyled. */
+export function links() {
+  return [{rel: 'stylesheet', href: demoStyles}];
+}
 
 export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte
@@ -21,8 +30,9 @@ export async function loader(args: Route.LoaderArgs) {
  * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
  */
 async function loadCriticalData({context, request}: Route.LoaderArgs) {
+  // A multiple of the 4-column grid, so a page never ends on a ragged row.
   const paginationVariables = getPaginationVariables(request, {
-    pageBy: 4,
+    pageBy: 12,
   });
 
   const [{collections}] = await Promise.all([
@@ -80,13 +90,12 @@ export default function Collections() {
         <div className="archive-wrap">
           <PaginatedResourceSection<CollectionFragment>
             connection={collections}
-            resourcesClassName="collections-grid-new"
+            resourcesClassName="category-grid-4"
           >
-            {({node: collection, index}) => (
-              <CollectionItem
+            {({node: collection}) => (
+              <CategoryCard
                 key={collection.id}
-                collection={collection}
-                index={index}
+                category={toCategory(collection)}
               />
             )}
           </PaginatedResourceSection>
@@ -96,35 +105,22 @@ export default function Collections() {
   );
 }
 
-function CollectionItem({
-  collection,
-  index,
-}: {
-  collection: CollectionFragment;
-  index: number;
-}) {
-  return (
-    <Link
-      className="collection-card-new"
-      key={collection.id}
-      to={`/collections/${collection.handle}`}
-      prefetch="intent"
-    >
-      {collection?.image && (
-        <Image
-          alt={collection.image.altText || collection.title}
-          aspectRatio="3/4"
-          data={collection.image}
-          loading={index < 3 ? 'eager' : undefined}
-          sizes="(min-width: 45em) 400px, 100vw"
-        />
-      )}
-      <div className="collection-card-overlay-new">
-        <div className="collection-card-title-new">{collection.title}</div>
-        <div className="collection-card-cta-new">Browse →</div>
-      </div>
-    </Link>
-  );
+/**
+ * Same shape the homepage builds in `_index.tsx`'s `buildCategories()`: the
+ * collection's own image, falling back to its first product's featured image so
+ * a collection with no artwork set in Admin still shows a tile rather than an
+ * empty square.
+ */
+function toCategory(collection: CollectionFragment) {
+  return {
+    title: collection.title,
+    image:
+      collection.image?.url ??
+      collection.products.nodes[0]?.featuredImage?.url ??
+      null,
+    to: `/collections/${collection.handle}`,
+    count: collection.products.nodes.length,
+  };
 }
 
 const COLLECTIONS_QUERY = `#graphql
@@ -138,6 +134,17 @@ const COLLECTIONS_QUERY = `#graphql
       altText
       width
       height
+    }
+    products(first: 250) {
+      nodes {
+        id
+        featuredImage {
+          url
+          altText
+          width
+          height
+        }
+      }
     }
   }
   query StoreCollections(

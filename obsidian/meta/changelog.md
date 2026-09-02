@@ -1,6 +1,209 @@
 ---
 tags: [meta, changelog]
-updated: 2026-09-01
+updated: 2026-09-02
+---
+
+## 2026-09-02 — Header logo asset refreshed
+
+`public/darkwood.svg` replaced with the new export. Diffed before installing:
+the geometry, viewBox (`679x192`) and the four `#c9a27a` oak-mark fills are
+byte-identical — **only the 18 wordmark fills changed, `#4A2F1F` → `#352F2A`**.
+The designer had already applied the same rebase this session's token change
+made in CSS, so the mark and the UI now agree.
+
+Overwrote the existing file rather than adding `craftedwoodlogo.svg` and
+repointing: same asset, same dimensions, so no markup or CSS changed, and
+`landing-oak.tsx` — the other consumer of `darkwood.svg` — picks up the new
+mark instead of being left on the old walnut one.
+
+Verified in the browser: header logo renders at 156x44 from `/darkwood.svg`.
+
+`public/logo.svg` (footer, coming-soon) needed nothing — it is the light-on-dark
+variant and carries no walnut. **`public/favicon.svg` and `app/assets/favicon.svg`
+still hold `#4A2F1F`** and were left alone; changing a favicon is a visible
+identity change, so it wants asking first.
+
+---
+
+## 2026-09-02 — PDP maker strip matched to Figma `65:5096`
+
+Five values on `.maker` were off the comp:
+
+| | was | now |
+|---|---|---|
+| ground | `--cwf-dark` (`#443c35`) | `--cwf-ink` (`#1c1c1c`) |
+| columns | `1fr 1.4fr` | `1fr 1fr` |
+| `.ph` ratio | `5/6` | `1/1` |
+| `.sig` | Mark Bold 700 italic, `-.04em` | Outfit 500, no italic, no tracking |
+| `.maker p` | `max-width: 520px` | none — fills the column |
+
+Everything else already agreed with the comp and was left alone: the global
+`h1,h2,h3` rule is Outfit 500 / 56px / `-.03em` / 1.15, exactly the design's
+heading; `.ey` at `.18em` is the comp's 1.98px on 11px; `.by` at `.1em` is its
+1.2px on 12px; the paragraph's 1.7 is its 25.5px on 15px.
+
+Verified in the browser at 1440px: the grid measures `588px 588px` and the
+ground is `rgb(28, 28, 28)` — both the comp's own numbers.
+
+**One deliberate deviation.** Figma tints the `<em>` pure `#ffffff` against the
+heading's `#f3efea`. `.maker h2 em` keeps `color: inherit` per the single-colour
+heading rule set earlier the same day — a 2% lightness step is not worth
+reopening that, and the comp reads identically without it.
+
+**Noticed, not touched:** `.pdp-maker` has 11 rules in `app.css` and no markup
+anywhere renders it. Dead since some earlier refactor; left in place rather than
+deleted inside an unrelated change.
+
+---
+
+## 2026-09-02 — `--cwf-primary` rebased to #352f2a, site-wide
+
+After `.pdp-price-big` turned up still warm, the colour changed everywhere
+rather than rule by rule: `--cwf-primary` is now `#352f2a`, not `#4a2f1f`. One
+token edit carries all **125** of its usages — buttons, borders, dark section
+fills, PDP price, prices, links.
+
+**Its derived values moved with it**, or the site would have kept warm hairlines
+under cool text: `--cwf-line` `rgba(74,47,31,.12)` → `rgba(53,47,42,.12)`,
+`--cwf-primary-tint` likewise, and `--cwf-primary-dark` `#3a241a` → `#241f1a`
+(the same darker step `--cwf-ink-strong-hover` already used). **79 hardcoded
+`rgba(74,47,31,…)` tints** across `app.css` and `demo.css` — every muted caption,
+placeholder, shadow and hairline in the site — were rebased to `rgba(53,47,42,…)`
+at their existing alphas. Those predate the "tint via `color-mix`, never a fresh
+`rgba()`" rule; they are now at least all one hue.
+
+**Two literals deliberately survive.** `.product-swatch-tone-dark-walnut` and
+`.finish-swatch-dark-walnut` keep `#4a2f1f`: they render an actual timber finish
+a customer is choosing, so they have to match the wood, not the chrome.
+`assets/favicon.svg` also still carries the walnut.
+
+`--cwf-primary` and `--cwf-ink-strong` now hold the same value but stay separate
+tokens — they name different roles (brand/action vs. text-and-chrome) and may
+diverge again. `DESIGN.md` and the root `CLAUDE.md` token blocks were updated to
+match; they are the documents most likely to be quoted back as the source of
+truth.
+
+---
+
+## 2026-09-02 — Product-card titles move to `--cwf-ink-strong`
+
+`.pcard-name` was `--cwf-primary` (`#4a2f1f` walnut); it is now
+`--cwf-ink-strong` (`#352f2a`), matching `.pcard-price` right below it and the
+page headings changed in the same session.
+
+Scoped to that one rule on purpose. `--cwf-primary` has **125** other usages
+across `app.css` — buttons, borders, dark section grounds, footer — so
+redefining the token itself would have restyled the whole site rather than the
+card title that was asked about.
+
+---
+
+## 2026-09-02 — Page headings render in one colour
+
+Every `<em>` inside a page heading was `var(--cwf-accent)` — the pale gold —
+against a walnut or charcoal heading, so `Browse <em>Categories</em>` read as
+two colours and the emphasised word was the *faintest* text in the line. All
+eight rules (`.page-header h1 em`, `.pdp-info h1 em`, `.pdp-maker h2 em`,
+`.hero h1 em`, `.archive-hero-title em`, `.news h2 em`, `.maker h2 em`,
+`.coming-soon-title em`) now take `color: inherit`.
+
+`inherit` rather than a literal `#352f2a` on each: four of those headings sit on
+**dark** grounds (`.pdp-maker`, `.news`, `.maker` at `#f3efea`, and
+`.coming-soon-title` on `--cwf-ink`), where `#352f2a` would have been almost
+invisible. Inheriting makes "single colour" true on both grounds and survives a
+heading being moved between them.
+
+The four light-ground headings then moved to `--cwf-ink-strong` (`#352f2a`) as
+asked — `.archive-hero-title` and `.pdp-info h1` were `--cwf-primary`,
+`.page-header h1` and `.hero h1` were `--cwf-dark`. `<em>` stays
+`font-style: normal`; it is still a semantic hook, just no longer a coloured
+one. Rule recorded in [[../frontend/design-system|design-system]].
+
+---
+
+## 2026-09-02 — All-categories page uses the homepage category card, 4-up
+
+`/collections` rendered its own card — `.collection-card-new`, a 3/4 portrait
+photo with a dark gradient overlay, the title in Mark Bold and a "Browse →"
+CTA — which looked nothing like the tiles on the homepage.
+
+**`CategoryCard` extracted.** The `.demo-cat-card` markup moved out of
+`CategoriesGrid` into `app/components/CategoryCard.tsx`; both the homepage
+carousel and `collections._index` now render it, so the two cannot drift. The
+`Category` type moved with it and `CategoriesGrid` re-exports it, so nothing
+that imported it had to change.
+
+**Grid, not carousel.** `.collections-grid-new` and the five
+`.collection-card-*` rules were deleted (dead once the card changed) and
+replaced by `.category-grid-4` — 4 columns, 3 under 1080px, 2 under 767px, at
+the track's own 16px gap. The card needs no overrides to sit in a grid cell:
+its `flex: 0 0 calc(…)` basis in `demo.css` is inert on a grid item.
+
+**Two things the route had to pick up.** `demo.css` is route-scoped, not global,
+so `collections._index` now exports `links()` for it or the tiles render
+unstyled. And the card shows a product count, so `COLLECTIONS_QUERY`'s fragment
+gained `products(first: 250) { nodes { id featuredImage {…} } }` — the same
+shape `_index.tsx`'s `buildCategories()` reads, giving the count and the
+first-product image fallback for a collection with no artwork in Admin.
+`pageBy` went 4 → 12 so a page never ends on a ragged row.
+
+Verified on the running site: seven cards, real counts (`2`, `3`, `1`…), no
+`collection-card-new` left in the HTML.
+
+---
+
+## 2026-09-02 — Homepage accents drop the warm brown for `--cwf-ink-strong`
+
+`demo.css` carried ten raw `#61482e` literals — a warmer brown than the rest of
+the chrome — on `.demo-categories-all` / `.demo-textures-all`, both dark button
+variants (`.demo-btn-solid` border, `.demo-btn-outline-dark`), `.demo-hero-arrow`,
+the `.demo-hero-dot.is-active::after` progress fill, the `.demo-cat-arrow` and
+`.demo-tex-arrow` hover badges, and `.demo-process-card p`. All now render
+`#352f2a`, matching the headings they sit beside.
+
+Written as `var(--cwf-ink-strong)`, not the new hex: that token is already
+`#352f2a` and already named this exact role, and per [[../frontend/design-system|
+design-system]] a colour with a token never gets re-literalled. `grep -i 61482e
+app/` is now empty. Colour-only change; no markup or component touched.
+
+**Follow-up: the carousel nav was a second, different brown.** The chevrons and
+page dots shared by both homepage carousels (`.demo-popular-arrow` /
+`.demo-cat-arrow-btn`, `button.demo-popular-dot` / `button.demo-cat-dot`) were
+not `#61482e` at all — they took `var(--cwf-accent-deep)` (`#7a5a3a`, the oak
+tone), so they stayed brown after the sweep above. Both rules now use
+`--cwf-ink-strong` too, matching the "All Categories" link they sit under.
+
+The other **17** `--cwf-accent-deep` usages in `demo.css` were left alone
+deliberately — the popular-tab pills, `.demo-marquee` band, benefits, quotes,
+stats and FAQ are sections where the oak tone is the intended brand accent
+([[../frontend/design-system|design-system]]), not chrome that drifted. Only the
+carousel nav was recoloured.
+
+---
+
+## 2026-09-02 — "Our Textures" restored, and the homepage review count reads 1.4k
+
+**`TexturesGrid` is back on the homepage.** It was deleted on 2026-08-31 (see
+that entry) for duplicating `CategoriesGrid`'s six categories; the client asked
+for it back. Restored as it was — same `.demo-textures` / `.demo-tex-*` CSS,
+same close-up swatch images from `public/demo/texture-*.jpg`, same slot between
+`CraftmanshipProcess` and `ContactBanner` — with one change: the head now uses
+`EditableText` (`textures.heading` / `textures.subheading` /
+`textures.linkLabel`), which did not exist when it was removed, so the copy is
+inline-editable like every other section. The three `textures_*` `home_page`
+metaobject fields are read again; they were never deleted in Admin, so nothing
+needs re-seeding.
+
+**The headline review count is now a constant, not the metafield aggregate.**
+`4.9 · 166 reviews` became `4.9 · 1.4k reviews` (and the hero badge
+`4.9 (1.4k) reviews from Etsy customers`). 166 was only the reviews synced onto
+products; the badge claims the shop's Etsy history, which is ~1.4k. The average
+is still derived — `STORE_REVIEW_COUNT` in `lib/site.ts` supplies just the
+count, applied once in `_index.tsx`'s loader so hero and testimonials cannot
+drift, and `formatReviewCount()` in `reviewStats.ts` renders it compactly. See
+[[decisions-log|ADR-0010]]. Per-product ratings, the PDP and the review cards
+are unchanged.
+
 ---
 
 ## 2026-09-01 — Edit toolbar: dev bypass, and codegen stops choking on it

@@ -22,14 +22,14 @@ All colors live as CSS custom properties on `:root` and should be referenced by 
 
 ```css
 :root{
-  --primary:    #4A2F1F;  /* Dark Walnut — CTAs, headings, primary text on light */
+  --primary:    #352F2A;  /* CTAs, headings, primary text on light (was #4A2F1F walnut until 2026-09-02) */
   --accent:     #C9A27A;  /* Warm Oak — icons, borders, hover states, mark */
   --accent-deep:#7A5A3A;  /* Deeper oak — eyebrows, secondary text on light */
   --surface:    #F3EFEA;  /* Linen — page bg, card fills */
   --sand:       #E8DFD1;  /* Sand — secondary surfaces, icon tiles */
   --dark:       #2A2A2A;  /* Charcoal — dark sections, nav, footer-adjacent */
   --ink:        #1C1C1C;  /* Ink — true footer, marquee strip */
-  --line:       rgba(74,47,31,.12);  /* hairlines on light */
+  --line:       rgba(53,47,42,.12);  /* hairlines on light — tinted off --primary */
   --line-dark:  rgba(201,162,122,.18);/* hairlines on dark */
 }
 ```

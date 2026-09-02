@@ -27,9 +27,26 @@ A component references tier 2/3 only. A raw hex or px in a `className` is a bug.
 | Token | Tier | Value | Use for |
 |-------|------|-------|---------|
 | `--cwf-star` | semantic | `#ffa817` | every rating star, site-wide (cards, PDP, testimonials, review lists). Never `--cwf-accent` — that pale gold washes out on light cards |
-| `--cwf-ink-strong` | semantic | `#352f2a` | the strong text/chrome colour: header nav, dropdown, search, account/cart pills, contact panel, demo headings, card prices. Cooler than `--cwf-primary`; take tints via `color-mix(… N%, transparent)`, never a new `rgba()` |
+| `--cwf-primary` | semantic | `#352f2a` | CTAs, buttons, borders, dark section fills, primary text on light. **Was `#4a2f1f` (warm walnut) until 2026-09-02**, when the whole UI moved onto the cooler value — so it now equals `--cwf-ink-strong`. The two are kept as separate tokens because they name different roles (brand/action vs. text-and-chrome) and may diverge again; don't collapse them. The walnut hex survives only where it names a real timber finish |
+| `--cwf-ink-strong` | semantic | `#352f2a` | the strong text/chrome colour: header nav, dropdown, search, account/cart pills, contact panel, demo headings, card prices, **and every homepage accent — "All Categories"/"All Products" links, outline/solid buttons, hero arrows and the autoplay dot fill, the category and texture hover badges, process card copy.** Those ten were a raw `#61482e` (warmer brown) in `demo.css` until 2026-09-02; there is now no bare hex for this colour anywhere in `app/`. **Also every light-background page heading** (`.archive-hero-title`, `.page-header h1`, `.pdp-info h1`, `.hero h1`) and the product-card title `.pcard-name`, since 2026-09-02 — see the rule below. Cooler than `--cwf-primary`; take tints via `color-mix(… N%, transparent)`, never a new `rgba()` |
 | `--cwf-ink-strong-hover` | semantic | `#241f1a` | hover fill for the header cart pill |
 | `--cwf-tile` | semantic | `#f6f6f6` | neutral tile behind product/collection media (`.pcard-img`, and via `--demo-tile-bg` the homepage card tiles). Not `--cwf-card`/`--cwf-sand` — the warm beige competes with the oak in cut-out photos |
+
+## Headings are one colour
+
+A page heading renders in a single colour. The `<em>` inside one (`Browse
+<em>Categories</em>`) is a **typographic** emphasis, not a chromatic one — it
+takes `color: inherit`, never its own value. Do not reintroduce the
+`color: var(--cwf-accent)` split that `.page-header h1 em`, `.pdp-info h1 em`,
+`.pdp-maker h2 em`, `.hero h1 em`, `.archive-hero-title em`, `.news h2 em`,
+`.maker h2 em` and `.coming-soon-title em` all carried until 2026-09-02 — that
+pale gold on a light ground was the weakest text on the page, and it landed on
+the one word the heading was trying to stress.
+
+On a light ground a heading is `--cwf-ink-strong` (`#352f2a`); on a dark one it
+keeps its light value (`#f3efea` for `.pdp-maker`/`.news`/`.maker`, and
+`.coming-soon-title` on `--cwf-ink`). Either way the `em` inherits, so a heading
+moved between grounds stays correct with no second edit.
 
 ## Adding a token
 

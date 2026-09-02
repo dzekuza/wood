@@ -35,7 +35,7 @@
 
 .header--overlay.is-scrolled {
   background: #fff;
-  border-bottom-color: rgba(74, 47, 31, 0.1);
+  border-bottom-color: rgba(53, 47, 42, 0.1);
 }
 
 .header--overlay:not(.is-scrolled) .header-logo img { filter: brightness(0) invert(1); }
@@ -207,7 +207,7 @@
 
 .demo-btn-solid {
   background: #ffa817;
-  border: 1.25px solid #61482e;
+  border: 1.25px solid var(--cwf-ink-strong);
   color: #2f1d0b;
 }
 
@@ -235,7 +235,7 @@
   width: 44px;
   height: 44px;
   border-radius: 44px;
-  color: #61482e;
+  color: var(--cwf-ink-strong);
   opacity: 0.65;
   transition: opacity 150ms ease, background 150ms ease;
 }
@@ -284,7 +284,7 @@ button.demo-hero-dot.is-active::after {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: #61482e;
+  background: var(--cwf-ink-strong);
   transform-origin: left center;
   animation: demo-hero-dot-fill var(--demo-hero-slide-duration) linear forwards;
 }
@@ -377,7 +377,7 @@ button.demo-hero-dot.is-active::after {
   font-weight: 500;
   font-size: 14px;
   text-transform: capitalize;
-  color: #61482e;
+  color: var(--cwf-ink-strong);
   transition: opacity 150ms ease;
 }
 
@@ -447,7 +447,7 @@ button.demo-hero-dot.is-active::after {
   width: 40px;
   border-radius: 40px;
   background: #fff;
-  color: #61482e;
+  color: var(--cwf-ink-strong);
   opacity: 0;
   transform: scale(0.9);
   transition: opacity 200ms ease, transform 200ms ease;
@@ -677,7 +677,7 @@ button.demo-hero-dot.is-active::after {
   font-size: 10px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(74, 47, 31, 0.45);
+  color: rgba(53, 47, 42, 0.45);
 }
 
 .demo-product-price-value {
@@ -716,7 +716,7 @@ button.demo-hero-dot.is-active::after {
   justify-content: center;
   height: 32px;
   width: 32px;
-  color: var(--cwf-accent-deep);
+  color: var(--cwf-ink-strong);
   transition: opacity 150ms ease;
 }
 
@@ -739,7 +739,7 @@ button.demo-cat-dot {
   height: 9px;
   width: 9px;
   border-radius: 7px;
-  background: var(--cwf-accent-deep);
+  background: var(--cwf-ink-strong);
   opacity: 0.25;
   transition: width 200ms ease, opacity 200ms ease;
 }
@@ -759,8 +759,8 @@ button.demo-cat-dot.is-active {
 
 .demo-btn-outline-dark {
   background: transparent;
-  border: 1.25px solid #61482e;
-  color: #61482e;
+  border: 1.25px solid var(--cwf-ink-strong);
+  color: var(--cwf-ink-strong);
   padding: 16px 46px;
 }
 
@@ -773,6 +773,152 @@ button.demo-cat-dot.is-active {
   .demo-popular-inner { padding: 32px 20px; gap: 24px; }
   .demo-popular-heading { font-size: 28px; }
   .demo-btn-outline-dark { width: 100%; }
+}
+
+/* -------------------------------------------------------
+ * Our Textures grid
+ * ------------------------------------------------------- */
+.demo-textures {
+  width: 100%;
+  background: #fff;
+}
+
+.demo-textures-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  padding: 40px 40px 80px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.demo-textures-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+}
+
+.demo-textures-head h2 {
+  font-family: var(--demo-font-display);
+  font-weight: 500;
+  font-size: 36px;
+  line-height: 1.1667;
+  letter-spacing: -0.02em;
+  color: #352f2a;
+  margin: 0;
+}
+
+.demo-textures-sub {
+  font-family: var(--demo-font-body);
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.4;
+  color: var(--cwf-ink-strong);
+  max-width: 500px;
+  margin: 0;
+}
+
+.demo-textures-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--demo-font-display);
+  font-weight: 500;
+  font-size: 14px;
+  text-transform: capitalize;
+  color: var(--cwf-ink-strong);
+  transition: opacity 150ms ease;
+}
+
+.demo-textures-all:hover { opacity: 0.65; }
+.demo-textures-all i { font-size: 13px; }
+
+.demo-tex-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 24px;
+  width: 100%;
+}
+
+.demo-tex-card {
+  display: flex;
+  flex-direction: column;
+  color: inherit;
+}
+
+.demo-tex-swatch {
+  position: relative;
+  display: block;
+  height: 104px;
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--demo-tile-bg);
+}
+
+.demo-tex-swatch img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 400ms ease;
+}
+
+.demo-tex-card:hover .demo-tex-swatch img { transform: scale(1.06); }
+
+.demo-tex-arrow {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  width: 32px;
+  border-radius: 32px;
+  background: #fff;
+  color: var(--cwf-ink-strong);
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+
+.demo-tex-arrow i { font-size: 13px; }
+.demo-tex-card:hover .demo-tex-arrow { opacity: 1; transform: scale(1); }
+
+/* Touch devices have no hover state — keep the badge visible */
+@media (hover: none) {
+  .demo-tex-arrow { opacity: 1; transform: scale(1); }
+}
+
+.demo-tex-title {
+  font-family: var(--demo-font-display);
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--cwf-ink-strong);
+  margin-top: 12px;
+}
+
+.demo-tex-count {
+  font-family: var(--demo-font-body);
+  font-size: 12px;
+  color: var(--cwf-ink-strong);
+  opacity: 0.7;
+  margin-top: 2px;
+}
+
+@media (max-width: 1080px) {
+  .demo-tex-grid { grid-template-columns: repeat(3, 1fr); }
+  .demo-textures-inner { padding: 40px 32px 64px; }
+}
+
+@media (max-width: 620px) {
+  .demo-tex-grid { grid-template-columns: repeat(2, 1fr); }
+  .demo-textures-inner { padding: 32px 20px 48px; }
+  .demo-textures-head h2 { font-size: 28px; }
 }
 
 /* -------------------------------------------------------
@@ -944,7 +1090,7 @@ button.demo-review-photo:hover {
 .demo-review-product {
   font-family: var(--demo-font-body);
   font-size: 12px;
-  color: rgba(74, 47, 31, 0.55);
+  color: rgba(53, 47, 42, 0.55);
 }
 
 @media (max-width: 620px) {
@@ -1075,7 +1221,7 @@ button.demo-review-photo:hover {
   font-family: var(--demo-font-body);
   font-size: 14px;
   line-height: 1.6;
-  color: #61482e;
+  color: var(--cwf-ink-strong);
   margin: 0;
 }
 

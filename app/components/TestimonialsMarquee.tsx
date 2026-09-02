@@ -4,7 +4,7 @@ import {StarFilledIcon} from '~/components/Icons';
 import {EditableText} from '~/components/EditableText';
 import {Lightbox} from '~/components/Lightbox';
 import {HOME_CONTENT_DEFAULTS} from '~/lib/homeContent';
-import type {RatingSummary} from '~/lib/reviewStats';
+import {formatReviewCount, type RatingSummary} from '~/lib/reviewStats';
 
 function ReviewCard({
   review,
@@ -126,7 +126,8 @@ export function TestimonialsMarquee({
             ))}
           </span>
           <span>
-            {summary.average.toFixed(1)} · {summary.count} reviews
+            {summary.average.toFixed(1)} · {formatReviewCount(summary.count)}{' '}
+            reviews
           </span>
         </div>
         <EditableText as="h2" field="testimonials.heading">

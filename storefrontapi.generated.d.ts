@@ -491,6 +491,15 @@ export type HomeContentQuery = {
           >;
         }>;
       }>;
+      texturesHeading?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'value'>
+      >;
+      texturesSubheading?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'value'>
+      >;
+      texturesLinkLabel?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'value'>
+      >;
       contactHeading?: StorefrontAPI.Maybe<
         Pick<StorefrontAPI.MetaobjectField, 'value'>
       >;
@@ -1065,6 +1074,15 @@ export type CollectionFragment = Pick<
   image?: StorefrontAPI.Maybe<
     Pick<StorefrontAPI.Image, 'id' | 'url' | 'altText' | 'width' | 'height'>
   >;
+  products: {
+    nodes: Array<
+      Pick<StorefrontAPI.Product, 'id'> & {
+        featuredImage?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.Image, 'url' | 'altText' | 'width' | 'height'>
+        >;
+      }
+    >;
+  };
 };
 
 export type StoreCollectionsQueryVariables = StorefrontAPI.Exact<{
@@ -1090,6 +1108,18 @@ export type StoreCollectionsQuery = {
             'id' | 'url' | 'altText' | 'width' | 'height'
           >
         >;
+        products: {
+          nodes: Array<
+            Pick<StorefrontAPI.Product, 'id'> & {
+              featuredImage?: StorefrontAPI.Maybe<
+                Pick<
+                  StorefrontAPI.Image,
+                  'url' | 'altText' | 'width' | 'height'
+                >
+              >;
+            }
+          >;
+        };
       }
     >;
     pageInfo: Pick<
@@ -2398,7 +2428,7 @@ interface GeneratedQueryTypes {
     return: FooterQuery;
     variables: FooterQueryVariables;
   };
-  '#graphql\n  #graphql\n  fragment HomeMediaImage on MediaImage {\n    image {\n      url\n      altText\n      width\n      height\n    }\n  }\n\n  query HomeContent($country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    home: metaobject(handle: {type: "home_page", handle: "main"}) {\n      id\n      heroSlides: field(key: "hero_slides") {\n        references(first: 12) {\n          nodes {\n            ... on Metaobject {\n              id\n              image: field(key: "image") {\n                reference { ...HomeMediaImage }\n              }\n              heading: field(key: "heading") { value }\n              blurb: field(key: "blurb") { value }\n              primaryCtaLabel: field(key: "primary_cta_label") { value }\n              primaryCtaUrl: field(key: "primary_cta_url") { value }\n              secondaryCtaLabel: field(key: "secondary_cta_label") { value }\n              secondaryCtaUrl: field(key: "secondary_cta_url") { value }\n            }\n          }\n        }\n      }\n      categoriesHeading: field(key: "categories_heading") { value }\n      categoriesSubheading: field(key: "categories_subheading") { value }\n      categoriesLinkLabel: field(key: "categories_link_label") { value }\n      popularHeading: field(key: "popular_heading") { value }\n      popularCtaLabel: field(key: "popular_cta_label") { value }\n      testimonialsHeading: field(key: "testimonials_heading") { value }\n      processHeading: field(key: "process_heading") { value }\n      processSubheading: field(key: "process_subheading") { value }\n      processCtaLabel: field(key: "process_cta_label") { value }\n      processImage: field(key: "process_image") {\n        reference { ...HomeMediaImage }\n      }\n      processSteps: field(key: "process_steps") {\n        references(first: 12) {\n          nodes {\n            ... on Metaobject {\n              id\n              icon: field(key: "icon") { value }\n              title: field(key: "title") { value }\n              description: field(key: "description") { value }\n            }\n          }\n        }\n      }\n      contactHeading: field(key: "contact_heading") { value }\n      contactSubheading: field(key: "contact_subheading") { value }\n      contactCtaLabel: field(key: "contact_cta_label") { value }\n    }\n  }\n': {
+  '#graphql\n  #graphql\n  fragment HomeMediaImage on MediaImage {\n    image {\n      url\n      altText\n      width\n      height\n    }\n  }\n\n  query HomeContent($country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    home: metaobject(handle: {type: "home_page", handle: "main"}) {\n      id\n      heroSlides: field(key: "hero_slides") {\n        references(first: 12) {\n          nodes {\n            ... on Metaobject {\n              id\n              image: field(key: "image") {\n                reference { ...HomeMediaImage }\n              }\n              heading: field(key: "heading") { value }\n              blurb: field(key: "blurb") { value }\n              primaryCtaLabel: field(key: "primary_cta_label") { value }\n              primaryCtaUrl: field(key: "primary_cta_url") { value }\n              secondaryCtaLabel: field(key: "secondary_cta_label") { value }\n              secondaryCtaUrl: field(key: "secondary_cta_url") { value }\n            }\n          }\n        }\n      }\n      categoriesHeading: field(key: "categories_heading") { value }\n      categoriesSubheading: field(key: "categories_subheading") { value }\n      categoriesLinkLabel: field(key: "categories_link_label") { value }\n      popularHeading: field(key: "popular_heading") { value }\n      popularCtaLabel: field(key: "popular_cta_label") { value }\n      testimonialsHeading: field(key: "testimonials_heading") { value }\n      processHeading: field(key: "process_heading") { value }\n      processSubheading: field(key: "process_subheading") { value }\n      processCtaLabel: field(key: "process_cta_label") { value }\n      processImage: field(key: "process_image") {\n        reference { ...HomeMediaImage }\n      }\n      processSteps: field(key: "process_steps") {\n        references(first: 12) {\n          nodes {\n            ... on Metaobject {\n              id\n              icon: field(key: "icon") { value }\n              title: field(key: "title") { value }\n              description: field(key: "description") { value }\n            }\n          }\n        }\n      }\n      texturesHeading: field(key: "textures_heading") { value }\n      texturesSubheading: field(key: "textures_subheading") { value }\n      texturesLinkLabel: field(key: "textures_link_label") { value }\n      contactHeading: field(key: "contact_heading") { value }\n      contactSubheading: field(key: "contact_subheading") { value }\n      contactCtaLabel: field(key: "contact_cta_label") { value }\n    }\n  }\n': {
     return: HomeContentQuery;
     variables: HomeContentQueryVariables;
   };
@@ -2438,7 +2468,7 @@ interface GeneratedQueryTypes {
     return: SiblingCollectionsQuery;
     variables: SiblingCollectionsQueryVariables;
   };
-  '#graphql\n  fragment Collection on Collection {\n    id\n    title\n    handle\n    image {\n      id\n      url\n      altText\n      width\n      height\n    }\n  }\n  query StoreCollections(\n    $country: CountryCode\n    $endCursor: String\n    $first: Int\n    $language: LanguageCode\n    $last: Int\n    $startCursor: String\n  ) @inContext(country: $country, language: $language) {\n    collections(\n      first: $first,\n      last: $last,\n      before: $startCursor,\n      after: $endCursor\n    ) {\n      nodes {\n        ...Collection\n      }\n      pageInfo {\n        hasNextPage\n        hasPreviousPage\n        startCursor\n        endCursor\n      }\n    }\n  }\n': {
+  '#graphql\n  fragment Collection on Collection {\n    id\n    title\n    handle\n    image {\n      id\n      url\n      altText\n      width\n      height\n    }\n    products(first: 250) {\n      nodes {\n        id\n        featuredImage {\n          url\n          altText\n          width\n          height\n        }\n      }\n    }\n  }\n  query StoreCollections(\n    $country: CountryCode\n    $endCursor: String\n    $first: Int\n    $language: LanguageCode\n    $last: Int\n    $startCursor: String\n  ) @inContext(country: $country, language: $language) {\n    collections(\n      first: $first,\n      last: $last,\n      before: $startCursor,\n      after: $endCursor\n    ) {\n      nodes {\n        ...Collection\n      }\n      pageInfo {\n        hasNextPage\n        hasPreviousPage\n        startCursor\n        endCursor\n      }\n    }\n  }\n': {
     return: StoreCollectionsQuery;
     variables: StoreCollectionsQueryVariables;
   };
