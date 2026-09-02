@@ -248,6 +248,7 @@ const POPULAR_PRODUCT_ITEM_FRAGMENT = `#graphql
     id
     handle
     title
+    tags
     options {
       name
       optionValues {
@@ -304,6 +305,7 @@ const STORE_REVIEWS_QUERY = `#graphql
       nodes {
         id
         handle
+        tags
         metafield(namespace: "reviews", key: "product_reviews") {
           value
         }

@@ -1,4 +1,12 @@
-import type {UpsellSurchargesQuery} from 'storefrontapi.generated';
+import type {ProductFragment} from 'storefrontapi.generated';
+
+/** Shopify tag marking a product as an add-on (surcharge) rather than a real
+ * catalog item. Tagging is how merchants keep new add-ons out of listings —
+ * see `filterHiddenProducts`. */
+export const ADDON_TAG = 'addon';
+
+/** Storefront search-query clause excluding add-on products from listings. */
+export const EXCLUDE_HIDDEN_PRODUCTS_QUERY = `-tag:${ADDON_TAG}`;
 
 export type UpsellOption = {
   key: string;
@@ -7,103 +15,96 @@ export type UpsellOption = {
   variantTitle?: string;
 };
 
-export type UpsellSurchargeVariant =
-  UpsellSurchargesQuery['products']['nodes'][number]['variants']['nodes'][number];
+/** One referenced add-on product, as returned by the PDP query. */
+export type AddonProductReference = NonNullable<
+  NonNullable<ProductFragment['addonProducts']>['references']
+>['nodes'][number];
 
-/** Loader-shaped data: each configured group paired with its resolved variant (if any) per option. */
+export type UpsellSurchargeVariant = Extract<
+  AddonProductReference,
+  {__typename?: 'Product'}
+>['variants']['nodes'][number];
+
+export type UpsellGroup = {
+  /** The add-on product's id — stable across renames, unlike a handle. */
+  id: string;
+  /** Option-row heading on the PDP. */
+  label: string;
+  defaultOptionKey: string;
+  /** Label for the always-free option, or null when every choice is paid. */
+  defaultOptionLabel: string | null;
+};
+
+/** Loader-shaped data: each resolved group paired with its selectable options. */
 export type UpsellGroupData = {
   group: UpsellGroup;
   options: Array<{option: UpsellOption; variant: UpsellSurchargeVariant | null}>;
 };
 
-export type UpsellGroup = {
-  id: string;
-  label: string;
-  /** Handle of a hidden Shopify product whose variants price each paid option. */
-  surchargeProductHandle: string;
-  defaultOptionKey: string;
-  /** Label for the always-free option (has no backing Shopify variant). */
-  defaultOptionLabel: string;
-};
+/** Option key for a group's free choice. Paid options key off their variant id. */
+export const FREE_OPTION_KEY = 'default';
 
 /**
- * Merchants can scope which upsell groups appear on a given product via a
- * Shopify product metafield: namespace `custom`, key `addon_groups`, type
- * "List of single line text values" — one Storefront -> Admin -> Custom data
- * -> Products definition, no code changes needed after that.
+ * Add-on groups are defined entirely in Shopify — no code changes needed to
+ * add, rename, reprice, or retire one:
  *
- * The value is a JSON array of `UpsellGroup.id`s, e.g. ["workingType"].
- * - Metafield not set at all -> every group in UPSELL_GROUPS applies (legacy
- *   default, keeps existing products unaffected).
- * - Metafield set to `[]` -> no upsell groups show on that product.
- * - Metafield set to specific ids -> only those groups show, in the order
- *   they're defined in UPSELL_GROUPS below.
+ * - An **add-on product** is any product tagged `addon`, carrying metafields
+ *   `custom.addon_label` (the PDP row heading, e.g. "Working type") and
+ *   `custom.addon_free_option` (the no-cost choice, e.g. "Sanded"; blank means
+ *   every choice is paid). Each variant is one paid choice — its title is the
+ *   button label and its price the surcharge.
+ * - A **catalog product** opts in via `custom.addon_products`, a
+ *   list-of-product-references metafield pointing at the add-on products it
+ *   offers. Merchants pick these from a product picker in the admin.
+ *
+ * Unset or empty means this product shows no add-ons.
  */
-export function resolveUpsellGroupsForProduct(metafieldValue?: string | null): UpsellGroup[] {
-  if (metafieldValue == null) return UPSELL_GROUPS;
+export function buildUpsellGroups(
+  references: readonly AddonProductReference[] | null | undefined,
+): UpsellGroupData[] {
+  if (!references?.length) return [];
 
-  let enabledIds: unknown;
-  try {
-    enabledIds = JSON.parse(metafieldValue);
-  } catch {
-    return UPSELL_GROUPS;
-  }
+  return references.flatMap((reference) => {
+    if (reference.__typename !== 'Product') return [];
 
-  if (!Array.isArray(enabledIds)) return UPSELL_GROUPS;
+    const label = reference.addonLabel?.value?.trim() || reference.title;
+    const freeLabel = reference.addonFreeOption?.value?.trim() || null;
+    const variants = reference.variants.nodes;
 
-  const enabled = new Set(enabledIds);
-  return UPSELL_GROUPS.filter((group) => enabled.has(group.id));
+    // A group with no free choice and no variants has nothing to render.
+    if (!freeLabel && variants.length === 0) return [];
+
+    const group: UpsellGroup = {
+      id: reference.id,
+      label,
+      defaultOptionKey: freeLabel ? FREE_OPTION_KEY : variants[0].id,
+      defaultOptionLabel: freeLabel,
+    };
+
+    const options: UpsellGroupData['options'] = [
+      ...(freeLabel
+        ? [{option: {key: FREE_OPTION_KEY, label: freeLabel}, variant: null}]
+        : []),
+      // Paid options come straight from the add-on product's live variants, so
+      // adding/renaming/repricing a variant in Shopify admin shows up here.
+      ...variants.map((variant) => ({
+        option: {key: variant.id, label: variant.title, variantTitle: variant.title},
+        variant,
+      })),
+    ];
+
+    return [{group, options}];
+  });
 }
 
 /**
- * To add a new upsell group:
- * 1. Create a hidden Shopify product (status can stay unpublished/draft-like via
- *    not adding it to any collection) with one variant per paid option — each
- *    variant's title becomes that option's button label on the PDP, so name
- *    variants exactly as you want them to read to shoppers (e.g. "+2 ft").
- * 2. Add a group entry here (id, label, surchargeProductHandle, and the
- *    always-free default option's key/label).
- * The PDP form, cart line creation, and cart line display all read this array
- * plus the surcharge product's live variants — no other code changes are
- * needed, and adding/renaming/repricing a variant in Shopify admin now shows
- * up on the PDP automatically.
+ * Add-on products must stay out of customer-facing listings. The Storefront
+ * API's `-tag:` search negation is silently ignored whenever a `sortKey` is
+ * also passed to `products(...)`, so any listing that sorts must additionally
+ * filter them out client-side.
  */
-export const UPSELL_GROUPS: UpsellGroup[] = [
-  {
-    id: 'workingType',
-    label: 'Working type',
-    surchargeProductHandle: 'working-type-surcharge',
-    defaultOptionKey: 'sanded',
-    defaultOptionLabel: 'Sanded',
-  },
-  {
-    id: 'heightAllowance',
-    label: 'Height allowance',
-    surchargeProductHandle: 'height-allowance-surcharge',
-    defaultOptionKey: 'standard',
-    defaultOptionLabel: 'Standard',
-  },
-];
-
-/**
- * Handles of hidden pricing-helper products (surcharges, gift cards) that
- * should never appear in customer-facing product listings/carousels.
- */
-export const HIDDEN_PRODUCT_HANDLES: string[] = [
-  ...UPSELL_GROUPS.map((group) => group.surchargeProductHandle),
-  'gift-card',
-];
-
-/** Storefront search query fragment that excludes hidden pricing-helper products. */
-export const EXCLUDE_HIDDEN_PRODUCTS_QUERY = HIDDEN_PRODUCT_HANDLES.map(
-  (handle) => `-handle:${handle}`,
-).join(' AND ');
-
-/**
- * The Storefront API's `-handle:` search-query negation is silently ignored
- * whenever a `sortKey` is also passed to `products(...)` — so any listing
- * that sorts must additionally filter hidden products out client-side.
- */
-export function filterHiddenProducts<T extends {handle: string}>(nodes: T[]): T[] {
-  return nodes.filter((node) => !HIDDEN_PRODUCT_HANDLES.includes(node.handle));
+export function filterHiddenProducts<T extends {tags?: string[] | null}>(
+  nodes: T[],
+): T[] {
+  return nodes.filter((node) => !node.tags?.includes(ADDON_TAG));
 }

@@ -21,7 +21,7 @@ import {SITE_NAME} from '~/lib/site';
 import {ProductItem} from '~/components/ProductItem';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {ReviewsSection, type ProductReview} from '~/components/ReviewsSection';
-import {UPSELL_GROUPS, resolveUpsellGroupsForProduct} from '~/lib/upsells';
+import {buildUpsellGroups} from '~/lib/upsells';
 import {Reveal} from '~/components/animate-ui/Reveal';
 import {StaggerGroup, StaggerItem} from '~/components/animate-ui/StaggerGroup';
 import {DURATION, EASE_OUT} from '~/lib/motion';
@@ -59,22 +59,12 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
     throw new Error('Expected product handle to be defined');
   }
 
-  const upsellHandlesQuery = UPSELL_GROUPS.map(
-    (group) => `handle:${group.surchargeProductHandle}`,
-  ).join(' OR ');
-
-  const [{product}, {products: surchargeProducts}] = await Promise.all([
-    storefront.query(PRODUCT_QUERY, {
-      variables: {handle, selectedOptions: getSelectedProductOptions(request)},
-      cache: storefront.CacheNone(),
-    }),
-    upsellHandlesQuery
-      ? storefront.query(UPSELL_SURCHARGES_QUERY, {
-          variables: {query: upsellHandlesQuery},
-          cache: storefront.CacheShort(),
-        })
-      : Promise.resolve({products: {nodes: []}}),
-  ]);
+  // Add-on groups arrive with the product itself — they are Shopify product
+  // references on `custom.addon_products`, so no second round trip is needed.
+  const {product} = await storefront.query(PRODUCT_QUERY, {
+    variables: {handle, selectedOptions: getSelectedProductOptions(request)},
+    cache: storefront.CacheNone(),
+  });
 
   if (!product?.id) {
     throw new Response(null, {status: 404});
@@ -87,34 +77,9 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
     cache: storefront.CacheShort(),
   });
 
-  const surchargeVariantsByHandle = new Map(
-    (surchargeProducts?.nodes ?? []).map((p) => [p.handle, p.variants.nodes]),
+  const upsellGroupsData = buildUpsellGroups(
+    product.addonProducts?.references?.nodes,
   );
-
-  const applicableUpsellGroups = resolveUpsellGroupsForProduct(
-    product.addonGroupsMetafield?.value,
-  );
-
-  const upsellGroupsData = applicableUpsellGroups.map((group) => {
-    const variants = surchargeVariantsByHandle.get(group.surchargeProductHandle) ?? [];
-    return {
-      group,
-      options: [
-        {
-          option: {key: group.defaultOptionKey, label: group.defaultOptionLabel},
-          variant: null,
-        },
-        // Every other paid option comes straight from the surcharge product's
-        // live variants — the variant title is both its label and its price
-        // lookup key, so adding/renaming/repricing a variant in Shopify admin
-        // shows up here with no code change.
-        ...variants.map((variant) => ({
-          option: {key: variant.id, label: variant.title, variantTitle: variant.title},
-          variant,
-        })),
-      ],
-    };
-  });
 
   return {
     product,
@@ -793,8 +758,27 @@ const PRODUCT_FRAGMENT = `#graphql
     metafield(namespace: "reviews", key: "product_reviews") {
       value
     }
-    addonGroupsMetafield: metafield(namespace: "custom", key: "addon_groups") {
-      value
+    addonProducts: metafield(namespace: "custom", key: "addon_products") {
+      references(first: 10) {
+        nodes {
+          __typename
+          ... on Product {
+            id
+            title
+            addonLabel: metafield(namespace: "custom", key: "addon_label") {
+              value
+            }
+            addonFreeOption: metafield(namespace: "custom", key: "addon_free_option") {
+              value
+            }
+            variants(first: 20) {
+              nodes {
+                ...ProductVariant
+              }
+            }
+          }
+        }
+      }
     }
     seo {
       description
@@ -859,19 +843,3 @@ const PRODUCT_QUERY = `#graphql
   ${PRODUCT_FRAGMENT}
 ` as const;
 
-const UPSELL_SURCHARGES_QUERY = `#graphql
-  query UpsellSurcharges($query: String!, $country: CountryCode, $language: LanguageCode)
-  @inContext(country: $country, language: $language) {
-    products(first: 20, query: $query) {
-      nodes {
-        handle
-        variants(first: 20) {
-          nodes {
-            ...ProductVariant
-          }
-        }
-      }
-    }
-  }
-  ${PRODUCT_VARIANT_FRAGMENT}
-` as const;

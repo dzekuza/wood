@@ -225,6 +225,7 @@ const COLLECTION_ITEM_FRAGMENT = `#graphql
     id
     handle
     title
+    tags
     options {
       name
       optionValues {

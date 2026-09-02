@@ -10,6 +10,46 @@ consequences. Use [[templates/adr-note]] for new entries. Newest first.
 
 ---
 
+## ADR-0011 — Add-on groups are Shopify data, not code
+
+- **Status:** Accepted
+- **Date:** 2026-09-02
+
+**Context.** "Working type" and "Height allowance" were hardcoded in an
+`UPSELL_GROUPS` array, and products opted in via `custom.addon_groups`, a
+free-text list of ids (`workingType`, `heightAllowance`). Three problems for a
+merchant handover: a new add-on type needed a developer and a deploy; a typo in
+the id silently dropped the group with no feedback; and an unset metafield meant
+*all* groups, so any new group appeared on every product at once. A new
+surcharge product also leaked into listings until its handle was added to a
+hardcoded `HIDDEN_PRODUCT_HANDLES` array.
+
+**Decision.** Make the surcharge product itself the definition of the add-on.
+An add-on product carries `custom.addon_label` and `custom.addon_free_option`
+and is tagged `addon`; catalog products opt in through `custom.addon_products`,
+a **list of product references** — a picker in Admin, not typed ids. Hiding
+moved from a handle array to the `addon` tag, so new add-ons are hidden the
+moment they are tagged.
+
+Two consequences fell out for free: the references expand inside the existing
+PDP query, **removing a whole Storefront round trip** (`UPSELL_SURCHARGES_QUERY`
+is gone), and group ids are now product gids, stable across renames.
+
+Opt-in replaces opt-out: unset now means *no* add-ons. All 11 catalog products
+were backfilled with both add-ons so the storefront was unchanged at cutover.
+
+Rejected: keeping code-defined groups and just adding `choices` validation to
+the text metafield. It fixes typos and nothing else — a new add-on type would
+still need a developer, which is the actual handover problem.
+
+**Consequences.** The client owns the whole lifecycle. The cost is that every
+product-listing query must now select `tags`, or add-on products leak into it —
+noted in [[../frontend/product-addons]]. `custom.addon_groups` was left in place
+rather than deleted, so the change is reversible; it can be removed in Admin
+once this has been live a while.
+
+---
+
 ## ADR-0010 — Inline copy editing stores in Shopify, and loads in the route loader
 
 - **Status:** Accepted

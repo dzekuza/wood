@@ -31,6 +31,7 @@ and AI agents (Claude Code, Cursor).
 - [[design-system]] — tokens, CSS layers, styling rules
 - [[homepage-content]] — merchant-editable homepage copy & imagery (metaobjects)
 - [[edit-toolbar]] — admin-only inline copy editing on the live landing page
+- [[product-addons]] — merchant-managed PDP add-ons (working type, height allowance)
 - [[component-conventions]] — how to write & place components
 - [[html-semantics]] — semantic, accessible, SEO-correct markup rules
 - [[components/ui|UI primitives catalog]]

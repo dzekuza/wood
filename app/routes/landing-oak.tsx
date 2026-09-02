@@ -155,6 +155,7 @@ const POPULAR_PRODUCT_ITEM_FRAGMENT = `#graphql
     id
     handle
     title
+    tags
     options {
       name
       optionValues {

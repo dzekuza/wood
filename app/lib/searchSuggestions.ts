@@ -19,6 +19,7 @@ export const SEARCH_SUGGESTIONS_QUERY = `#graphql
     id
     handle
     title
+    tags
     priceRange {
       minVariantPrice {
         amount

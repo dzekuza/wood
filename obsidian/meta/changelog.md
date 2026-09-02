@@ -3,6 +3,39 @@ tags: [meta, changelog]
 updated: 2026-09-02
 ---
 
+## 2026-09-02 — Add-ons became merchant-managed Shopify data
+
+`UPSELL_GROUPS` is gone. An add-on is now just a product tagged `addon` with
+`custom.addon_label` + `custom.addon_free_option`, and products opt in through
+`custom.addon_products` — a **product-reference picker**, replacing the
+typo-prone `custom.addon_groups` text list. The client can now create, rename,
+reprice, retire, and re-target add-ons entirely in Admin, with no deploy.
+
+`app/lib/upsells.ts` rewritten around `buildUpsellGroups()`. Because the
+references expand inside `PRODUCT_QUERY`, `UPSELL_SURCHARGES_QUERY` and its
+second Storefront round trip were deleted outright.
+
+Hiding switched from the hardcoded `HIDDEN_PRODUCT_HANDLES` array to the
+`addon` tag, so a new add-on hides itself. **`tags` had to be added to six
+listing queries** (`_index` ×2, `landing-oak`, `collections.$handle`,
+`collections.all`, `searchSuggestions`) — `filterHiddenProducts()` reads it, and
+the Storefront API drops `-tag:` negation whenever `sortKey` is passed.
+
+Shopify side: three metafield definitions created, both surcharge products
+tagged and labelled, and all 11 catalog products backfilled with both add-ons so
+nothing changed visually at cutover. One trap worth remembering — definitions
+created via the Admin API default to `access.storefront: NONE`, which returns
+`null` on the storefront and makes every add-on vanish; all three needed
+`PUBLIC_READ`.
+
+Verified against the running dev server: both rows render with live prices on
+the Coat Rack PDP, detaching Height allowance from the Oak Doorstop removed just
+that row, and neither surcharge product appears on `/` or `/collections/all`.
+
+See [[../frontend/product-addons]] and [[decisions-log]] ADR-0011.
+
+---
+
 ## 2026-09-02 — Header logo asset refreshed
 
 `public/darkwood.svg` replaced with the new export. Diffed before installing:
