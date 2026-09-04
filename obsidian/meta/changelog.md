@@ -3,6 +3,33 @@ tags: [meta, changelog]
 updated: 2026-09-04
 ---
 
+## 2026-09-04 — Colour options get name-based fallback swatches, no longer wait on Shopify
+
+Follow-up to the entry below: since `ProductOptionValue.swatch` isn't
+resolving via either the Admin or Storefront API (all documented
+preconditions verified correct — see [[decisions-log#ADR-0012]]), waiting on
+Shopify wasn't a reliable path to visible swatches.
+
+`ProductForm` (`app/components/ProductForm.tsx`) now force-routes any option
+named `Colour`/`Color` (`isColourOption`, `/colou?r/i` on the option name)
+into the swatch-rendering branch regardless of whether Shopify returns real
+`swatch.color`/`swatch.image` data. `ProductOptionSwatch` gained a
+`forceSwatch` prop so it renders a `getSwatchTone`-based flat colour chip
+(same name-keyword tone map already used for `product-swatch-tone-oak`,
+`-walnut`, `-whitewash`, etc.) instead of falling back to plain text when
+there's no real swatch. If Shopify's linked-option swatch data ever starts
+resolving, it takes over automatically — the branch already prefers real
+`swatch.image`/`swatch.color` first.
+
+Verified on Solid Oak Block: Colour now renders as 6 tone chips (Clear, Old
+Oak, Dark, Grey, Light Grey, White) instead of a dropdown. "Size (cm)"
+(compound `WxWxH` values) intentionally stays a dropdown — user declined
+extending the length-slider treatment to compound size options, to avoid
+also changing `Beam Size (Front Side x Top Side)` and similar options
+elsewhere.
+
+---
+
 ## 2026-09-04 — Colour option linking attempted for Solid Oak Block; swatches still not resolving via Storefront API
 
 Requested: make the "Colour" option (Clear, Old Oak, Dark, Grey, Light Grey,

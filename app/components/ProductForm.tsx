@@ -80,12 +80,20 @@ export function ProductForm({
           );
         }
 
-        const hasSwatches = option.optionValues.some(
-          (v) => v.swatch?.color || v.swatch?.image?.previewImage?.url,
-        );
+        const optionNameLower = option.name.toLowerCase();
+
+        // Colour-type options always render as swatches, falling back to a
+        // name-based tone (see getSwatchTone) when Shopify hasn't returned
+        // real swatch.color/swatch.image data for the linked option yet.
+        const isColourOption = /colou?r/.test(optionNameLower);
+
+        const hasSwatches =
+          isColourOption ||
+          option.optionValues.some(
+            (v) => v.swatch?.color || v.swatch?.image?.previewImage?.url,
+          );
 
         // Length-type options (Length, Beam Length, etc.) render as a slider/progress bar
-        const optionNameLower = option.name.toLowerCase();
         const isLengthOption =
           optionNameLower === 'length' ||
           optionNameLower.includes('length') ||
@@ -217,7 +225,7 @@ export function ProductForm({
                       data-selected={selected ? 'true' : 'false'}
                       className={`product-optn${available ? '' : ' is-unavailable'}`}
                     >
-                      <ProductOptionSwatch swatch={swatch} name={name} />
+                      <ProductOptionSwatch swatch={swatch} name={name} forceSwatch={isColourOption} />
                     </Link>
                   );
                 } else {
@@ -237,7 +245,7 @@ export function ProductForm({
                         }
                       }}
                     >
-                      <ProductOptionSwatch swatch={swatch} name={name} />
+                      <ProductOptionSwatch swatch={swatch} name={name} forceSwatch={isColourOption} />
                     </button>
                   );
                 }
@@ -353,14 +361,16 @@ export function ProductForm({
 function ProductOptionSwatch({
   swatch,
   name,
+  forceSwatch,
 }: {
   swatch?: Maybe<ProductOptionValueSwatch> | undefined;
   name: string;
+  forceSwatch?: boolean;
 }) {
   const image = swatch?.image?.previewImage?.url;
   const color = swatch?.color;
 
-  if (!image && !color) return <>{name}</>;
+  if (!image && !color && !forceSwatch) return <>{name}</>;
 
   return (
     <>
