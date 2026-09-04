@@ -256,7 +256,10 @@ select:focus {
 .overlay aside {
   background: var(--cwf-surface);
   box-shadow: -8px 0 48px rgba(53,47,42,.14);
+  /* dvh tracks the real visible viewport as mobile browser toolbars show/hide;
+     100vh alone can leave a gap under the drawer on those browsers. */
   height: 100vh;
+  height: 100dvh;
   width: min(var(--aside-width), 100vw);
   position: fixed;
   right: calc(-1 * var(--aside-width));
@@ -523,6 +526,15 @@ button.reset > * {
   .header-topbar { padding: 16px 20px; gap: 16px; }
 }
 
+/* Logo + 5 CTA buttons (menu/search/account/currency/cart) are both
+   flex-shrink:0 — below ~480px their combined width outgrows the viewport
+   and the row overflows, pushing the cart button past the edge. Shrinking
+   the logo and tightening the CTA row here is what keeps everything on
+   screen instead of clipping. */
+@media (max-width: 480px) {
+  .header-topbar { padding: 12px 14px; gap: 10px; }
+}
+
 .header-logo {
   display: flex;
   align-items: center;
@@ -535,6 +547,10 @@ button.reset > * {
   height: 44px;
   width: auto;
   border-radius: 0;
+}
+
+@media (max-width: 480px) {
+  .header-logo img { height: 32px; }
 }
 
 .header-logo-text {
@@ -931,10 +947,16 @@ button.reset > * {
 }
 
 @media (max-width: 480px) {
+  .header-currency,
   .header-currency-select,
   .header-currency-value {
-    padding: 0 10px;
-    font-size: 14px;
+    height: 36px;
+  }
+  .header-currency-select,
+  .header-currency-value {
+    padding: 0 8px;
+    font-size: 13px;
+    line-height: 34px;
   }
 }
 
@@ -959,7 +981,8 @@ button.reset > * {
 
 @media (max-width: 480px) {
   .header-cart-btn {
-    width: 40px;
+    width: 36px;
+    height: 36px;
     padding: 0;
     gap: 0;
     justify-content: center;
@@ -989,6 +1012,18 @@ button.reset > * {
 
 .header-menu-mobile-toggle { color: color-mix(in srgb, var(--cwf-ink-strong) 60%, transparent); transition: color 150ms, border-color 150ms; }
 .header-menu-mobile-toggle:hover { color: var(--cwf-ink-strong); border-color: var(--cwf-accent); }
+
+/* These 40px circular CTA buttons shrink together with the cart button
+   (see its own ≤480px rule above) and the currency pill's tighter padding
+   to keep the row's total width under the viewport on phones. */
+@media (max-width: 480px) {
+  .header-menu-mobile-toggle,
+  .header-icon-link,
+  .header-account-btn {
+    height: 36px;
+    width: 36px;
+  }
+}
 
 .unit-toggle {
   display: inline-flex;

@@ -3,6 +3,35 @@ tags: [meta, changelog]
 updated: 2026-09-04
 ---
 
+## 2026-09-04 — Mobile header overflow (cart clipped off-screen) and drawer height gap
+
+Two real-device mobile bugs, verified with Chrome DevTools MCP's device
+emulation (`390x844`, `375x667`, `360x740`, `320x568` — `claude-in-chrome`'s
+`resize_window` couldn't get the actual page below ~579px CSS width, so it
+couldn't reproduce either):
+
+- **Header overflow.** `.header-topbar`'s two children (`.header-logo` and
+  `.header-topbar-ctas`, holding the menu/search/account/currency/cart
+  buttons) are both `flex-shrink: 0`. Their combined width (measured ~522px
+  including padding) exceeds any phone viewport under ~520px, so the row
+  overflowed and the cart button — last in the row — got pushed off-screen.
+  Fixed in `app/styles/app.css` under a single `@media (max-width: 480px)`
+  pass: logo `44px → 32px`, the four circular buttons (menu/search/account/
+  cart) `40px → 36px`, currency pill padding/font tightened, topbar padding
+  `16px 20px → 12px 14px`. Verified overflow-free at 480/390/375/360px; ~31px
+  of overflow remains at 320px (iPhone SE 1st-gen, discontinued 2018) — left
+  as a known limit rather than sacrificing a header control for it.
+- **Drawer height gap.** `.overlay aside` (the mobile menu/search/cart
+  drawer, [[../frontend/components/common#Aside|Aside.tsx]]) used
+  `height: 100vh` alone. Some mobile browsers compute `100vh` against a
+  different viewport state than what's currently visible (toolbar shown vs.
+  hidden), leaving the drawer shorter than the screen and exposing the dark
+  backdrop underneath. Added `height: 100dvh` after the `100vh` line — `dvh`
+  tracks the real visible viewport continuously, `vh` stays as the fallback
+  for browsers without `dvh` support.
+
+---
+
 ## 2026-09-04 — Quantity stepper didn't scale the Order now button price
 
 `ProductForm`'s `totalPrice` (shown as "Order now · £X" on the PDP CTA) was
