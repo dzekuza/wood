@@ -3,6 +3,28 @@ tags: [meta, changelog]
 updated: 2026-09-04
 ---
 
+## 2026-09-04 — "Our Textures" homepage section is now purely decorative
+
+The section rendered `CategoriesGrid`'s exact category data (title, product
+count, link to the collection) with grain close-up crops swapped in for the
+category photo — so it read as a confusing second category-navigation grid
+under an "Our Textures" heading, rather than a materials/finishes showcase.
+
+`TexturesGrid` (`app/components/TexturesGrid.tsx`) tiles now show only the
+close-up image — no title, count, or per-tile link (the `<Link>` per card was
+removed entirely). The section-level "All Products" link stays. Corresponding
+CSS (`.demo-tex-arrow`, `.demo-tex-title`, `.demo-tex-count` in
+`app/styles/demo.css`) removed as unused.
+
+> [!note] Still reusing category data, just for the image only
+> The images are still keyed off the product categories (`TEXTURE_IMAGES` by
+> collection handle) — this only removes the text/link chrome that made it
+> *look* like a nav grid. A future ask for genuine finish/colour swatches
+> (Clear Oil, Old Oak, etc.) here would be a different data source, not this
+> change.
+
+---
+
 ## 2026-09-04 — Colour options get name-based fallback swatches, no longer wait on Shopify
 
 Follow-up to the entry below: since `ProductOptionValue.swatch` isn't

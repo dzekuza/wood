@@ -55,24 +55,18 @@ export function TexturesGrid({
           </Link>
         </div>
 
+        {/* Purely decorative wood grain/finish close-ups — not a second
+            category nav, so no title/count/link on the tiles themselves. */}
         <div className="demo-tex-grid">
           {categories.map((category) => {
             const image = textureImageFor(category);
+            if (!image) return null;
             return (
-              <Link key={category.title} to={category.to} className="demo-tex-card">
+              <span key={category.title} className="demo-tex-card">
                 <span className="demo-tex-swatch">
-                  {image && <img src={image} alt={category.title} loading="lazy" />}
-                  <span className="demo-tex-arrow" aria-hidden>
-                    <i className="ti ti-arrow-up-right" />
-                  </span>
+                  <img src={image} alt="" loading="lazy" />
                 </span>
-                <span className="demo-tex-title">{category.title}</span>
-                {typeof category.count === 'number' && (
-                  <span className="demo-tex-count">
-                    {category.count} {category.count === 1 ? 'product' : 'products'}
-                  </span>
-                )}
-              </Link>
+              </span>
             );
           })}
         </div>
