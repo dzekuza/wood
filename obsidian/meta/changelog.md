@@ -1,6 +1,109 @@
 ---
 tags: [meta, changelog]
-updated: 2026-09-02
+updated: 2026-09-04
+---
+
+## 2026-09-04 — Colour option linking attempted for Solid Oak Block; swatches still not resolving via Storefront API
+
+Requested: make the "Colour" option (Clear, Old Oak, Dark, Grey, Light Grey,
+White) on **Solid Oak Block** render as image swatches instead of a dropdown,
+same as the 2026-09-02 Oil Colour fix.
+
+Live Shopify Admin changes made via the Admin GraphQL API (`SHOPIFY_ADMIN_TOKEN`
+in `.env`), all confirmed with no `userErrors`:
+- Created `custom.colour` (`list.metaobject_reference`, validated to the shared
+  `Color` metaobject definition `43664605526`, storefront `PUBLIC_READ`).
+- Created 6 new `shopify--color-pattern` metaobjects with **plain labels**
+  (`Clear`, `Old Oak`, `Dark`, `Grey`, `Light Grey`, `White`), reusing the same
+  hex colours/images as the existing "...Oil" entries used by Oil Colour.
+- Linked the Colour option (`gid://shopify/ProductOption/13865293381974` on
+  product `10815940657494`) to `custom.colour`, mapping each value to its new
+  metaobject.
+
+> [!warning] Linking an option value renames it to the metaobject's label
+> `productOptionUpdate` **overwrites the option value's name** with the linked
+> metaobject's `label` field the moment `linkedMetafieldValue` is set — it
+> cannot be set independently (a follow-up call passing both `name` and
+> `linkedMetafieldValue` was rejected: `CANNOT_COMBINE_LINKED_AND_NONLINKED_OPTION_VALUES`).
+> This is why the existing Oil Colour metaobjects are labelled "Clear Oil",
+> "Old Oak Oil", etc. — and why this fix needed brand-new metaobjects with
+> plain labels rather than reusing those, to avoid renaming this product's
+> live variant titles to "... Oil".
+
+**Result: swatches still don't render.** After linking, `ProductOptionValue.swatch`
+still returns `null` via the Storefront API for **both** the new Colour option
+*and* the pre-existing Oil Colour option on the beam products — so the
+2026-09-02 entry's claim that Oil Colour swatches would "just work" once linked
+was never actually verified end-to-end and appears to be wrong, or something
+changed since. No API-detectable cause was found (checked: `access.storefront`
+is `PUBLIC_READ` on both the metafield definition and the metaobject
+definition; tried API versions 2024-10 through unstable — all `null`).
+
+Tried switching the link to Shopify's *standard* `shopify.color-pattern`
+metafield definition (id `492270616918`, same underlying metaobject
+definition) instead of the custom `custom.colour` one, since that's what
+Shopify's own "Add options like size or color" Admin picker uses — this was
+**rejected** with `INVALID_METAFIELD_VALUE_FOR_LINKED_OPTION`, meaning the
+standard field enforces some extra validation on which metaobjects are
+acceptable that isn't visible via the Admin GraphQL API. The option stayed
+linked to `custom.colour` (no partial/broken state left behind).
+
+**Current live state:** Colour option values are `Clear / Old Oak / Dark /
+Grey / Light Grey / White` (names preserved) and linked to `custom.colour` →
+the 6 new metaobjects. Storefront still shows the dropdown (`ProductForm`'s
+`hasSwatches` check correctly falls back when `swatch` is `null` — no code
+regression), so behaviour is unchanged for shoppers.
+
+**Next step:** this needs to be finished in the Shopify Admin UI directly —
+open Solid Oak Block → Options and variants → link "Colour" through the
+built-in "Add options like size or color" flow (pick the new plain-labelled
+entries, or reuse the "...Oil" ones) — since the UI evidently does something
+beyond what `productOptionUpdate`/`metafieldDefinitionCreate` expose over the
+API. Worth checking the *existing* Oil Colour option there too, since it has
+the identical unresolved-swatch symptom.
+
+---
+
+## 2026-09-04 — "Beam Lenght" option now renders as the length slider
+
+`ProductForm`'s length-slider special-case only matched an option named
+exactly `length`, so beam products (whose Shopify option is spelled
+`Beam Lenght`, matching a real store typo) fell through to the generic
+size dropdown instead of the step slider used elsewhere.
+
+Fixed by loosening the check in `app/components/ProductForm.tsx` to match
+any non-swatch option name containing `length` or `lenght` (case-insensitive),
+so `Beam Lenght` (and any future `X Length` option) gets the same
+progress-bar/slider treatment as the plain `Length` option. Verified against
+the "TEST FLAMED Solid Oak Mantle Beam" product in the dev server — steps
+render and clicking a step updates the selected variant/URL correctly.
+
+---
+
+## 2026-09-02 — Oil Colour swatches surfaced in the variant option picker
+
+The six oil swatches (Clear, Old Oak, Dark, Grey, Light Grey, White — hex plus
+images) already existed as `shopify--color-pattern` metaobject entries, but
+"Add options like size or color" never offered them. Only "Height x Depth"
+appeared.
+
+Cause: an option can only be linked when **a Product metafield definition of
+type `list.metaobject_reference` points at the metaobject definition**
+([docs](https://shopify.dev/docs/apps/build/product-merchandising/products-and-collections/metafield-linked)).
+`custom.height_depth` is exactly that, which is why it was the only suggestion;
+nothing pointed at the colour metaobject.
+
+Fixed by creating `custom.oil_colour` (Oil Colour, `list.metaobject_reference`,
+validated to metaobject definition `43664605526`, storefront `PUBLIC_READ`).
+No code change — `ProductForm` already renders `swatch.color` /
+`swatch.image` via `ProductOptionSwatch`.
+
+> [!note] Existing products combine oil and hooks
+> Their current option is a single "Oil Colour + Hooks Colour" with ~30 text
+> values ("Clear + Black"). A linked option maps one metaobject per value, so
+> using swatches means splitting it into two options — a variant restructure,
+> not a settings change.
+
 ---
 
 ## 2026-09-02 — Add-ons became merchant-managed Shopify data

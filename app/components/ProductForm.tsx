@@ -84,8 +84,14 @@ export function ProductForm({
           (v) => v.swatch?.color || v.swatch?.image?.previewImage?.url,
         );
 
-        // Length renders as a progress bar across the available steps
-        if (!hasSwatches && option.name.toLowerCase() === 'length') {
+        // Length-type options (Length, Beam Length, etc.) render as a slider/progress bar
+        const optionNameLower = option.name.toLowerCase();
+        const isLengthOption =
+          optionNameLower === 'length' ||
+          optionNameLower.includes('length') ||
+          optionNameLower.includes('lenght');
+
+        if (!hasSwatches && isLengthOption) {
           const values = option.optionValues;
           const selectedIndex = values.findIndex((v) => v.selected);
           const percent =

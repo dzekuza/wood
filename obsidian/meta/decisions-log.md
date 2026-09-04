@@ -1,12 +1,48 @@
 ---
 tags: [meta, decision]
-updated: 2026-09-02
+updated: 2026-09-04
 ---
 
 # Decisions Log (ADRs)
 
 Architecture Decision Records. Each entry captures a choice, its context, and its
 consequences. Use [[templates/adr-note]] for new entries. Newest first.
+
+---
+
+## ADR-0012 — Colour/swatch option linking must be done in Shopify Admin UI, not the Admin GraphQL API
+
+- **Status:** Accepted (process constraint, not a code decision)
+- **Date:** 2026-09-04
+
+**Context.** `ProductForm` already renders real swatches (`swatch.color` /
+`swatch.image`) whenever the Storefront API returns them — no code change is
+needed to "turn on" swatches for an option, only merchant-side option linking
+(see [[changelog]] 2026-09-02 Oil Colour entry). Attempting this for the
+Solid Oak Block "Colour" option via the Admin GraphQL API
+(`metafieldDefinitionCreate` + `productOptionUpdate` with `linkedMetafield`/
+`linkedMetafieldValue`) succeeded with no `userErrors`, correctly linked the
+option, and preserved the original value names — but `ProductOptionValue.swatch`
+still resolved to `null` on the Storefront API afterwards, for this option
+*and* for the pre-existing (already "working" per the earlier changelog entry)
+Oil Colour option. Re-linking to Shopify's standard `shopify.color-pattern`
+metafield (the one the Admin UI's own picker uses) was outright rejected
+(`INVALID_METAFIELD_VALUE_FOR_LINKED_OPTION`).
+
+**Decision.** Treat "make an option show swatches" as an **Admin UI task**,
+not something to automate via the Admin GraphQL API. Whatever the Admin UI's
+"Add options like size or color" flow does beyond `productOptionUpdate` +
+`metafieldDefinitionCreate` isn't exposed by the API, and API-side linking can
+silently produce a linked-but-non-rendering state. Metaobject entries
+(`shopify--color-pattern`) can still be created via API to save the merchant
+data-entry work (hex colours + images) — only the final option-to-field link
+should be done by hand in Admin.
+
+**Consequence.** Any future "colour/size swatch not showing" request should
+route straight to: (1) confirm `ProductForm`'s `hasSwatches`/rendering logic
+is fine (it is — this is a data problem, not a code problem), then (2) ask the
+merchant to complete/re-confirm the option link in Shopify Admin rather than
+trying to script it end-to-end.
 
 ---
 
