@@ -44,6 +44,19 @@ is fine (it is — this is a data problem, not a code problem), then (2) ask the
 merchant to complete/re-confirm the option link in Shopify Admin rather than
 trying to script it end-to-end.
 
+> [!note] Later same-day update — the real-photo route was abandoned too
+> A follow-up did successfully bypass `ProductOptionValue.swatch` entirely by
+> reading the real photographed finish images straight off the product's
+> `custom.oil_colour`/`custom.colour` metafields via `references { nodes {
+> ... on Metaobject { field(key: ...) } } }` — this genuinely worked (verified
+> real photos for Clear/Old Oak/Dark/Grey). It was reverted anyway on user
+> feedback ("wrong images") in favour of a **static local fallback**:
+> `getSwatchTexture()` in `~/lib/swatches.ts` reassigns the six
+> `public/demo/texture-*.jpg` crops (already used by `TexturesGrid`) to the
+> six named finishes by visual tone, with no live Shopify data involved. See
+> [[changelog]] 2026-09-04 "PDP colour swatches get a static texture-photo
+> fallback" for the full before/after.
+
 ---
 
 ## ADR-0011 — Add-on groups are Shopify data, not code

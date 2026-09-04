@@ -3,7 +3,58 @@ tags: [meta, changelog]
 updated: 2026-09-04
 ---
 
+## 2026-09-04 — Quantity stepper didn't scale the Order now button price
+
+`ProductForm`'s `totalPrice` (shown as "Order now · £X" on the PDP CTA) was
+`(variant price + upsell surcharge)` with no `* quantity` — so bumping the
+qty stepper from 1 to 3 left the button's price unchanged even though the
+actual cart line (added via `AddToCartButton`'s `lines`) was correct.
+One-line fix in `app/components/ProductForm.tsx`. Verified: Solid Oak Block
+at qty 1 → £71.35, qty 3 → £214.05.
+
+---
+
+## 2026-09-04 — PDP colour swatches get a static texture-photo fallback; "Our Textures" landing section keeps its original shape
+
+Two follow-ups landed and were reverted same-day before settling here — see
+[[decisions-log#ADR-0012]] for the full story:
+
+- **Rejected:** making "Our Textures" purely decorative (no title/count/link).
+- **Rejected:** making "Our Textures" show real per-finish product counts
+  (Clear/Old Oak/Dark/Grey/Light Grey/White) computed from a whole-catalog
+  scan, with images/colours read live from Shopify's `shopify--color-pattern`
+  metaobjects.
+- **Rejected:** PDP colour swatches reading the *real* photographed finish
+  images live off the product's `custom.oil_colour`/`custom.colour`
+  metafields (bypassing the broken `ProductOptionValue.swatch` field) — this
+  technically worked (verified real photos rendering for Clear/Old
+  Oak/Dark/Grey), but was reverted as "wrong images" per user feedback.
+
+**What actually shipped:**
+- `TexturesGrid` is back to its original shape exactly (category title,
+  product count, per-tile link to the collection, `texture-*.jpg` close-up
+  images) — see the "Colour swatches..." entry above this one, which is now
+  superseded on the "Our Textures" side.
+- Tile titles now come from a new `TEXTURE_NAMES` map (`Rustic Oak`,
+  `Whitewashed Oak`, `Golden Oak`, `Ash Grey`, `Natural Oak`, `Smoked Oak`) —
+  finish/texture names, not the category name — falling back to the category
+  title for any collection with no entry (e.g. Console Tables). The product
+  count is still the collection's count, not tied to the new title.
+- PDP Colour/Oil Colour swatches use a new `getSwatchTexture()` in
+  `~/lib/swatches.ts`: the same six `texture-*.jpg` crops, reassigned by
+  visual tone to the six named finishes, used as `ProductOptionSwatch`'s
+  `forceSwatch` fallback image ahead of the flat `getSwatchTone` chip. Static
+  local assets, not live Shopify data — see ADR-0012 for why real Shopify
+  swatch data was abandoned as the fallback source.
+
+---
+
 ## 2026-09-04 — "Our Textures" homepage section is now purely decorative
+
+> [!warning] Reverted same day
+> See the entry above ("PDP colour swatches get a static texture-photo
+> fallback...") — this decorative-tiles version was rejected in favour of
+> reverting to the original category-grid shape with renamed titles.
 
 The section rendered `CategoriesGrid`'s exact category data (title, product
 count, link to the collection) with grain close-up crops swapped in for the

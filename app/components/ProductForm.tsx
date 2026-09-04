@@ -12,7 +12,7 @@ import {useUnitSystem} from '~/hooks/useUnitSystem';
 import {UnitToggle} from '~/components/UnitToggle';
 import {formatMeasurement} from '~/lib/units';
 import type {UpsellGroupData} from '~/lib/upsells';
-import {getSwatchTone} from '~/lib/swatches';
+import {getSwatchTexture, getSwatchTone} from '~/lib/swatches';
 
 export function ProductForm({
   productOptions,
@@ -52,7 +52,7 @@ export function ProductForm({
 
   const totalPrice = selectedVariant?.price
     ? {
-        amount: (parseFloat(selectedVariant.price.amount) + upsellSurcharge).toFixed(2),
+        amount: ((parseFloat(selectedVariant.price.amount) + upsellSurcharge) * quantity).toFixed(2),
         currencyCode: selectedVariant.price.currencyCode,
       }
     : undefined;
@@ -225,7 +225,12 @@ export function ProductForm({
                       data-selected={selected ? 'true' : 'false'}
                       className={`product-optn${available ? '' : ' is-unavailable'}`}
                     >
-                      <ProductOptionSwatch swatch={swatch} name={name} forceSwatch={isColourOption} />
+                      <ProductOptionSwatch
+                        swatch={swatch}
+                        name={name}
+                        forceSwatch={isColourOption}
+                        fallbackImage={isColourOption ? getSwatchTexture(name) : undefined}
+                      />
                     </Link>
                   );
                 } else {
@@ -245,7 +250,12 @@ export function ProductForm({
                         }
                       }}
                     >
-                      <ProductOptionSwatch swatch={swatch} name={name} forceSwatch={isColourOption} />
+                      <ProductOptionSwatch
+                        swatch={swatch}
+                        name={name}
+                        forceSwatch={isColourOption}
+                        fallbackImage={isColourOption ? getSwatchTexture(name) : undefined}
+                      />
                     </button>
                   );
                 }
@@ -362,12 +372,16 @@ function ProductOptionSwatch({
   swatch,
   name,
   forceSwatch,
+  fallbackImage,
 }: {
   swatch?: Maybe<ProductOptionValueSwatch> | undefined;
   name: string;
   forceSwatch?: boolean;
+  fallbackImage?: string;
 }) {
-  const image = swatch?.image?.previewImage?.url;
+  // Real Shopify swatch data first, then the local texture-crop image (see
+  // getSwatchTexture) for forced colour options, then a name-based flat tone.
+  const image = swatch?.image?.previewImage?.url ?? fallbackImage;
   const color = swatch?.color;
 
   if (!image && !color && !forceSwatch) return <>{name}</>;

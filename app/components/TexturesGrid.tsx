@@ -17,9 +17,30 @@ const TEXTURE_IMAGES: Record<string, string> = {
   'solid-oak-coat-racks': '/demo/texture-coat-racks.jpg',
 };
 
+/**
+ * The tile shows a wood grain close-up, so its title names that grain/finish,
+ * not the underlying collection — a category with no name here falls back to
+ * its own title rather than dropping out of the grid.
+ */
+const TEXTURE_NAMES: Record<string, string> = {
+  'solid-oak-mantel-beams': 'Rustic Oak',
+  'solid-oak-shelves': 'Smoked Oak',
+  'solid-oak-door-stops': 'Golden Oak',
+  'solid-oak-cube-blocks': 'Natural Oak',
+  'solid-oak-fireplace-surrounds': 'Ash Grey',
+  'solid-oak-coat-racks': 'Whitewashed Oak',
+};
+
+function categoryHandle(category: Category) {
+  return category.to.split('/').filter(Boolean).pop() ?? '';
+}
+
 function textureImageFor(category: Category) {
-  const handle = category.to.split('/').filter(Boolean).pop() ?? '';
-  return TEXTURE_IMAGES[handle] ?? category.image;
+  return TEXTURE_IMAGES[categoryHandle(category)] ?? category.image;
+}
+
+function textureNameFor(category: Category) {
+  return TEXTURE_NAMES[categoryHandle(category)] ?? category.title;
 }
 
 export interface TexturesGridProps {
@@ -55,18 +76,25 @@ export function TexturesGrid({
           </Link>
         </div>
 
-        {/* Purely decorative wood grain/finish close-ups — not a second
-            category nav, so no title/count/link on the tiles themselves. */}
         <div className="demo-tex-grid">
           {categories.map((category) => {
             const image = textureImageFor(category);
-            if (!image) return null;
+            const name = textureNameFor(category);
             return (
-              <span key={category.title} className="demo-tex-card">
+              <Link key={category.title} to={category.to} className="demo-tex-card">
                 <span className="demo-tex-swatch">
-                  <img src={image} alt="" loading="lazy" />
+                  {image && <img src={image} alt={name} loading="lazy" />}
+                  <span className="demo-tex-arrow" aria-hidden>
+                    <i className="ti ti-arrow-up-right" />
+                  </span>
                 </span>
-              </span>
+                <span className="demo-tex-title">{name}</span>
+                {typeof category.count === 'number' && (
+                  <span className="demo-tex-count">
+                    {category.count} {category.count === 1 ? 'product' : 'products'}
+                  </span>
+                )}
+              </Link>
             );
           })}
         </div>

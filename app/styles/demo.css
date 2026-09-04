@@ -844,7 +844,9 @@ button.demo-cat-dot.is-active {
 }
 
 .demo-tex-card {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  color: inherit;
 }
 
 .demo-tex-swatch {
@@ -866,6 +868,47 @@ button.demo-cat-dot.is-active {
 }
 
 .demo-tex-card:hover .demo-tex-swatch img { transform: scale(1.06); }
+
+.demo-tex-arrow {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  width: 32px;
+  border-radius: 32px;
+  background: #fff;
+  color: var(--cwf-ink-strong);
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+
+.demo-tex-arrow i { font-size: 13px; }
+.demo-tex-card:hover .demo-tex-arrow { opacity: 1; transform: scale(1); }
+
+/* Touch devices have no hover state — keep the badge visible */
+@media (hover: none) {
+  .demo-tex-arrow { opacity: 1; transform: scale(1); }
+}
+
+.demo-tex-title {
+  font-family: var(--demo-font-display);
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--cwf-ink-strong);
+  margin-top: 12px;
+}
+
+.demo-tex-count {
+  font-family: var(--demo-font-body);
+  font-size: 12px;
+  color: var(--cwf-ink-strong);
+  opacity: 0.7;
+  margin-top: 2px;
+}
 
 @media (max-width: 1080px) {
   .demo-tex-grid { grid-template-columns: repeat(3, 1fr); }
