@@ -2985,6 +2985,7 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
   .product-opts { margin-top: 22px; }
   .product-opt-label { margin-bottom: 10px; }
   .product-opt-row { gap: 8px; }
+  .product-optn:has(.product-swatch-has-image) { width: 88px; }
   .pdp-cta-row { margin-top: 22px; }
   .pdp-assure { grid-template-columns: 1fr; gap: 8px; margin-top: 20px; }
 }
@@ -3217,6 +3218,43 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .product-opt-note { margin-top: 8px; font-size: 12px; color: var(--cwf-ink-strong); opacity: .75; }
 .product-optn:has(.product-swatch) { flex-direction: column; gap: 8px; padding: 16px 14px 12px; text-align: center; }
 
+/* A colour value backed by a real grain photo renders as a filled tile — the
+   texture fills the whole button and the value name sits on it as a pill, so
+   the finish is judged from a large sample instead of a 28px chip. Flat tone
+   chips (no photo) keep the chip-above-label layout and the hover preview. */
+.product-optn:has(.product-swatch-has-image) {
+  position: relative;
+  width: 104px;
+  aspect-ratio: 1 / 1;
+  padding: 0;
+  gap: 0;
+  border-radius: 16px;
+  overflow: hidden;
+}
+.product-optn:has(.product-swatch-has-image) .product-swatch-wrap { position: absolute; inset: 0; }
+.product-optn:has(.product-swatch-has-image) .product-swatch { width: 100%; height: 100%; border: 0; border-radius: 0; }
+.product-optn:has(.product-swatch-has-image) .product-swatch-name {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  bottom: 6px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  background: rgba(53, 47, 42, .58);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  /* Wraps rather than truncating — "Light Grey Oil" does not fit one line at
+     this tile width, and an ellipsised finish name is not a usable label. */
+  white-space: normal;
+}
+.product-optn[data-selected="true"]:has(.product-swatch-has-image) { box-shadow: 0 0 0 2px var(--cwf-ink-strong); }
+.product-optn[data-selected="true"]:has(.product-swatch-has-image) .product-swatch-name { background: var(--cwf-ink-strong); }
+
 .product-swatch-wrap { position: relative; display: inline-flex; }
 .product-swatch-tooltip {
   position: absolute;
@@ -3253,7 +3291,6 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
   transform: translateX(-50%) translateY(0);
 }
 .product-swatch-tooltip-preview { width: 96px; height: 96px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, .2); display: flex; align-items: center; justify-content: center; overflow: hidden; background: var(--cwf-sand); }
-.product-swatch-tooltip-preview img { width: 100%; height: 100%; object-fit: cover; }
 .product-swatch-tooltip-label { font-size: 16px; font-weight: 600; color: #f3efea; letter-spacing: .02em; }
 
 .product-swatch { width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(0, 0, 0, .1); display: inline-flex; align-items: center; justify-content: center; overflow: hidden; background: var(--cwf-sand); }
@@ -3266,6 +3303,13 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .product-swatch-tone-ash { background: #d8c8b2; }
 .product-swatch-tone-reclaimed { background: #8d7156; }
 .product-swatch-tone-neutral { background: linear-gradient(135deg, #e8dfd1, #c9a27a); }
+/* Hardware finishes (Hook Colour, Bracket Colour …) — metals get a two-stop
+   sheen so brushed and polished read differently at chip size. */
+.product-swatch-tone-brass { background: linear-gradient(135deg, #e8c88a, #a5822f); }
+.product-swatch-tone-antique-brass { background: linear-gradient(135deg, #b9975b, #6d5426); }
+.product-swatch-tone-copper { background: linear-gradient(135deg, #d08a5c, #8a4a2b); }
+.product-swatch-tone-chrome { background: linear-gradient(135deg, #f2f4f6, #a8b0b6); }
+.product-swatch-tone-pewter { background: linear-gradient(135deg, #8b9095, #4c5155); }
 
 /* ── Breadcrumb bar ── */
 .crumbbar { background: #fff; padding: 18px 0; border-bottom: .5px solid var(--cwf-line); }

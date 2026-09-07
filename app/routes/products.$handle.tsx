@@ -14,8 +14,6 @@ import {ProductPrice} from '~/components/ProductPrice';
 import {ProductImage} from '~/components/ProductImage';
 import {ProductModel3D} from '~/components/ProductModel3D';
 import {ProductForm} from '~/components/ProductForm';
-import {AddToCartButton} from '~/components/AddToCartButton';
-import {useAside} from '~/components/Aside';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {SITE_NAME} from '~/lib/site';
 import {ProductItem} from '~/components/ProductItem';
@@ -223,7 +221,6 @@ export default function Product() {
   const [viewingCount, setViewingCount] = useState<number | null>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
-  const {open} = useAside();
 
   useEffect(() => {
     if (selectedVariant?.image) {
@@ -250,6 +247,15 @@ export default function Product() {
     obs.observe(el);
     return () => obs.disconnect();
   }, []);
+
+  function scrollToTop() {
+    window.scrollTo({
+      top: 0,
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        ? 'auto'
+        : 'smooth',
+    });
+  }
 
   function scrollToSlide(i: number) {
     const track = carouselRef.current;
@@ -629,14 +635,16 @@ export default function Product() {
             </span>
           </div>
           <div className="pdp-atc-wrap">
-            <AddToCartButton
+            {/* Sends the shopper back up to the real buy box (variant options,
+                quantity, upsells) instead of adding the current selection
+                blind from the bottom of the page. */}
+            <button
+              type="button"
               className="btn btn-primary btn-pill pdp-atc-btn"
-              disabled={!selectedVariant || !selectedVariant.availableForSale}
-              onClick={() => open('cart')}
-              lines={cartLines}
+              onClick={scrollToTop}
             >
               {selectedVariant?.availableForSale ? 'Order now' : 'Sold out'}
-            </AddToCartButton>
+            </button>
           </div>
         </div>
       </div>

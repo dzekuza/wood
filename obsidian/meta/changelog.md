@@ -3,6 +3,87 @@ tags: [meta, changelog]
 updated: 2026-09-07
 ---
 
+## 2026-09-07 — "Our Textures" tiles are named after the oil finishes
+
+`TEXTURE_NAMES` in `TexturesGrid` renamed from invented grain names (Rustic
+Oak, Whitewashed Oak, Golden Oak, Ash Grey, Natural Oak, Smoked Oak) to the six
+finishes shoppers actually pick on the PDP: **Dark Oil, White Oil, Old Oak Oil,
+Light Grey Oil, Clear Oil, Grey Oil** (left to right on the homepage, i.e.
+mantel-beams, coat-racks, door-stops, fireplace-surrounds, cube-blocks,
+shelves). Photos are unchanged.
+
+**Known mismatch:** the finish→photo pairing here now disagrees with
+`lib/swatches.ts` on two of six — the landing tile labelled White Oil shows
+`texture-coat-racks.jpg` while the PDP's White Oil swatch shows
+`texture-surround-mantels.jpg`, and Light Grey Oil is the same pair reversed.
+The other four agree. Left as-is on purpose: the new labels came from the
+merchant judging the photos by eye, and re-pointing `swatches.ts` would change
+PDP swatches nobody asked to change.
+
+## 2026-09-07 — Hardware colour options, and no more "+£0.00" on addons
+
+Two PDP option fixes:
+
+- **Zero-price addons no longer show a surcharge.** Every "Working type"
+  option is a £0 surcharge variant, so each button carried a literal
+  `+£0.00`. `ProductForm` now renders the `+<Money>` only when
+  `parseFloat(variant.price.amount) > 0`; options with no surcharge variant
+  at all still show "Free".
+- **Hardware colour options (Hook Colour, Bracket Colour, …) are supported.**
+  They already matched `isColourOption` (`/colou?r/`), so they rendered as
+  swatches — but through `getSwatchTexture`, which would have given a "White"
+  hook the white-oil wood grain. New `isHardwareColourOption()` in
+  `lib/swatches.ts` (`/hook|handle|hardware|bracket|fixing|knob|hinge/i`)
+  suppresses the timber-texture fallback for those options, and
+  `getSwatchTone` now matches metals **before** the timber words so "Black"
+  and "White" read as painted metal: brass, antique/aged brass,
+  copper/bronze, chrome/nickel/stainless/silver/polished, and
+  pewter/graphite/gunmetal/anthracite, each with a new
+  `.product-swatch-tone-*` two-stop sheen in `app.css`. The Shopify-side
+  option itself still has to be created on the product in the admin — the
+  storefront just renders whatever values it finds.
+
+## 2026-09-07 — Colour swatches render as full-bleed texture tiles
+
+The Oil Colour row showed a 28px circular grain chip with the value name
+underneath, which is too small to judge a finish by — the grain read as a
+smudge. Photo-backed swatches are now 104px square tiles (88px under 767px,
+`border-radius:16px`) with the texture covering the whole button and the value
+name as a translucent blurred pill over its bottom edge; selection is a 2px ink
+ring plus a solid pill. The pill wraps rather than ellipsising, so "Light Grey
+Oil" stays readable. Implemented as CSS only
+(`.product-optn:has(.product-swatch-has-image)` in `app.css`) — the sole
+markup change in `ProductForm.tsx` is wrapping the value name in
+`.product-swatch-name` so it is stylable, plus dropping the hover tooltip for
+photo swatches (a full-size tile has nothing to preview; flat tone chips keep
+it, and `.product-swatch-tooltip-preview img` went with it as dead CSS).
+
+## 2026-09-07 — PDP sticky bar CTA scrolls to the buy box instead of adding to cart
+
+`.pdp-sticky-bar` mounted its own `AddToCartButton` with the same `cartLines` as
+the real buy box, so "Order now" at the bottom of a PDP added the current
+variant + upsell selection blind — the shopper could not see what they were
+buying, and the bar's own copy of the form duplicated the page's cart state.
+Now it is a plain `<button type="button">` that calls `scrollToTop()`
+(`window.scrollTo`, `behavior: 'auto'` under `prefers-reduced-motion`), sending
+the shopper back to `ProductForm` where the options, quantity, upsells and the
+real Add to cart live. Markup/CSS are unchanged (`.pdp-atc-wrap` +
+`.pdp-atc-btn`), and the label still flips to "Sold out"; the button is no
+longer disabled in that state since scrolling always works. `AddToCartButton`
+and `useAside` are no longer imported by `products.$handle.tsx`.
+
+## 2026-09-07 — "Our Textures" cards are no longer links, and drop the count
+
+Each texture card was a `<Link>` to the underlying collection with a
+`{n} product(s)` line under the finish name. Both were removed at the
+merchant's request: the card is now a plain `<div>` (grain photo + finish
+name), so the section is decorative rather than a second category nav, and the
+count — which was the collection's product count, never a count of that finish
+— is gone. The hover arrow badge (`.demo-tex-arrow`) and the hover image zoom
+went with it, since neither means anything on a non-clickable card; their CSS
+plus `.demo-tex-count` were deleted from `demo.css`. Note this repeats a
+change that was reverted on 2026-09-04 — that revert is superseded.
+
 ## 2026-09-07 — "Our Textures" no longer shows non-texture categories
 
 `TexturesGrid` rendered the exact same `Category[]` array as `CategoriesGrid`

@@ -12,7 +12,11 @@ import {useUnitSystem} from '~/hooks/useUnitSystem';
 import {UnitToggle} from '~/components/UnitToggle';
 import {formatMeasurement} from '~/lib/units';
 import type {UpsellGroupData} from '~/lib/upsells';
-import {getSwatchTexture, getSwatchTone} from '~/lib/swatches';
+import {
+  getSwatchTexture,
+  getSwatchTone,
+  isHardwareColourOption,
+} from '~/lib/swatches';
 
 export function ProductForm({
   productOptions,
@@ -86,6 +90,11 @@ export function ProductForm({
         // name-based tone (see getSwatchTone) when Shopify hasn't returned
         // real swatch.color/swatch.image data for the linked option yet.
         const isColourOption = /colou?r/.test(optionNameLower);
+
+        // "Hook Colour" and friends are colour options, but their values are
+        // metals — swatch chips yes, wood-grain crops no.
+        const isTimberColourOption =
+          isColourOption && !isHardwareColourOption(option.name);
 
         const hasSwatches =
           isColourOption ||
@@ -229,7 +238,7 @@ export function ProductForm({
                         swatch={swatch}
                         name={name}
                         forceSwatch={isColourOption}
-                        fallbackImage={isColourOption ? getSwatchTexture(name) : undefined}
+                        fallbackImage={isTimberColourOption ? getSwatchTexture(name) : undefined}
                       />
                     </Link>
                   );
@@ -254,7 +263,7 @@ export function ProductForm({
                         swatch={swatch}
                         name={name}
                         forceSwatch={isColourOption}
-                        fallbackImage={isColourOption ? getSwatchTexture(name) : undefined}
+                        fallbackImage={isTimberColourOption ? getSwatchTexture(name) : undefined}
                       />
                     </button>
                   );
@@ -290,7 +299,10 @@ export function ProductForm({
               >
                 {formatMeasurement(option.label, unit, group.label)}
                 {option.variantTitle ? (
-                  variant && (
+                  // A surcharge variant priced at 0 adds nothing, so "+£0.00"
+                  // is noise on every option — only a real uplift is shown.
+                  variant &&
+                  parseFloat(variant.price.amount) > 0 && (
                     <span className="product-opt-surcharge">
                       +<Money as="span" data={variant.price} />
                     </span>
@@ -395,16 +407,18 @@ function ProductOptionSwatch({
         >
           {!!image && <img src={image} alt={name} />}
         </span>
-        <span className="product-swatch-tooltip" role="tooltip">
-          <span
-            className={`product-swatch-tooltip-preview ${image ? 'product-swatch-has-image' : getSwatchTone(name, color)}`}
-          >
-            {!!image && <img src={image} alt={name} />}
+        {/* A tile that already shows the grain full-size has nothing to
+            preview, so the hover tooltip is only for flat tone chips. */}
+        {!image && (
+          <span className="product-swatch-tooltip" role="tooltip">
+            <span
+              className={`product-swatch-tooltip-preview ${getSwatchTone(name, color)}`}
+            />
+            <span className="product-swatch-tooltip-label">{name}</span>
           </span>
-          <span className="product-swatch-tooltip-label">{name}</span>
-        </span>
+        )}
       </span>
-      {name}
+      <span className="product-swatch-name">{name}</span>
     </>
   );
 }

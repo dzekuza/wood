@@ -18,17 +18,18 @@ const TEXTURE_IMAGES: Record<string, string> = {
 };
 
 /**
- * The tile shows a wood grain close-up, so its title names that grain/finish,
- * not the underlying collection — a category with no name here falls back to
- * its own title rather than dropping out of the grid.
+ * The tile shows a wood grain close-up, so its title names the oil finish that
+ * grain represents — the same six names shoppers pick from in the PDP's "Oil
+ * Colour" option — not the underlying collection. A category with no name here
+ * falls back to its own title rather than dropping out of the grid.
  */
 const TEXTURE_NAMES: Record<string, string> = {
-  'solid-oak-mantel-beams': 'Rustic Oak',
-  'solid-oak-shelves': 'Smoked Oak',
-  'solid-oak-door-stops': 'Golden Oak',
-  'solid-oak-cube-blocks': 'Natural Oak',
-  'solid-oak-fireplace-surrounds': 'Ash Grey',
-  'solid-oak-coat-racks': 'Whitewashed Oak',
+  'solid-oak-mantel-beams': 'Dark Oil',
+  'solid-oak-shelves': 'Grey Oil',
+  'solid-oak-door-stops': 'Old Oak Oil',
+  'solid-oak-cube-blocks': 'Clear Oil',
+  'solid-oak-fireplace-surrounds': 'Light Grey Oil',
+  'solid-oak-coat-racks': 'White Oil',
 };
 
 function categoryHandle(category: Category) {
@@ -85,20 +86,12 @@ export function TexturesGrid({
             const image = textureImageFor(category);
             const name = textureNameFor(category);
             return (
-              <Link key={category.title} to={category.to} className="demo-tex-card">
+              <div key={category.title} className="demo-tex-card">
                 <span className="demo-tex-swatch">
                   {image && <img src={image} alt={name} loading="lazy" />}
-                  <span className="demo-tex-arrow" aria-hidden>
-                    <i className="ti ti-arrow-up-right" />
-                  </span>
                 </span>
                 <span className="demo-tex-title">{name}</span>
-                {typeof category.count === 'number' && (
-                  <span className="demo-tex-count">
-                    {category.count} {category.count === 1 ? 'product' : 'products'}
-                  </span>
-                )}
-              </Link>
+              </div>
             );
           })}
         </div>

@@ -39,6 +39,16 @@ export function getSwatchTexture(name: string): string | undefined {
 }
 
 /**
+ * Hardware options ("Hook Colour", "Bracket Colour", …) are colour options
+ * too, but their values name a metal, not a timber finish — so they must not
+ * fall back to a wood-grain crop (a "White" hook would otherwise show the
+ * white-oil grain). They render as flat metal chips from getSwatchTone.
+ */
+export function isHardwareColourOption(optionName: string): boolean {
+  return /hook|handle|hardware|bracket|fixing|knob|hinge/i.test(optionName);
+}
+
+/**
  * Maps a variant option's name/color to one of the `.product-swatch-tone-*`
  * CSS classes in app.css, for options with no swatch image (a flat color chip).
  * Shared between ProductForm (PDP option picker) and ProductItem (card grid)
@@ -46,6 +56,14 @@ export function getSwatchTexture(name: string): string | undefined {
  */
 export function getSwatchTone(name: string, color?: string | null) {
   const value = `${name} ${color ?? ''}`.toLowerCase();
+
+  // Metal finishes first — a "Black" or "White" hook is a painted metal chip,
+  // not the ebonised/whitewash timber tone those words mean on a wood option.
+  if (value.includes('antique brass') || value.includes('aged brass')) return 'product-swatch-tone-antique-brass';
+  if (value.includes('brass') || value.includes('gold')) return 'product-swatch-tone-brass';
+  if (value.includes('copper') || value.includes('bronze')) return 'product-swatch-tone-copper';
+  if (value.includes('chrome') || value.includes('nickel') || value.includes('stainless') || value.includes('silver') || value.includes('polished')) return 'product-swatch-tone-chrome';
+  if (value.includes('pewter') || value.includes('graphite') || value.includes('gunmetal') || value.includes('anthracite')) return 'product-swatch-tone-pewter';
 
   if (value.includes('dark walnut')) return 'product-swatch-tone-dark-walnut';
   if (value.includes('walnut')) return 'product-swatch-tone-walnut';
