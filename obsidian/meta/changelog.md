@@ -1,7 +1,17 @@
 ---
 tags: [meta, changelog]
-updated: 2026-09-04
+updated: 2026-09-07
 ---
+
+## 2026-09-07 — "Our Textures" no longer shows non-texture categories
+
+`TexturesGrid` rendered the exact same `Category[]` array as `CategoriesGrid`
+above it, with no filtering — any collection with no entry in
+`TEXTURE_IMAGES`/`TEXTURE_NAMES` (e.g. "Console Tables") fell back to its own
+product photo and title, breaking the section's all-texture-swatch look.
+Fixed by filtering `categories` to only handles present in `TEXTURE_IMAGES`
+before rendering ([[../frontend/components/common#TexturesGrid]]); the
+dropped category still appears in `CategoriesGrid`, just not here.
 
 ## 2026-09-04 — Mobile header overflow (cart clipped off-screen) and drawer height gap
 

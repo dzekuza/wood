@@ -52,7 +52,11 @@ export function TexturesGrid({
   categories,
   content = HOME_CONTENT_DEFAULTS.textures,
 }: TexturesGridProps) {
-  if (!categories.length) return null;
+  const textureCategories = categories.filter(
+    (category) => categoryHandle(category) in TEXTURE_IMAGES,
+  );
+
+  if (!textureCategories.length) return null;
 
   return (
     <section className="demo-textures">
@@ -77,7 +81,7 @@ export function TexturesGrid({
         </div>
 
         <div className="demo-tex-grid">
-          {categories.map((category) => {
+          {textureCategories.map((category) => {
             const image = textureImageFor(category);
             const name = textureNameFor(category);
             return (
