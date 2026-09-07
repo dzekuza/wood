@@ -3,6 +3,24 @@ tags: [meta, changelog]
 updated: 2026-09-07
 ---
 
+## 2026-09-07 — New homepage process image
+
+The "Craft wood Furniture" process section now shows an oak mantel beam above a
+modern log-store fireplace instead of the old stone-wall mantel shot. Changed in
+**two places**, because the live page reads the metaobject, not the coded
+default:
+
+- `public/demo/workshop.jpg` replaced (the `HOME_CONTENT_DEFAULTS.process.image`
+  fallback, used only when the metaobject has no image),
+- the `home_page` metaobject's `process_image` field repointed to a newly
+  uploaded file, `home-workshop-2026-09.jpg`
+  (`gid://shopify/MediaImage/65051214479702`), alt "Oak mantel beam above a
+  modern log-store fireplace".
+
+Note the project's `SHOPIFY_ADMIN_TOKEN` lacks `write_files`, so
+`stagedUploadsCreate`/`fileCreate` had to go through the Shopify MCP
+connection; only the binary POST to the staged Google Storage URL used curl.
+
 ## 2026-09-07 — Coat racks: hook colour is a real variant option ("Rack Colour")
 
 The coat racks carried a single fused option, `Oil Colour + Hooks Colour`, with
