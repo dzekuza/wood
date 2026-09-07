@@ -3,6 +3,31 @@ tags: [meta, changelog]
 updated: 2026-09-07
 ---
 
+## 2026-09-07 — Coat racks: hook colour is a real variant option ("Rack Colour")
+
+The coat racks carried a single fused option, `Oil Colour + Hooks Colour`, with
+30 combined values (`Clear + Black`, `Old Oak + Chrome`, …) alongside `Size`.
+Shoppers could not pick the two independently, and the old 100-variant cap had
+silently truncated `76cm - 5 Hooks` to 10 of its 30 colour values.
+
+Split on **TEST Coat Rack with Shelf** (`gid://shopify/Product/10815930401110`)
+via one async `productSet` into three real options — Size (4), **Oil Colour**
+(Clear, Old Oak, Dark, Grey, Light Grey, White) and **Rack Colour** (Black,
+Gold, Old Copper, Chrome, Old Brass) — giving the full 120 variants at £20.00
+/ `CONTINUE`. 100 kept their `CR1-*` SKU, mapped across from the old fused
+value; the 20 new `76cm` combos have none. Title, status, handle, tags,
+description and media survived the re-sync. Value typos were normalised on the
+way through (`Ligth Grey`, `Light Grey+OldCopper`, `White  + Old Copper`,
+and one product's `Old Bronze` → `Old Brass`).
+
+The option is named **Rack Colour**, not Hook Colour, at the merchant's
+request, so `rack` joined the `isHardwareColourOption` pattern — otherwise a
+metal option would have gone down the timber-texture path. `Old Brass` also
+now resolves to the antique-brass tone instead of colliding with `Gold`.
+
+**Only the TEST product is split.** The other ~10 coat racks still carry the
+fused option and need the same treatment.
+
 ## 2026-09-07 — "Our Textures" tiles are named after the oil finishes
 
 `TEXTURE_NAMES` in `TexturesGrid` renamed from invented grain names (Rustic

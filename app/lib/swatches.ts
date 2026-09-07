@@ -39,13 +39,15 @@ export function getSwatchTexture(name: string): string | undefined {
 }
 
 /**
- * Hardware options ("Hook Colour", "Bracket Colour", …) are colour options
- * too, but their values name a metal, not a timber finish — so they must not
- * fall back to a wood-grain crop (a "White" hook would otherwise show the
- * white-oil grain). They render as flat metal chips from getSwatchTone.
+ * Hardware options are colour options too, but their values name a metal, not
+ * a timber finish — so they must not fall back to a wood-grain crop (a "White"
+ * hook would otherwise show the white-oil grain). They render as flat metal
+ * chips from getSwatchTone. "Rack Colour" is in here because that is what the
+ * coat racks call their hook/rail metal option (Black, Gold, Old Copper,
+ * Chrome, Old Brass) — the timber colour on those products is "Oil Colour".
  */
 export function isHardwareColourOption(optionName: string): boolean {
-  return /hook|handle|hardware|bracket|fixing|knob|hinge/i.test(optionName);
+  return /hook|handle|hardware|bracket|fixing|knob|hinge|rack/i.test(optionName);
 }
 
 /**
@@ -59,7 +61,7 @@ export function getSwatchTone(name: string, color?: string | null) {
 
   // Metal finishes first — a "Black" or "White" hook is a painted metal chip,
   // not the ebonised/whitewash timber tone those words mean on a wood option.
-  if (value.includes('antique brass') || value.includes('aged brass')) return 'product-swatch-tone-antique-brass';
+  if (value.includes('antique brass') || value.includes('aged brass') || value.includes('old brass')) return 'product-swatch-tone-antique-brass';
   if (value.includes('brass') || value.includes('gold')) return 'product-swatch-tone-brass';
   if (value.includes('copper') || value.includes('bronze')) return 'product-swatch-tone-copper';
   if (value.includes('chrome') || value.includes('nickel') || value.includes('stainless') || value.includes('silver') || value.includes('polished')) return 'product-swatch-tone-chrome';
