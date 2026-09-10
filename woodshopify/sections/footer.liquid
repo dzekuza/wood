@@ -1,0 +1,104 @@
+<footer class="site-footer" style="--footer-bg: {{ section.settings.background }}; --footer-text: {{ section.settings.text_color }};">
+  <div class="site-footer__wrap">
+    <div class="site-footer__brand">
+      <p class="site-footer__title">{{ shop.name }}</p>
+      {%- if section.settings.description != blank -%}
+        <p class="site-footer__desc">{{ section.settings.description }}</p>
+      {%- endif -%}
+    </div>
+
+    <div class="site-footer__links">
+      {%- for link in section.settings.menu.links -%}
+        <a href="{{ link.url }}" class="site-footer__link">{{ link.title }}</a>
+      {%- endfor -%}
+    </div>
+
+    {%- if section.settings.show_newsletter -%}
+      <div class="site-footer__newsletter">
+        {% form 'customer' %}
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          <label for="NewsletterEmail">{{ 'footer.newsletter_label' | t }}</label>
+          <input type="email" id="NewsletterEmail" name="contact[email]" placeholder="{{ 'footer.newsletter_placeholder' | t }}" required>
+          <button type="submit">{{ 'footer.newsletter_submit' | t }}</button>
+          {{ form.errors | default_errors }}
+        {% endform %}
+      </div>
+    {%- endif -%}
+  </div>
+
+  <div class="site-footer__bottom">
+    <p>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}</p>
+  </div>
+</footer>
+
+{% stylesheet %}
+.site-footer {
+  background: var(--footer-bg);
+  color: var(--footer-text);
+  padding: 48px 0 24px;
+}
+
+.site-footer__wrap {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 32px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  justify-content: space-between;
+}
+
+.site-footer__title {
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.site-footer__links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.site-footer__link {
+  color: inherit;
+  text-decoration: none;
+  opacity: 0.8;
+}
+
+.site-footer__newsletter {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 320px;
+}
+
+.site-footer__newsletter input {
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+}
+
+.site-footer__bottom {
+  max-width: 1320px;
+  margin: 32px auto 0;
+  padding: 16px 32px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.footer.name",
+  "settings": [
+    { "type": "richtext", "id": "description", "label": "t:sections.footer.settings.description" },
+    { "type": "link_list", "id": "menu", "label": "t:sections.footer.settings.menu", "default": "footer" },
+    { "type": "checkbox", "id": "show_newsletter", "label": "t:sections.footer.settings.show_newsletter", "default": true },
+    { "type": "color", "id": "background", "label": "t:sections.footer.settings.background", "default": "#1c1c1c" },
+    { "type": "color", "id": "text_color", "label": "t:sections.footer.settings.text_color", "default": "#f3efea" }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,26 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Wood Shopify",
+    "theme_version": "1.0.0",
+    "theme_author": "CraftWoodFurniture",
+    "theme_documentation_url": "https://craftwoodfurniture.com",
+    "theme_support_url": "https://craftwoodfurniture.com"
+  },
+  {
+    "name": "t:settings.colors.name",
+    "settings": [
+      { "type": "color", "id": "color_primary", "label": "t:settings.colors.primary", "default": "#4a2f1f" },
+      { "type": "color", "id": "color_accent", "label": "t:settings.colors.accent", "default": "#c9a27a" },
+      { "type": "color", "id": "color_surface", "label": "t:settings.colors.surface", "default": "#f3efea" },
+      { "type": "color", "id": "color_dark", "label": "t:settings.colors.dark", "default": "#2a2a2a" }
+    ]
+  },
+  {
+    "name": "t:settings.typography.name",
+    "settings": [
+      { "type": "font_picker", "id": "font_heading", "label": "t:settings.typography.heading", "default": "assistant_n4" },
+      { "type": "font_picker", "id": "font_body", "label": "t:settings.typography.body", "default": "assistant_n4" }
+    ]
+  }
+]

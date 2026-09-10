@@ -1,0 +1,54 @@
+<section class="collection">
+  <div class="collection__wrap">
+    <div class="collection__head">
+      <h1 class="collection__title">{{ collection.title }}</h1>
+      {%- if collection.description != blank -%}
+        <div class="collection__description">{{ collection.description }}</div>
+      {%- endif -%}
+    </div>
+
+    {% paginate collection.products by 24 %}
+      <div class="collection__grid">
+        {%- for product in collection.products -%}
+          {%- render 'product-card', product: product -%}
+        {%- endfor -%}
+      </div>
+
+      {{ paginate | default_pagination }}
+    {% endpaginate %}
+  </div>
+</section>
+
+{% stylesheet %}
+.collection__wrap {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 48px 32px;
+}
+
+.collection__head {
+  margin-bottom: 32px;
+}
+
+.collection__title {
+  margin: 0 0 12px;
+}
+
+.collection__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 989px) {
+  .collection__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.main_collection.name"
+}
+{% endschema %}

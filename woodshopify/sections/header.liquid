@@ -1,0 +1,112 @@
+<header class="site-header" style="--header-bg: {{ section.settings.background }};">
+  <div class="site-header__wrap">
+    <a href="{{ routes.root_url }}" class="site-header__logo">
+      {%- if section.settings.logo -%}
+        {{ section.settings.logo | image_url: width: 240 | image_tag: loading: 'eager', alt: shop.name }}
+      {%- else -%}
+        <span>{{ shop.name }}</span>
+      {%- endif -%}
+    </a>
+
+    <nav class="site-header__nav" aria-label="{{ 'general.navigation' | t }}">
+      {%- for link in section.settings.menu.links -%}
+        <a href="{{ link.url }}" class="site-header__link"{% if link.active %} aria-current="page"{% endif %}>{{ link.title }}</a>
+      {%- endfor -%}
+    </nav>
+
+    <div class="site-header__actions">
+      <a href="{{ routes.search_url }}" class="site-header__icon" aria-label="{{ 'general.search' | t }}">
+        {%- render 'icon-search' -%}
+      </a>
+      <a href="{{ routes.account_url }}" class="site-header__icon" aria-label="{{ 'general.account' | t }}">
+        {%- render 'icon-account' -%}
+      </a>
+      <a href="{{ routes.cart_url }}" class="site-header__icon site-header__cart" aria-label="{{ 'general.cart' | t }}">
+        {%- render 'icon-cart' -%}
+        {%- if cart.item_count > 0 -%}
+          <span class="site-header__cart-count">{{ cart.item_count }}</span>
+        {%- endif -%}
+      </a>
+    </div>
+  </div>
+</header>
+
+{% stylesheet %}
+.site-header {
+  background: var(--header-bg);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.site-header__wrap {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.site-header__logo {
+  font-weight: 700;
+  font-size: 1.25rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.site-header__nav {
+  display: flex;
+  gap: 24px;
+  flex: 1;
+  justify-content: center;
+}
+
+.site-header__link {
+  text-decoration: none;
+  color: inherit;
+  font-size: 0.95rem;
+}
+
+.site-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.site-header__icon {
+  position: relative;
+  display: inline-flex;
+  color: inherit;
+}
+
+.site-header__cart-count {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: currentColor;
+  color: Canvas;
+  font-size: 10px;
+  line-height: 16px;
+  text-align: center;
+}
+
+@media (max-width: 749px) {
+  .site-header__nav {
+    display: none;
+  }
+}
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.header.name",
+  "settings": [
+    { "type": "image_picker", "id": "logo", "label": "t:sections.header.settings.logo" },
+    { "type": "link_list", "id": "menu", "label": "t:sections.header.settings.menu", "default": "main-menu" },
+    { "type": "color", "id": "background", "label": "t:sections.header.settings.background", "default": "#ffffff" }
+  ]
+}
+{% endschema %}

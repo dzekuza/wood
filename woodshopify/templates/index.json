@@ -1,0 +1,23 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero",
+      "settings": {
+        "eyebrow": "Craft Wood Furniture",
+        "heading": "Handcrafted furniture, built to last",
+        "button_label": "Shop collection",
+        "button_url": "/collections/all"
+      }
+    },
+    "featured": {
+      "type": "featured-collection",
+      "settings": {
+        "eyebrow": "New arrivals",
+        "title": "Featured collection",
+        "collection": "solid-oak-mantel-beams",
+        "products_to_show": 8
+      }
+    }
+  },
+  "order": ["hero", "featured"]
+}

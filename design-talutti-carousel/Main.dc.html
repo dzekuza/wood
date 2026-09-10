@@ -1,0 +1,242 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&display=swap&subset=latin,latin-ext">
+  <style>
+    body { margin: 0; }
+    a { color: #FDB913; text-decoration: none; }
+    a:hover { color: #ffffff; }
+    * { box-sizing: border-box; }
+
+    button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    button:focus-visible { outline: 3px solid #FDB913; outline-offset: 4px; }
+
+    /* the press itself rides the inner content, so it never fights the
+       inline transforms the carousel animates on the button */
+    .press { display: block; transition: transform 150ms cubic-bezier(.3,.85,.4,1); }
+    button:hover .press { transform: scale(1.05); }
+    button:active .press { transform: scale(0.9); }
+
+    .btn { transition: background-color 170ms ease, border-color 170ms ease, box-shadow 200ms ease; }
+    .btn:hover { background: rgba(0,0,0,.66) !important; box-shadow: 0 10px 26px rgba(0,0,0,.42); }
+    .btn:active { box-shadow: 0 2px 6px rgba(0,0,0,.5); }
+
+    .chip:hover { background: rgba(0,0,0,.64) !important; border-color: rgba(255,255,255,.5) !important; }
+    .arrow:hover { background: rgba(0,0,0,.55) !important; }
+    .meniu:hover { background: #171717 !important; box-shadow: 0 10px 26px rgba(0,0,0,.5); }
+  </style>
+</helmet>
+
+<div style="position: relative; width: 1280px; height: 767px; overflow: hidden; background: #1A1A1A; font-family: Anton, 'Arial Narrow', 'Haettenschweiler', sans-serif; color: #ffffff" onMouseEnter="{{ hoverOn }}" onMouseLeave="{{ hoverOff }}" onFocusCapture="{{ hoverOn }}" onBlurCapture="{{ hoverOff }}">
+
+  <!-- SCENES — crossfade + slow push -->
+  <div style="position: absolute; left: -47px; top: -28px; width: 1327px; height: 795px; overflow: hidden">
+    <img src="screen-tasty.jpg" alt="" style="{{ scene0 }}">
+    <img src="screen-texmex.jpg" alt="" style="{{ scene1 }}">
+    <img src="screen-bakes.jpg" alt="" style="{{ scene2 }}">
+  </div>
+
+  <div style="position: absolute; left: -275px; top: -183px; width: 920px; height: 920px; border-radius: 50%; background: radial-gradient(circle, rgba(255,196,92,.16) 0%, rgba(255,196,92,0) 62%); pointer-events: none"></div>
+  <div style="{{ glowStyle }}"></div>
+
+  <div style="position: absolute; inset: 0; background: linear-gradient(105deg, rgba(12,10,8,.62) 0%, rgba(12,10,8,.20) 38%, rgba(12,10,8,0) 60%); pointer-events: none"></div>
+  <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(12,10,8,.42) 0%, rgba(12,10,8,0) 22%, rgba(12,10,8,0) 62%, rgba(12,10,8,.50) 100%); pointer-events: none"></div>
+
+  <!-- framing outline — wipes open from the top -->
+  <div style="{{ frameStyle }}"></div>
+
+  <!-- TOP BAR -->
+  <div style="position: absolute; left: 60px; top: 54px; width: 1160px; height: 56px">
+    <div style="position: absolute; left: 0; top: 0; display: flex; align-items: center; gap: 16px">
+      <button onClick="{{ noop }}" class="btn" style="display: flex; align-items: center; justify-content: center; padding: 16px 32px; border-radius: 8px; background: rgba(0,0,0,.3); border: 2px solid #FDB913; cursor: pointer">
+        <span class="press" style="font-family: Anton, 'Arial Narrow', sans-serif; font-size: 20px; line-height: 1; text-transform: uppercase; color: #FDB913; white-space: nowrap">Kaunas</span>
+      </button>
+      <button onClick="{{ noop }}" class="btn" style="display: flex; align-items: center; justify-content: center; padding: 16px 32px; border-radius: 8px; background: rgba(0,0,0,.5); border: 2px solid #ffffff; cursor: pointer">
+        <span class="press" style="font-family: Anton, 'Arial Narrow', sans-serif; font-size: 20px; line-height: 1; text-transform: uppercase; color: rgba(255,255,255,.9); white-space: nowrap">Vilnius</span>
+      </button>
+    </div>
+    <img src="talutti-wordmark.svg" alt="Talutti" style="position: absolute; left: 528.99px; top: 6px; width: 102.15px; height: 40px; display: block">
+    <button onClick="{{ noop }}" style="position: absolute; left: 1117px; top: 6px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: none; border: 0; padding: 0; cursor: pointer">
+      <span class="press" style="display: flex; flex-direction: column; justify-content: space-between; width: 38px; height: 24px">
+        <span style="display: block; width: 100%; height: 4px; border-radius: 2px; background: #ffffff"></span>
+        <span style="display: block; width: 100%; height: 4px; border-radius: 2px; background: #ffffff"></span>
+        <span style="display: block; width: 100%; height: 4px; border-radius: 2px; background: #ffffff"></span>
+      </span>
+    </button>
+  </div>
+
+  <!-- SCRIPT LOGOTYPES — scale + fade, one per brand -->
+  <img src="script-tasty.svg" alt="Tasty Trip" style="{{ mark0 }}">
+  <img src="script-texmex.svg" alt="Tex Mex" style="{{ mark1 }}">
+  <img src="script-bakes.svg" alt="Bakes and Shakes" style="{{ mark2 }}">
+
+  <!-- ARROWS -->
+  <button onClick="{{ prev }}" class="arrow" style="{{ arrowLeftStyle }}">
+    <svg class="press" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 5l-7 7 7 7"></path></svg>
+  </button>
+  <button onClick="{{ next }}" class="arrow" style="{{ arrowRightStyle }}">
+    <svg class="press" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"></path></svg>
+  </button>
+
+  <!-- HEADLINE — three masked lines rising in sequence -->
+  <div style="position: absolute; left: 62px; top: 528px; width: 460px; display: flex; flex-direction: column">
+    <span style="display: block; overflow: hidden; height: 57.6px"><span style="{{ line0 }}">{{ head.a }}</span></span>
+    <span style="display: block; overflow: hidden; height: 57.6px"><span style="{{ line1 }}">{{ head.b }}</span></span>
+    <span style="display: block; overflow: hidden; height: 57.6px"><span style="{{ line2 }}">{{ head.c }}</span></span>
+  </div>
+
+  <!-- BRUSH UNDERLINE — draws on -->
+  <div style="position: absolute; left: 47.41px; top: 702.87px; width: 377.25px; height: 30.85px; pointer-events: none">
+    <svg width="378" height="31" viewBox="0 0 378 31" fill="none" style="display: block; overflow: visible">
+      <path pathLength="100" d="M3 21.5C64 9.5 138 3.5 214 4.5c52 .7 104 4.6 158 12.4" stroke-width="9" stroke-linecap="round" style="{{ strokeA }}"></path>
+      <path pathLength="100" d="M27 28c58-8 121-11.5 186-10.6 46 .6 92 3.4 138 8.6" stroke-width="4.5" stroke-linecap="round" opacity=".72" style="{{ strokeB }}"></path>
+    </svg>
+  </div>
+
+  <!-- MENIU -->
+  <button onClick="{{ noop }}" class="meniu" style="{{ meniuStyle }}">
+    <span class="press" style="font-family: Anton, 'Arial Narrow', sans-serif; font-size: 20px; line-height: 1; text-transform: uppercase; color: rgba(255,255,255,.9); white-space: nowrap">Meniu</span>
+  </button>
+
+  <!-- CHIPS — the carousel control, each with its own autoplay bar -->
+  <div style="position: absolute; left: 792px; top: 638px; width: 444.04px; height: 96.14px">
+    <button onClick="{{ chip0.pick }}" class="chip" style="{{ chip0.style }}">
+      <img src="brand-tastytrip.svg" alt="Tasty Trip" class="press" style="{{ chip0.logoStyle }}">
+      <span style="{{ chip0.barStyle }}"></span>
+    </button>
+    <button onClick="{{ chip1.pick }}" class="chip" style="{{ chip1.style }}">
+      <img src="brand-texmex.svg" alt="Tex Mex" class="press" style="{{ chip1.logoStyle }}">
+      <span style="{{ chip1.barStyle }}"></span>
+    </button>
+    <button onClick="{{ chip2.pick }}" class="chip" style="{{ chip2.style }}">
+      <img src="brand-bakes.svg" alt="Bakes and Shakes" class="press" style="{{ chip2.logoStyle }}">
+      <span style="{{ chip2.barStyle }}"></span>
+    </button>
+  </div>
+
+  <!-- pause / counter -->
+  <button onClick="{{ togglePause }}" class="btn" style="position: absolute; left: 692px; top: 672px; height: 44px; display: flex; align-items: center; gap: 10px; padding: 0 16px; border-radius: 999px; background: rgba(0,0,0,.42); border: 1.5px solid rgba(255,255,255,.24); color: rgba(255,255,255,.88); cursor: pointer; font-family: Anton, 'Arial Narrow', sans-serif; font-size: 14px; letter-spacing: .06em; text-transform: uppercase">
+    <span class="press" style="{{ pauseIconStyle }}"></span>
+    {{ counter }}
+  </button>
+
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{"autoplaySeconds":{"editor":"range","default":8,"min":4,"max":16,"step":1,"unit":"s","section":"Karuselė"},"kenBurns":{"editor":"boolean","default":true,"section":"Animacija"}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { brand: 1, phase: 'in', progress: 0, paused: false, hover: false };
+  }
+
+  componentDidMount() {
+    this.tick = setInterval(() => {
+      const st = this.state;
+      if (st.paused || st.hover || st.phase !== 'in') return;
+      const secs = this.props.autoplaySeconds ?? 8;
+      const step = 100 / (secs * 10);
+      const p = st.progress + step;
+      if (p >= 100) this.go(st.brand + 1);
+      else this.setState({ progress: p });
+    }, 100);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.tick);
+    clearTimeout(this.swap);
+  }
+
+  go(n) {
+    const next = ((n % 3) + 3) % 3;
+    if (this.state.phase !== 'in') return;
+    if (next === this.state.brand) { this.setState({ progress: 0 }); return; }
+    this.setState({ phase: 'out', progress: 0 });
+    this.swap = setTimeout(() => this.setState({ brand: next, phase: 'in' }), 300);
+  }
+
+  renderVals() {
+    const s = this.state;
+    const inn = s.phase === 'in';
+    const kb = this.props.kenBurns ?? true;
+    const E = 'cubic-bezier(.22,.9,.28,1)';
+    const OUT = 'cubic-bezier(.5,0,.75,0)';
+
+    const BRANDS = [
+      { accent: '#43FFF6', head: { a: 'Kelionė', b: 'prasideda nuo', c: 'pirmo kąsnio' },
+        mark: { x: 497, y: 127, w: 272, h: 64 } },
+      { accent: '#7DBC2B', head: { a: 'Meksika', b: 'prasideda nuo', c: 'pirmo kąsnio' },
+        mark: { x: 498, y: 133, w: 284, h: 62 } },
+      { accent: '#FFAA00', head: { a: 'Vakaras', b: 'prasideda nuo', c: 'pirmo kąsnio' },
+        mark: { x: 463, y: 124, w: 354, h: 74 } }
+    ];
+    const b = BRANDS[s.brand];
+
+    // one orchestration helper: enter with a stagger, leave together and fast
+    const move = (dy, delay, dur) => inn
+      ? 'opacity: 1; transform: translate3d(0, 0, 0); transition: opacity ' + dur + 'ms ' + E + ' ' + delay + 'ms, transform ' + dur + 'ms ' + E + ' ' + delay + 'ms'
+      : 'opacity: 0; transform: translate3d(0, ' + dy + 'px, 0); transition: opacity 260ms ' + OUT + ', transform 260ms ' + OUT;
+
+    const scene = (i) => {
+      const on = i === s.brand;
+      const sc = on && kb ? 1.06 : 1;
+      return 'position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; transform-origin: 58% 46%; opacity: ' + (on ? 1 : 0) + '; transform: scale(' + sc + '); transition: opacity 760ms ease, transform ' + (on ? (this.props.autoplaySeconds ?? 8) * 1000 + 900 : 700) + 'ms linear';
+    };
+
+    const mark = (i) => {
+      const on = i === s.brand;
+      const m = BRANDS[i].mark;
+      return 'position: absolute; left: ' + m.x + 'px; top: ' + m.y + 'px; width: ' + m.w + 'px; height: ' + m.h + 'px; display: block; transform-origin: 50% 60%; opacity: ' + (on && inn ? 1 : 0) + '; transform: scale(' + (on && inn ? 1 : 0.86) + ') translate3d(0, ' + (on && inn ? 0 : 10) + 'px, 0); transition: opacity ' + (on ? 620 : 240) + 'ms ' + E + ' ' + (on && inn ? 120 : 0) + 'ms, transform ' + (on ? 720 : 240) + 'ms ' + E + ' ' + (on && inn ? 120 : 0) + 'ms; pointer-events: none';
+    };
+
+    const stroke = (delay, dur) => 'stroke: ' + b.accent + '; stroke-dasharray: 100; stroke-dashoffset: ' + (inn ? 0 : 100) + '; transition: stroke-dashoffset ' + (inn ? dur : 220) + 'ms ' + (inn ? E : OUT) + ' ' + (inn ? delay : 0) + 'ms, stroke 400ms ease';
+
+    const chip = (i) => {
+      const on = i === s.brand;
+      return {
+        pick: () => this.go(i),
+        style: 'position: absolute; left: ' + (i * 153.346).toFixed(2) + 'px; top: 0; width: 137.35px; height: 96.14px; display: flex; align-items: center; justify-content: center; padding: 12px 14px; border-radius: 8px; overflow: hidden; cursor: pointer; background: rgba(0,0,0,' + (on ? '.55' : '.42') + '); border: 2px solid ' + (on ? b.accent : 'rgba(255,255,255,.22)') + '; transform: translate3d(0, ' + (on ? -6 : 0) + 'px, 0); transition: border-color 320ms ease, background 320ms ease, transform 380ms ' + E,
+        logoStyle: 'max-width: 100%; max-height: 100%; width: auto; height: auto; display: block; opacity: ' + (on ? 1 : 0.6) + '; filter: grayscale(' + (on ? 0 : 0.5) + '); transition: opacity 320ms ease, filter 320ms ease',
+        barStyle: 'position: absolute; left: 0; bottom: 0; height: 3px; width: ' + (on ? s.progress : 0) + '%; background: ' + b.accent + '; transition: width 120ms linear'
+      };
+    };
+
+    const arrow = (x, y) => 'position: absolute; left: ' + x + 'px; top: ' + y + 'px; width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(0,0,0,.28); border: 2px solid rgba(255,255,255,.9); cursor: pointer; opacity: ' + (s.hover ? 1 : 0.72) + '; transform: scale(' + (s.hover ? 1 : 0.94) + '); transition: opacity 300ms ease, transform 300ms ' + E;
+
+    return {
+      head: b.head,
+      scene0: scene(0), scene1: scene(1), scene2: scene(2),
+      mark0: mark(0), mark1: mark(1), mark2: mark(2),
+      line0: 'display: block; font-family: Anton, \'Arial Narrow\', sans-serif; font-size: 48px; line-height: 1.2; letter-spacing: -0.48px; text-transform: uppercase; color: #ffffff; will-change: transform; ' + move(64, 200, 620),
+      line1: 'display: block; font-family: Anton, \'Arial Narrow\', sans-serif; font-size: 48px; line-height: 1.2; letter-spacing: -0.48px; text-transform: uppercase; color: #ffffff; will-change: transform; ' + move(64, 280, 620),
+      line2: 'display: block; font-family: Anton, \'Arial Narrow\', sans-serif; font-size: 48px; line-height: 1.2; letter-spacing: -0.48px; text-transform: uppercase; color: #ffffff; will-change: transform; ' + move(64, 360, 620),
+      strokeA: stroke(520, 760),
+      strokeB: stroke(620, 760),
+      meniuStyle: 'position: absolute; left: 583px; top: 553px; width: 112px; height: 52px; display: flex; align-items: center; justify-content: center; padding: 16px 32px; border-radius: 8px; background: #000000; border: 0; cursor: pointer; ' + move(18, 420, 480),
+      frameStyle: 'position: absolute; left: 521px; top: 184px; width: 239px; height: 399px; border: 2px solid rgba(255,255,255,.85); border-radius: 2px; pointer-events: none; transform-origin: 50% 0%; opacity: ' + (inn ? 1 : 0) + '; transform: scaleY(' + (inn ? 1 : 0.72) + '); transition: opacity 640ms ' + E + ' ' + (inn ? 260 : 0) + 'ms, transform 760ms ' + E + ' ' + (inn ? 260 : 0) + 'ms',
+      glowStyle: 'position: absolute; left: 807px; top: -195px; width: 788px; height: 788px; border-radius: 50%; pointer-events: none; background: radial-gradient(circle, ' + b.accent + '2E 0%, ' + b.accent + '00 60%); transition: background 900ms ease',
+      chip0: chip(0), chip1: chip(1), chip2: chip(2),
+      arrowLeftStyle: arrow(489, 416),
+      arrowRightStyle: arrow(792, 352),
+      counter: (s.brand + 1) + ' / 3',
+      pauseIconStyle: s.paused || s.hover
+        ? 'display: block; width: 0; height: 0; border-left: 11px solid rgba(255,255,255,.88); border-top: 7px solid transparent; border-bottom: 7px solid transparent'
+        : 'display: block; width: 11px; height: 14px; border-left: 4px solid rgba(255,255,255,.88); border-right: 4px solid rgba(255,255,255,.88)',
+      togglePause: () => this.setState({ paused: !s.paused }),
+      hoverOn: () => this.setState({ hover: true }),
+      hoverOff: () => this.setState({ hover: false }),
+      prev: () => this.go(s.brand - 1),
+      next: () => this.go(s.brand + 1),
+      noop: () => {}
+    };
+  }
+}
+</script>
+</body>
+</html>

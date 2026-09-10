@@ -1,0 +1,12 @@
+{
+  "artboards": [
+    { "file": "TastyTrip.dc.html", "x": 0, "y": 0, "w": 1280, "h": 767, "title": "Tasty Trip" },
+    { "file": "Main.dc.html", "x": 1400, "y": 0, "w": 1280, "h": 767, "title": "Tex Mex" },
+    { "file": "Bakes.dc.html", "x": 2800, "y": 0, "w": 1280, "h": 767, "title": "Bakes & Shakes" }
+  ],
+  "annotations": [
+    { "id": "note-copy", "x": 1400, "y": -170, "w": 460, "text": "Antraštė: Figma faile visuose trijuose ekranuose palikta ta pati eilutė „Meksika prasideda nuo pirmo kąsnio“. Tex-Mex ekrane ji palikta tokia, kokia suprojektuota; Tasty Trip ir Bakes & Shakes ekranams parašytos to paties skambesio eilutės." },
+    { "id": "note-type", "x": 1900, "y": -170, "w": 420, "text": "Šriftas: Anton (Google Fonts) — 20 px viršutinei juostai ir mygtukams, 48 px antraštei, tarpas -0,48 px. Prekės ženklų rašysenos logotipai ir kortelės — SVG iš Figma." }
+  ],
+  "launch": { "view": "canvas" }
+}

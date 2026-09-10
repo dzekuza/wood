@@ -1,0 +1,85 @@
+<section class="featured-collection">
+  <div class="featured-collection__wrap">
+    <div class="featured-collection__head">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="featured-collection__eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+      <h2 class="featured-collection__title">{{ section.settings.title }}</h2>
+      {%- if section.settings.collection != blank -%}
+        <a href="{{ section.settings.collection.url }}" class="featured-collection__browse">{{ 'general.browse_all' | t }}</a>
+      {%- endif -%}
+    </div>
+
+    <div class="featured-collection__grid">
+      {%- if section.settings.collection != blank -%}
+        {%- for product in section.settings.collection.products limit: section.settings.products_to_show -%}
+          {%- render 'product-card', product: product -%}
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+.featured-collection {
+  padding: 64px 0;
+}
+
+.featured-collection__wrap {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.featured-collection__head {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.featured-collection__eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 11px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.featured-collection__title {
+  margin: 0;
+  flex: 1;
+}
+
+.featured-collection__browse {
+  color: inherit;
+  text-decoration: none;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.featured-collection__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 989px) {
+  .featured-collection__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.featured_collection.name",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "t:sections.featured_collection.settings.eyebrow" },
+    { "type": "text", "id": "title", "label": "t:sections.featured_collection.settings.title", "default": "Featured collection" },
+    { "type": "collection", "id": "collection", "label": "t:sections.featured_collection.settings.collection" },
+    { "type": "range", "id": "products_to_show", "label": "t:sections.featured_collection.settings.products_to_show", "min": 2, "max": 12, "step": 1, "default": 4 }
+  ],
+  "presets": [{ "name": "t:sections.featured_collection.name" }]
+}
+{% endschema %}

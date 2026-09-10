@@ -1,0 +1,13 @@
+{
+  "artboards": [
+    { "file": "Audit.dc.html", "x": 0, "y": 0, "w": 1000, "h": 1480, "title": "Auditas — kas neveikia", "print": "flow" },
+    { "file": "Main.dc.html", "x": 1120, "y": 0, "w": 1440, "h": 900, "title": "Naujas hero — Desktop", "is_interactive": true },
+    { "file": "Mobile.dc.html", "x": 2680, "y": 0, "w": 390, "h": 844, "title": "Naujas hero — Mobile", "is_interactive": true }
+  ],
+  "annotations": [
+    { "id": "note-photos", "x": 1120, "y": -190, "w": 420, "text": "Nuotraukos: Figma faile visi trys prekės ženklai naudoja tą pačią Tex-Mex nuotrauką. Čia ji pakartota visiems trims, tik su skirtingu spalvos atspalviu — realiame diegime kiekvienas ženklas turi turėti savo kadrą." },
+    { "id": "note-data", "x": 1580, "y": -190, "w": 420, "text": "Pavyzdiniai duomenys: darbo laikas, statusas „Atidaryta / Uždaryta“, atstumai ir Vilniaus adresai. Be jų sąveika neveiktų — pakeisk realiais. Vilniaus adresai palikti laužtiniuose skliaustuose." },
+    { "id": "note-mobile", "x": 2680, "y": -190, "w": 390, "text": "Mobilėje: parinkiklis atsidaro kaip apatinis lakštas, CTA gyvena nykščio zonoje, o prekės ženklų juosta — scroll-snap su 132×76 kortelėmis." }
+  ],
+  "launch": { "view": "canvas" }
+}

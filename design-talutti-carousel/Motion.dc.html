@@ -1,0 +1,114 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&display=swap&subset=latin,latin-ext">
+  <style>
+    body { margin: 0; }
+    a { color: #FDB913; }
+    a:hover { color: #ffffff; }
+    * { box-sizing: border-box; }
+  </style>
+</helmet>
+
+<div style="width: 880px; min-height: 1010px; padding: 40px 36px 44px 36px; background: #131313; color: #ffffff; font-family: Archivo, system-ui, sans-serif; display: flex; flex-direction: column; gap: 28px">
+
+  <div style="display: flex; flex-direction: column; gap: 8px">
+    <span style="font-size: 11px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: #FDB913">Judesio specifikacija</span>
+    <h2 style="margin: 0; font-family: Anton, 'Arial Narrow', sans-serif; font-size: 36px; line-height: 1; text-transform: uppercase">Perėjimas tarp prekės ženklų</h2>
+    <p style="margin: 0; max-width: 700px; font-size: 14.5px; line-height: 1.55; color: rgba(255,255,255,.68); text-wrap: pretty">Vienas perjungimas — dvi fazės. Turinys išeina kartu ir greitai, o sugrįžta pakopomis, iš apačios į viršų. Bendra trukmė nuo paspaudimo iki nurimusio kadro — 1,42 s.</p>
+  </div>
+
+  <!-- PHASE 1 -->
+  <div style="display: flex; flex-direction: column; gap: 12px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <span style="font-family: Anton, sans-serif; font-size: 22px; color: #FF6B6B">1</span>
+      <span style="font-size: 16px; font-weight: 700">Išėjimas — 0 → 300 ms</span>
+      <span style="font-size: 13px; color: rgba(255,255,255,.52); font-family: ui-monospace, monospace">cubic-bezier(.5, 0, .75, 0)</span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+      <div style="display: flex; flex-direction: column; gap: 5px; padding: 14px 16px; border-radius: 10px; background: #1B1B1B; border: 1px solid rgba(255,255,255,.10)">
+        <span style="font-size: 14px; font-weight: 600">Antraštė, Meniu, potėpis</span>
+        <span style="font-size: 13px; line-height: 1.5; color: rgba(255,255,255,.60)">Opacity 1 → 0, translateY 0 → 64 px. Be pakopų — visi elementai išeina vienu metu, kad kadras greitai išsivalytų.</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 5px; padding: 14px 16px; border-radius: 10px; background: #1B1B1B; border: 1px solid rgba(255,255,255,.10)">
+        <span style="font-size: 14px; font-weight: 600">Rašysenos logotipas, rėmelis</span>
+        <span style="font-size: 13px; line-height: 1.5; color: rgba(255,255,255,.60)">Logotipas 240 ms iki scale .86; rėmelis suskleidžiamas scaleY .72 nuo viršutinio krašto.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div style="display: flex; flex-direction: column; gap: 12px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <span style="font-family: Anton, sans-serif; font-size: 22px; color: #7DBC2B">2</span>
+      <span style="font-size: 16px; font-weight: 700">Įėjimas — 300 ms → 1 420 ms</span>
+      <span style="font-size: 13px; color: rgba(255,255,255,.52); font-family: ui-monospace, monospace">cubic-bezier(.22, .9, .28, 1)</span>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <div style="display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-radius: 10px; background: #1B1B1B; border: 1px solid rgba(255,255,255,.10)">
+        <span style="width: 210px; flex-shrink: 0; font-size: 14px; font-weight: 600">Scena (kryžminis perėjimas)</span>
+        <span style="width: 96px; flex-shrink: 0; font-size: 13px; color: rgba(255,255,255,.52); font-family: ui-monospace, monospace">+0 ms</span>
+        <span style="flex-grow: 1; font-size: 13px; color: rgba(255,255,255,.62)">opacity 760 ms · lėtas priartinimas scale 1 → 1,06 per visą slaidą</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-radius: 10px; background: #1B1B1B; border: 1px solid rgba(255,255,255,.10)">
+        <span style="width: 210px; flex-shrink: 0; font-size: 14px; font-weight: 600">Rašysenos logotipas</span>
+        <span style="width: 96px; flex-shrink: 0; font-size: 13px; color: rgba(255,255,255,.52); font-family: ui-monospace, monospace">+120 ms</span>
+        <span style="flex-grow: 1; font-size: 13px; color: rgba(255,255,255,.62)">scale .86 → 1, translateY 10 → 0, 720 ms</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-radius: 10px; background: #1B1B1B; border: 1px solid rgba(255,255,255,.10)">
+        <span style="width: 210px; flex-shrink: 0; font-size: 14px; font-weight: 600">Antraštės eilutės ×3</span>
+        <span style="width: 96px; flex-shrink: 0; font-size: 13px; color: rgba(255,255,255,.52); font-family: ui-monospace, monospace">+200 / 280 / 360 ms</span>
+        <span style="flex-grow: 1; font-size: 13px; color: rgba(255,255,255,.62)">kiekviena eilutė kyla iš po kaukės, 620 ms, 80 ms pakopa</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-radius: 10px; background: #1B1B1B; border: 1px solid rgba(255,255,255,.10)">
+        <span style="width: 210px; flex-shrink: 0; font-size: 14px; font-weight: 600">Rėmelis virš gėrimo</span>
+        <span style="width: 96px; flex-shrink: 0; font-size: 13px; color: rgba(255,255,255,.52); font-family: ui-monospace, monospace">+260 ms</span>
+        <span style="flex-grow: 1; font-size: 13px; color: rgba(255,255,255,.62)">scaleY .72 → 1 nuo viršaus, 760 ms</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-radius: 10px; background: #1B1B1B; border: 1px solid rgba(255,255,255,.10)">
+        <span style="width: 210px; flex-shrink: 0; font-size: 14px; font-weight: 600">Meniu mygtukas</span>
+        <span style="width: 96px; flex-shrink: 0; font-size: 13px; color: rgba(255,255,255,.52); font-family: ui-monospace, monospace">+420 ms</span>
+        <span style="flex-grow: 1; font-size: 13px; color: rgba(255,255,255,.62)">translateY 18 → 0, 480 ms — paskutinis, todėl akis nusileidžia ant jo</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-radius: 10px; background: #1B1B1B; border: 1px solid rgba(255,255,255,.10)">
+        <span style="width: 210px; flex-shrink: 0; font-size: 14px; font-weight: 600">Teptuko potėpis</span>
+        <span style="width: 96px; flex-shrink: 0; font-size: 13px; color: rgba(255,255,255,.52); font-family: ui-monospace, monospace">+520 / 620 ms</span>
+        <span style="flex-grow: 1; font-size: 13px; color: rgba(255,255,255,.62)">stroke-dashoffset 100 → 0, 760 ms — nubrėžiamas iš kairės</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RULES -->
+  <div style="display: flex; flex-direction: column; gap: 12px">
+    <span style="font-size: 16px; font-weight: 700">Taisyklės</span>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+      <div style="display: flex; flex-direction: column; gap: 5px; padding: 14px 16px; border-radius: 10px; background: #1B1B1B; border: 1px solid rgba(255,255,255,.10)">
+        <span style="font-size: 14px; font-weight: 600">Automatinis sukimas sustoja</span>
+        <span style="font-size: 13px; line-height: 1.5; color: rgba(255,255,255,.60)">Užvedus pelę, gavus fokusą arba paspaudus pauzės mygtuką. Skaitiklis rodo, kuris iš trijų.</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 5px; padding: 14px 16px; border-radius: 10px; background: #1B1B1B; border: 1px solid rgba(255,255,255,.10)">
+        <span style="font-size: 14px; font-weight: 600">Eiga matoma ant kortelės</span>
+        <span style="font-size: 13px; line-height: 1.5; color: rgba(255,255,255,.60)">Aktyvios kortelės apačioje bėga prekės ženklo spalvos juostelė — ne atskiras indikatorius kitame ekrano gale.</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 5px; padding: 14px 16px; border-radius: 10px; background: #1B1B1B; border: 1px solid rgba(255,255,255,.10)">
+        <span style="font-size: 14px; font-weight: 600">Perjungimas neperšoka</span>
+        <span style="font-size: 13px; line-height: 1.5; color: rgba(255,255,255,.60)">Kol vyksta išėjimo fazė, nauji paspaudimai ignoruojami — antraštė niekada nepersidengia su ankstesne.</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 5px; padding: 14px 16px; border-radius: 10px; background: #1B1B1B; border: 1px solid rgba(255,255,255,.10)">
+        <span style="font-size: 14px; font-weight: 600">Spalva seka ženklą</span>
+        <span style="font-size: 13px; line-height: 1.5; color: rgba(255,255,255,.60)">Potėpis, kortelės rėmelis, eigos juostelė ir šiltas švytėjimas dešinėje pereina į #43FFF6, #7DBC2B arba #FFAA00 per 900 ms.</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

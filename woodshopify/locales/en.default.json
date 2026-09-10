@@ -1,0 +1,23 @@
+{
+  "general": {
+    "navigation": "Navigation",
+    "search": "Search",
+    "account": "Account",
+    "cart": "Cart",
+    "browse_all": "Browse all"
+  },
+  "accessibility": {
+    "skip_to_content": "Skip to content"
+  },
+  "products": {
+    "product": {
+      "add_to_cart": "Add to cart",
+      "sold_out": "Sold out"
+    }
+  },
+  "footer": {
+    "newsletter_label": "Sign up for updates",
+    "newsletter_placeholder": "Email address",
+    "newsletter_submit": "Subscribe"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1280, "h": 767, "title": "Hero karuselė", "is_interactive": true },
+    { "file": "Motion.dc.html", "x": 1400, "y": 0, "w": 880, "h": 1010, "title": "Judesio specifikacija", "print": "flow" }
+  ],
+  "annotations": [
+    { "id": "note-try", "x": 0, "y": -150, "w": 460, "text": "Spustelėkite prekės ženklo korteles arba rodykles. Automatinis sukimas — 8 s, sustoja užvedus pelę. Trukmę ir lėtą priartinimą galima keisti virš kadro esančiais jungikliais." }
+  ],
+  "launch": { "view": "canvas" }
+}

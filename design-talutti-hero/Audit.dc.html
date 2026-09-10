@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&display=swap&subset=latin,latin-ext">
+  <style>
+    body { margin: 0; }
+    a { color: #FDB913; }
+    a:hover { color: #ffd15c; }
+    * { box-sizing: border-box; }
+  </style>
+</helmet>
+
+<div style="width: 1000px; min-height: 1290px; padding: 40px 30px 48px 30px; background: #131313; color: #ffffff; font-family: Archivo, system-ui, sans-serif; display: flex; flex-direction: column; gap: 30px">
+
+  <div style="display: flex; flex-direction: column; gap: 8px">
+    <span style="font-size: 11px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: #FDB913">Kas neveikia — dabartinis hero</span>
+    <h2 style="margin: 0; font-family: Anton, 'Arial Narrow', sans-serif; font-size: 40px; line-height: 1; text-transform: uppercase">Šeši trukdžiai, viena priežastis</h2>
+    <p style="margin: 0; max-width: 780px; font-size: 15px; line-height: 1.55; color: rgba(255,255,255,.68); text-wrap: pretty">Hero vienu metu prašo dviejų atskirų sprendimų — <strong style="color: #ffffff">kur valgyti</strong> ir <strong style="color: #ffffff">ką valgyti</strong> — bet nė vienam neduoda tvarkingo valdiklio. Abi sistemos plaukioja ant tos pačios judrios nuotraukos, o galutinio veiksmo mygtuko nėra.</p>
+  </div>
+
+  <!-- ANNOTATED SCREENSHOT -->
+  <div style="position: relative; width: 940px; height: 560px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,.14); background: #0D0D0D">
+    <img src="current-hero.jpg" alt="Dabartinis Talutti hero" style="position: absolute; top: 0; left: 0; width: 940px; height: auto; display: block">
+    <div style="position: absolute; left: 16px; top: 30px; width: 32px; height: 32px; border-radius: 50%; background: #FDB913; color: #101010; font-family: Anton, sans-serif; font-size: 17px; display: flex; align-items: center; justify-content: center">1</div>
+    <div style="position: absolute; left: 16px; top: 104px; width: 32px; height: 32px; border-radius: 50%; background: #FDB913; color: #101010; font-family: Anton, sans-serif; font-size: 17px; display: flex; align-items: center; justify-content: center">2</div>
+    <div style="position: absolute; left: 348px; top: 132px; width: 32px; height: 32px; border-radius: 50%; background: #FDB913; color: #101010; font-family: Anton, sans-serif; font-size: 17px; display: flex; align-items: center; justify-content: center">3</div>
+    <div style="position: absolute; left: 322px; top: 300px; width: 32px; height: 32px; border-radius: 50%; background: #FDB913; color: #101010; font-family: Anton, sans-serif; font-size: 17px; display: flex; align-items: center; justify-content: center">4</div>
+    <div style="position: absolute; left: 268px; top: 466px; width: 32px; height: 32px; border-radius: 50%; background: #FDB913; color: #101010; font-family: Anton, sans-serif; font-size: 17px; display: flex; align-items: center; justify-content: center">5</div>
+    <div style="position: absolute; left: 16px; top: 486px; width: 32px; height: 32px; border-radius: 50%; background: #FDB913; color: #101010; font-family: Anton, sans-serif; font-size: 17px; display: flex; align-items: center; justify-content: center">6</div>
+  </div>
+
+  <!-- FINDINGS -->
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px">
+
+    <div style="display: flex; gap: 14px; padding: 18px; border-radius: 12px; background: #1B1B1B; border: 1px solid rgba(255,255,255,.10)">
+      <span style="flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; background: rgba(253,185,19,.16); color: #FDB913; font-family: Anton, sans-serif; font-size: 14px; display: flex; align-items: center; justify-content: center">1</span>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 15px; font-weight: 700">Miestas ir restoranas — du atskiri valdikliai</span>
+        <span style="font-size: 13.5px; line-height: 1.5; color: rgba(255,255,255,.64)">Mygtukai viršuje, adresai apačioje kairėje, o pasirinkimas dar kartą kartojasi žalioje juostoje. Ta pati būsena trijose vietose, trimis skirtingais pavidalais.</span>
+        <span style="font-size: 13px; font-weight: 600; color: #8DC63F">→ Vienas parinkiklio mygtukas, atidarantis vieną skydelį.</span>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 14px; padding: 18px; border-radius: 12px; background: #1B1B1B; border: 1px solid rgba(255,255,255,.10)">
+      <span style="flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; background: rgba(253,185,19,.16); color: #FDB913; font-family: Anton, sans-serif; font-size: 14px; display: flex; align-items: center; justify-content: center">2</span>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 15px; font-weight: 700">Šeši adresai be jokio konteksto</span>
+        <span style="font-size: 13.5px; line-height: 1.5; color: rgba(255,255,255,.64)">Nuogas sąrašas: nėra darbo laiko, nėra „dirba dabar“, nėra atstumo. Radijo taškeliai žada pasirinkimą, bet pasirinktasis niekuo neišsiskiria. 16 px tekstas ant nuotraukos vietomis nebeįskaitomas.</span>
+        <span style="font-size: 13px; font-weight: 600; color: #8DC63F">→ Kiekviena eilutė: adresas, statusas, valandos, atstumas.</span>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 14px; padding: 18px; border-radius: 12px; background: #1B1B1B; border: 1px solid rgba(255,255,255,.10)">
+      <span style="flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; background: rgba(253,185,19,.16); color: #FDB913; font-family: Anton, sans-serif; font-size: 14px; display: flex; align-items: center; justify-content: center">3</span>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 15px; font-weight: 700">Baltas stačiakampis nieko nereiškia</span>
+        <span style="font-size: 13.5px; line-height: 1.5; color: rgba(255,255,255,.64)">Rėmelis apie taurę atrodo kaip valdiklis — bet nėra spaudžiamas ir nieko nežymi. Dekoras, kuris imituoja sąsają, kainuoja paspaudimą.</span>
+        <span style="font-size: 13px; font-weight: 600; color: #8DC63F">→ Pašalinta.</span>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 14px; padding: 18px; border-radius: 12px; background: #1B1B1B; border: 1px solid rgba(255,255,255,.10)">
+      <span style="flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; background: rgba(253,185,19,.16); color: #FDB913; font-family: Anton, sans-serif; font-size: 14px; display: flex; align-items: center; justify-content: center">4</span>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 15px; font-weight: 700">Rodyklės atskirtos nuo karuselės</span>
+        <span style="font-size: 13.5px; line-height: 1.5; color: rgba(255,255,255,.64)">64 px rodyklės kabo nuotraukos viduryje, o tikroji karuselė — logotipų juosta 250 px žemiau. Du valdikliai vienam darbui, per visą ekraną vienas nuo kito. Nėra nei skaitiklio, nei eigos, nei „braukite“ užuominos.</span>
+        <span style="font-size: 13px; font-weight: 600; color: #8DC63F">→ Rodyklės perkeltos prie pačios juostos.</span>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 14px; padding: 18px; border-radius: 12px; background: #1B1B1B; border: 1px solid rgba(255,255,255,.10)">
+      <span style="flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; background: rgba(253,185,19,.16); color: #FDB913; font-family: Anton, sans-serif; font-size: 14px; display: flex; align-items: center; justify-content: center">5</span>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 15px; font-weight: 700">Perjungimas neduoda atlygio</span>
+        <span style="font-size: 13.5px; line-height: 1.5; color: rgba(255,255,255,.64)">Pasirinkus kitą prekės ženklą pasikeičia tik mažas logotipo rėmelis — nuotrauka, antraštė ir tekstas lieka tie patys. Karuselė atrodo sugedusi.</span>
+        <span style="font-size: 13px; font-weight: 600; color: #8DC63F">→ Keičiasi visa scena: nuotrauka, antraštė, tekstas, CTA.</span>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 14px; padding: 18px; border-radius: 12px; background: #1B1B1B; border: 1px solid rgba(255,255,255,.10)">
+      <span style="flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; background: rgba(253,185,19,.16); color: #FDB913; font-family: Anton, sans-serif; font-size: 14px; display: flex; align-items: center; justify-content: center">6</span>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 15px; font-weight: 700">Nėra pagrindinio veiksmo</span>
+        <span style="font-size: 13.5px; line-height: 1.5; color: rgba(255,255,255,.64)">Vienintelė paskata — pilka „Menu ↓“ nuoroda kampe. Žmogus pasirinko miestą ir prekės ženklą, o toliau turi pats slinkti ir ieškoti.</span>
+        <span style="font-size: 13px; font-weight: 600; color: #8DC63F">→ Vienas ryškus CTA: „Žiūrėti meniu“.</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

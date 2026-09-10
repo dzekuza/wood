@@ -1,0 +1,63 @@
+{
+  "sections": {
+    "header": {
+      "name": "Header",
+      "settings": {
+        "logo": "Logo",
+        "menu": "Menu",
+        "background": "Background color"
+      }
+    },
+    "footer": {
+      "name": "Footer",
+      "settings": {
+        "description": "Description",
+        "menu": "Menu",
+        "show_newsletter": "Show newsletter signup",
+        "background": "Background color",
+        "text_color": "Text color"
+      }
+    },
+    "hero": {
+      "name": "Hero",
+      "settings": {
+        "image": "Image",
+        "eyebrow": "Eyebrow",
+        "heading": "Heading",
+        "text": "Text",
+        "button_label": "Button label",
+        "button_url": "Button link",
+        "background": "Background color"
+      }
+    },
+    "featured_collection": {
+      "name": "Featured collection",
+      "settings": {
+        "eyebrow": "Eyebrow",
+        "title": "Heading",
+        "collection": "Collection",
+        "products_to_show": "Products to show"
+      }
+    },
+    "main_product": {
+      "name": "Product information"
+    },
+    "main_collection": {
+      "name": "Collection"
+    }
+  },
+  "settings": {
+    "colors": {
+      "name": "Colors",
+      "primary": "Primary",
+      "accent": "Accent",
+      "surface": "Surface",
+      "dark": "Dark"
+    },
+    "typography": {
+      "name": "Typography",
+      "heading": "Heading font",
+      "body": "Body font"
+    }
+  }
+}

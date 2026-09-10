@@ -1,0 +1,31 @@
+:root {
+  --primary: #4a2f1f;
+  --accent: #c9a27a;
+  --surface: #f3efea;
+  --dark: #2a2a2a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Assistant', sans-serif;
+  color: var(--dark);
+  background: var(--surface);
+}
+
+.skip-to-content {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+}
+
+.skip-to-content:focus {
+  left: 16px;
+  top: 16px;
+  z-index: 999;
+  background: #fff;
+  padding: 8px 16px;
+}

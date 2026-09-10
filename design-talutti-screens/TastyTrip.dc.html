@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&display=swap&subset=latin,latin-ext">
+  <style>
+    body { margin: 0; }
+    a { color: #43FFF6; text-decoration: none; }
+    a:hover { color: #ffffff; }
+    * { box-sizing: border-box; }
+  </style>
+</helmet>
+
+<div style="position: relative; width: 1280px; height: 767px; overflow: hidden; background: #1A1A1A; font-family: Anton, 'Arial Narrow', 'Haettenschweiler', sans-serif; color: #ffffff">
+
+  <!-- SCENE -->
+  <img src="screen-tasty.jpg" alt="" style="position: absolute; left: -47px; top: -28px; width: 1327px; height: 795px; object-fit: cover; display: block">
+
+  <!-- Ellipse 2 / Ellipse 1 — the two soft glows -->
+  <div style="position: absolute; left: -275px; top: -183px; width: 920px; height: 920px; border-radius: 50%; background: radial-gradient(circle, rgba(255,196,92,.16) 0%, rgba(255,196,92,0) 62%); pointer-events: none"></div>
+  <div style="position: absolute; left: 807px; top: -195px; width: 788px; height: 788px; border-radius: 50%; background: radial-gradient(circle, rgba(255,214,130,.20) 0%, rgba(255,214,130,0) 60%); pointer-events: none"></div>
+
+  <!-- bottom-left readability scrim for the headline -->
+  <div style="position: absolute; inset: 0; background: linear-gradient(105deg, rgba(12,10,8,.62) 0%, rgba(12,10,8,.20) 38%, rgba(12,10,8,0) 60%); pointer-events: none"></div>
+  <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(12,10,8,.42) 0%, rgba(12,10,8,0) 22%, rgba(12,10,8,0) 62%, rgba(12,10,8,.50) 100%); pointer-events: none"></div>
+
+  <!-- Rectangle 2/3 — the framing outline over the drink -->
+  <div style="position: absolute; left: 521px; top: 184px; width: 239px; height: 399px; border: 2px solid rgba(255,255,255,.85); border-radius: 2px; pointer-events: none"></div>
+
+  <!-- Frame 50 — top bar -->
+  <div style="position: absolute; left: 60px; top: 54px; width: 1160px; height: 56px">
+    <div style="position: absolute; left: 0; top: 0; display: flex; align-items: center; gap: 16px">
+      <button onClick="{{ noop }}" style="display: flex; align-items: center; justify-content: center; padding: 16px 32px; border-radius: 8px; background: rgba(0,0,0,.3); border: 2px solid #FDB913; cursor: pointer">
+        <span style="font-family: Anton, 'Arial Narrow', sans-serif; font-size: 20px; line-height: 1; text-transform: uppercase; color: #FDB913; white-space: nowrap">Kaunas</span>
+      </button>
+      <button onClick="{{ noop }}" style="display: flex; align-items: center; justify-content: center; padding: 16px 32px; border-radius: 8px; background: rgba(0,0,0,.5); border: 2px solid #ffffff; cursor: pointer">
+        <span style="font-family: Anton, 'Arial Narrow', sans-serif; font-size: 20px; line-height: 1; text-transform: uppercase; color: rgba(255,255,255,.9); white-space: nowrap">Vilnius</span>
+      </button>
+    </div>
+    <img src="talutti-wordmark.svg" alt="Talutti" style="position: absolute; left: 528.99px; top: 6px; width: 102.15px; height: 40px; display: block">
+    <button onClick="{{ noop }}" style="position: absolute; left: 1120px; top: 16px; width: 38px; height: 24px; display: flex; flex-direction: column; justify-content: space-between; background: none; border: 0; padding: 0; cursor: pointer">
+      <span style="display: block; width: 100%; height: 4px; border-radius: 2px; background: #ffffff"></span>
+      <span style="display: block; width: 100%; height: 4px; border-radius: 2px; background: #ffffff"></span>
+      <span style="display: block; width: 100%; height: 4px; border-radius: 2px; background: #ffffff"></span>
+    </button>
+  </div>
+
+  <!-- brand script logotype -->
+  <img src="script-tasty.svg" alt="TastyTrip" style="position: absolute; left: 497px; top: 127px; width: 272px; height: 64px; display: block">
+
+  <!-- Frame 11 / Frame 10 — carousel arrows -->
+  <button onClick="{{ noop }}" style="position: absolute; left: 489px; top: 416px; width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(0,0,0,.28); border: 2px solid rgba(255,255,255,.9); cursor: pointer"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 5l-7 7 7 7"></path></svg></button>
+  <button onClick="{{ noop }}" style="position: absolute; left: 792px; top: 352px; width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(0,0,0,.28); border: 2px solid rgba(255,255,255,.9); cursor: pointer"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"></path></svg></button>
+
+  <!-- headline + brush underline -->
+  <h1 style="position: absolute; left: 62px; top: 538px; width: 411px; margin: 0; font-family: Anton, 'Arial Narrow', sans-serif; font-size: 48px; line-height: 1.2; letter-spacing: -0.48px; text-transform: uppercase; color: #ffffff">Kelionė prasideda nuo pirmo kąsnio</h1>
+  <div style="position: absolute; left: 47.41px; top: 702.87px; width: 377.25px; height: 30.85px; pointer-events: none"><svg width="378" height="31" viewBox="0 0 378 31" fill="none" style="display: block"><path d="M3 21.5C64 9.5 138 3.5 214 4.5c52 .7 104 4.6 158 12.4" stroke="#43FFF6" stroke-width="9" stroke-linecap="round"></path><path d="M27 28c58-8 121-11.5 186-10.6 46 .6 92 3.4 138 8.6" stroke="#43FFF6" stroke-width="4.5" stroke-linecap="round" opacity=".72"></path></svg></div>
+
+  <!-- Frame 13 — Meniu -->
+  <button onClick="{{ noop }}" style="position: absolute; left: 583px; top: 553px; width: 112px; height: 52px; display: flex; align-items: center; justify-content: center; padding: 16px 32px; border-radius: 8px; background: #000000; border: 0; cursor: pointer">
+    <span style="font-family: Anton, 'Arial Narrow', sans-serif; font-size: 20px; line-height: 1; text-transform: uppercase; color: rgba(255,255,255,.9); white-space: nowrap">Meniu</span>
+  </button>
+
+  <!-- Frame 9 — restaurant type chips -->
+  <div style="position: absolute; left: 792px; top: 638px; width: 444.04px; height: 96.14px">
+      <div style="position: absolute; left: 0.0px; top: 0; width: 137.35px; height: 96.14px; display: flex; align-items: center; justify-content: center; padding: 12px 14px; border-radius: 8px; background: rgba(0,0,0,.55); border: 2px solid #43FFF6">
+        <img src="brand-tastytrip.svg" alt="" style="max-width: 100%; max-height: 100%; width: auto; height: auto; display: block; opacity: 1">
+      </div>
+      <div style="position: absolute; left: 153.35px; top: 0; width: 137.35px; height: 96.14px; display: flex; align-items: center; justify-content: center; padding: 12px 14px; border-radius: 8px; background: rgba(0,0,0,.42); border: 2px solid rgba(255,255,255,.22)">
+        <img src="brand-texmex.svg" alt="" style="max-width: 100%; max-height: 100%; width: auto; height: auto; display: block; opacity: .72">
+      </div>
+      <div style="position: absolute; left: 306.69px; top: 0; width: 137.35px; height: 96.14px; display: flex; align-items: center; justify-content: center; padding: 12px 14px; border-radius: 8px; background: rgba(0,0,0,.42); border: 2px solid rgba(255,255,255,.22)">
+        <img src="brand-bakes.svg" alt="" style="max-width: 100%; max-height: 100%; width: auto; height: auto; display: block; opacity: .72">
+      </div>
+  </div>
+
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{"$preview":{"width":1280,"height":767}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { noop: () => {} };
+  }
+}
+</script>
+</body>
+</html>

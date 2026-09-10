@@ -1,0 +1,82 @@
+{% doc %}
+  Renders a product card with image, title, and price.
+  @param {product} product - The product to render
+  @example
+  {% render 'product-card', product: product %}
+{% enddoc %}
+
+<div class="product-card">
+  <a href="{{ product.url }}" class="product-card__media">
+    {%- if product.featured_image -%}
+      {{ product.featured_image | image_url: width: 600 | image_tag: loading: 'lazy', widths: '300,450,600', sizes: '(min-width: 990px) 25vw, 50vw' }}
+    {%- endif -%}
+    {%- unless product.available -%}
+      <span class="product-card__badge">{{ 'products.product.sold_out' | t }}</span>
+    {%- endunless -%}
+  </a>
+
+  <div class="product-card__info">
+    <a href="{{ product.url }}" class="product-card__title">{{ product.title }}</a>
+    <p class="product-card__price">
+      {%- if product.compare_at_price > product.price -%}
+        <span class="product-card__price--sale">{{ product.price | money }}</span>
+        <s class="product-card__price--compare">{{ product.compare_at_price | money }}</s>
+      {%- else -%}
+        {{ product.price | money }}
+      {%- endif -%}
+    </p>
+  </div>
+</div>
+
+{% stylesheet %}
+.product-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.product-card__media {
+  position: relative;
+  display: block;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #f3efea;
+}
+
+.product-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-card__badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #2a2a2a;
+  color: #fff;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.product-card__title {
+  color: inherit;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.product-card__price {
+  margin: 0;
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.product-card__price--compare {
+  opacity: 0.5;
+}
+{% endstylesheet %}

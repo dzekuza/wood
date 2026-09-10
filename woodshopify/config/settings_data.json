@@ -1,0 +1,13 @@
+{
+  "current": "Default",
+  "presets": {
+    "Default": {
+      "color_primary": "#4a2f1f",
+      "color_accent": "#c9a27a",
+      "color_surface": "#f3efea",
+      "color_dark": "#2a2a2a",
+      "font_heading": "assistant_n4",
+      "font_body": "assistant_n4"
+    }
+  }
+}
