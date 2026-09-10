@@ -288,32 +288,72 @@ export function ProductForm({
             </span>
           </div>
           <div className="product-opt-row">
-            {options.map(({option, variant}) => (
-              <button
-                key={option.key}
-                type="button"
-                className="product-optn"
-                data-selected={
-                  selectedUpsells[group.id] === option.key ? 'true' : 'false'
-                }
-                disabled={Boolean(option.variantTitle) && !variant}
-                onClick={() => onUpsellChange(group.id, option.key)}
-              >
-                {formatMeasurement(option.label, unit, group.label)}
-                {option.variantTitle ? (
-                  // A surcharge variant priced at 0 adds nothing, so "+£0.00"
-                  // is noise on every option — only a real uplift is shown.
-                  variant &&
-                  parseFloat(variant.price.amount) > 0 && (
-                    <span className="product-opt-surcharge">
-                      +<Money as="span" data={variant.price} />
+            {options.map(({option, variant}) => {
+              const image = variant?.image;
+              const surcharge =
+                option.variantTitle && variant && parseFloat(variant.price.amount) > 0
+                  ? variant.price
+                  : null;
+
+              // Same swatch-tile treatment as an image-backed colour variant
+              // option (e.g. Oil Colour) — an upsell option becomes one the
+              // moment its own variant carries an image in Shopify Admin, no
+              // separate opt-in needed.
+              if (image) {
+                return (
+                  <button
+                    key={option.key}
+                    type="button"
+                    className="product-optn"
+                    data-selected={
+                      selectedUpsells[group.id] === option.key ? 'true' : 'false'
+                    }
+                    disabled={Boolean(option.variantTitle) && !variant}
+                    onClick={() => onUpsellChange(group.id, option.key)}
+                  >
+                    <span className="product-swatch-wrap">
+                      <span className="product-swatch product-swatch-has-image">
+                        <img src={image.url} alt={image.altText ?? option.label} />
+                      </span>
+                      <span className="product-swatch-name">
+                        {formatMeasurement(option.label, unit, group.label)}
+                      </span>
                     </span>
-                  )
-                ) : (
-                  <span className="product-opt-surcharge">Free</span>
-                )}
-              </button>
-            ))}
+                    {surcharge && (
+                      <span className="product-opt-surcharge-badge">
+                        +<Money as="span" data={surcharge} />
+                      </span>
+                    )}
+                  </button>
+                );
+              }
+
+              return (
+                <button
+                  key={option.key}
+                  type="button"
+                  className="product-optn"
+                  data-selected={
+                    selectedUpsells[group.id] === option.key ? 'true' : 'false'
+                  }
+                  disabled={Boolean(option.variantTitle) && !variant}
+                  onClick={() => onUpsellChange(group.id, option.key)}
+                >
+                  {formatMeasurement(option.label, unit, group.label)}
+                  {option.variantTitle ? (
+                    // A surcharge variant priced at 0 adds nothing, so "+£0.00"
+                    // is noise on every option — only a real uplift is shown.
+                    surcharge && (
+                      <span className="product-opt-surcharge">
+                        +<Money as="span" data={surcharge} />
+                      </span>
+                    )
+                  ) : (
+                    <span className="product-opt-surcharge">Free</span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
         );

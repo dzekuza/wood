@@ -3,6 +3,22 @@ tags: [meta, changelog]
 updated: 2026-09-10
 ---
 
+## 2026-09-10 — Upsell (add-on) options render as photo swatch tiles when their variant has an image
+
+The client added Coat Racks as an add-on to the Solid Oak Mantle Beam product
+and asked how to give its colour options (Black/White/Light Grey) the same
+photo-tile look as Oil Colour. Turned out the image data was already being
+fetched — `PRODUCT_VARIANT_FRAGMENT` (reused inside `addonProducts`'s nested
+`variants` selection) already selects `image`, it just wasn't rendered.
+`ProductForm` now checks `variant?.image` per upsell option and renders the
+existing `.product-swatch-has-image` tile markup instead of a plain text
+button whenever it's set — zero GraphQL changes. A surcharge (if any) becomes
+a small corner badge (`.product-opt-surcharge-badge`) since the tile has no
+room for inline text. See [[../frontend/components/common|common
+components]] for the full mechanism, and set it per-variant the same way as
+any other variant image: Shopify Admin → the add-on product → the specific
+colour variant → variant image.
+
 ## 2026-09-10 — About page: oversized `.story-card h3`, stacked stat panel
 
 Two unrelated layout bugs on the About page (`.story-*` classes, shared by

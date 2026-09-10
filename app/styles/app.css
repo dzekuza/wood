@@ -3251,6 +3251,20 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
   white-space: normal;
 }
 .product-optn[data-selected="true"]:has(.product-swatch-has-image) { box-shadow: 0 0 0 2px var(--cwf-ink-strong); }
+/* A priced upsell option (e.g. a Coat Racks colour with a surcharge variant)
+   still needs its uplift visible even once it's a photo tile — free options
+   (the common case) show nothing extra, matching plain colour swatches. */
+.product-opt-surcharge-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  padding: 3px 7px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, .92);
+  color: var(--cwf-ink-strong);
+  font-size: 10px;
+  font-weight: 700;
+}
 @media (hover: hover) and (pointer: fine) {
   .product-optn:has(.product-swatch-has-image):hover { transform: scale(1.05); }
 }
