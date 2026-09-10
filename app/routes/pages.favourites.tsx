@@ -1,52 +1,74 @@
-import {Link} from 'react-router';
+import {Link, useLoaderData} from 'react-router';
 import {Money} from '@shopify/hydrogen';
 import type {CurrencyCode} from '@shopify/hydrogen/storefront-api-types';
+import type {Route} from './+types/pages.favourites';
 import {useFavourites} from '~/hooks/useFavourites';
 import type {FavouriteProduct} from '~/hooks/useFavourites';
+import {EditableText} from '~/components/EditableText';
+import {EditToolbar} from '~/components/EditToolbar';
+import {EditToolbarProvider} from '~/components/EditToolbarProvider';
+import {FAVOURITES_SLUG} from '~/lib/pageContent';
+import {loadPageContentState} from '~/lib/pageContent.server';
 
 export const meta = () => [
   {title: 'Favourites — CraftWoodFurniture'},
   {name: 'description', content: 'Your saved pieces from CraftWoodFurniture.'},
 ];
 
+export async function loader({context, request}: Route.LoaderArgs) {
+  return {
+    pageContent: await loadPageContentState(context, request, FAVOURITES_SLUG),
+  };
+}
+
 export default function FavouritesPage() {
   const {favourites, removeFavourite} = useFavourites();
+  const {pageContent} = useLoaderData<typeof loader>();
 
   return (
-    <div className="archive-page">
-      <div className="archive-hero">
-        <div className="archive-wrap">
-          <div className="archive-hero-inner">
-            <h1 className="archive-hero-title">Your <em>Favourites</em></h1>
-          </div>
-          <p className="archive-hero-blurb">
-            Pieces you&rsquo;ve saved. Come back any time — they&rsquo;ll be here.
-          </p>
-        </div>
-      </div>
-
-      <section className="fav-section">
-        <div className="archive-wrap">
-          {favourites.length === 0 ? (
-            <div className="fav-empty">
-              <svg className="fav-empty-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-              <h2>Nothing saved yet</h2>
-              <p>Browse our collection and tap the heart icon to save pieces you love.</p>
-              <Link to="/collections/all" className="btn btn-primary btn-pill fav-empty-cta">Browse all pieces</Link>
+    <EditToolbarProvider slug={FAVOURITES_SLUG} initialState={pageContent} label="Favourites page copy">
+      <div className="archive-page">
+        <div className="archive-hero">
+          <div className="archive-wrap">
+            <div className="archive-hero-inner">
+              <EditableText as="h1" className="archive-hero-title" field="favourites.hero.heading">
+                Your Favourites
+              </EditableText>
             </div>
-          ) : (
-            <>
-              <p className="fav-count">{favourites.length} {favourites.length === 1 ? 'piece' : 'pieces'} saved</p>
-              <div className="products-grid">
-                {favourites.map((item) => (
-                  <FavCard key={item.id} item={item} onRemove={removeFavourite} />
-                ))}
-              </div>
-            </>
-          )}
+            <EditableText as="p" className="archive-hero-blurb" field="favourites.hero.blurb">
+              Pieces you&rsquo;ve saved. Come back any time — they&rsquo;ll be here.
+            </EditableText>
+          </div>
         </div>
-      </section>
-    </div>
+
+        <section className="fav-section">
+          <div className="archive-wrap">
+            {favourites.length === 0 ? (
+              <div className="fav-empty">
+                <svg className="fav-empty-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                <EditableText as="h2" field="favourites.empty.heading">
+                  Nothing saved yet
+                </EditableText>
+                <EditableText as="p" field="favourites.empty.blurb">
+                  Browse our collection and tap the heart icon to save pieces you love.
+                </EditableText>
+                <Link to="/collections/all" className="btn btn-primary btn-pill fav-empty-cta">Browse all pieces</Link>
+              </div>
+            ) : (
+              <>
+                <p className="fav-count">{favourites.length} {favourites.length === 1 ? 'piece' : 'pieces'} saved</p>
+                <div className="products-grid">
+                  {favourites.map((item) => (
+                    <FavCard key={item.id} item={item} onRemove={removeFavourite} />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </section>
+      </div>
+      <EditToolbar />
+    </EditToolbarProvider>
   );
 }
 

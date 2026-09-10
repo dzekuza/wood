@@ -19,6 +19,7 @@ import {SITE_NAME} from '~/lib/site';
 import {ProductItem} from '~/components/ProductItem';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {ReviewsSection, type ProductReview} from '~/components/ReviewsSection';
+import {Lightbox} from '~/components/Lightbox';
 import {buildUpsellGroups} from '~/lib/upsells';
 import {Reveal} from '~/components/animate-ui/Reveal';
 import {StaggerGroup, StaggerItem} from '~/components/animate-ui/StaggerGroup';
@@ -106,6 +107,15 @@ export default function Product() {
       return JSON.parse(product.metafield?.value ?? '[]') as ProductReview[];
     } catch {
       return [];
+    }
+  })();
+
+  const sliderOptionOverrides: string[] | null = (() => {
+    try {
+      const value = product.sliderOptions?.value;
+      return value ? (JSON.parse(value) as string[]) : null;
+    } catch {
+      return null;
     }
   })();
 
@@ -216,6 +226,21 @@ export default function Product() {
   type GalleryItem = (typeof galleryItems)[number];
   const [activeItem, setActiveItem] = useState<GalleryItem | null>(galleryItems[0] ?? null);
   const [carouselIndex, setCarouselIndex] = useState(0);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+
+  const lightboxImages = useMemo(
+    () =>
+      galleryItems
+        .filter((item): item is Extract<GalleryItem, {type: 'image'}> => item.type === 'image')
+        .map((item) => ({src: item.image.url, alt: item.image.altText || title})),
+    [galleryItems, title],
+  );
+
+  function openLightboxFor(item: GalleryItem | null | undefined) {
+    if (!item || item.type !== 'image') return;
+    const index = lightboxImages.findIndex((img) => img.src === item.image.url);
+    if (index !== -1) setLightboxIndex(index);
+  }
   const [descExpanded, setDescExpanded] = useState(false);
   const [showSticky, setShowSticky] = useState(false);
   const [viewingCount, setViewingCount] = useState<number | null>(null);
@@ -320,7 +345,14 @@ export default function Product() {
                     {item.type === 'model' ? (
                       <ProductModel3D sources={item.sources} alt={item.alt ?? title} />
                     ) : (
-                      <ProductImage image={item.image} />
+                      <button
+                        type="button"
+                        className="pdp-zoom-btn reset"
+                        onClick={() => openLightboxFor(item)}
+                        aria-label="View full image"
+                      >
+                        <ProductImage image={item.image} />
+                      </button>
                     )}
                     {selectedVariant?.availableForSale === false && (
                       <span className="pdp-ribbon">Sold Out</span>
@@ -395,13 +427,29 @@ export default function Product() {
                 {activeItem?.type === 'model' ? (
                   <ProductModel3D sources={activeItem.sources} alt={activeItem.alt ?? title} />
                 ) : (
-                  <ProductImage image={activeItem?.image ?? selectedVariant?.image} />
+                  <button
+                    type="button"
+                    className="pdp-zoom-btn reset"
+                    onClick={() => openLightboxFor(activeItem)}
+                    aria-label="View full image"
+                  >
+                    <ProductImage image={activeItem?.image ?? selectedVariant?.image} />
+                  </button>
                 )}
                 {selectedVariant?.availableForSale === false && (
                   <span className="pdp-ribbon">Sold Out</span>
                 )}
               </div>
             </div>
+
+            {lightboxIndex !== null && (
+              <Lightbox
+                images={lightboxImages}
+                index={lightboxIndex}
+                onClose={() => setLightboxIndex(null)}
+                onNavigate={setLightboxIndex}
+              />
+            )}
 
             {/* Info */}
             <StaggerGroup className="pdp-info">
@@ -473,6 +521,7 @@ export default function Product() {
                     onUpsellChange={handleUpsellChange}
                     quantity={quantity}
                     onQuantityChange={setQuantity}
+                    sliderOptionOverrides={sliderOptionOverrides}
                   />
                 </div>
               </StaggerItem>
@@ -764,6 +813,9 @@ const PRODUCT_FRAGMENT = `#graphql
       }
     }
     metafield(namespace: "reviews", key: "product_reviews") {
+      value
+    }
+    sliderOptions: metafield(namespace: "custom", key: "slider_options") {
       value
     }
     addonProducts: metafield(namespace: "custom", key: "addon_products") {

@@ -1,4 +1,5 @@
 import {Link} from 'react-router';
+import {EditableText} from '~/components/EditableText';
 
 const BENEFITS = [
   {icon: 'ti-shield-check', title: 'Durability'},
@@ -9,28 +10,37 @@ const BENEFITS = [
   {icon: 'ti-certificate', title: 'Built to Last'},
 ];
 
+const HEADING_LINES = ['Six reasons our furniture', 'outlasts the trend'];
+
 export function OakBenefits() {
   return (
     <section className="demo-benefits">
       <div className="demo-benefits-head">
-        <p className="demo-benefits-eyebrow">Why Solid Oak</p>
+        <EditableText as="p" className="demo-benefits-eyebrow" field="benefits.eyebrow">
+          Why Solid Oak
+        </EditableText>
         <h2 className="demo-benefits-heading">
-          Six reasons our furniture
-          <br />
-          outlasts the trend
+          {HEADING_LINES.map((line, i) => (
+            <span key={i}>
+              <EditableText field={`benefits.heading.${i}`}>{line}</EditableText>
+              {i < HEADING_LINES.length - 1 && <br />}
+            </span>
+          ))}
         </h2>
         <Link to="/collections/all" className="demo-btn demo-btn-solid-dark">
-          Shop All
+          <EditableText field="benefits.ctaLabel">Shop All</EditableText>
         </Link>
       </div>
 
       <div className="demo-benefits-grid">
-        {BENEFITS.map((benefit) => (
+        {BENEFITS.map((benefit, index) => (
           <div className="demo-benefit-card" key={benefit.title}>
             <span className="demo-benefit-icon">
               <i className={`ti ${benefit.icon}`} />
             </span>
-            <p className="demo-benefit-title">{benefit.title}</p>
+            <EditableText as="p" className="demo-benefit-title" field={`benefits.items.${index}.title`}>
+              {benefit.title}
+            </EditableText>
           </div>
         ))}
       </div>

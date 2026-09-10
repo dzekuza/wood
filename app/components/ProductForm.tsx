@@ -11,6 +11,7 @@ import {useFavourites} from '~/hooks/useFavourites';
 import {useUnitSystem} from '~/hooks/useUnitSystem';
 import {UnitToggle} from '~/components/UnitToggle';
 import {formatMeasurement} from '~/lib/units';
+import {isSliderOption} from '~/lib/productOptionDisplay';
 import type {UpsellGroupData} from '~/lib/upsells';
 import {
   getSwatchTexture,
@@ -28,6 +29,7 @@ export function ProductForm({
   onUpsellChange,
   quantity,
   onQuantityChange,
+  sliderOptionOverrides,
 }: {
   productOptions: MappedProductOptions[];
   selectedVariant: ProductFragment['selectedOrFirstAvailableVariant'];
@@ -40,6 +42,8 @@ export function ProductForm({
   onUpsellChange: (groupId: string, optionKey: string) => void;
   quantity: number;
   onQuantityChange: (quantity: number) => void;
+  /** From the product's `custom.slider_options` metafield — see [[productOptionDisplay]]. */
+  sliderOptionOverrides?: string[] | null;
 }) {
   const navigate = useNavigate();
   const {open} = useAside();
@@ -102,13 +106,11 @@ export function ProductForm({
             (v) => v.swatch?.color || v.swatch?.image?.previewImage?.url,
           );
 
-        // Length-type options (Length, Beam Length, etc.) render as a slider/progress bar
-        const isLengthOption =
-          optionNameLower === 'length' ||
-          optionNameLower.includes('length') ||
-          optionNameLower.includes('lenght');
-
-        if (!hasSwatches && isLengthOption) {
+        // Options named in SLIDER_OPTION_NAMES (or the product's
+        // custom.slider_options metafield, when set) render as a
+        // slider/progress bar; every other non-swatch option renders as a
+        // dropdown below.
+        if (!hasSwatches && isSliderOption(option.name, sliderOptionOverrides)) {
           const values = option.optionValues;
           const selectedIndex = values.findIndex((v) => v.selected);
           const percent =

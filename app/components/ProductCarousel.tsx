@@ -1,6 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
 import {Link} from 'react-router';
 import {ProductItem} from '~/components/ProductItem';
+import {EditableText} from '~/components/EditableText';
 import type {PopularProductItemLandingOakFragment} from 'storefrontapi.generated';
 
 const PER_PAGE = 4;
@@ -52,7 +53,9 @@ export function ProductCarousel({
 
   return (
     <section className="demo-popular">
-      <h2 className="demo-popular-heading">{heading}</h2>
+      <EditableText as="h2" className="demo-popular-heading" field="popular.heading">
+        {heading}
+      </EditableText>
 
       {populatedTabs.length > 1 && (
         <div className="demo-popular-tabs">
@@ -118,7 +121,7 @@ export function ProductCarousel({
       )}
 
       <Link to={exploreTo} className="demo-btn demo-btn-outline-dark">
-        Explore Categories
+        <EditableText field="popular.exploreLabel">Explore Categories</EditableText>
       </Link>
     </section>
   );

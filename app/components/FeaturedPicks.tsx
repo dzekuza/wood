@@ -1,5 +1,6 @@
 import {Link} from 'react-router';
 import type {PopularProductItemLandingOakFragment} from 'storefrontapi.generated';
+import {EditableText} from '~/components/EditableText';
 
 const THEMES = ['sage', 'oak', 'walnut'] as const;
 
@@ -12,7 +13,9 @@ export function FeaturedPicks({
 
   return (
     <section className="demo-featured">
-      <h2 className="demo-popular-heading">Most popular</h2>
+      <EditableText as="h2" className="demo-popular-heading" field="featured.heading">
+        Most popular
+      </EditableText>
 
       <div className="demo-featured-grid">
         {products.map((product, index) => {
@@ -33,9 +36,17 @@ export function FeaturedPicks({
                 )}
               </div>
               <div className="demo-featured-body">
-                <p className="demo-featured-eyebrow">Handcrafted in solid oak</p>
+                <EditableText as="p" className="demo-featured-eyebrow" field="featured.eyebrow">
+                  Handcrafted in solid oak
+                </EditableText>
                 <p className="demo-featured-title">{product.title}</p>
-                <span className="demo-btn demo-btn-outline-light demo-btn-sm">Shop now</span>
+                <EditableText
+                  as="span"
+                  className="demo-btn demo-btn-outline-light demo-btn-sm"
+                  field="featured.ctaLabel"
+                >
+                  Shop now
+                </EditableText>
               </div>
             </Link>
           );

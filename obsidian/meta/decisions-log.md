@@ -10,6 +10,119 @@ consequences. Use [[templates/adr-note]] for new entries. Newest first.
 
 ---
 
+## ADR-0014 — Edit toolbar rolled out to every content page, not just the homepage
+
+- **Status:** Accepted
+- **Date:** 2026-09-10
+
+**Context.** The inline copy-editing toolbar ([[../frontend/edit-toolbar]])
+only ever ran on `_index.tsx`. Every other page — About, Contact, the
+Categories index, All Products, Favourites, and `landing-oak` — either had no
+`EditableText` calls at all, or (for `landing-oak`, which reuses
+`HeroCarousel`/`CraftmanshipProcess`) had them silently degrade to plain text
+for lack of an `EditToolbarProvider` ancestor. The client asked for the same
+edit-in-place capability everywhere there is real marketing copy.
+
+**Decision.** Wire the existing, already-generic mechanism onto six more
+routes rather than build anything new: `pageContent.server.ts`,
+`EditToolbarProvider`, and `EditableText` take a `slug` and otherwise know
+nothing about which page they're on — `loadPageContentState` in a route's
+loader plus wrapping the page in `<EditToolbarProvider slug={...}>` is the
+entire integration cost per page, confirmed against the actual code before
+writing anything (see [[../frontend/edit-toolbar]] for the resulting slug/id
+table). Added six slug constants to the client-safe `pageContent.ts`
+(`ABOUT_SLUG`, `CONTACT_SLUG`, `COLLECTIONS_INDEX_SLUG`,
+`COLLECTIONS_ALL_SLUG`, `FAVOURITES_SLUG`, `LANDING_OAK_SLUG`), each its own
+independent `page_content` metaobject entry — Shopify's handle-based
+`metaobjectUpsert` auto-creates the entry on first edit, so this needed zero
+Admin-side setup beyond what already existed for the homepage.
+
+**Scope, decided with the client up front** (asked via two direct questions
+rather than assumed): product/collection/search pages stay out, since their
+copy is live Shopify catalog data (titles, descriptions, prices), not
+hand-authored marketing copy — there is nothing to override. Policy pages
+(`policies.*.tsx`) stay out too, on the client's own call: they render
+Shopify's Shop Policy text, edited in Admin → Settings → Policies, and legal
+copy shouldn't be casually rewritten from a floating toolbar. Everything else
+with real hand-written copy went in, including `landing-oak` and its six
+exclusive components (`ProductCarousel`, `FeaturedPicks`, `OakBenefits`,
+`ValueMarquee`, `CraftStats`, `FaqAccordion`), none of which had ever carried
+an `EditableText` call before this.
+
+**Consequences / things worth knowing:**
+- A heading that used an inline `<em>` for a stressed word (About's
+  "Cotswolds", Contact's "room in mind", Categories' "Categories") lost that
+  emphasis — `EditableText`'s `children` prop is a plain `string`
+  (contentEditable can't safely round-trip arbitrary nested markup), so those
+  headings are now flat text. This mirrors the homepage's own convention: a
+  multi-line hero heading is already split into one `EditableText` per line
+  (`hero.n.heading.i`) rather than carrying inline markup, for the same
+  reason.
+- `ValueMarquee`'s track duplicates its four value props back-to-back for a
+  seamless CSS scroll loop. Both copies of each prop share **one** field id
+  (`values.{i % 4}`) rather than getting independent ids per rendered `<span>`
+  — otherwise editing the first copy would visibly desync from the second
+  mid-scroll.
+- Verified live against a running dev server (with the site-password gate
+  unlocked) rather than trusting the read-through: fetched all six new routes
+  plus the homepage, grepped for the `edit-toolbar` wrapper element (present
+  on every one) and spot-checked rendered copy text, and confirmed the dev
+  server log carried none of the "server-only module referenced by client"
+  errors the mechanism is known to be able to trigger (see
+  [[../frontend/edit-toolbar]]'s own warning about `.server` imports reaching
+  a component).
+
+---
+
+## ADR-0013 — Per-product slider/dropdown choice lives in a merchant-editable metafield, not just code
+
+- **Status:** Accepted
+- **Date:** 2026-09-10
+
+**Context.** Which non-swatch PDP variant option renders as the length
+slider vs. a dropdown was a coded allowlist (`SLIDER_OPTION_NAMES` in
+`app/lib/productOptionDisplay.ts`, see [[changelog]] earlier 2026-09-10
+entry). That fixed the immediate bug (compound dimension options wrongly
+sliding) but still required a code change + deploy for the merchant to
+change which option slides on a given product — not workable for someone
+without dev access.
+
+**Decision.** Added `custom.slider_options` — a `list.single_line_text_field`
+product metafield definition, created via
+`scripts/setup-slider-options-metafield.mjs` (Admin GraphQL
+`metafieldDefinitionCreate`). It shows up as "PDP Slider Options" directly on
+every product's edit page in Shopify Admin. `products.$handle.tsx` reads it
+(`sliderOptions` alias on the `Product` fragment) and passes it to
+`ProductForm` as `sliderOptionOverrides`; `isSliderOption()` uses it in place
+of `SLIDER_OPTION_NAMES` whenever the merchant has set it (exact,
+case-insensitive name match against the product's own option names), falling
+back to the coded default when blank. No app, no deploy, no code change
+needed to flip a given product's slider option going forward.
+
+**Gotcha — this store's plan rejects an explicit `access` value on
+`metafieldDefinitionCreate`.** Passing any `access: {admin: ..., storefront:
+...}` combination (including the "correct" `MERCHANT_READ_WRITE` +
+`PUBLIC_READ` pair) fails with `"Setting this access control is not
+permitted. It must be one of [\"public_read_write\"]"` — a plan-level
+restriction on this shop, not an invalid mutation. The definition must be
+created with **no** `access` field (defaults to `admin:
+PUBLIC_READ_WRITE, storefront: NONE`), then a **separate**
+`metafieldDefinitionUpdate` call grants `access: {storefront: PUBLIC_READ}` —
+that combination *is* accepted post-creation. Storefront read is required:
+without it, the Storefront API token used by this Hydrogen build can't see
+the value at all, and `sliderOptions` silently stays `null` for every
+product. The setup script does both calls, in that order, and is safe to
+re-run (`TAKEN` on create, no-op on the access update once already granted).
+
+**Verified live** against `wood-123252.myshopify.com`: set
+`custom.slider_options` to `["Mantle Beam (Front Side x Top side x
+Lenght)"]` on the fireplace-surround product, confirmed via the running dev
+server that only that option rendered `.product-opt-progress` (slider) while
+"Upstand" stayed `.product-opt-select` (dropdown), then deleted the test
+value to restore the coded default for that product.
+
+---
+
 ## ADR-0012 — Colour/swatch option linking must be done in Shopify Admin UI, not the Admin GraphQL API
 
 - **Status:** Accepted (process constraint, not a code decision)

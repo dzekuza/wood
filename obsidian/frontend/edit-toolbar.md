@@ -1,18 +1,28 @@
 ---
 tags: [frontend, shopify, content, cms]
-updated: 2026-09-01
+updated: 2026-09-10
 ---
 
 # Edit toolbar (inline copy editing)
 
 An allowlisted admin browsing the live storefront can flip **Edit on**, retype
-any headline, blurb or button label on the landing page in place, then
-**Publish** it — or **Reset** to throw the draft away. Nobody else sees the
-toolbar, or even receives its markup.
+any headline, blurb or button label on the page in place, then **Publish** it
+— or **Reset** to throw the draft away. Nobody else sees the toolbar, or even
+receives its markup.
 
 Adapted from the `edittoolbar` kit's Hydrogen adapter
 (`~/Desktop/projects/edittoolbar/hydrogen`), with two deliberate deviations —
 see [[decisions-log|ADR-0010]].
+
+> [!info] Live on every content page, not just the homepage
+> Until 2026-09-10 this was wired into `_index.tsx` only — every other route
+> rendered `EditableText` calls (inside shared components like
+> `HeroCarousel`/`CraftmanshipProcess`) with no `EditToolbarProvider`
+> ancestor, so they degraded to plain text with no toolbar at all. See
+> [[decisions-log#ADR-0014]] for the full rollout (which pages, which slugs,
+> which components gained their first `EditableText` calls) — the mechanism
+> itself needed zero backend changes, since `pageContent.server.ts` was
+> already generic over any `slug` string.
 
 > [!warning] Not wired up until the one-time setup runs
 > The metaobject definition, the Admin scopes and the allowlist all have to
@@ -40,6 +50,8 @@ Copy is stored as a flat `{fieldId: string}` JSON map. The ids are the contract
 between the stored copy and the markup — **renaming one orphans what an admin
 already wrote**, so treat them as permanent.
 
+### Homepage (slug `index`)
+
 | Section | Ids |
 |---|---|
 | Hero (per slide `n`) | `hero.n.heading.i`, `hero.n.blurb`, `hero.n.cta.primary`, `hero.n.cta.secondary` |
@@ -47,13 +59,34 @@ already wrote**, so treat them as permanent.
 | Most popular | `popular.heading`, `popular.ctaLabel` |
 | Testimonials | `testimonials.heading` |
 | Process | `process.heading`, `process.subheading`, `process.ctaLabel`, `process.steps.i.title`, `process.steps.i.description` |
-| Contact | `contact.heading`, `contact.subheading`, `contact.ctaLabel` |
+| Contact (footer `ContactBanner`) | `contact.heading`, `contact.subheading`, `contact.ctaLabel` |
 
-Ids are **page-scoped by the metaobject handle**, not globally unique: the
-components carrying them (`HeroCarousel`, `CategoriesGrid`,
-`CraftmanshipProcess`, `ContactBanner`, `TestimonialsMarquee`) also render on
-`landing-oak`, which has no provider — there they are plain text. Giving that
-page its own toolbar means its own slug, and it would get its own copy map.
+Ids are **page-scoped by the metaobject handle**, not globally unique — each
+page below is its own `page_content` entry (Shopify metaobject handle = the
+slug), so the same id string on two different pages never collides. That's
+what let `HeroCarousel`, `CraftmanshipProcess`, `ProductCarousel`,
+`OakBenefits`, `CraftStats` and `FaqAccordion` reuse ids like `hero.n.blurb`
+or `process.heading` on `landing-oak` (slug `landing-oak`) that already exist
+on the homepage (slug `index`) — two independent copy maps, no code change to
+either side needed.
+
+### Other pages (rolled out 2026-09-10 — see [[decisions-log#ADR-0014]])
+
+| Page | Route | Slug | Field id prefix |
+|---|---|---|---|
+| About | `about.tsx` | `about` | `about.hero.*`, `about.story.*`, `about.facts.i.*`, `about.pillars.i.*`, `about.pillars.heading`, `about.cta.*` |
+| Contact | `contact.tsx` | `contact` | `contact.hero.*`, `contact.primary.*`, `contact.channels.i.*`, `contact.steps.heading`, `contact.steps.i` |
+| Categories | `collections._index.tsx` | `collections` | `collections.hero.*` |
+| All Products | `collections.all.tsx` | `collections-all` | `all-products.hero.heading`, `all-products.faq.heading`, `all-products.faq.i.question`/`.answer` |
+| Favourites | `pages.favourites.tsx` | `favourites` | `favourites.hero.*`, `favourites.empty.*` |
+| Landing (oak) | `landing-oak.tsx` | `landing-oak` | Reuses `hero.*`/`process.*` (see above) plus its exclusive components' own ids: `popular.*` (`ProductCarousel`), `featured.*` (`FeaturedPicks`), `benefits.*` (`OakBenefits`), `values.i` (`ValueMarquee`, **one id per prop, not per rendered item** — the track renders the four props twice back-to-back for a seamless CSS loop, so both copies read `values.{i % 4}` and always match), `stats.*` (`CraftStats`), `faq.*` (`FaqAccordion`) |
+
+Product/collection/search pages were deliberately left out — their copy
+(titles, descriptions, prices) is live Shopify catalog data, not hand-authored
+marketing copy, so there is nothing here for an admin to override. Policy
+pages (`policies.*.tsx`) were also left out on purpose: they render Shopify's
+own Shop Policy text, edited in Admin → Settings → Policies, not something
+that should be casually rewritten from a floating toolbar.
 
 ## Storage
 
@@ -135,6 +168,13 @@ missing allowlist means nobody is an admin.
    the app, not in `.env`.
 4. Log in at `/account/login` with an allowlisted email, open `/`, and the
    toolbar appears bottom-right.
+5. Nothing further needed per page. Every slug in the table above shares the
+   one `page_content` definition from step 1 — `metaobjectUpsert`'s
+   handle-based upsert auto-creates a new metaobject entry the first time any
+   admin edits a given page, exactly like step 1's throwaway self-test entry
+   did. Adding a new page to the toolbar is purely a code change (a slug
+   constant + wrapping the route in `EditToolbarProvider`), never an Admin
+   setup step.
 
 > [!info] In local dev, everyone is an admin
 > `isAdminCustomer` returns `true` immediately when `import.meta.env.DEV`, so

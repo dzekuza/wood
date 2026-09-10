@@ -7,7 +7,12 @@ import {SortDropdown} from '~/components/SortDropdown';
 import {CollectionFilters} from '~/components/CollectionFilters';
 import {CollectionCategoryNav} from '~/components/CollectionCategoryNav';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
+import {EditableText} from '~/components/EditableText';
+import {EditToolbar} from '~/components/EditToolbar';
+import {EditToolbarProvider} from '~/components/EditToolbarProvider';
 import {applyLocalFilters, buildLocalFilters} from '~/lib/collectionFilters';
+import {COLLECTIONS_ALL_SLUG} from '~/lib/pageContent';
+import {loadPageContentState} from '~/lib/pageContent.server';
 import {SITE_NAME, shouldHideCollection} from '~/lib/site';
 import type {SortValue} from '~/components/SortDropdown';
 import type {CollectionItemFragment} from 'storefrontapi.generated';
@@ -19,7 +24,12 @@ export const meta: Route.MetaFunction = () => [
 
 export async function loader(args: Route.LoaderArgs) {
   const criticalData = await loadCriticalData(args);
-  return criticalData;
+  const pageContent = await loadPageContentState(
+    args.context,
+    args.request,
+    COLLECTIONS_ALL_SLUG,
+  );
+  return {...criticalData, pageContent};
 }
 
 // This page aggregates the whole catalog via the top-level `products` field,
@@ -101,116 +111,133 @@ const FAQ_ITEMS = [
 // ── page ──────────────────────────────────────────────────────────────────────
 
 export default function AllProducts() {
-  const {products, filters, sidebarCategories, sortParam} = useLoaderData<typeof loader>();
+  const {products, filters, sidebarCategories, sortParam, pageContent} = useLoaderData<typeof loader>();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   return (
-    <div className="archive-page">
-      <Breadcrumbs items={[{label: 'All Products'}]} />
-      <div className="archive-hero">
-        <div className="archive-wrap">
-          <div className="archive-hero-inner">
-            <h1 className="archive-hero-title">Products</h1>
+    <EditToolbarProvider
+      slug={COLLECTIONS_ALL_SLUG}
+      initialState={pageContent}
+      label="All Products page copy"
+    >
+      <div className="archive-page">
+        <Breadcrumbs items={[{label: 'All Products'}]} />
+        <div className="archive-hero">
+          <div className="archive-wrap">
+            <div className="archive-hero-inner">
+              <EditableText as="h1" className="archive-hero-title" field="all-products.hero.heading">
+                Products
+              </EditableText>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="shop-shell">
-        <div className="archive-wrap">
-          <div className="shop-layout">
-            <aside className="shop-sidebar">
-              <CollectionFilters
-                filters={filters}
-                categoriesSlot={<CollectionCategoryNav categories={sidebarCategories} />}
-              />
+        <div className="shop-shell">
+          <div className="archive-wrap">
+            <div className="shop-layout">
+              <aside className="shop-sidebar">
+                <CollectionFilters
+                  filters={filters}
+                  categoriesSlot={<CollectionCategoryNav categories={sidebarCategories} />}
+                />
+              </aside>
+
+              <div>
+                <div className="shop-toolbar">
+                  <div className="shop-toolbar-left">
+                    <span className="filter-bar-count">{products.nodes.length} pieces</span>
+                    <button
+                      type="button"
+                      className="filter-mobile-btn"
+                      onClick={() => setMobileFiltersOpen(true)}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="4" y1="6" x2="20" y2="6" /><circle cx="9" cy="6" r="2" fill="currentColor" stroke="none" />
+                        <line x1="4" y1="12" x2="20" y2="12" /><circle cx="15" cy="12" r="2" fill="currentColor" stroke="none" />
+                        <line x1="4" y1="18" x2="20" y2="18" /><circle cx="11" cy="18" r="2" fill="currentColor" stroke="none" />
+                      </svg>
+                      Filters
+                    </button>
+                  </div>
+                  <div className="shop-toolbar-right">
+                    <SortDropdown current={sortParam} />
+                  </div>
+                </div>
+
+                <div className="pgrid">
+                  {(products.nodes as CollectionItemFragment[]).map((product, index) => (
+                    <ProductItem
+                      key={product.id}
+                      product={product}
+                      loading={index < 12 ? 'eager' : undefined}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {mobileFiltersOpen && (
+          <div className="mob-filter-overlay" role="presentation">
+            <button
+              type="button"
+              className="mob-filter-backdrop"
+              aria-label="Close filters"
+              onClick={() => setMobileFiltersOpen(false)}
+            />
+            <aside
+              className="mob-filter-drawer"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="mobile-filter-title"
+            >
+              <div className="mob-filter-header">
+                <span className="eyebrow" id="mobile-filter-title">Filters</span>
+                <button className="mob-filter-close" onClick={() => setMobileFiltersOpen(false)} aria-label="Close filters">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+              </div>
+              <div className="mob-filter-body">
+                <CollectionFilters
+                  filters={filters}
+                  resultCount={products.nodes.length}
+                  categoriesSlot={<CollectionCategoryNav categories={sidebarCategories} />}
+                />
+              </div>
+              <div className="mob-filter-footer">
+                <button className="btn btn-primary btn-pill" onClick={() => setMobileFiltersOpen(false)}>
+                  Show {products.nodes.length} products
+                </button>
+              </div>
             </aside>
+          </div>
+        )}
 
-            <div>
-              <div className="shop-toolbar">
-                <div className="shop-toolbar-left">
-                  <span className="filter-bar-count">{products.nodes.length} pieces</span>
-                  <button
-                    type="button"
-                    className="filter-mobile-btn"
-                    onClick={() => setMobileFiltersOpen(true)}
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <line x1="4" y1="6" x2="20" y2="6" /><circle cx="9" cy="6" r="2" fill="currentColor" stroke="none" />
-                      <line x1="4" y1="12" x2="20" y2="12" /><circle cx="15" cy="12" r="2" fill="currentColor" stroke="none" />
-                      <line x1="4" y1="18" x2="20" y2="18" /><circle cx="11" cy="18" r="2" fill="currentColor" stroke="none" />
-                    </svg>
-                    Filters
-                  </button>
-                </div>
-                <div className="shop-toolbar-right">
-                  <SortDropdown current={sortParam} />
-                </div>
-              </div>
-
-              <div className="pgrid">
-                {(products.nodes as CollectionItemFragment[]).map((product, index) => (
-                  <ProductItem
-                    key={product.id}
-                    product={product}
-                    loading={index < 12 ? 'eager' : undefined}
-                  />
-                ))}
-              </div>
+        <div className="archive-faq">
+          <div className="archive-wrap">
+            <EditableText as="h2" className="archive-faq-title" field="all-products.faq.heading">
+              Still have questions?
+            </EditableText>
+            <div className="faq-list">
+              {FAQ_ITEMS.map((item, index) => (
+                <details key={item.question} className="faq-item">
+                  <summary>
+                    <EditableText as="span" field={`all-products.faq.${index}.question`}>
+                      {item.question}
+                    </EditableText>
+                  </summary>
+                  <EditableText as="p" className="faq-item-body" field={`all-products.faq.${index}.answer`}>
+                    {item.answer}
+                  </EditableText>
+                </details>
+              ))}
             </div>
           </div>
         </div>
       </div>
-
-      {mobileFiltersOpen && (
-        <div className="mob-filter-overlay" role="presentation">
-          <button
-            type="button"
-            className="mob-filter-backdrop"
-            aria-label="Close filters"
-            onClick={() => setMobileFiltersOpen(false)}
-          />
-          <aside
-            className="mob-filter-drawer"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="mobile-filter-title"
-          >
-            <div className="mob-filter-header">
-              <span className="eyebrow" id="mobile-filter-title">Filters</span>
-              <button className="mob-filter-close" onClick={() => setMobileFiltersOpen(false)} aria-label="Close filters">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              </button>
-            </div>
-            <div className="mob-filter-body">
-              <CollectionFilters
-                filters={filters}
-                resultCount={products.nodes.length}
-                categoriesSlot={<CollectionCategoryNav categories={sidebarCategories} />}
-              />
-            </div>
-            <div className="mob-filter-footer">
-              <button className="btn btn-primary btn-pill" onClick={() => setMobileFiltersOpen(false)}>
-                Show {products.nodes.length} products
-              </button>
-            </div>
-          </aside>
-        </div>
-      )}
-
-      <div className="archive-faq">
-        <div className="archive-wrap">
-          <h2 className="archive-faq-title">Still have questions?</h2>
-          <div className="faq-list">
-            {FAQ_ITEMS.map((item) => (
-              <details key={item.question} className="faq-item">
-                <summary>{item.question}</summary>
-                <div className="faq-item-body">{item.answer}</div>
-              </details>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
+      <EditToolbar />
+    </EditToolbarProvider>
   );
 }
 

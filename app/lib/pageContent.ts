@@ -37,6 +37,17 @@ export const EMPTY_PAGE_CONTENT: PageContentState = {
  */
 export const LANDING_SLUG = 'index';
 
+/** Slugs for every other page wired into the same `page_content` mechanism.
+ *  Each is an independent metaobject entry (Shopify auto-creates it on first
+ *  edit via `metaobjectUpsert`'s handle-based upsert) — no per-page Admin
+ *  setup needed beyond the one-time `page_content` definition. */
+export const ABOUT_SLUG = 'about';
+export const CONTACT_SLUG = 'contact';
+export const COLLECTIONS_INDEX_SLUG = 'collections';
+export const COLLECTIONS_ALL_SLUG = 'collections-all';
+export const FAVOURITES_SLUG = 'favourites';
+export const LANDING_OAK_SLUG = 'landing-oak';
+
 /** Builds a stable dotted field id — `fieldId('hero', 0, 'blurb')`. */
 export function fieldId(...parts: Array<string | number>): string {
   return parts.join('.');

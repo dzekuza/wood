@@ -1,4 +1,5 @@
 import {Link} from 'react-router';
+import {EditableText} from '~/components/EditableText';
 
 const STATS = [
   {value: '27+', label: 'Years of craft', theme: 'sand'},
@@ -13,17 +14,23 @@ export function CraftStats() {
       <div className="demo-stats-grid">
         <div className="demo-stats-left">
           <div className="demo-stats-feature">
-            <p className="demo-stats-feature-title">Meet the Makers</p>
-            <Link to="/about" className="demo-btn demo-btn-outline-dark demo-btn-sm">
+            <EditableText as="p" className="demo-stats-feature-title" field="stats.featureTitle">
               Meet the Makers
+            </EditableText>
+            <Link to="/about" className="demo-btn demo-btn-outline-dark demo-btn-sm">
+              <EditableText field="stats.featureCtaLabel">Meet the Makers</EditableText>
             </Link>
           </div>
 
           <div className="demo-stats-2x2">
-            {STATS.map((stat) => (
+            {STATS.map((stat, index) => (
               <div className={`demo-stat-card demo-stat-${stat.theme}`} key={stat.label}>
-                <p className="demo-stat-value">{stat.value}</p>
-                <p className="demo-stat-label">{stat.label}</p>
+                <EditableText as="p" className="demo-stat-value" field={`stats.items.${index}.value`}>
+                  {stat.value}
+                </EditableText>
+                <EditableText as="p" className="demo-stat-label" field={`stats.items.${index}.label`}>
+                  {stat.label}
+                </EditableText>
               </div>
             ))}
           </div>

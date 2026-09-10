@@ -11,7 +11,11 @@ import {ValueMarquee} from '~/components/ValueMarquee';
 import {ReviewQuoteGrid} from '~/components/ReviewQuoteGrid';
 import {CraftStats} from '~/components/CraftStats';
 import {FaqAccordion} from '~/components/FaqAccordion';
+import {EditToolbar} from '~/components/EditToolbar';
+import {EditToolbarProvider} from '~/components/EditToolbarProvider';
 import {HOMEPAGE_REVIEWS} from '~/lib/reviews';
+import {LANDING_OAK_SLUG} from '~/lib/pageContent';
+import {loadPageContentState} from '~/lib/pageContent.server';
 import {SITE_NAME} from '~/lib/site';
 import {EXCLUDE_HIDDEN_PRODUCTS_QUERY, filterHiddenProducts} from '~/lib/upsells';
 import demoStyles from '~/styles/demo.css?url';
@@ -99,12 +103,13 @@ function buildPopularTabs(
 }
 
 export async function loader(args: Route.LoaderArgs) {
-  const {context} = args;
-  const [heroShowcase, popularProducts] = await Promise.all([
+  const {context, request} = args;
+  const [heroShowcase, popularProducts, pageContent] = await Promise.all([
     context.storefront.query(HERO_SHOWCASE_QUERY),
     context.storefront.query(POPULAR_PRODUCTS_QUERY, {
       variables: {query: EXCLUDE_HIDDEN_PRODUCTS_QUERY},
     }),
+    loadPageContentState(context, request, LANDING_OAK_SLUG),
   ]);
 
   const visiblePopularProducts = filterHiddenProducts<
@@ -117,6 +122,7 @@ export async function loader(args: Route.LoaderArgs) {
     heroSlides: buildHeroSlides(heroShowcase),
     popularTabs: buildPopularTabs(heroShowcase, bestsellers),
     featuredProducts: bestsellers.slice(0, 3),
+    pageContent,
   };
 }
 
@@ -124,24 +130,31 @@ export default function LandingOak() {
   const data = useLoaderData<typeof loader>();
 
   return (
-    <div className="demo-page">
-      {data.isShopLinked ? null : <MockShopNotice />}
-      <HeroCarousel slides={data.heroSlides} />
-      <ProductCarousel heading="Most popular" tabs={data.popularTabs} exploreTo="/collections/all" />
-      <FeaturedPicks products={data.featuredProducts} />
-      <OakBenefits />
-      <CraftmanshipProcess />
-      <div className="demo-fullbleed">
-        <img src="/demo/hero-1.png" alt="Solid oak furniture styled in a Cotswolds home" loading="lazy" />
+    <EditToolbarProvider
+      slug={LANDING_OAK_SLUG}
+      initialState={data.pageContent}
+      label="Landing (oak) copy"
+    >
+      <div className="demo-page">
+        {data.isShopLinked ? null : <MockShopNotice />}
+        <HeroCarousel slides={data.heroSlides} />
+        <ProductCarousel heading="Most popular" tabs={data.popularTabs} exploreTo="/collections/all" />
+        <FeaturedPicks products={data.featuredProducts} />
+        <OakBenefits />
+        <CraftmanshipProcess />
+        <div className="demo-fullbleed">
+          <img src="/demo/hero-1.png" alt="Solid oak furniture styled in a Cotswolds home" loading="lazy" />
+        </div>
+        <ValueMarquee />
+        <ReviewQuoteGrid reviews={HOMEPAGE_REVIEWS} />
+        <CraftStats />
+        <FaqAccordion />
+        <section className="demo-brand-mark">
+          <img src="/darkwood.svg" alt="Craft Wood Furniture" loading="lazy" />
+        </section>
       </div>
-      <ValueMarquee />
-      <ReviewQuoteGrid reviews={HOMEPAGE_REVIEWS} />
-      <CraftStats />
-      <FaqAccordion />
-      <section className="demo-brand-mark">
-        <img src="/darkwood.svg" alt="Craft Wood Furniture" loading="lazy" />
-      </section>
-    </div>
+      <EditToolbar />
+    </EditToolbarProvider>
   );
 }
 

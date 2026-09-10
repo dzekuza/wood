@@ -79,6 +79,21 @@ Two display faces now, not one — see `DESIGN.md` §3 for the full rationale:
 > `links()` in `_index.tsx`/`landing-oak.tsx` load fonts for those two routes
 > only — never rely on them for a rule in `app.css`, which applies site-wide.
 
+> [!danger] `public/fonts/outfit-medium.ttf` was a wrong font mislabeled as Outfit — fixed 2026-09-10
+> The file's own `name` table correctly said "Outfit Medium" (so nothing in
+> the CSS or codegen could catch it), but its actual glyph outlines were a
+> different, much rounder/bolder display face — every `h1`/`h2`/`h3` and
+> `.archive-hero-title`/`.title` heading site-wide rendered that wrong face,
+> not real Outfit. Confirmed by rendering the real Google-hosted Outfit 500
+> side-by-side and comparing glyph shapes (screenshots, not just CSS
+> inspection — the `font-family` cascade and `@font-face` declarations were
+> never wrong). Fixed by converting `@fontsource/outfit`'s
+> `outfit-latin-500-normal.woff` to TTF with `fontTools` and overwriting the
+> file — no CSS or dependency change, since `app.css`'s `@font-face` already
+> pointed at the right path. If headings ever look wrong again, verify the
+> **file's rendered glyphs**, not just its `name` table or the CSS — a font
+> file can claim to be the right family while shipping the wrong shapes.
+
 - **Mark Bold** (`/fonts/mark-bold.ttf`) — still used, but only for prices,
   stat numbers, pull-quotes, and repeated card names (product/category card
   titles) — anything "spoken" that isn't a structural heading.

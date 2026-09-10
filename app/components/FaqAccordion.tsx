@@ -1,4 +1,5 @@
 import {useState} from 'react';
+import {EditableText} from '~/components/EditableText';
 
 const FAQS = [
   {
@@ -25,8 +26,10 @@ export function FaqAccordion() {
   return (
     <section className="demo-faq">
       <div className="demo-faq-head">
-        <h2>FAQ</h2>
-        <p>Answers to the questions we hear most from new customers.</p>
+        <EditableText as="h2" field="faq.heading">FAQ</EditableText>
+        <EditableText as="p" field="faq.subheading">
+          Answers to the questions we hear most from new customers.
+        </EditableText>
       </div>
 
       <div className="demo-faq-list">
@@ -41,9 +44,15 @@ export function FaqAccordion() {
                 aria-expanded={isOpen}
               >
                 <i className={`ti ${isOpen ? 'ti-minus' : 'ti-plus'}`} aria-hidden />
-                <span>{faq.q}</span>
+                <EditableText as="span" field={`faq.items.${i}.question`}>
+                  {faq.q}
+                </EditableText>
               </button>
-              {isOpen && <p className="demo-faq-answer">{faq.a}</p>}
+              {isOpen && (
+                <EditableText as="p" className="demo-faq-answer" field={`faq.items.${i}.answer`}>
+                  {faq.a}
+                </EditableText>
+              )}
             </div>
           );
         })}

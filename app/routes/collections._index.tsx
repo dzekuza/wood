@@ -5,6 +5,11 @@ import type {CollectionFragment} from 'storefrontapi.generated';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {CategoryCard} from '~/components/CategoryCard';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
+import {EditableText} from '~/components/EditableText';
+import {EditToolbar} from '~/components/EditToolbar';
+import {EditToolbarProvider} from '~/components/EditToolbarProvider';
+import {COLLECTIONS_INDEX_SLUG} from '~/lib/pageContent';
+import {loadPageContentState} from '~/lib/pageContent.server';
 import {shouldHideCollection} from '~/lib/site';
 import demoStyles from '~/styles/demo.css?url';
 
@@ -22,7 +27,13 @@ export async function loader(args: Route.LoaderArgs) {
   // Await the critical data required to render initial state of the page
   const criticalData = await loadCriticalData(args);
 
-  return {...deferredData, ...criticalData};
+  const pageContent = await loadPageContentState(
+    args.context,
+    args.request,
+    COLLECTIONS_INDEX_SLUG,
+  );
+
+  return {...deferredData, ...criticalData, pageContent};
 }
 
 /**
@@ -66,42 +77,49 @@ function loadDeferredData({context}: Route.LoaderArgs) {
 }
 
 export default function Collections() {
-  const {collections} = useLoaderData<typeof loader>();
+  const {collections, pageContent} = useLoaderData<typeof loader>();
 
   return (
-    <div className="archive-page">
-      <Breadcrumbs items={[{label: 'Categories'}]} />
-      {/* Hero */}
-      <div className="archive-hero">
-        <div className="archive-wrap">
-          <div className="archive-hero-inner">
-            <h1 className="archive-hero-title">
-              Browse <em>Categories</em>
-            </h1>
+    <EditToolbarProvider
+      slug={COLLECTIONS_INDEX_SLUG}
+      initialState={pageContent}
+      label="Categories page copy"
+    >
+      <div className="archive-page">
+        <Breadcrumbs items={[{label: 'Categories'}]} />
+        {/* Hero */}
+        <div className="archive-hero">
+          <div className="archive-wrap">
+            <div className="archive-hero-inner">
+              <EditableText as="h1" className="archive-hero-title" field="collections.hero.heading">
+                Browse Categories
+              </EditableText>
+            </div>
+            <EditableText as="p" className="archive-hero-blurb" field="collections.hero.blurb">
+              Every piece of furniture, sorted by room. All solid wood, all made in our workshop.
+            </EditableText>
           </div>
-          <p className="archive-hero-blurb">
-            Every piece of furniture, sorted by room. All solid wood, all made in our workshop.
-          </p>
         </div>
-      </div>
 
-      {/* Grid */}
-      <div className="collections-index-shell">
-        <div className="archive-wrap">
-          <PaginatedResourceSection<CollectionFragment>
-            connection={collections}
-            resourcesClassName="category-grid-4"
-          >
-            {({node: collection}) => (
-              <CategoryCard
-                key={collection.id}
-                category={toCategory(collection)}
-              />
-            )}
-          </PaginatedResourceSection>
+        {/* Grid */}
+        <div className="collections-index-shell">
+          <div className="archive-wrap">
+            <PaginatedResourceSection<CollectionFragment>
+              connection={collections}
+              resourcesClassName="category-grid-4"
+            >
+              {({node: collection}) => (
+                <CategoryCard
+                  key={collection.id}
+                  category={toCategory(collection)}
+                />
+              )}
+            </PaginatedResourceSection>
+          </div>
         </div>
       </div>
-    </div>
+      <EditToolbar />
+    </EditToolbarProvider>
   );
 }
 

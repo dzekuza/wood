@@ -1,7 +1,157 @@
 ---
 tags: [meta, changelog]
-updated: 2026-09-07
+updated: 2026-09-10
 ---
+
+## 2026-09-10 — About page: oversized `.story-card h3`, stacked stat panel
+
+Two unrelated layout bugs on the About page (`.story-*` classes, shared by
+any future page reusing that pattern):
+
+- `.story-card h3` had no `font-size` override, so it inherited the base
+  `h1,h2,h3 { font-size: 56px }` rule meant for real page headings — a
+  small 3-up pillar card ("Timber first" / "Joinery that shows" / "Built to
+  stay in use") was rendering its heading at full hero-title size. Added
+  `font-size: clamp(20px, 2.2vw, 26px); line-height: 1.25;`, matching the
+  scale `.contact-primary-card .title` already uses for a comparable
+  card-heading context.
+- `.story-panel` (the "4 / 25 / 120+" stat block) was `display: grid` with
+  no `grid-template-columns`, so its three `.story-stat` children fell onto
+  separate implicit rows and stacked vertically instead of sitting inline.
+  Added `grid-template-columns: repeat(3, 1fr)`. No extra mobile breakpoint
+  needed — `.story-grid` already collapses to one column at 980px, which
+  gives the panel the full page width back at the point three columns would
+  otherwise get tight.
+
+Verified with an isolated preview against the real `app.css` (both together,
+since they sit in the same section).
+
+## 2026-09-10 — Header dropdown: fixed hover square-corner overflow
+
+The `.header-dropdown-menu` padding-removal earlier today (below) exposed a
+second bug: with padding gone, the first/last item's `:hover` background
+rectangle reached the container's rounded corners and poked past them
+(square corners visibly overflowing the 10px rounded panel). Added
+`overflow: hidden` to `.header-dropdown-menu` — the panel's own `box-shadow`
+is unaffected (an element's own shadow isn't clipped by its own `overflow`),
+only descendant content is. Verified with an isolated hover screenshot
+against the real `app.css` before/after.
+
+## 2026-09-10 — Fixed corrupted `outfit-medium.ttf`: every heading was rendering the wrong font
+
+`public/fonts/outfit-medium.ttf` — self-hosted, used by every `h1`/`h2`/`h3`
+and section-heading class site-wide — had its `name` table correctly
+labelled "Outfit Medium" but shipped completely different, much rounder/
+bolder glyph outlines. Every heading on every page (not just the About page
+where the user first spotted it) was rendering that wrong face; the CSS
+`font-family` cascade was never at fault. See
+[[../frontend/design-system#Typography]] for the full diagnosis (glyph-shape
+comparison against the real Google-hosted Outfit, not just a CSS check) and
+the fix (converted `@fontsource/outfit`'s WOFF to TTF with `fontTools`,
+overwrote the file in place — no code change).
+
+## 2026-09-10 — Header nav dropdown: removed extra top/bottom padding
+
+`.header-dropdown-menu` had `padding: 8px 0` plus a `padding-top: 16px`
+override (net 16px top / 8px bottom around the item list). Removed both in
+favour of `padding: 0` — `.header-dropdown-item` already carries its own
+`10px 20px`, so the list still has breathing room, just without the extra
+band of empty space above/below it inside the panel.
+
+## 2026-09-10 — Edit toolbar rolled out to every content page
+
+See [[decisions-log#ADR-0014]] for the full writeup. Short version: the
+inline copy-editing toolbar ([[../frontend/edit-toolbar]]) only ran on the
+homepage until today. Wired the same (already page-agnostic) mechanism into
+`about.tsx`, `contact.tsx`, `collections._index.tsx`, `collections.all.tsx`,
+`pages.favourites.tsx`, and `landing-oak.tsx` — each gets its own slug and
+independent `page_content` metaobject entry, auto-created on first edit, no
+Admin setup needed. `landing-oak`'s six exclusive components
+(`ProductCarousel`, `FeaturedPicks`, `OakBenefits`, `ValueMarquee`,
+`CraftStats`, `FaqAccordion`) got their first `EditableText` calls in the
+process. Product/collection/search pages and the policy pages were
+deliberately left out (live Shopify data / legal text edited in Admin, not
+marketing copy) — confirmed with the client before doing the rollout, not
+assumed.
+
+## 2026-09-10 — Photo swatch tiles: gradient label + hover/press scale
+
+`ProductForm`'s photo-backed colour swatch tiles (`.product-optn:has(.product-swatch-has-image)`,
+see [[../frontend/components/common|common components]]):
+
+- The value name (e.g. "White Oil") was a translucent rounded pill inset 6px
+  from the tile edge. It's now a full-width bottom gradient overlay
+  (`linear-gradient(to top, color-mix(in srgb, var(--cwf-ink-strong) 88%,
+  transparent), transparent)`) with the text sitting directly on the fade —
+  no pill shape, no `backdrop-filter`. The selected-state pill-solidify
+  override is gone with it; the existing box-shadow ring still carries
+  selection.
+- Tiles now scale up on hover (`scale(1.05)`, guarded to
+  `(hover: hover) and (pointer: fine)` so a touch tap doesn't leave a
+  lingering hover-scale) and further on press (`scale(1.08)` on `:active`,
+  covering mouse press and touch tap alike).
+
+Verified visually against a standalone preview page loading the real
+`app.css` (not the live storefront — this store's `SITE_PASSWORD` gate makes
+quick iteration awkward, and the change is presentational only).
+
+## 2026-09-10 — Slider vs. dropdown is merchant-editable per product (Shopify Admin)
+
+Built on the same-day fix below: the slider/dropdown choice is now also
+controllable per product from Shopify Admin, no dev involvement needed.
+
+- Live on `wood-123252.myshopify.com`: new `custom.slider_options` product
+  metafield definition ("PDP Slider Options"), created via
+  `scripts/setup-slider-options-metafield.mjs`. Shows up as an editable
+  field directly on every product's edit page.
+- `products.$handle.tsx`'s `Product` fragment now fetches it (`sliderOptions`
+  alias); `ProductForm` gets it as `sliderOptionOverrides` and
+  `isSliderOption()` uses it in place of the coded `SLIDER_OPTION_NAMES`
+  whenever it's set. See [[decisions-log#ADR-0013]] for the full mechanism
+  and a plan-restriction gotcha in the setup script (this store's plan
+  rejects `access` on `metafieldDefinitionCreate`; storefront read has to be
+  granted in a follow-up `metafieldDefinitionUpdate` call).
+- Verified live: set the metafield on the fireplace-surround product,
+  confirmed the affected option switched to the slider on the running dev
+  server, then removed the test value.
+
+## 2026-09-10 — Slider vs. dropdown is now an explicit option allowlist
+
+`ProductForm.tsx` used to pick the length-slider control for any non-swatch
+option whose name **contained** "length" or "lenght" (substring match). That
+mis-fired on compound dimension options — e.g. "Mantle Beam (Front Side x
+Top Side x Lenght)" — whose values are strings like `12.7cm x 10.2cm x
+121.9cm` with no single scrubbable axis, so they rendered a slider that made
+no sense.
+
+Replaced with `isSliderOption()` / `SLIDER_OPTION_NAMES` in new
+`app/lib/productOptionDisplay.ts` ([[../frontend/utils|utils catalog]]):
+exact, case-insensitive option-name match, default `['Length']`. Any
+non-swatch option not in that list now falls through to the dropdown
+branch. To make a genuinely single-axis option (e.g. a real standalone
+"Beam Length") use the slider, add its exact name to the list.
+
+## 2026-09-10 — PDP image click opens lightbox
+
+Clicking the product page gallery image now opens the shared `Lightbox`
+([[../frontend/components/common|common components]]) instead of doing
+nothing. Wired into `products.$handle.tsx` on both gallery presentations:
+
+- desktop `.pdp-main-img` (the large image next to the thumb rail),
+- mobile `.pdp-carousel-slide` (the swipeable carousel).
+
+Both are wrapped in a new `.pdp-zoom-btn` (`position: absolute; inset: 0;
+cursor: zoom-in`) button rather than adding an `onClick` to the existing
+`div`, so the click target stays keyboard/AT-reachable. 3D-model gallery
+items are untouched — no zoom button, no lightbox entry — only `image`-type
+`galleryItems` populate `lightboxImages`. The lightbox opens to the image
+that was clicked (index resolved by matching `image.url` against
+`lightboxImages`, not by carousel/thumb position, so desktop and mobile stay
+in sync even though they render the gallery independently).
+
+No new component: this reuses the existing `Lightbox` used by
+`TestimonialsMarquee`/`ReviewsSection`, so all three surfaces already share
+one set of `.lightbox*` CSS rules.
 
 ## 2026-09-07 — New homepage process image
 
