@@ -1,12 +1,38 @@
 ---
 tags: [meta, decision]
-updated: 2026-09-04
+updated: 2026-10-12
 ---
 
 # Decisions Log (ADRs)
 
 Architecture Decision Records. Each entry captures a choice, its context, and its
 consequences. Use [[templates/adr-note]] for new entries. Newest first.
+
+---
+
+## ADR-0015 — Category order is merchant-set via a collection `custom.sort_order` metafield
+
+**Date:** 2026-10-12 · **Status:** accepted
+
+**Context.** The client asked to move categories up/down. The homepage grid
+followed a coded `HOMEPAGE_CATEGORY_ORDER`, the shop sidebar followed Shopify's
+`sortKey: TITLE` (alphabetical), and the Categories page followed Shopify's
+default — three different orders, none editable without a deploy. The
+Storefront API has no merchant-controlled sort for the `collections` field.
+
+**Decision.** One comparator, `compareCategories` (`lib/site.ts`), used by every
+category list. It sorts by the collection metafield `custom.sort_order`
+(integer, lowest first, unset last), then by `HOMEPAGE_CATEGORY_ORDER` as the
+fallback. Each category query selects `sortOrder: metafield(namespace:
+"custom", key: "sort_order")`.
+
+**Consequences.** The merchant reorders categories in Shopify Admin →
+Collections → (collection) → Metafields → Sort order. The metafield definition
+(created 2026-10-12 via the Admin API) has `access.storefront = PUBLIC_READ`;
+without that every value reads `null` and the coded fallback applies. Note the
+header "By category" dropdown follows the **main menu's** item order instead,
+which is reordered in Online Store → Navigation. The sidebar now follows the same order as the homepage
+instead of alphabetical.
 
 ---
 

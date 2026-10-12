@@ -7,10 +7,13 @@ import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {ProductItem} from '~/components/ProductItem';
 import {SortDropdown} from '~/components/SortDropdown';
 import {CollectionFilters} from '~/components/CollectionFilters';
-import {CollectionCategoryNav} from '~/components/CollectionCategoryNav';
+import {
+  buildSidebarCategories,
+  CollectionCategoryNav,
+} from '~/components/CollectionCategoryNav';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {parseFiltersFromSearchParams} from '~/lib/collectionFilters';
-import {SITE_NAME, shouldHideCollection} from '~/lib/site';
+import {SITE_NAME} from '~/lib/site';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 import type {SortValue} from '~/components/SortDropdown';
 
@@ -75,18 +78,7 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   // The API handle might be localized, so redirect to the localized handle
   redirectIfHandleIsLocalized(request, {handle, data: collection});
 
-  const sidebarCategories = collections.nodes
-    .filter(
-      (node) => !shouldHideCollection({handle: node.handle, title: node.title}),
-    )
-    .slice(0, 8)
-    .map((node) => ({
-      id: node.id,
-      handle: node.handle,
-      title: node.title,
-      image: node.image,
-      count: node.products.nodes.length,
-    }));
+  const sidebarCategories = buildSidebarCategories(collections.nodes);
 
   return {
     collection,
@@ -363,6 +355,9 @@ const SIDEBAR_CATEGORIES_QUERY = `#graphql
         id
         title
         handle
+        sortOrder: metafield(namespace: "custom", key: "sort_order") {
+          value
+        }
         image {
           url
           altText

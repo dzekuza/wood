@@ -1,5 +1,10 @@
 import {Link} from 'react-router';
 import {Image} from '@shopify/hydrogen';
+import {
+  compareCategories,
+  shouldHideCollection,
+  type SortableCategory,
+} from '~/lib/site';
 
 export type SidebarCategory = {
   id: string;
@@ -8,6 +13,31 @@ export type SidebarCategory = {
   count: number;
   image?: {url: string; altText?: string | null; width?: number | null; height?: number | null} | null;
 };
+
+type SidebarCategoryNode = SortableCategory & {
+  id: string;
+  title: string;
+  image?: SidebarCategory['image'];
+  products: {nodes: unknown[]};
+};
+
+/** Shared by `collections.all` and `collections.$handle` so both sidebars list
+ *  the same categories in the same, merchant-controlled order. */
+export function buildSidebarCategories(
+  nodes: SidebarCategoryNode[],
+): SidebarCategory[] {
+  return nodes
+    .filter((node) => !shouldHideCollection(node))
+    .sort(compareCategories)
+    .slice(0, 8)
+    .map((node) => ({
+      id: node.id,
+      handle: node.handle,
+      title: node.title,
+      image: node.image,
+      count: node.products.nodes.length,
+    }));
+}
 
 /**
  * "Categories" block for the shop sidebar — collections with their thumbnail,
@@ -52,8 +82,11 @@ export function CollectionCategoryNav({
             )}
             <span className="sidebar-category-text">
               <span className="sidebar-category-name">{category.title}</span>
+              {/* Counts distinct products; each one also comes in several
+                  sizes and oil finishes, which a bare "1 product" undersells. */}
               <span className="sidebar-category-count">
-                {category.count} {category.count === 1 ? 'product' : 'products'}
+                {category.count} {category.count === 1 ? 'product' : 'products'}{' '}
+                + size &amp; finish variations
               </span>
             </span>
           </Link>

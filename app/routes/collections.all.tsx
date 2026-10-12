@@ -5,7 +5,10 @@ import {getPaginationVariables} from '@shopify/hydrogen';
 import {ProductItem} from '~/components/ProductItem';
 import {SortDropdown} from '~/components/SortDropdown';
 import {CollectionFilters} from '~/components/CollectionFilters';
-import {CollectionCategoryNav} from '~/components/CollectionCategoryNav';
+import {
+  buildSidebarCategories,
+  CollectionCategoryNav,
+} from '~/components/CollectionCategoryNav';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {EditableText} from '~/components/EditableText';
 import {EditToolbar} from '~/components/EditToolbar';
@@ -13,7 +16,7 @@ import {EditToolbarProvider} from '~/components/EditToolbarProvider';
 import {applyLocalFilters, buildLocalFilters} from '~/lib/collectionFilters';
 import {COLLECTIONS_ALL_SLUG} from '~/lib/pageContent';
 import {loadPageContentState} from '~/lib/pageContent.server';
-import {SITE_NAME, shouldHideCollection} from '~/lib/site';
+import {SITE_NAME} from '~/lib/site';
 import type {SortValue} from '~/components/SortDropdown';
 import type {CollectionItemFragment} from 'storefrontapi.generated';
 import {EXCLUDE_HIDDEN_PRODUCTS_QUERY, filterHiddenProducts} from '~/lib/upsells';
@@ -64,18 +67,7 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
   const filters = buildLocalFilters(allProducts);
   const filteredProducts = applyLocalFilters(allProducts, url.searchParams);
 
-  const sidebarCategories = collections.nodes
-    .filter(
-      (node) => !shouldHideCollection({handle: node.handle, title: node.title}),
-    )
-    .slice(0, 8)
-    .map((node) => ({
-      id: node.id,
-      handle: node.handle,
-      title: node.title,
-      image: node.image,
-      count: node.products.nodes.length,
-    }));
+  const sidebarCategories = buildSidebarCategories(collections.nodes);
 
   return {
     products: {...products, nodes: filteredProducts},
@@ -307,6 +299,9 @@ const ALL_COLLECTIONS_QUERY = `#graphql
         id
         title
         handle
+        sortOrder: metafield(namespace: "custom", key: "sort_order") {
+          value
+        }
         image {
           url
           altText

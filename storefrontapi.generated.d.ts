@@ -565,6 +565,7 @@ export type HeroShowcaseCollectionFragment = Pick<
   StorefrontAPI.Collection,
   'id' | 'title' | 'handle'
 > & {
+  sortOrder?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
   image?: StorefrontAPI.Maybe<
     Pick<StorefrontAPI.Image, 'url' | 'altText' | 'width' | 'height'>
   >;
@@ -588,6 +589,7 @@ export type HeroShowcaseQuery = {
   collections: {
     nodes: Array<
       Pick<StorefrontAPI.Collection, 'id' | 'title' | 'handle'> & {
+        sortOrder?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
         image?: StorefrontAPI.Maybe<
           Pick<StorefrontAPI.Image, 'url' | 'altText' | 'width' | 'height'>
         >;
@@ -1058,6 +1060,7 @@ export type SiblingCollectionsQuery = {
   collections: {
     nodes: Array<
       Pick<StorefrontAPI.Collection, 'id' | 'title' | 'handle'> & {
+        sortOrder?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
         image?: StorefrontAPI.Maybe<
           Pick<StorefrontAPI.Image, 'url' | 'altText' | 'width' | 'height'>
         >;
@@ -1071,6 +1074,7 @@ export type CollectionFragment = Pick<
   StorefrontAPI.Collection,
   'id' | 'title' | 'handle'
 > & {
+  sortOrder?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
   image?: StorefrontAPI.Maybe<
     Pick<StorefrontAPI.Image, 'id' | 'url' | 'altText' | 'width' | 'height'>
   >;
@@ -1102,6 +1106,7 @@ export type StoreCollectionsQuery = {
   collections: {
     nodes: Array<
       Pick<StorefrontAPI.Collection, 'id' | 'title' | 'handle'> & {
+        sortOrder?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
         image?: StorefrontAPI.Maybe<
           Pick<
             StorefrontAPI.Image,
@@ -1184,6 +1189,7 @@ export type AllCollectionsAllQuery = {
   collections: {
     nodes: Array<
       Pick<StorefrontAPI.Collection, 'id' | 'title' | 'handle'> & {
+        sortOrder?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
         image?: StorefrontAPI.Maybe<
           Pick<StorefrontAPI.Image, 'url' | 'altText' | 'width' | 'height'>
         >;
@@ -1941,6 +1947,7 @@ export type ProductFragment = Pick<
     >;
   };
   metafield?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
+  leadTime?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
   sliderOptions?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
   addonProducts?: StorefrontAPI.Maybe<{
     references?: StorefrontAPI.Maybe<{
@@ -2208,6 +2215,7 @@ export type ProductQuery = {
         >;
       };
       metafield?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
+      leadTime?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
       sliderOptions?: StorefrontAPI.Maybe<
         Pick<StorefrontAPI.Metafield, 'value'>
       >;
@@ -2275,6 +2283,9 @@ export type ProductQuery = {
       seo: Pick<StorefrontAPI.Seo, 'description' | 'title'>;
     }
   >;
+  shop: {
+    leadTime?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
+  };
 };
 
 export type SearchProductFragment = {__typename: 'Product'} & Pick<
@@ -2540,15 +2551,15 @@ interface GeneratedQueryTypes {
     return: CollectionQuery;
     variables: CollectionQueryVariables;
   };
-  '#graphql\n  query SiblingCollections($country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    collections(first: 20, sortKey: TITLE) {\n      nodes {\n        id\n        title\n        handle\n        image {\n          url\n          altText\n          width\n          height\n        }\n        products(first: 250) {\n          nodes {\n            id\n          }\n        }\n      }\n    }\n  }\n': {
+  '#graphql\n  query SiblingCollections($country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    collections(first: 20, sortKey: TITLE) {\n      nodes {\n        id\n        title\n        handle\n        sortOrder: metafield(namespace: "custom", key: "sort_order") {\n          value\n        }\n        image {\n          url\n          altText\n          width\n          height\n        }\n        products(first: 250) {\n          nodes {\n            id\n          }\n        }\n      }\n    }\n  }\n': {
     return: SiblingCollectionsQuery;
     variables: SiblingCollectionsQueryVariables;
   };
-  '#graphql\n  fragment Collection on Collection {\n    id\n    title\n    handle\n    image {\n      id\n      url\n      altText\n      width\n      height\n    }\n    products(first: 250) {\n      nodes {\n        id\n        featuredImage {\n          url\n          altText\n          width\n          height\n        }\n      }\n    }\n  }\n  query StoreCollections(\n    $country: CountryCode\n    $endCursor: String\n    $first: Int\n    $language: LanguageCode\n    $last: Int\n    $startCursor: String\n  ) @inContext(country: $country, language: $language) {\n    collections(\n      first: $first,\n      last: $last,\n      before: $startCursor,\n      after: $endCursor\n    ) {\n      nodes {\n        ...Collection\n      }\n      pageInfo {\n        hasNextPage\n        hasPreviousPage\n        startCursor\n        endCursor\n      }\n    }\n  }\n': {
+  '#graphql\n  fragment Collection on Collection {\n    id\n    title\n    handle\n    sortOrder: metafield(namespace: "custom", key: "sort_order") {\n      value\n    }\n    image {\n      id\n      url\n      altText\n      width\n      height\n    }\n    products(first: 250) {\n      nodes {\n        id\n        featuredImage {\n          url\n          altText\n          width\n          height\n        }\n      }\n    }\n  }\n  query StoreCollections(\n    $country: CountryCode\n    $endCursor: String\n    $first: Int\n    $language: LanguageCode\n    $last: Int\n    $startCursor: String\n  ) @inContext(country: $country, language: $language) {\n    collections(\n      first: $first,\n      last: $last,\n      before: $startCursor,\n      after: $endCursor\n    ) {\n      nodes {\n        ...Collection\n      }\n      pageInfo {\n        hasNextPage\n        hasPreviousPage\n        startCursor\n        endCursor\n      }\n    }\n  }\n': {
     return: StoreCollectionsQuery;
     variables: StoreCollectionsQueryVariables;
   };
-  '#graphql\n  query AllCollectionsAll {\n    collections(first: 20, sortKey: TITLE) {\n      nodes {\n        id\n        title\n        handle\n        image {\n          url\n          altText\n          width\n          height\n        }\n        products(first: 250) {\n          nodes {\n            id\n          }\n        }\n      }\n    }\n  }\n': {
+  '#graphql\n  query AllCollectionsAll {\n    collections(first: 20, sortKey: TITLE) {\n      nodes {\n        id\n        title\n        handle\n        sortOrder: metafield(namespace: "custom", key: "sort_order") {\n          value\n        }\n        image {\n          url\n          altText\n          width\n          height\n        }\n        products(first: 250) {\n          nodes {\n            id\n          }\n        }\n      }\n    }\n  }\n': {
     return: AllCollectionsAllQuery;
     variables: AllCollectionsAllQueryVariables;
   };
@@ -2580,7 +2591,7 @@ interface GeneratedQueryTypes {
     return: ProductRecommendationsQuery;
     variables: ProductRecommendationsQueryVariables;
   };
-  '#graphql\n  query Product(\n    $country: CountryCode\n    $handle: String!\n    $language: LanguageCode\n    $selectedOptions: [SelectedOptionInput!]!\n  ) @inContext(country: $country, language: $language) {\n    product(handle: $handle) {\n      ...Product\n    }\n  }\n  #graphql\n  fragment Product on Product {\n    id\n    title\n    vendor\n    handle\n    descriptionHtml\n    description\n    encodedVariantExistence\n    encodedVariantAvailability\n    options {\n      name\n      optionValues {\n        name\n        firstSelectableVariant {\n          ...ProductVariant\n        }\n        swatch {\n          color\n          image {\n            previewImage {\n              url\n            }\n          }\n        }\n      }\n    }\n    selectedOrFirstAvailableVariant(selectedOptions: $selectedOptions, ignoreUnknownOptions: true, caseInsensitiveMatch: true) {\n      ...ProductVariant\n    }\n    adjacentVariants (selectedOptions: $selectedOptions) {\n      ...ProductVariant\n    }\n    media(first: 25) {\n      nodes {\n        __typename\n        ... on MediaImage {\n          id\n          image {\n            url\n            altText\n            width\n            height\n          }\n        }\n        ... on Model3d {\n          id\n          alt\n          sources {\n            url\n            format\n            mimeType\n            filesize\n          }\n        }\n      }\n    }\n    metafield(namespace: "reviews", key: "product_reviews") {\n      value\n    }\n    sliderOptions: metafield(namespace: "custom", key: "slider_options") {\n      value\n    }\n    addonProducts: metafield(namespace: "custom", key: "addon_products") {\n      references(first: 10) {\n        nodes {\n          __typename\n          ... on Product {\n            id\n            title\n            addonLabel: metafield(namespace: "custom", key: "addon_label") {\n              value\n            }\n            addonFreeOption: metafield(namespace: "custom", key: "addon_free_option") {\n              value\n            }\n            variants(first: 20) {\n              nodes {\n                ...ProductVariant\n              }\n            }\n          }\n        }\n      }\n    }\n    seo {\n      description\n      title\n    }\n  }\n  #graphql\n  fragment ProductVariant on ProductVariant {\n    availableForSale\n    compareAtPrice {\n      amount\n      currencyCode\n    }\n    id\n    image {\n      __typename\n      id\n      url\n      altText\n      width\n      height\n    }\n    price {\n      amount\n      currencyCode\n    }\n    product {\n      title\n      handle\n    }\n    selectedOptions {\n      name\n      value\n    }\n    sku\n    title\n    unitPrice {\n      amount\n      currencyCode\n    }\n  }\n\n\n': {
+  '#graphql\n  query Product(\n    $country: CountryCode\n    $handle: String!\n    $language: LanguageCode\n    $selectedOptions: [SelectedOptionInput!]!\n  ) @inContext(country: $country, language: $language) {\n    product(handle: $handle) {\n      ...Product\n    }\n    shop {\n      leadTime: metafield(namespace: "custom", key: "lead_time") {\n        value\n      }\n    }\n  }\n  #graphql\n  fragment Product on Product {\n    id\n    title\n    vendor\n    handle\n    descriptionHtml\n    description\n    encodedVariantExistence\n    encodedVariantAvailability\n    options {\n      name\n      optionValues {\n        name\n        firstSelectableVariant {\n          ...ProductVariant\n        }\n        swatch {\n          color\n          image {\n            previewImage {\n              url\n            }\n          }\n        }\n      }\n    }\n    selectedOrFirstAvailableVariant(selectedOptions: $selectedOptions, ignoreUnknownOptions: true, caseInsensitiveMatch: true) {\n      ...ProductVariant\n    }\n    adjacentVariants (selectedOptions: $selectedOptions) {\n      ...ProductVariant\n    }\n    media(first: 25) {\n      nodes {\n        __typename\n        ... on MediaImage {\n          id\n          image {\n            url\n            altText\n            width\n            height\n          }\n        }\n        ... on Model3d {\n          id\n          alt\n          sources {\n            url\n            format\n            mimeType\n            filesize\n          }\n        }\n      }\n    }\n    metafield(namespace: "reviews", key: "product_reviews") {\n      value\n    }\n    leadTime: metafield(namespace: "custom", key: "lead_time") {\n      value\n    }\n    sliderOptions: metafield(namespace: "custom", key: "slider_options") {\n      value\n    }\n    addonProducts: metafield(namespace: "custom", key: "addon_products") {\n      references(first: 10) {\n        nodes {\n          __typename\n          ... on Product {\n            id\n            title\n            addonLabel: metafield(namespace: "custom", key: "addon_label") {\n              value\n            }\n            addonFreeOption: metafield(namespace: "custom", key: "addon_free_option") {\n              value\n            }\n            variants(first: 20) {\n              nodes {\n                ...ProductVariant\n              }\n            }\n          }\n        }\n      }\n    }\n    seo {\n      description\n      title\n    }\n  }\n  #graphql\n  fragment ProductVariant on ProductVariant {\n    availableForSale\n    compareAtPrice {\n      amount\n      currencyCode\n    }\n    id\n    image {\n      __typename\n      id\n      url\n      altText\n      width\n      height\n    }\n    price {\n      amount\n      currencyCode\n    }\n    product {\n      title\n      handle\n    }\n    selectedOptions {\n      name\n      value\n    }\n    sku\n    title\n    unitPrice {\n      amount\n      currencyCode\n    }\n  }\n\n\n': {
     return: ProductQuery;
     variables: ProductQueryVariables;
   };

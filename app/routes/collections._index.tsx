@@ -10,7 +10,7 @@ import {EditToolbar} from '~/components/EditToolbar';
 import {EditToolbarProvider} from '~/components/EditToolbarProvider';
 import {COLLECTIONS_INDEX_SLUG} from '~/lib/pageContent';
 import {loadPageContentState} from '~/lib/pageContent.server';
-import {shouldHideCollection} from '~/lib/site';
+import {compareCategories, shouldHideCollection} from '~/lib/site';
 import demoStyles from '~/styles/demo.css?url';
 
 /** The cards are `.demo-cat-card`, which lives in `demo.css` — the homepage's
@@ -56,13 +56,17 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
   return {
     collections: {
       ...collections,
-      nodes: collections.nodes.filter(
-        (collection) =>
-          !shouldHideCollection({
-            handle: collection.handle,
-            title: collection.title,
-          }),
-      ),
+      // Sorted within the page (12 per page) — the shop has well under a
+      // page of categories, so this is the full merchant-set order.
+      nodes: collections.nodes
+        .filter(
+          (collection) =>
+            !shouldHideCollection({
+              handle: collection.handle,
+              title: collection.title,
+            }),
+        )
+        .sort(compareCategories),
     },
   };
 }
@@ -146,6 +150,9 @@ const COLLECTIONS_QUERY = `#graphql
     id
     title
     handle
+    sortOrder: metafield(namespace: "custom", key: "sort_order") {
+      value
+    }
     image {
       id
       url

@@ -39,8 +39,8 @@ export interface CurrencyOption {
 
 /**
  * One entry per *currency*, not per country. Shopify markets often map many
- * countries onto one currency (this shop's GB and LT markets both settle in
- * EUR); listing every country would show the shopper the same currency twice.
+ * countries onto one currency; listing every country would show the shopper
+ * the same currency twice.
  * The first country offering a currency wins, which keeps the order stable.
  */
 export function currencyOptions(

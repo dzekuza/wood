@@ -1,7 +1,7 @@
 import {Link} from 'react-router';
 import {Image, Money, Pagination} from '@shopify/hydrogen';
 import {urlWithTrackingParams, type RegularSearchReturn} from '~/lib/search';
-import {getPagePath} from '~/lib/site';
+import {BLOG_LABEL, getPagePath} from '~/lib/site';
 
 type SearchItems = RegularSearchReturn['result']['items'];
 type PartialSearchResult<ItemType extends keyof SearchItems> = Pick<
@@ -43,7 +43,7 @@ function SearchResultsArticles({
     <section className="search-result search-result-links">
       <div className="search-result-head">
         <div>
-          <span className="eyebrow">Journal</span>
+          <span className="eyebrow">{BLOG_LABEL}</span>
           <h2>Articles</h2>
         </div>
         <span className="search-result-count">{articles.nodes.length}</span>
@@ -60,7 +60,7 @@ function SearchResultsArticles({
             <div className="search-results-item search-results-item-link" key={article.id}>
               <Link prefetch="intent" to={articleUrl}>
                 <div className="search-results-link-copy">
-                  <span className="search-results-link-label">Journal article</span>
+                  <span className="search-results-link-label">Article</span>
                   <strong>{article.title}</strong>
                 </div>
                 <i className="ti ti-arrow-up-right" aria-hidden="true" />

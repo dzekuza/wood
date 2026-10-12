@@ -2,7 +2,7 @@ import {Suspense} from 'react';
 import {Await, NavLink} from 'react-router';
 import type {FooterQuery, HeaderQuery} from 'storefrontapi.generated';
 import {SocialLinks} from '~/components/SocialLinks';
-import {FLAGSHIP_PAGE_ROUTES} from '~/lib/site';
+import {BLOG_LABEL, FLAGSHIP_PAGE_ROUTES} from '~/lib/site';
 
 interface FooterProps {
   footer: Promise<FooterQuery | null>;
@@ -29,7 +29,7 @@ const FOOTER_COLS = [
     heading: 'Workshop',
     links: [
       {title: 'Our makers', url: FLAGSHIP_PAGE_ROUTES.about},
-      {title: 'Journal', url: '/blogs'},
+      {title: BLOG_LABEL, url: '/blogs'},
     ],
   },
   {

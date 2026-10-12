@@ -1,4 +1,5 @@
 import {useLoaderData} from 'react-router';
+import {BLOG_LABEL} from '~/lib/site';
 import type {Route} from './+types/blogs.$blogHandle._index';
 import {getPaginationVariables} from '@shopify/hydrogen';
 import type {ArticleItemFragment} from 'storefrontapi.generated';
@@ -8,7 +9,7 @@ import {ArticleCard} from '~/components/ArticleCard';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 
 export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `${data?.blog.title ?? 'Journal'} | CraftWoodFurniture`}];
+  return [{title: `${data?.blog.title ?? BLOG_LABEL} | CraftWoodFurniture`}];
 };
 
 export async function loader(args: Route.LoaderArgs) {
@@ -70,7 +71,7 @@ export default function Blog() {
     <div className="archive-page">
       <Breadcrumbs
         items={[
-          {label: 'Journal', to: '/blogs'},
+          {label: BLOG_LABEL, to: '/blogs'},
           {label: blog.title},
         ]}
       />

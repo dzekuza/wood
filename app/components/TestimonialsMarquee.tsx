@@ -5,6 +5,7 @@ import {EditableText} from '~/components/EditableText';
 import {Lightbox} from '~/components/Lightbox';
 import {HOME_CONTENT_DEFAULTS} from '~/lib/homeContent';
 import {formatReviewCount, type RatingSummary} from '~/lib/reviewStats';
+import {ETSY_REVIEWS_URL} from '~/lib/site';
 
 function ReviewCard({
   review,
@@ -138,6 +139,18 @@ export function TestimonialsMarquee({
       <div className="demo-review-rows">
         <MarqueeRow reviews={row1} />
         {row2.length > 0 && <MarqueeRow reviews={row2} reverse />}
+      </div>
+
+      <div className="demo-testimonials-cta">
+        <a
+          className="btn btn-line btn-pill"
+          href={ETSY_REVIEWS_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Read all {formatReviewCount(summary.count)} reviews on Etsy
+          <i className="ti ti-arrow-right" aria-hidden="true" />
+        </a>
       </div>
     </section>
   );

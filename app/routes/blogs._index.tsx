@@ -2,10 +2,10 @@ import {useLoaderData} from 'react-router';
 import type {Route} from './+types/blogs._index';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {ArticleCard} from '~/components/ArticleCard';
-import {SITE_NAME} from '~/lib/site';
+import {BLOG_LABEL, SITE_NAME} from '~/lib/site';
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: `Journal | ${SITE_NAME}`}];
+  return [{title: `${BLOG_LABEL} | ${SITE_NAME}`}];
 };
 
 export async function loader(args: Route.LoaderArgs) {
@@ -37,7 +37,7 @@ export default function Blogs() {
 
   return (
     <div className="archive-page">
-      <Breadcrumbs items={[{label: 'Journal'}]} />
+      <Breadcrumbs items={[{label: BLOG_LABEL}]} />
       <div className="archive-hero">
         <div className="archive-wrap">
           <div className="archive-hero-inner">

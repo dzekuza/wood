@@ -5,13 +5,16 @@ export const SITE_DOMAIN = 'craftwoodfurniture.co.uk';
  *  reintroduce a `tel:` link without a real, answered number. */
 export const CONTACT_EMAIL = 'hello@craftwoodfurniture.co.uk';
 
+/** Display name for the blog section (`/blogs`). The header link's label comes
+ *  from the Shopify main menu, so rename it there too if this changes. */
+export const BLOG_LABEL = 'Advice & Inspiration';
+
 /** The shop runs exactly two social accounts — Facebook and Pinterest. One list,
  *  used by both the announcement bar and the footer, so the two can never drift
- *  apart again.
- *  TODO: both URLs are still placeholders — swap in the real profile links. */
+ *  apart again. */
 export const SOCIAL_LINKS = [
-  {platform: 'facebook', label: 'Facebook', url: 'https://facebook.com'},
-  {platform: 'pinterest', label: 'Pinterest', url: 'https://pinterest.com'},
+  {platform: 'facebook', label: 'Facebook', url: 'https://www.facebook.com/profile.php?id=61567496682291'},
+  {platform: 'pinterest', label: 'Pinterest', url: 'https://uk.pinterest.com/craftwoodfurniture_homedecor/'},
 ] as const;
 
 export type SocialPlatform = (typeof SOCIAL_LINKS)[number]['platform'];
@@ -35,12 +38,20 @@ export const ANNOUNCEMENT_MESSAGES = [
  */
 export const STORE_REVIEW_COUNT = 1400;
 
+/** The shop's Etsy reviews — linked from the homepage testimonials as proof the
+ *  reviews (and the 1.4k count) are real, independently hosted feedback. */
+export const ETSY_REVIEWS_URL =
+  'https://www.etsy.com/uk/shop/CraftWoodFurniture#reviews';
+
 /**
- * Display order for the homepage category grid. The grid itself is data-driven —
- * it renders every collection the storefront returns that `shouldHideCollection`
- * does not filter out — so a new collection created in Admin appears without a
- * deploy. This list only decides *where* a known handle sits; anything not named
- * here is appended after them, alphabetically by however Shopify returned it.
+ * Fallback display order for category lists (homepage grid, Categories page,
+ * shop sidebar). Every list is data-driven — it renders every collection the
+ * storefront returns that `shouldHideCollection` does not filter out — so a new
+ * collection created in Admin appears without a deploy.
+ *
+ * The merchant controls the order with the collection metafield
+ * `custom.sort_order` (integer, lowest first); see `compareCategories`. This
+ * list only orders collections that have no sort order set.
  */
 export const HOMEPAGE_CATEGORY_ORDER = [
   'solid-oak-mantel-beams',
@@ -53,9 +64,31 @@ export const HOMEPAGE_CATEGORY_ORDER = [
 ];
 
 /** Sort key for a collection handle — unlisted handles sort to the end. */
-export function homepageCategoryRank(handle: string) {
+function homepageCategoryRank(handle: string) {
   const index = HOMEPAGE_CATEGORY_ORDER.indexOf(handle);
   return index === -1 ? HOMEPAGE_CATEGORY_ORDER.length : index;
+}
+
+/** The shape every category query selects for ordering. */
+export type SortableCategory = {
+  handle: string;
+  sortOrder?: {value: string} | null;
+};
+
+function merchantSortOrder(category: SortableCategory) {
+  const value = Number.parseInt(category.sortOrder?.value ?? '', 10);
+  return Number.isNaN(value) ? Number.POSITIVE_INFINITY : value;
+}
+
+/**
+ * `Array.sort` comparator for category lists: the merchant's
+ * `custom.sort_order` first (unset sorts last), then `HOMEPAGE_CATEGORY_ORDER`.
+ * `Array.sort` is stable, so remaining ties keep Shopify's order.
+ */
+export function compareCategories(a: SortableCategory, b: SortableCategory) {
+  const bySortOrder = merchantSortOrder(a) - merchantSortOrder(b);
+  if (bySortOrder !== 0 && !Number.isNaN(bySortOrder)) return bySortOrder;
+  return homepageCategoryRank(a.handle) - homepageCategoryRank(b.handle);
 }
 
 export const FLAGSHIP_PAGE_ROUTES = {

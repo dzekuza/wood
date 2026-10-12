@@ -42,9 +42,9 @@ function getLineItemChildrenMap(lines: CartLine[]): LineItemChildrenMap {
   const nestedIds = new Set(Object.values(children).flat().map((l) => l.id));
   for (const line of lines) {
     if (nestedIds.has(line.id)) continue;
-    const surchargeFor = line.attributes?.find(
-      (a) => a.key === 'Surcharge for',
-    )?.value;
+    const attr = (key: string) =>
+      line.attributes?.find((a) => a.key === key)?.value;
+    const surchargeFor = attr('Surcharge for');
     if (!surchargeFor) continue;
     const candidates = lines.filter(
       (l) =>
@@ -53,7 +53,15 @@ function getLineItemChildrenMap(lines: CartLine[]): LineItemChildrenMap {
         !l.attributes?.some((a) => a.key === 'Surcharge for') &&
         l.merchandise.product.title === surchargeFor,
     );
-    if (candidates.length === 1) addChild(candidates[0].id, line);
+    // The parent line records each chosen add-on as `{group label: option}`,
+    // which disambiguates when the same product is in the cart more than once.
+    const group = attr('Upsell group');
+    const option = attr('Upsell option');
+    const parent =
+      candidates.find((l) =>
+        l.attributes?.some((a) => a.key === group && a.value === option),
+      ) ?? candidates[0];
+    if (parent) addChild(parent.id, line);
   }
 
   return children;

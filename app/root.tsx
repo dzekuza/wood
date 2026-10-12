@@ -169,8 +169,23 @@ function loadDeferredData({context}: Route.LoaderArgs) {
       return null;
     });
 
+  // A cart keeps the currency of the market it was created in. One made before
+  // a market change (or before the shopper switched currency) would otherwise
+  // keep showing its old currency in the header badge and at checkout, so
+  // re-point it at the shopper's current country whenever the two disagree.
+  const country = storefront.i18n.country;
+  const cartInMarket = cart.get().then(async (current) => {
+    if (!current || current.buyerIdentity?.countryCode === country) {
+      return current;
+    }
+    const {cart: updated} = await cart.updateBuyerIdentity({
+      countryCode: country,
+    });
+    return updated ?? current;
+  });
+
   return {
-    cart: cart.get(),
+    cart: cartInMarket,
     isLoggedIn: customerAccount.isLoggedIn(),
     footer,
     searchSuggestions,

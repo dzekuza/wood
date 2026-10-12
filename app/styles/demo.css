@@ -99,11 +99,17 @@
   visibility: visible;
 }
 
+/* Darkens only behind the centred copy so the headline stays legible, and
+   leaves the edges of the photo — the room itself — close to full brightness. */
 .demo-hero-slide::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.35);
+  background: radial-gradient(
+    ellipse 55% 50% at 50% 50%,
+    rgba(0, 0, 0, 0.42),
+    rgba(0, 0, 0, 0.08) 100%
+  );
 }
 
 .demo-hero-content {
@@ -949,6 +955,13 @@ button.demo-cat-dot.is-active {
   overflow: hidden;
 }
 
+.demo-testimonials-cta {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+  padding: 0 20px;
+}
+
 .demo-review-track {
   display: flex;
   gap: 16px;
@@ -1217,13 +1230,13 @@ button.demo-review-photo:hover {
 .demo-contact {
   position: relative;
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;
   justify-content: space-between;
-  gap: 48px;
+  gap: 40px;
   flex-wrap: wrap;
   background: var(--cwf-ink-strong);
   border-radius: 24px;
-  padding: 62px 56px;
+  padding: 56px;
   overflow: hidden;
   max-width: 1320px;
   margin: 0 auto;
@@ -1239,24 +1252,18 @@ button.demo-review-photo:hover {
   user-select: none;
 }
 
-.demo-contact-left {
+.demo-contact-heading {
   position: relative;
   z-index: 1;
   display: flex;
   flex-direction: column;
-  gap: 91px;
-  max-width: 260px;
-}
-
-.demo-contact-heading {
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
+  gap: 20px;
+  max-width: 420px;
 }
 
 .demo-contact-divider {
   height: 1px;
-  width: 100%;
+  width: 120px;
   background: var(--cwf-accent, #c9a27a);
 }
 
@@ -1272,81 +1279,57 @@ button.demo-review-photo:hover {
 .demo-contact-heading p {
   font-family: var(--demo-font-body);
   font-size: 15px;
-  color: var(--cwf-surface, #f3efea);
-  margin: 8px 0 0;
+  color: rgba(243, 239, 234, 0.75);
+  margin: 0;
 }
 
-.demo-contact-etsy {
-  font-family: var(--demo-font-body);
-  font-size: 15px;
-  color: rgba(243, 239, 234, 0.65);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  transition: color 150ms ease;
-}
-
-.demo-contact-etsy:hover { color: var(--cwf-surface, #f3efea); }
-
-.demo-contact-columns {
+.demo-contact-actions {
   position: relative;
   z-index: 1;
   display: flex;
-  gap: 88px;
-  flex-wrap: wrap;
-}
-
-.demo-contact-col {
-  display: flex;
   flex-direction: column;
-  gap: 35px;
-  max-width: 333px;
+  align-items: flex-start;
+  gap: 16px;
 }
 
-.demo-contact-block {
-  display: flex;
-  flex-direction: column;
-  gap: 13px;
-  max-width: 239px;
-}
-
-.demo-contact-label {
+.demo-contact-email {
   font-family: var(--demo-font-body);
-  font-size: 16px;
-  letter-spacing: 0.02em;
-  color: var(--cwf-accent, #c9a27a);
+  font-size: 18px;
+  letter-spacing: 0.01em;
+  color: var(--cwf-surface, #f3efea);
+  text-decoration: underline;
+  text-decoration-color: var(--cwf-line-dark);
+  text-underline-offset: 5px;
+  transition: text-decoration-color 150ms ease;
 }
 
-.demo-contact-lines {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
+.demo-contact-email:hover { text-decoration-color: var(--cwf-accent); }
+
+.demo-contact-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  border-radius: 999px;
+  background: var(--cwf-accent);
+  color: var(--cwf-ink-strong);
   font-family: var(--demo-font-body);
-  font-size: 16px;
-  letter-spacing: 0.02em;
-  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  transition: background 150ms ease;
 }
 
-.demo-contact-address {
-  font-family: var(--demo-font-body);
-  font-size: 16px;
-  letter-spacing: 0.02em;
-  line-height: 1.5;
-  color: #fff;
-  margin: 0;
-  max-width: 333px;
-}
+.demo-contact-cta:hover { background: var(--cwf-accent-hover); }
 
 @media (max-width: 900px) {
   .demo-contact-wrap { padding: 32px 20px 56px; }
-  .demo-contact { padding: 40px 28px; }
-  .demo-contact-left { gap: 40px; max-width: 100%; }
-  .demo-contact-columns { gap: 40px; }
+  .demo-contact { padding: 40px 28px; align-items: flex-start; }
 }
 
 @media (max-width: 480px) {
   .demo-contact { padding: 32px 20px; }
   .demo-contact-heading h2 { font-size: 32px; }
-  .demo-contact-columns { gap: 28px; }
+  .demo-contact-email { font-size: 16px; word-break: break-all; }
 }
 
 /* -------------------------------------------------------

@@ -1,7 +1,73 @@
 ---
 tags: [meta, changelog]
-updated: 2026-09-10
+updated: 2026-10-12
 ---
+
+## 2026-10-12 — Description rich-text styles; store setup via Admin API
+
+- **PDP description** (`.pdp-sub` and the "Product Details" accordion body):
+  the global reset stripped list bullets and paragraph spacing from the
+  merchant's Shopify rich text. Added scoped styles for `p`, `ul/ol/li`
+  (oak-coloured markers), `strong`, headings and links in `app.css`.
+- **Shopify store changes** (Admin API, 2026-10-12):
+  - Metafield definitions created, all `access.storefront = PUBLIC_READ` and
+    pinned where per-item: Product `custom.lead_time` ("Lead time", single
+    line text), Shop `custom.lead_time` (set to "5–10 working days"),
+    Collection `custom.sort_order` ("Sort order", integer).
+  - Main menu item "News" and the `news` blog renamed to "Advice &
+    Inspiration" (handle and `/blogs/news` URL unchanged). The header query is
+    `CacheLong`, so the new label appears once that cache expires.
+- **Add-on prices checked:** every "AAA Working Type Surcharge" variant
+  (Sanded / Lightly / Heavily Worked) is priced £0.00 in Shopify, so a £0.00
+  add-on row in the cart is correct data, not a bug.
+
+## 2026-10-12 — Client feedback round, part 2: swatches, category order, reviews proof, contact, hero
+
+- **Photo swatches** (oil colours, hook colours): the name now sits under the
+  photo instead of on a dark gradient; desktop hover shows a 240px enlarged
+  preview (`SwatchZoom` in `ProductForm`). Previously hover only scaled the
+  tile 5%, which the client didn't notice on desktop.
+- **Category order** is merchant-editable via collection `custom.sort_order`
+  ([[decisions-log#ADR-0015]]); homepage, Categories page and sidebar share
+  `compareCategories`. Sidebar logic deduplicated into
+  `buildSidebarCategories`. Sidebar count reads "N products + size & finish
+  variations".
+- **Testimonials** end with a "Read all 1.4k reviews on Etsy" link
+  (`ETSY_REVIEWS_URL`).
+- **Contact page** reduced to the hero ("Get in touch.") plus one email card;
+  the "No ticket desk" card and the three-step section were removed along with
+  their CSS. **Homepage contact block** is heading + email + one `mailto:` CTA.
+- **Hero overlay** is a centred radial vignette instead of a flat 35% black, so
+  the room around the copy is visibly brighter. A lighter hero photo from the
+  client is still the real fix.
+
+## 2026-10-12 — Client feedback round (Komentarai 2026-10-11): cart add-ons, currency, PDP copy
+
+- **Cart add-on bug.** Removing a product left its add-on (surcharge) line in
+  the cart, which then popped up as its own row. `CartLineItem` now removes
+  and re-quantities the product line *and* its paired add-on lines together.
+  Add-ons also render as their own visible row ("+ Working type: Lightly
+  Worked · £x") instead of tiny inline text the client couldn't see.
+  `CartMain` pairing now prefers the parent whose `{group: option}` attribute
+  matches, so the same product twice in the cart pairs correctly.
+- **Currency.** A cart keeps the currency of the market it was created in, so
+  carts made before the GB market switched to GBP kept showing EUR amounts
+  in the header badge. `root.tsx` now re-points the cart's buyer identity at
+  the shopper's current country whenever the two disagree.
+- **PDP copy** replaced per the client: highlights, trust line, assurance
+  cards, "Production & Delivery" accordion, spec cards (Guarantee →
+  Craftsmanship with hammer icon, Sourcing → Options with ruler icon), and the
+  maker strip ("Our workshop", Oxfordshire line dropped).
+- **Lead time is merchant-editable**: `custom.lead_time` (single-line text) on
+  the product overrides the shop-level `custom.lead_time`; falls back to
+  "5–10 working days". Both metafield definitions need
+  `access.storefront = PUBLIC_READ`.
+- **Product cards** with no reviews show "New product" instead of
+  "0.0 (0 reviews)".
+- **Social links** set to the real Facebook and Pinterest profiles.
+- **Blog label** "Journal" → "Advice & Inspiration" (`BLOG_LABEL` in
+  `lib/site.ts`). The header link label comes from the Shopify main menu and
+  must be renamed there.
 
 ## 2026-09-10 — Upsell (add-on) options render as photo swatch tiles when their variant has an image
 

@@ -1392,7 +1392,18 @@ button.reset > * {
   line-height: 1.5;
 }
 
+.cart-line-addons {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+}
+
 .cart-line-surcharge {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+  line-height: 1.5;
   color: var(--cwf-accent-deep);
   font-weight: 600;
 }
@@ -2904,8 +2915,7 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .pcard-rating { display: flex; align-items: center; gap: 4px; line-height: 1; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: var(--cwf-ink-strong); }
 /* No reviews yet: the score still renders as 0.0 so the row never collapses,
    but muted — a gold star beside a zero reads as a real rating. */
-.pcard-rating.is-zero { color: color-mix(in srgb, var(--cwf-ink-strong) 45%, transparent); }
-.pcard-rating.is-zero svg { color: color-mix(in srgb, var(--cwf-ink-strong) 25%, transparent); }
+.pcard-rating.is-new { color: var(--cwf-accent-deep); font-weight: 600; }
 .pcard-rating svg { width: 13px; height: 13px; color: var(--cwf-star); }
 .pcard-rating-count { opacity: 0.8; }
 
@@ -3139,6 +3149,30 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .pdp-acc-icon { width: 16px; height: 16px; color: var(--cwf-accent); transition: transform .2s; flex-shrink: 0; }
 .pdp-acc[open] .pdp-acc-icon { transform: rotate(45deg); }
 .pdp-acc-body { padding: 0 0 20px; font-size: 14px; color: color-mix(in srgb, var(--cwf-ink-strong) 70%, transparent); line-height: 1.7; }
+/* Merchant-written description HTML (Shopify rich text): the global reset
+   strips list markers and paragraph spacing, so restore readable defaults for
+   paragraphs, lists, headings and links — in both places it renders. */
+.pdp-sub p, .pdp-acc-body p { margin: 0 0 12px; }
+.pdp-sub > :last-child, .pdp-acc-body > :last-child { margin-bottom: 0; }
+.pdp-sub strong, .pdp-acc-body strong,
+.pdp-sub b, .pdp-acc-body b { color: var(--cwf-ink-strong); font-weight: 700; }
+.pdp-sub ul, .pdp-acc-body ul,
+.pdp-sub ol, .pdp-acc-body ol { margin: 0 0 12px; padding-left: 1.25em; }
+.pdp-sub ul, .pdp-acc-body ul { list-style: disc; }
+.pdp-sub ol, .pdp-acc-body ol { list-style: decimal; }
+.pdp-sub li, .pdp-acc-body li { margin: 0 0 2px; padding-left: 2px; }
+.pdp-sub li::marker, .pdp-acc-body li::marker { color: var(--cwf-accent); }
+.pdp-sub h1, .pdp-sub h2, .pdp-sub h3, .pdp-sub h4, .pdp-sub h5, .pdp-sub h6,
+.pdp-acc-body h1, .pdp-acc-body h2, .pdp-acc-body h3, .pdp-acc-body h4, .pdp-acc-body h5, .pdp-acc-body h6 {
+  margin: 16px 0 8px;
+  font-family: inherit;
+  font-size: 1em;
+  font-weight: 700;
+  letter-spacing: normal;
+  line-height: inherit;
+  color: var(--cwf-ink-strong);
+}
+.pdp-sub a, .pdp-acc-body a { color: var(--cwf-accent-deep); text-decoration: underline; text-underline-offset: 3px; }
 .pdp-sub table, .pdp-acc-body table { width: 100%; border-collapse: collapse; overflow-x: auto; display: block; font-size: 13px; }
 .pdp-sub table th, .pdp-acc-body table th { background: var(--cwf-sand); color: var(--cwf-primary); font-weight: 600; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
 .pdp-sub table td, .pdp-acc-body table td, .pdp-sub table th, .pdp-acc-body table th { padding: 10px 14px; border: 1px solid var(--cwf-line); text-align: left; white-space: nowrap; }
@@ -3219,38 +3253,65 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .product-opt-note { margin-top: 8px; font-size: 12px; color: var(--cwf-ink-strong); opacity: .75; }
 .product-optn:has(.product-swatch) { flex-direction: column; gap: 8px; padding: 16px 14px 12px; text-align: center; }
 
-/* A colour value backed by a real grain photo renders as a filled tile — the
-   texture fills the whole button and the value name sits on it as a pill, so
-   the finish is judged from a large sample instead of a 28px chip. Flat tone
-   chips (no photo) keep the chip-above-label layout and the hover preview. */
+/* A colour value backed by a real photo (oil grain, hook finish) renders as a
+   large photo tile with its name underneath — never on top of the photo, so
+   the sample stays unobscured and the label stays legible. On desktop, hover
+   pops an enlarged preview above the tile (.product-swatch-zoom). Flat tone
+   chips (no photo) keep the chip-above-label layout and the hover tooltip. */
 .product-optn:has(.product-swatch-has-image) {
   position: relative;
   width: 104px;
-  aspect-ratio: 1 / 1;
   padding: 0;
-  gap: 0;
-  border-radius: 16px;
-  overflow: hidden;
+  gap: 6px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
-.product-optn:has(.product-swatch-has-image) .product-swatch-wrap { position: absolute; inset: 0; }
+.product-optn:has(.product-swatch-has-image):hover { background: transparent; }
+.product-optn:has(.product-swatch-has-image) .product-swatch-wrap {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px var(--cwf-line);
+  transition: box-shadow .15s;
+}
 .product-optn:has(.product-swatch-has-image) .product-swatch { width: 100%; height: 100%; border: 0; border-radius: 0; }
 .product-optn:has(.product-swatch-has-image) .product-swatch-name {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 28px 10px 10px;
-  background: linear-gradient(to top, color-mix(in srgb, var(--cwf-ink-strong) 88%, transparent), transparent);
-  color: #fff;
+  color: var(--cwf-ink-strong);
   font-size: 12px;
-  font-weight: 700;
-  line-height: 1.25;
+  font-weight: 500;
+  line-height: 1.3;
   text-align: center;
   /* Wraps rather than truncating — "Light Grey Oil" does not fit one line at
      this tile width, and an ellipsised finish name is not a usable label. */
   white-space: normal;
 }
-.product-optn[data-selected="true"]:has(.product-swatch-has-image) { box-shadow: 0 0 0 2px var(--cwf-ink-strong); }
+.product-optn[data-selected="true"]:has(.product-swatch-has-image) { background: transparent; color: var(--cwf-ink-strong); }
+.product-optn[data-selected="true"]:has(.product-swatch-has-image) .product-swatch-wrap { outline: 2px solid var(--cwf-ink-strong); outline-offset: 2px; }
+.product-optn[data-selected="true"]:has(.product-swatch-has-image) .product-swatch-name { font-weight: 700; }
+
+.product-swatch-zoom {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  z-index: 20;
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  width: 240px;
+  padding: 8px 8px 10px;
+  border-radius: 16px;
+  background: var(--cwf-primary);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, .22);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(6px);
+  transition: opacity .15s, transform .15s, visibility .15s;
+}
+.product-swatch-zoom img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 10px; }
+.product-swatch-zoom-label { font-size: 13px; font-weight: 600; color: var(--cwf-surface); text-align: center; }
 /* A priced upsell option (e.g. a Coat Racks colour with a surcharge variant)
    still needs its uplift visible even once it's a photo tile — free options
    (the common case) show nothing extra, matching plain colour swatches. */
@@ -3266,9 +3327,15 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
   font-weight: 700;
 }
 @media (hover: hover) and (pointer: fine) {
-  .product-optn:has(.product-swatch-has-image):hover { transform: scale(1.05); }
+  .product-swatch-zoom { display: flex; }
+  .product-optn:has(.product-swatch-has-image):hover .product-swatch-zoom {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+  }
+  .product-optn:has(.product-swatch-has-image):hover .product-swatch-wrap { box-shadow: 0 0 0 2px var(--cwf-accent); }
 }
-.product-optn:has(.product-swatch-has-image):active { transform: scale(1.08); }
+.product-optn:has(.product-swatch-has-image):active .product-swatch-wrap { transform: scale(.97); }
 
 .product-swatch-wrap { position: relative; display: inline-flex; }
 .product-swatch-tooltip {
@@ -4490,28 +4557,20 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .story-cta p { max-width: 560px; margin-top: 16px; color: rgba(53,47,42,.7); }
 .story-cta-actions { display: flex; gap: 12px; flex-wrap: wrap; }
 
-.contact-shell { display: grid; grid-template-columns: 1.15fr .85fr; gap: 28px; align-items: start; }
-.contact-primary-card,
-.contact-info-card { background: var(--cwf-surface); border-radius: 20px; padding: 32px; }
-/* Otherwise inherits the bare h2 rule's 56px — fine for a full-width section
-   head, but this h2 sits in a ~540px boxed card and wrapped to 3 oversized
-   lines. */
-.contact-primary-card .title { font-size: clamp(24px, 3vw, 32px); line-height: 1.25; }
-.contact-primary-card p { margin-top: 16px; color: rgba(53,47,42,.72); max-width: 560px; }
-.contact-action-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
-.contact-info-card { display: grid; gap: 18px; }
-.contact-channel { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: start; padding-bottom: 18px; border-bottom: .5px solid var(--cwf-line); }
-.contact-channel:last-of-type { border-bottom: none; padding-bottom: 0; }
+.contact-email-card { display: grid; grid-template-columns: auto 1fr auto; gap: 20px; align-items: center; max-width: 880px; background: var(--cwf-surface); border-radius: 20px; padding: 32px; transition: box-shadow .15s; }
+.contact-email-card:hover { box-shadow: 0 0 0 1px var(--cwf-accent); }
+.contact-email-card .contact-channel-copy strong { color: var(--cwf-primary); font-size: 18px; }
+@media (max-width: 720px) {
+  .contact-email-card { grid-template-columns: auto 1fr; padding: 22px; }
+  .contact-email-card .btn { grid-column: 1 / -1; justify-self: start; }
+}
 .contact-channel-icon { width: 42px; height: 42px; border-radius: 12px; background: rgba(201,162,122,.14); color: var(--cwf-accent-deep); display: inline-flex; align-items: center; justify-content: center; font-size: 20px; }
 .contact-channel-copy { display: grid; gap: 4px; }
 .contact-channel-label,
 .contact-note-label { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--cwf-ink-strong); font-weight: 700; }
-.contact-channel strong { color: var(--cwf-primary); font-size: 16px; }
-.contact-channel span:last-child,
+.contact-channel-copy > span:last-child,
 .contact-note p { color: color-mix(in srgb, var(--cwf-ink-strong) 70%, transparent); font-size: 16px; }
 .contact-note { padding-top: 6px; }
-.contact-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
-.contact-step { background: var(--cwf-surface); border-radius: 18px; padding: 24px; }
 
 .account-shell { padding: 36px 0 80px; }
 .account-menu { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
@@ -4529,18 +4588,14 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 
 @media (max-width: 980px) {
   .story-grid,
-  .contact-shell,
-  .story-pillars,
-  .contact-steps { grid-template-columns: 1fr; }
+  .story-pillars { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 767px) {
   .search-page { padding: 28px 0 72px; }
   .search-page-shell,
   .search-empty-state,
-  .account-content,
-  .contact-primary-card,
-  .contact-info-card { padding: 22px; }
+  .account-content { padding: 22px; }
   .search-page-form,
   .search-page-results,
   .search-product-grid { grid-template-columns: 1fr; }

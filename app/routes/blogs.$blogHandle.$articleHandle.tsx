@@ -4,10 +4,10 @@ import {Image} from '@shopify/hydrogen';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {ArticleCard} from '~/components/ArticleCard';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
-import {SITE_NAME} from '~/lib/site';
+import {BLOG_LABEL, SITE_NAME} from '~/lib/site';
 
 export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `${data?.article.title ?? 'Journal'} | ${SITE_NAME}`}];
+  return [{title: `${data?.article.title ?? BLOG_LABEL} | ${SITE_NAME}`}];
 };
 
 export async function loader(args: Route.LoaderArgs) {
@@ -88,7 +88,7 @@ export default function Article() {
     <div className="archive-page">
       <Breadcrumbs
         items={[
-          {label: 'Journal', to: '/blogs'},
+          {label: BLOG_LABEL, to: '/blogs'},
           {label: title},
         ]}
       />
@@ -114,7 +114,7 @@ export default function Article() {
         <div className="archive-wrap blog-index-section">
           <div className="shead">
             <div>
-              <span className="eyebrow">Journal</span>
+              <span className="eyebrow">{BLOG_LABEL}</span>
               <h2 className="title">You may also like</h2>
             </div>
           </div>

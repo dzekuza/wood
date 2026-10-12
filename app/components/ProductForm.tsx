@@ -315,9 +315,10 @@ export function ProductForm({
                       <span className="product-swatch product-swatch-has-image">
                         <img src={image.url} alt={image.altText ?? option.label} />
                       </span>
-                      <span className="product-swatch-name">
-                        {formatMeasurement(option.label, unit, group.label)}
-                      </span>
+                    </span>
+                    <SwatchZoom src={image.url} label={option.label} />
+                    <span className="product-swatch-name">
+                      {formatMeasurement(option.label, unit, group.label)}
                     </span>
                     {surcharge && (
                       <span className="product-opt-surcharge-badge">
@@ -460,7 +461,22 @@ function ProductOptionSwatch({
           </span>
         )}
       </span>
+      {!!image && <SwatchZoom src={image} label={name} />}
       <span className="product-swatch-name">{name}</span>
     </>
+  );
+}
+
+/**
+ * Enlarged photo shown above a photo swatch tile on desktop hover, so a grain
+ * or hook finish can be judged at a useful size. Hidden on touch devices,
+ * where a tap selects the option instead.
+ */
+function SwatchZoom({src, label}: {src: string; label: string}) {
+  return (
+    <span className="product-swatch-zoom" aria-hidden="true">
+      <img src={src} alt="" loading="lazy" />
+      <span className="product-swatch-zoom-label">{label}</span>
+    </span>
   );
 }

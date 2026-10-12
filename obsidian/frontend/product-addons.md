@@ -1,6 +1,6 @@
 ---
 tags: [frontend, shopify, merchant-editable, stable]
-updated: 2026-09-02
+updated: 2026-10-12
 ---
 
 # Product add-ons (Working type, Height allowance, …)
@@ -74,8 +74,11 @@ They are excluded two ways, both keyed on the `addon` tag:
 
 Untouched by this design and fully attribute-driven. A chosen paid option adds
 a **second cart line** for the add-on variant, tagged with `Surcharge for` =
-the parent product title; `CartMain` pairs it back to the parent line so it
-renders nested rather than as its own row. Labels come from `group.label` /
+the parent product title; `CartMain` pairs it back to the parent line (preferring
+the one whose `{group label: option}` attribute matches) so it renders as a
+"+ Group: Option · price" row under the product rather than as its own line.
+Remove and quantity buttons on the product act on its add-on lines too, so an
+add-on can never be orphaned in the cart. Labels come from `group.label` /
 `option.label`, so renaming an add-on in Shopify flows through automatically.
 
 ## Gotchas

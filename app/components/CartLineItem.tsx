@@ -78,28 +78,31 @@ export function CartLineItem({
             </div>
           </div>
 
-          {(meaningfulOptions.length > 0 || surchargeChildren.length > 0) && (
+          {meaningfulOptions.length > 0 && (
             <div className="cart-line-opts">
               {meaningfulOptions.map((o) => o.value).join(' · ')}
-              {surchargeChildren.map((child) => {
-                const upsellOption = child.attributes?.find(
-                  (a) => a.key === 'Upsell option',
-                )?.value;
-                return (
-                  <span key={child.id} className="cart-line-surcharge">
-                    {meaningfulOptions.length > 0 ? ' · ' : ''}
-                    {upsellOption}
-                    {' ('}
-                    <Money as="span" data={child.cost?.totalAmount} />
-                    {')'}
-                  </span>
-                );
-              })}
             </div>
           )}
 
+          {surchargeChildren.length > 0 && (
+            <ul className="cart-line-addons">
+              {surchargeChildren.map((child) => {
+                const attr = (key: string) =>
+                  child.attributes?.find((a) => a.key === key)?.value;
+                return (
+                  <li key={child.id} className="cart-line-surcharge">
+                    <span>
+                      + {attr('Upsell group')}: {attr('Upsell option')}
+                    </span>
+                    <Money as="span" data={child.cost?.totalAmount} />
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+
           <div className="cart-line-bottom">
-            <CartLineQuantity line={line} />
+            <CartLineQuantity line={line} addons={surchargeChildren} />
           </div>
         </div>
       </div>
@@ -130,16 +133,28 @@ export function CartLineItem({
  * These controls are disabled when the line item is new, and the server
  * hasn't yet responded that it was successfully added to the cart.
  */
-function CartLineQuantity({line}: {line: CartLine}) {
+function CartLineQuantity({
+  line,
+  addons,
+}: {
+  line: CartLine;
+  /** Surcharge add-on lines that must change and disappear with this line. */
+  addons: CartLine[];
+}) {
   if (!line || typeof line?.quantity === 'undefined') return null;
   const {id: lineId, quantity, isOptimistic} = line;
+  const addonIds = addons.map((a) => a.id);
+  const withAddons = (qty: number) => [
+    {id: lineId, quantity: qty},
+    ...addonIds.map((id) => ({id, quantity: qty})),
+  ];
   const prevQuantity = Number(Math.max(0, quantity - 1).toFixed(0));
   const nextQuantity = Number((quantity + 1).toFixed(0));
 
   return (
     <div className="cart-line-actions">
       <div className="cart-line-quantity">
-        <CartLineUpdateButton lines={[{id: lineId, quantity: prevQuantity}]}>
+        <CartLineUpdateButton lines={withAddons(prevQuantity)}>
           <button
             aria-label="Decrease quantity"
             disabled={quantity <= 1 || !!isOptimistic}
@@ -150,7 +165,7 @@ function CartLineQuantity({line}: {line: CartLine}) {
           </button>
         </CartLineUpdateButton>
         <span className="cart-qty-value">{quantity}</span>
-        <CartLineUpdateButton lines={[{id: lineId, quantity: nextQuantity}]}>
+        <CartLineUpdateButton lines={withAddons(nextQuantity)}>
           <button
             aria-label="Increase quantity"
             name="increase-quantity"
@@ -161,7 +176,10 @@ function CartLineQuantity({line}: {line: CartLine}) {
           </button>
         </CartLineUpdateButton>
       </div>
-      <CartLineRemoveButton lineIds={[lineId]} disabled={!!isOptimistic} />
+      <CartLineRemoveButton
+        lineIds={[lineId, ...addonIds]}
+        disabled={!!isOptimistic}
+      />
     </div>
   );
 }

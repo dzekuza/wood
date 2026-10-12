@@ -23,7 +23,7 @@ import {
   type HomeContent,
 } from '~/lib/homeContent';
 import {
-  homepageCategoryRank,
+  compareCategories,
   shouldHideCollection,
   SITE_NAME,
   STORE_REVIEW_COUNT,
@@ -65,9 +65,7 @@ function buildCategories(showcase: HeroShowcaseQuery | undefined): Category[] {
           title: collection.title,
         }),
     )
-    .sort(
-      (a, b) => homepageCategoryRank(a.handle) - homepageCategoryRank(b.handle),
-    )
+    .sort(compareCategories)
     .map((collection) => ({
       title: collection.title,
       image:
@@ -207,6 +205,9 @@ const HERO_SHOWCASE_COLLECTION_FIELDS = `#graphql
     id
     title
     handle
+    sortOrder: metafield(namespace: "custom", key: "sort_order") {
+      value
+    }
     image {
       url
       altText

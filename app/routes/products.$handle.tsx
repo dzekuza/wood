@@ -60,7 +60,7 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
 
   // Add-on groups arrive with the product itself — they are Shopify product
   // references on `custom.addon_products`, so no second round trip is needed.
-  const {product} = await storefront.query(PRODUCT_QUERY, {
+  const {product, shop} = await storefront.query(PRODUCT_QUERY, {
     variables: {handle, selectedOptions: getSelectedProductOptions(request)},
     cache: storefront.CacheNone(),
   });
@@ -80,8 +80,16 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
     product.addonProducts?.references?.nodes,
   );
 
+  // Merchant-editable production lead time: a product's own `custom.lead_time`
+  // wins, then the shop-wide `custom.lead_time`, then the coded default.
+  const leadTime =
+    product.leadTime?.value?.trim() ||
+    shop.leadTime?.value?.trim() ||
+    DEFAULT_LEAD_TIME;
+
   return {
     product,
+    leadTime,
     recommendations: productRecommendations?.slice(0, 4) ?? [],
     upsellGroupsData,
   };
@@ -100,7 +108,8 @@ function loadDeferredData({context, params}: Route.LoaderArgs) {
 }
 
 export default function Product() {
-  const {product, recommendations, upsellGroupsData} = useLoaderData<typeof loader>();
+  const {product, leadTime, recommendations, upsellGroupsData} =
+    useLoaderData<typeof loader>();
 
   const productReviews: ProductReview[] = (() => {
     try {
@@ -474,15 +483,15 @@ export default function Product() {
               <StaggerItem className="pdp-highlights">
                 <span className="pdp-highlight-item">
                   <i className="ti ti-tree" aria-hidden="true" />
-                  Solid hardwood, no MDF
+                  Made from solid oak
                 </span>
                 <span className="pdp-highlight-item">
                   <i className="ti ti-certificate" aria-hidden="true" />
-                  Hand-cut joinery
+                  Handcrafted in our workshop
                 </span>
                 <span className="pdp-highlight-item">
                   <i className="ti ti-package" aria-hidden="true" />
-                  White-glove delivery included
+                  Free UK delivery included
                 </span>
               </StaggerItem>
               <StaggerItem className="pdp-price-big">
@@ -531,7 +540,7 @@ export default function Product() {
                 <span className="pdp-guarantee-sep">·</span>
                 <span>30-day returns</span>
                 <span className="pdp-guarantee-sep">·</span>
-                <span>Free white-glove delivery</span>
+                <span>Free UK delivery included</span>
               </div>
 
               {/* Assurances */}
@@ -539,29 +548,29 @@ export default function Product() {
                 <div className="pdp-assure-item">
                   <svg className="pdp-assure-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
                   <div>
-                    <strong className="pdp-assure-strong">4–6 week lead</strong>
-                    <small className="pdp-assure-small">Joined to order</small>
+                    <strong className="pdp-assure-strong">{leadTime}</strong>
+                    <small className="pdp-assure-small">Made to order</small>
                   </div>
                 </div>
                 <div className="pdp-assure-item">
                   <svg className="pdp-assure-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
                   <div>
-                    <strong className="pdp-assure-strong">Made by hand</strong>
-                    <small className="pdp-assure-small">Joints and frame</small>
+                    <strong className="pdp-assure-strong">Crafted Solid Oak</strong>
+                    <small className="pdp-assure-small">Shaped, sanded and finished</small>
                   </div>
                 </div>
                 <div className="pdp-assure-item">
                   <svg className="pdp-assure-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
                   <div>
-                    <strong className="pdp-assure-strong">White-glove delivery</strong>
-                    <small className="pdp-assure-small">Placed, levelled, signed</small>
+                    <strong className="pdp-assure-strong">Free UK delivery</strong>
+                    <small className="pdp-assure-small">Carefully packed for transit</small>
                   </div>
                 </div>
                 <div className="pdp-assure-item">
                   <svg className="pdp-assure-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
                   <div>
-                    <strong className="pdp-assure-strong">FSC sourced</strong>
-                    <small className="pdp-assure-small">Single-supplier mill</small>
+                    <strong className="pdp-assure-strong">Solid European Oak</strong>
+                    <small className="pdp-assure-small">Natural grain, unique character</small>
                   </div>
                 </div>
               </div>
@@ -576,10 +585,10 @@ export default function Product() {
                 </details>
                 <details className="pdp-acc">
                   <summary>
-                    Delivery &amp; Assembly <svg className="pdp-acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Production &amp; Delivery <svg className="pdp-acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                   </summary>
                   <div className="pdp-acc-body">
-                    Joined to order in our workshop. Two-person white-glove delivery across the UK and EU; we place, level, and remove packaging. Shipped fully assembled — no flatpacks, no allen keys.
+                    Each piece is made to order in our workshop, with a standard production lead time up to 5 working days. Your order is carefully packed and sent by courier, with free UK delivery included. Transit time is additional and depends on your location.
                   </div>
                 </details>
                 <details className="pdp-acc">
@@ -605,26 +614,26 @@ export default function Product() {
               <StaggerItem className="pdp-spec-card">
                 <svg className="pdp-spec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22V12"/><path d="M17 8l-5-6-5 6h3l-3 4h4l-3 4h8l-3-4h4l-3-4z"/></svg>
                 <div className="pdp-spec-label">Wood</div>
-                <div className="pdp-spec-val">Solid Hardwood</div>
-                <div className="pdp-spec-sub">No MDF or particleboard</div>
+                <div className="pdp-spec-val">Solid European Oak</div>
+                <div className="pdp-spec-sub">Natural grain, unique character</div>
               </StaggerItem>
               <StaggerItem className="pdp-spec-card">
-                <svg className="pdp-spec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
-                <div className="pdp-spec-label">Guarantee</div>
-                <div className="pdp-spec-val">25 Years</div>
-                <div className="pdp-spec-sub">Joints and frame</div>
+                <svg className="pdp-spec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M15 12l-8.5 8.5a2.12 2.12 0 1 1-3-3L12 9"/><path d="M17.64 15 22 10.64"/><path d="m20.91 11.7-1.25-1.25a2.4 2.4 0 0 1-.7-1.7V7.86L16.24 5.1a6 6 0 0 0-8.48 0L7 5.86l2.42 2.42a2.4 2.4 0 0 1 .7 1.7v.88l1.25 1.25"/></svg>
+                <div className="pdp-spec-label">Craftsmanship</div>
+                <div className="pdp-spec-val">Made in Our Workshop</div>
+                <div className="pdp-spec-sub">Shaped, sanded and finished</div>
               </StaggerItem>
               <StaggerItem className="pdp-spec-card">
                 <svg className="pdp-spec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
                 <div className="pdp-spec-label">Delivery</div>
-                <div className="pdp-spec-val">White Glove</div>
-                <div className="pdp-spec-sub">Assembled in your room</div>
+                <div className="pdp-spec-val">Free UK Delivery</div>
+                <div className="pdp-spec-sub">Carefully packed for transit</div>
               </StaggerItem>
               <StaggerItem className="pdp-spec-card">
-                <svg className="pdp-spec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
-                <div className="pdp-spec-label">Sourcing</div>
-                <div className="pdp-spec-val">FSC Certified</div>
-                <div className="pdp-spec-sub">Responsibly managed</div>
+                <svg className="pdp-spec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></svg>
+                <div className="pdp-spec-label">Options</div>
+                <div className="pdp-spec-val">Sizes &amp; Oil Finishes</div>
+                <div className="pdp-spec-sub">Choose what suits your home</div>
               </StaggerItem>
             </StaggerGroup>
           </div>
@@ -637,15 +646,14 @@ export default function Product() {
               )}
             </div>
             <div>
-              <div className="ey">The maker</div>
+              <div className="ey">Our workshop</div>
               <h2>
                 Crafted with <em>care and precision</em>.
               </h2>
               <p>
-                Each piece passes through our workshop from rough boards to final wax. The mortice-and-tenon joints are draw-bored — a peg driven through offset holes that pulls the joint tighter the longer it sits. No screws, no metal in the frame.
+                We make each piece from solid European oak, shaping, sanding and oiling it in our own workshop. We work with the timber’s natural grain, knots and texture, giving every finished piece its own character. Choose your size and oil finish to create a piece that suits your home.
               </p>
               <div className="sig">— Craft Wood Furniture</div>
-              <div className="by">Oxfordshire workshop</div>
             </div>
           </Reveal>
 
@@ -815,6 +823,9 @@ const PRODUCT_FRAGMENT = `#graphql
     metafield(namespace: "reviews", key: "product_reviews") {
       value
     }
+    leadTime: metafield(namespace: "custom", key: "lead_time") {
+      value
+    }
     sliderOptions: metafield(namespace: "custom", key: "slider_options") {
       value
     }
@@ -889,6 +900,9 @@ const PRODUCT_RECOMMENDATIONS_QUERY = `#graphql
   }
 ` as const;
 
+/** Shown when neither the product nor the shop sets `custom.lead_time`. */
+const DEFAULT_LEAD_TIME = '5–10 working days';
+
 const PRODUCT_QUERY = `#graphql
   query Product(
     $country: CountryCode
@@ -898,6 +912,11 @@ const PRODUCT_QUERY = `#graphql
   ) @inContext(country: $country, language: $language) {
     product(handle: $handle) {
       ...Product
+    }
+    shop {
+      leadTime: metafield(namespace: "custom", key: "lead_time") {
+        value
+      }
     }
   }
   ${PRODUCT_FRAGMENT}
