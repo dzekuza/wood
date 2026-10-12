@@ -19,6 +19,7 @@ import {SITE_NAME} from '~/lib/site';
 import {ProductItem} from '~/components/ProductItem';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {ReviewsSection, type ProductReview} from '~/components/ReviewsSection';
+import {getRatingSummary} from '~/lib/reviewStats';
 import {Lightbox} from '~/components/Lightbox';
 import {buildUpsellGroups} from '~/lib/upsells';
 import {Reveal} from '~/components/animate-ui/Reveal';
@@ -145,6 +146,7 @@ export default function Product() {
   });
 
   const {title, descriptionHtml} = product;
+  const rating = getRatingSummary(product.metafield?.value);
 
   const [quantity, setQuantity] = useState(1);
 
@@ -463,10 +465,22 @@ export default function Product() {
             {/* Info */}
             <StaggerGroup className="pdp-info">
               <StaggerItem className="pdp-rating-row">
-                <span className="pdp-rating-stars">★★★★★</span>
-                <span>4.9 / 5</span>
+                {/* Real per-product rating; a product with none yet is
+                    labelled "New product", matching its listing card. */}
+                {rating ? (
+                  <>
+                    <span className="pdp-rating-stars">★★★★★</span>
+                    <span>
+                      {rating.average.toFixed(1)} / 5 ({rating.count})
+                    </span>
+                  </>
+                ) : (
+                  <span className="pdp-rating-new">New product</span>
+                )}
                 <span className="pdp-rating-sep">·</span>
-                <a href="#reviews" className="pdp-rating-link">See reviews</a>
+                <a href="#reviews" className="pdp-rating-link">
+                  {rating ? 'See reviews' : 'See shop reviews'}
+                </a>
                 {viewingCount !== null && (
                   <>
                     <span className="pdp-rating-sep">·</span>

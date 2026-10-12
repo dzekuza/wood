@@ -3,6 +3,16 @@ tags: [meta, changelog]
 updated: 2026-10-12
 ---
 
+## 2026-10-12 — PDP rating row uses the real per-product rating
+
+The PDP header showed a hardcoded "★★★★★ 4.9 / 5" on every product, including
+ones with no reviews (and e.g. the Coat Rack Rail, whose real average is 4.0).
+It now reads `getRatingSummary(product.metafield)` — "4.0 / 5 (4)" — and a
+product with no reviews shows "New product · See shop reviews", matching the
+listing card. The `ReviewsSection` fallback (shop-wide reviews shown on such a
+product) now says "4.9 · 1.4k shop reviews on Etsy" (from `STORE_REVIEW_COUNT`)
+and links to `ETSY_REVIEWS_URL`, replacing a stale hardcoded "1,310 reviews".
+
 ## 2026-10-12 — Description rich-text styles; store setup via Admin API
 
 - **PDP description** (`.pdp-sub` and the "Product Details" accordion body):

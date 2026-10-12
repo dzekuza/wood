@@ -2,6 +2,8 @@ import {useState} from 'react';
 import {Link} from 'react-router';
 import {REVIEWS} from '~/lib/reviews';
 import {Lightbox} from '~/components/Lightbox';
+import {formatReviewCount} from '~/lib/reviewStats';
+import {ETSY_REVIEWS_URL, STORE_REVIEW_COUNT} from '~/lib/site';
 
 export type ProductReview = {
   author: string;
@@ -170,7 +172,16 @@ export function ReviewsSection({reviews}: {reviews?: ProductReview[]}) {
           </div>
           <div className="right">
             <div className="tgrid-rating">★★★★★</div>
-            <span className="tgrid-count">4.9 · 1,310 reviews</span>
+            {/* A product without its own reviews shows the shop's — labelled as
+                such, with the same store-wide count as the homepage. */}
+            <a
+              className="tgrid-count"
+              href={ETSY_REVIEWS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              4.9 · {formatReviewCount(STORE_REVIEW_COUNT)} shop reviews on Etsy
+            </a>
           </div>
         </div>
       </div>
