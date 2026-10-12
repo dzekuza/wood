@@ -107,8 +107,8 @@
   inset: 0;
   background: radial-gradient(
     ellipse 55% 50% at 50% 50%,
-    rgba(0, 0, 0, 0.42),
-    rgba(0, 0, 0, 0.08) 100%
+    rgba(0, 0, 0, 0.22),
+    rgba(0, 0, 0, 0) 100%
   );
 }
 

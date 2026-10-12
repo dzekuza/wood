@@ -47,8 +47,9 @@ and links to `ETSY_REVIEWS_URL`, replacing a stale hardcoded "1,310 reviews".
 - **Contact page** reduced to the hero ("Get in touch.") plus one email card;
   the "No ticket desk" card and the three-step section were removed along with
   their CSS. **Homepage contact block** is heading + email + one `mailto:` CTA.
-- **Hero overlay** is a centred radial vignette instead of a flat 35% black, so
-  the room around the copy is visibly brighter. A lighter hero photo from the
+- **Hero overlay** is a centred radial vignette instead of a flat 35% black
+  (22% behind the copy fading to 0% at the edges, lowered again on request),
+  so the room around the copy is visibly brighter. A lighter hero photo from the
   client is still the real fix.
 
 ## 2026-10-12 — Client feedback round (Komentarai 2026-10-11): cart add-ons, currency, PDP copy
