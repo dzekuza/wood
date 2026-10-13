@@ -1,7 +1,40 @@
 ---
 tags: [meta, changelog]
-updated: 2026-10-12
+updated: 2026-10-13
 ---
+
+## 2026-10-13 — PDP assurance icons; category sort order seeded
+
+- **PDP assurance grid** (`.pdp-assure`): "Crafted Solid Oak" now uses a hammer
+  icon (was an award ribbon) and "Free UK delivery" a package icon (was a
+  wrench). Both are Tabler outline paths inlined like the other three.
+- **Shopify store change** (Admin API, 2026-10-13): set collection
+  `custom.sort_order` on every category — Mantel Beams 10, Coat Racks 20,
+  Door Stops 30, Fireplace Surrounds 40, Cube Blocks 50, Shelves 60, Console
+  Tables 70 — so the merchant can reorder categories from Admin.
+- **PDP trust copy is toolbar-editable** ([[decisions-log#ADR-0016]]): the
+  assurance tiles and guarantee strip moved into
+  `app/components/ProductAssurances.tsx` and use `EditableText`. All product
+  pages share one `page_content` entry, slug `product`. The lead-time title
+  still comes from `custom.lead_time`.
+- **PDP reviews now match the homepage**: `ReviewsSection` renders
+  `TestimonialsMarquee` (white cards with filled stars, centered heading, "Read
+  all 1.4k reviews on Etsy" button). The old `.tcard`/`.rev-marquee-*`/
+  `.tgrid-*`/`.section-linen-cont` CSS was removed from `app.css`.
+- **Review marquees scroll slower, at a constant speed**: duration is now
+  card count × 10s (11.5s for the reverse row) instead of a fixed 46s/52s. The
+  homepage rows went from 46s to 90s, and long PDP rows no longer race.
+- **PDP description text size fixed**: the global `p { font-size: 1rem }` made
+  every description paragraph 17px, ignoring `.pdp-sub` (16px) and
+  `.pdp-acc-body` (14px). Paragraphs there now inherit size and line-height,
+  and the `<p>` Shopify wraps around each list item has no margin, so lists
+  sit tight.
+- **Length slider restored on 1.1, 1.2 and 1.3 mantel beams**: the option was
+  renamed "Beam Lenght" → "Beam Length" but `custom.slider_options` still said
+  "Beam Lenght", so the exact-name match failed and they fell back to a
+  dropdown. Updated the three metafields to `["Beam Length"]` (Admin API), and
+  `isSliderOption` now treats "lenght" and "length" as the same so a spelling
+  fix can't break it again.
 
 ## 2026-10-12 — PDP rating row uses the real per-product rating
 

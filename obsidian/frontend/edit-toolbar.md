@@ -1,6 +1,6 @@
 ---
 tags: [frontend, shopify, content, cms]
-updated: 2026-09-10
+updated: 2026-10-13
 ---
 
 # Edit toolbar (inline copy editing)
@@ -79,10 +79,12 @@ either side needed.
 | Categories | `collections._index.tsx` | `collections` | `collections.hero.*` |
 | All Products | `collections.all.tsx` | `collections-all` | `all-products.hero.heading`, `all-products.faq.heading`, `all-products.faq.i.question`/`.answer` |
 | Favourites | `pages.favourites.tsx` | `favourites` | `favourites.hero.*`, `favourites.empty.*` |
+| Product (all PDPs share it — 2026-10-13, [[decisions-log#ADR-0016]]) | `products.$handle.tsx` via `ProductAssurances.tsx` | `product` | `product.assure.{1-3}.title`, `product.assure.{0-3}.detail`, `product.guarantee.{0-2}`, `testimonials.heading` (reviews section). Tile 0's title is the lead time from `custom.lead_time`, not an override |
 | Landing (oak) | `landing-oak.tsx` | `landing-oak` | Reuses `hero.*`/`process.*` (see above) plus its exclusive components' own ids: `popular.*` (`ProductCarousel`), `featured.*` (`FeaturedPicks`), `benefits.*` (`OakBenefits`), `values.i` (`ValueMarquee`, **one id per prop, not per rendered item** — the track renders the four props twice back-to-back for a seamless CSS loop, so both copies read `values.{i % 4}` and always match), `stats.*` (`CraftStats`), `faq.*` (`FaqAccordion`) |
 
-Product/collection/search pages were deliberately left out — their copy
-(titles, descriptions, prices) is live Shopify catalog data, not hand-authored
+Collection/search pages, and the catalog parts of product pages, were
+deliberately left out — their copy (titles, descriptions, prices) is live
+Shopify catalog data, not hand-authored
 marketing copy, so there is nothing here for an admin to override. Policy
 pages (`policies.*.tsx`) were also left out on purpose: they render Shopify's
 own Shop Policy text, edited in Admin → Settings → Policies, not something

@@ -1,6 +1,6 @@
 ---
 tags: [meta, decision]
-updated: 2026-10-12
+updated: 2026-10-13
 ---
 
 # Decisions Log (ADRs)
@@ -9,6 +9,27 @@ Architecture Decision Records. Each entry captures a choice, its context, and it
 consequences. Use [[templates/adr-note]] for new entries. Newest first.
 
 ---
+
+## ADR-0016 — PDP trust copy joins the edit toolbar under one shared `product` slug
+
+- **Status:** Accepted
+- **Date:** 2026-10-13
+
+**Context.** [[#ADR-0014]] left product pages out of the toolbar because their
+copy is catalog data. But the PDP's assurance tiles and guarantee strip
+("Crafted Solid Oak", "Free UK delivery", "30-day returns", …) are
+hand-written and identical on every product, and the client asked to edit them.
+
+**Decision.** Every PDP shares one `page_content` entry, slug `product`
+(`PRODUCT_SLUG`), so an edit applies to all products at once. Only the trust
+copy is editable (`product.assure.{1-3}.title`, `product.assure.{0-3}.detail`,
+`product.guarantee.{0-2}`). Titles, descriptions and prices stay catalog data.
+Tile 0's title (lead time) is **not** an override — it stays on the
+per-product/shop `custom.lead_time` metafield so per-product lead times keep working.
+
+**Consequences.** One extra cached Admin read per PDP load (fetched in parallel
+with the product query). No per-product copy overrides — that would need a
+slug per handle.
 
 ## ADR-0015 — Category order is merchant-set via a collection `custom.sort_order` metafield
 

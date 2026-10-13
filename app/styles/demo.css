@@ -966,12 +966,16 @@ button.demo-cat-dot.is-active {
   display: flex;
   gap: 16px;
   width: max-content;
-  animation: demo-marquee 46s linear infinite;
+  /* Constant speed whatever the row length: ~10s per card (set from JS by
+     MarqueeRow; 9 is the homepage row, the fallback before hydration). */
+  --demo-review-cards: 9;
+  --demo-review-seconds-per-card: 10s;
+  animation: demo-marquee calc(var(--demo-review-cards) * var(--demo-review-seconds-per-card)) linear infinite;
 }
 
 .demo-review-row.is-reverse .demo-review-track {
   animation-direction: reverse;
-  animation-duration: 52s;
+  --demo-review-seconds-per-card: 11.5s;
 }
 
 .demo-review-row:hover .demo-review-track {

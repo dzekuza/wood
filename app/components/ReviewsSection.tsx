@@ -1,9 +1,6 @@
-import {useState} from 'react';
-import {Link} from 'react-router';
-import {REVIEWS} from '~/lib/reviews';
-import {Lightbox} from '~/components/Lightbox';
-import {formatReviewCount} from '~/lib/reviewStats';
-import {ETSY_REVIEWS_URL, STORE_REVIEW_COUNT} from '~/lib/site';
+import {TestimonialsMarquee} from '~/components/TestimonialsMarquee';
+import {HOMEPAGE_REVIEWS} from '~/lib/reviews';
+import {STORE_REVIEW_COUNT} from '~/lib/site';
 
 export type ProductReview = {
   author: string;
@@ -15,199 +12,41 @@ export type ProductReview = {
   productHandle?: string;
 };
 
-function StarRow({rating}: {rating: number}) {
-  return (
-    <div className="stars">{'★'.repeat(rating)}{'☆'.repeat(5 - rating)}</div>
-  );
+/** Shop-wide headline used when a product has no reviews of its own — the
+ *  same figure the homepage shows. */
+const SHOP_RATING = {average: 4.9, count: STORE_REVIEW_COUNT};
+
+/** A marquee row needs enough cards to overflow the viewport, or the loop
+ *  shows a gap; a product with two reviews repeats them until it does. */
+const MIN_CARDS = 6;
+
+function fillMarquee(reviews: ProductReview[]): ProductReview[] {
+  const result = [...reviews];
+  while (result.length < MIN_CARDS) result.push(...reviews);
+  return result;
 }
 
-function ProductReviewCard({review, ariaHidden}: {review: ProductReview; ariaHidden?: boolean}) {
-  const photos = review.images ?? [];
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-
-  return (
-    <div className="tcard rev-marquee-card" aria-hidden={ariaHidden || undefined}>
-      <StarRow rating={review.rating} />
-      <q>{review.body}</q>
-      {photos.length > 0 && (
-        <div className="rev-images">
-          {photos.slice(0, 4).map((src, i) => (
-            <button
-              key={i}
-              className="rev-img-btn"
-              onClick={() => !ariaHidden && setOpenIndex(i)}
-              tabIndex={ariaHidden ? -1 : 0}
-              aria-label={`View review photo ${i + 1}`}
-            >
-              {/* Decorative: the wrapping button already carries the label. */}
-              <img src={src} alt="" className="rev-img-thumb" loading="lazy" />
-            </button>
-          ))}
-        </div>
-      )}
-      <div className="who">
-        <span className="av" />
-        <div>
-          <div className="nm">{review.author}</div>
-          <div className="rl">
-            {review.productHandle ? (
-              <Link
-                to={`/products/${review.productHandle}`}
-                className="rev-product-link"
-                tabIndex={ariaHidden ? -1 : 0}
-              >
-                {review.product || review.created_at}
-              </Link>
-            ) : (
-              review.product || review.created_at
-            )}
-          </div>
-        </div>
-      </div>
-      {openIndex !== null && !ariaHidden && (
-        <Lightbox
-          images={photos.slice(0, 4).map((src) => ({
-            src,
-            alt: `Photo from ${review.author}'s review`,
-          }))}
-          index={openIndex}
-          onClose={() => setOpenIndex(null)}
-          onNavigate={setOpenIndex}
-        />
-      )}
-    </div>
-  );
-}
-
-function StaticReviewCard({r, ariaHidden}: {r: (typeof REVIEWS)[number]; ariaHidden?: boolean}) {
-  return (
-    <div className="tcard rev-marquee-card" aria-hidden={ariaHidden || undefined}>
-      <div className="stars">{r.stars}</div>
-      <q>{r.quote}</q>
-      <div className="who">
-        <span className="av" />
-        <div>
-          <div className="nm">{r.name}</div>
-          <div className="rl">{r.product}</div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
+/**
+ * PDP reviews — the homepage `TestimonialsMarquee`, fed this product's own
+ * reviews when it has any, otherwise the curated shop reviews.
+ */
 export function ReviewsSection({reviews}: {reviews?: ProductReview[]}) {
-  const source = reviews && reviews.length > 0 ? reviews : null;
-
-  // Ensure enough cards to fill the marquee by duplicating if needed
-  const ensureFull = (arr: ProductReview[], min = 6): ProductReview[] => {
-    if (arr.length >= min) return arr;
-    const result = [...arr];
-    while (result.length < min) result.push(...arr);
-    return result;
-  };
-
-  if (source) {
-    const full = ensureFull(source);
-    const mid = Math.ceil(full.length / 2);
-    const topRow = full.slice(0, mid);
-    const bottomRow = full.slice(mid).length >= 3 ? full.slice(mid) : full.slice(0, mid);
-
-    const avgRating = (source.reduce((s, r) => s + r.rating, 0) / source.length).toFixed(1);
-
+  if (!reviews?.length) {
     return (
-      <section id="reviews" className="section-linen-cont">
-        <div className="cwf-wrap">
-          <div className="shead">
-            <div>
-              <h2 className="title">What our customers say</h2>
-            </div>
-            <div className="right">
-              <div className="tgrid-rating">★★★★★</div>
-              <span className="tgrid-count">
-                {avgRating} · {source.length} reviews
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="rev-marquee-section">
-          {/* Row 1 — slides left */}
-          <div className="rev-marquee-wrap">
-            <div className="rev-marquee-track rev-marquee-left">
-              {topRow.map((r, i) => (
-                <ProductReviewCard key={`t-${i}`} review={r} />
-              ))}
-              {topRow.map((r, i) => (
-                <ProductReviewCard key={`td-${i}`} review={r} ariaHidden />
-              ))}
-            </div>
-          </div>
-          {/* Row 2 — slides right */}
-          <div className="rev-marquee-wrap">
-            <div className="rev-marquee-track rev-marquee-right">
-              {bottomRow.map((r, i) => (
-                <ProductReviewCard key={`b-${i}`} review={r} />
-              ))}
-              {bottomRow.map((r, i) => (
-                <ProductReviewCard key={`bd-${i}`} review={r} ariaHidden />
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+      <div id="reviews">
+        <TestimonialsMarquee reviews={HOMEPAGE_REVIEWS} rating={SHOP_RATING} />
+      </div>
     );
   }
 
-  // Fallback — static REVIEWS marquee (no real reviews available)
-  const mid = Math.ceil(REVIEWS.length / 2);
-  const topRow = REVIEWS.slice(0, mid);
-  const bottomRow = REVIEWS.slice(mid);
+  const rating = {
+    average: reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length,
+    count: reviews.length,
+  };
 
   return (
-    <section id="reviews" className="section-linen-cont">
-      <div className="cwf-wrap">
-        <div className="shead">
-          <div>
-            <h2 className="title">What our customers say</h2>
-          </div>
-          <div className="right">
-            <div className="tgrid-rating">★★★★★</div>
-            {/* A product without its own reviews shows the shop's — labelled as
-                such, with the same store-wide count as the homepage. */}
-            <a
-              className="tgrid-count"
-              href={ETSY_REVIEWS_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              4.9 · {formatReviewCount(STORE_REVIEW_COUNT)} shop reviews on Etsy
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <div className="rev-marquee-section">
-        <div className="rev-marquee-wrap">
-          <div className="rev-marquee-track rev-marquee-left">
-            {topRow.map((r) => (
-              <StaticReviewCard key={r.name + r.product} r={r} />
-            ))}
-            {topRow.map((r) => (
-              <StaticReviewCard key={'d-' + r.name + r.product} r={r} ariaHidden />
-            ))}
-          </div>
-        </div>
-        <div className="rev-marquee-wrap">
-          <div className="rev-marquee-track rev-marquee-right">
-            {bottomRow.map((r) => (
-              <StaticReviewCard key={r.name + r.product} r={r} />
-            ))}
-            {bottomRow.map((r) => (
-              <StaticReviewCard key={'d-' + r.name + r.product} r={r} ariaHidden />
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
+    <div id="reviews">
+      <TestimonialsMarquee reviews={fillMarquee(reviews)} rating={rating} />
+    </div>
   );
 }

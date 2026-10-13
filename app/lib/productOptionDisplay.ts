@@ -19,8 +19,17 @@
  */
 export const SLIDER_OPTION_NAMES = ['Length'];
 
+/**
+ * Case-insensitive, trimmed, and blind to the catalog's common "Lenght"
+ * misspelling: options were renamed "Beam Lenght" → "Beam Length" while their
+ * metafields still said "Beam Lenght", silently turning sliders into dropdowns.
+ */
+function normalizeOptionName(name: string): string {
+  return name.trim().toLowerCase().replace(/lenght/g, 'length');
+}
+
 export function isSliderOption(optionName: string, overrides?: string[] | null): boolean {
   const list = overrides && overrides.length > 0 ? overrides : SLIDER_OPTION_NAMES;
-  const normalized = optionName.trim().toLowerCase();
-  return list.some((name) => name.trim().toLowerCase() === normalized);
+  const normalized = normalizeOptionName(optionName);
+  return list.some((name) => normalizeOptionName(name) === normalized);
 }

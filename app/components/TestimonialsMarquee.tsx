@@ -1,11 +1,11 @@
-import {useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import type {ProductReview} from '~/components/ReviewsSection';
 import {StarFilledIcon} from '~/components/Icons';
 import {EditableText} from '~/components/EditableText';
 import {Lightbox} from '~/components/Lightbox';
 import {HOME_CONTENT_DEFAULTS} from '~/lib/homeContent';
 import {formatReviewCount, type RatingSummary} from '~/lib/reviewStats';
-import {ETSY_REVIEWS_URL} from '~/lib/site';
+import {ETSY_REVIEWS_URL, STORE_REVIEW_COUNT} from '~/lib/site';
 
 function ReviewCard({
   review,
@@ -74,9 +74,21 @@ function MarqueeRow({
   reviews: ProductReview[];
   reverse?: boolean;
 }) {
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  // The loop length grows with the card count, so the duration has to as well
+  // or a long row (a PDP with 40 reviews) races past. CSS turns the count into
+  // a per-card duration — see `--demo-review-cards` in demo.css.
+  useEffect(() => {
+    trackRef.current?.style.setProperty(
+      '--demo-review-cards',
+      String(reviews.length),
+    );
+  }, [reviews.length]);
+
   return (
     <div className={`demo-review-row${reverse ? ' is-reverse' : ''}`}>
-      <div className="demo-review-track">
+      <div className="demo-review-track" ref={trackRef}>
         {[...reviews, ...reviews].map((review, i) => (
           <ReviewCard
             review={review}
@@ -148,7 +160,9 @@ export function TestimonialsMarquee({
           target="_blank"
           rel="noopener noreferrer"
         >
-          Read all {formatReviewCount(summary.count)} reviews on Etsy
+          {/* Always the shop-wide Etsy total, not `summary` — on a PDP that is
+              only this product's reviews. */}
+          Read all {formatReviewCount(STORE_REVIEW_COUNT)} reviews on Etsy
           <i className="ti ti-arrow-right" aria-hidden="true" />
         </a>
       </div>

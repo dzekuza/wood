@@ -25,6 +25,18 @@ import {buildUpsellGroups} from '~/lib/upsells';
 import {Reveal} from '~/components/animate-ui/Reveal';
 import {StaggerGroup, StaggerItem} from '~/components/animate-ui/StaggerGroup';
 import {DURATION, EASE_OUT} from '~/lib/motion';
+import demoStyles from '~/styles/demo.css?url';
+import {ProductAssurances, ProductGuarantees} from '~/components/ProductAssurances';
+import {EditToolbar} from '~/components/EditToolbar';
+import {EditToolbarProvider} from '~/components/EditToolbarProvider';
+import {PRODUCT_SLUG} from '~/lib/pageContent';
+import {loadPageContentState} from '~/lib/pageContent.server';
+
+/** The reviews marquee (`TestimonialsMarquee`) is styled in the homepage's
+ *  `demo.css`, so the PDP loads it too. */
+export function links() {
+  return [{rel: 'stylesheet', href: demoStyles}];
+}
 
 export const meta: Route.MetaFunction = ({data}) => {
   return [
@@ -61,10 +73,13 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
 
   // Add-on groups arrive with the product itself — they are Shopify product
   // references on `custom.addon_products`, so no second round trip is needed.
-  const {product, shop} = await storefront.query(PRODUCT_QUERY, {
-    variables: {handle, selectedOptions: getSelectedProductOptions(request)},
-    cache: storefront.CacheNone(),
-  });
+  const [{product, shop}, pageContent] = await Promise.all([
+    storefront.query(PRODUCT_QUERY, {
+      variables: {handle, selectedOptions: getSelectedProductOptions(request)},
+      cache: storefront.CacheNone(),
+    }),
+    loadPageContentState(context, request, PRODUCT_SLUG),
+  ]);
 
   if (!product?.id) {
     throw new Response(null, {status: 404});
@@ -91,6 +106,7 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   return {
     product,
     leadTime,
+    pageContent,
     recommendations: productRecommendations?.slice(0, 4) ?? [],
     upsellGroupsData,
   };
@@ -109,7 +125,7 @@ function loadDeferredData({context, params}: Route.LoaderArgs) {
 }
 
 export default function Product() {
-  const {product, leadTime, recommendations, upsellGroupsData} =
+  const {product, leadTime, pageContent, recommendations, upsellGroupsData} =
     useLoaderData<typeof loader>();
 
   const productReviews: ProductReview[] = (() => {
@@ -325,418 +341,388 @@ export default function Product() {
   }
 
   return (
-    <div className="archive-page">
-      <Breadcrumbs
-        items={[
-          {label: 'Categories', to: '/collections/all'},
-          {label: title},
-        ]}
-      />
+    <EditToolbarProvider
+      slug={PRODUCT_SLUG}
+      initialState={pageContent}
+      label="Product page copy"
+    >
+      <div className="archive-page">
+        <Breadcrumbs
+          items={[
+            {label: 'Categories', to: '/collections/all'},
+            {label: title},
+          ]}
+        />
 
-      {/* PDP */}
-      <section className="pdp">
-        <div className="pdp-wrap">
-          <motion.div
-            key={product.id}
-            className="pdp-grid"
-            initial={{opacity: 0, transform: 'translateY(16px)'}}
-            animate={{opacity: 1, transform: 'translateY(0px)'}}
-            transition={{duration: DURATION, ease: EASE_OUT}}
-          >
-            {/* Gallery slider */}
-            <div className="pdp-carousel">
-              <div className="pdp-carousel-stage">
-              <div
-                className="pdp-carousel-track"
-                ref={carouselRef}
-                onScroll={handleCarouselScroll}
-              >
-                {galleryItems.map((item) => (
-                  <div key={item.key} className="pdp-carousel-slide">
-                    {item.type === 'model' ? (
-                      <ProductModel3D sources={item.sources} alt={item.alt ?? title} />
-                    ) : (
-                      <button
-                        type="button"
-                        className="pdp-zoom-btn reset"
-                        onClick={() => openLightboxFor(item)}
-                        aria-label="View full image"
-                      >
-                        <ProductImage image={item.image} />
-                      </button>
-                    )}
-                    {selectedVariant?.availableForSale === false && (
-                      <span className="pdp-ribbon">Sold Out</span>
-                    )}
-                  </div>
-                ))}
-              </div>
-              {galleryItems.length > 1 && (
-                <>
-                  <div className="pdp-carousel-arrows">
-                    <button
-                      className="pdp-carousel-arrow"
-                      onClick={() => scrollToSlide(Math.max(0, carouselIndex - 1))}
-                      aria-label="Previous image"
-                      disabled={carouselIndex === 0}
-                    >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-                    </button>
-                    <button
-                      className="pdp-carousel-arrow"
-                      onClick={() => scrollToSlide(Math.min(galleryItems.length - 1, carouselIndex + 1))}
-                      aria-label="Next image"
-                      disabled={carouselIndex === galleryItems.length - 1}
-                    >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-                    </button>
-                  </div>
-                </>
-              )}
-              </div>
-              {galleryItems.length > 1 && (
-                <div className="pdp-carousel-dots">
-                  {galleryItems.map((item, i) => (
-                    <button
-                      key={item.key}
-                      className={`pdp-carousel-dot${carouselIndex === i ? ' active' : ''}`}
-                      onClick={() => scrollToSlide(i)}
-                      aria-label={item.type === 'model' ? '3D model' : `Image ${i + 1}`}
-                    />
+        {/* PDP */}
+        <section className="pdp">
+          <div className="pdp-wrap">
+            <motion.div
+              key={product.id}
+              className="pdp-grid"
+              initial={{opacity: 0, transform: 'translateY(16px)'}}
+              animate={{opacity: 1, transform: 'translateY(0px)'}}
+              transition={{duration: DURATION, ease: EASE_OUT}}
+            >
+              {/* Gallery slider */}
+              <div className="pdp-carousel">
+                <div className="pdp-carousel-stage">
+                <div
+                  className="pdp-carousel-track"
+                  ref={carouselRef}
+                  onScroll={handleCarouselScroll}
+                >
+                  {galleryItems.map((item) => (
+                    <div key={item.key} className="pdp-carousel-slide">
+                      {item.type === 'model' ? (
+                        <ProductModel3D sources={item.sources} alt={item.alt ?? title} />
+                      ) : (
+                        <button
+                          type="button"
+                          className="pdp-zoom-btn reset"
+                          onClick={() => openLightboxFor(item)}
+                          aria-label="View full image"
+                        >
+                          <ProductImage image={item.image} />
+                        </button>
+                      )}
+                      {selectedVariant?.availableForSale === false && (
+                        <span className="pdp-ribbon">Sold Out</span>
+                      )}
+                    </div>
                   ))}
                 </div>
-              )}
-            </div>
-
-            {/* Gallery — desktop only */}
-            <div className="pdp-gallery">
-              <div className="pdp-thumbs">
-                {galleryItems.map((item) => (
-                  <button
-                    key={item.key}
-                    className={`pdp-thumb${activeItem?.key === item.key ? ' active' : ''}`}
-                    onClick={() => setActiveItem(item)}
-                  >
-                    {item.type === 'model' ? (
-                      <>
-                        <ProductModel3D
-                          sources={item.sources}
-                          alt={item.alt ?? title}
-                          interactive={false}
-                        />
-                        <span className="pdp-thumb-3d" aria-hidden="true">
-                          <i className="ti ti-cube" />
-                        </span>
-                      </>
-                    ) : (
-                      <ProductImage image={item.image} sizes="88px" />
-                    )}
-                  </button>
-                ))}
-              </div>
-              <div className="pdp-main-img">
-                {activeItem?.type === 'model' ? (
-                  <ProductModel3D sources={activeItem.sources} alt={activeItem.alt ?? title} />
-                ) : (
-                  <button
-                    type="button"
-                    className="pdp-zoom-btn reset"
-                    onClick={() => openLightboxFor(activeItem)}
-                    aria-label="View full image"
-                  >
-                    <ProductImage image={activeItem?.image ?? selectedVariant?.image} />
-                  </button>
-                )}
-                {selectedVariant?.availableForSale === false && (
-                  <span className="pdp-ribbon">Sold Out</span>
-                )}
-              </div>
-            </div>
-
-            {lightboxIndex !== null && (
-              <Lightbox
-                images={lightboxImages}
-                index={lightboxIndex}
-                onClose={() => setLightboxIndex(null)}
-                onNavigate={setLightboxIndex}
-              />
-            )}
-
-            {/* Info */}
-            <StaggerGroup className="pdp-info">
-              <StaggerItem className="pdp-rating-row">
-                {/* Real per-product rating; a product with none yet is
-                    labelled "New product", matching its listing card. */}
-                {rating ? (
+                {galleryItems.length > 1 && (
                   <>
-                    <span className="pdp-rating-stars">★★★★★</span>
-                    <span>
-                      {rating.average.toFixed(1)} / 5 ({rating.count})
-                    </span>
-                  </>
-                ) : (
-                  <span className="pdp-rating-new">New product</span>
-                )}
-                <span className="pdp-rating-sep">·</span>
-                <a href="#reviews" className="pdp-rating-link">
-                  {rating ? 'See reviews' : 'See shop reviews'}
-                </a>
-                {viewingCount !== null && (
-                  <>
-                    <span className="pdp-rating-sep">·</span>
-                    <span className="pdp-viewing">
-                      <span className="pdp-viewing-dot" />
-                      {viewingCount} viewing now
-                    </span>
+                    <div className="pdp-carousel-arrows">
+                      <button
+                        className="pdp-carousel-arrow"
+                        onClick={() => scrollToSlide(Math.max(0, carouselIndex - 1))}
+                        aria-label="Previous image"
+                        disabled={carouselIndex === 0}
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                      </button>
+                      <button
+                        className="pdp-carousel-arrow"
+                        onClick={() => scrollToSlide(Math.min(galleryItems.length - 1, carouselIndex + 1))}
+                        aria-label="Next image"
+                        disabled={carouselIndex === galleryItems.length - 1}
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                      </button>
+                    </div>
                   </>
                 )}
-              </StaggerItem>
-              <StaggerItem>
-                <h1>{title}</h1>
-              </StaggerItem>
-              <StaggerItem className="pdp-highlights">
-                <span className="pdp-highlight-item">
-                  <i className="ti ti-tree" aria-hidden="true" />
-                  Made from solid oak
-                </span>
-                <span className="pdp-highlight-item">
-                  <i className="ti ti-certificate" aria-hidden="true" />
-                  Handcrafted in our workshop
-                </span>
-                <span className="pdp-highlight-item">
-                  <i className="ti ti-package" aria-hidden="true" />
-                  Free UK delivery included
-                </span>
-              </StaggerItem>
-              <StaggerItem className="pdp-price-big">
-                <ProductPrice
-                  price={selectedVariant?.price}
-                  compareAtPrice={selectedVariant?.compareAtPrice}
+                </div>
+                {galleryItems.length > 1 && (
+                  <div className="pdp-carousel-dots">
+                    {galleryItems.map((item, i) => (
+                      <button
+                        key={item.key}
+                        className={`pdp-carousel-dot${carouselIndex === i ? ' active' : ''}`}
+                        onClick={() => scrollToSlide(i)}
+                        aria-label={item.type === 'model' ? '3D model' : `Image ${i + 1}`}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Gallery — desktop only */}
+              <div className="pdp-gallery">
+                <div className="pdp-thumbs">
+                  {galleryItems.map((item) => (
+                    <button
+                      key={item.key}
+                      className={`pdp-thumb${activeItem?.key === item.key ? ' active' : ''}`}
+                      onClick={() => setActiveItem(item)}
+                    >
+                      {item.type === 'model' ? (
+                        <>
+                          <ProductModel3D
+                            sources={item.sources}
+                            alt={item.alt ?? title}
+                            interactive={false}
+                          />
+                          <span className="pdp-thumb-3d" aria-hidden="true">
+                            <i className="ti ti-cube" />
+                          </span>
+                        </>
+                      ) : (
+                        <ProductImage image={item.image} sizes="88px" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+                <div className="pdp-main-img">
+                  {activeItem?.type === 'model' ? (
+                    <ProductModel3D sources={activeItem.sources} alt={activeItem.alt ?? title} />
+                  ) : (
+                    <button
+                      type="button"
+                      className="pdp-zoom-btn reset"
+                      onClick={() => openLightboxFor(activeItem)}
+                      aria-label="View full image"
+                    >
+                      <ProductImage image={activeItem?.image ?? selectedVariant?.image} />
+                    </button>
+                  )}
+                  {selectedVariant?.availableForSale === false && (
+                    <span className="pdp-ribbon">Sold Out</span>
+                  )}
+                </div>
+              </div>
+
+              {lightboxIndex !== null && (
+                <Lightbox
+                  images={lightboxImages}
+                  index={lightboxIndex}
+                  onClose={() => setLightboxIndex(null)}
+                  onNavigate={setLightboxIndex}
                 />
-              </StaggerItem>
-              {descriptionHtml && (
-                <StaggerItem className={`pdp-sub-wrap${descExpanded ? ' pdp-sub-expanded' : ''}`}>
-                  <div className="pdp-sub" dangerouslySetInnerHTML={{__html: descriptionHtml}} />
-                  <button
-                    className="pdp-sub-toggle"
-                    onClick={() => setDescExpanded(v => !v)}
-                    aria-expanded={descExpanded}
-                  >
-                    {descExpanded ? 'Show less' : 'Show more'}
-                  </button>
+              )}
+
+              {/* Info */}
+              <StaggerGroup className="pdp-info">
+                <StaggerItem className="pdp-rating-row">
+                  {/* Real per-product rating; a product with none yet is
+                      labelled "New product", matching its listing card. */}
+                  {rating ? (
+                    <>
+                      <span className="pdp-rating-stars">★★★★★</span>
+                      <span>
+                        {rating.average.toFixed(1)} / 5 ({rating.count})
+                      </span>
+                    </>
+                  ) : (
+                    <span className="pdp-rating-new">New product</span>
+                  )}
+                  <span className="pdp-rating-sep">·</span>
+                  <a href="#reviews" className="pdp-rating-link">
+                    {rating ? 'See reviews' : 'See shop reviews'}
+                  </a>
+                  {viewingCount !== null && (
+                    <>
+                      <span className="pdp-rating-sep">·</span>
+                      <span className="pdp-viewing">
+                        <span className="pdp-viewing-dot" />
+                        {viewingCount} viewing now
+                      </span>
+                    </>
+                  )}
                 </StaggerItem>
-              )}
-
-              <StaggerItem className="pdp-urgency">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                Made to order · 3 workshop slots left this month
-              </StaggerItem>
-
-              <StaggerItem>
-                <div ref={ctaRef}>
-                  <ProductForm
-                    productOptions={productOptions}
-                    selectedVariant={selectedVariant}
-                    product={product}
-                    lines={cartLines}
-                    upsellGroupsData={upsellGroupsData}
-                    selectedUpsells={selectedUpsells}
-                    onUpsellChange={handleUpsellChange}
-                    quantity={quantity}
-                    onQuantityChange={setQuantity}
-                    sliderOptionOverrides={sliderOptionOverrides}
+                <StaggerItem>
+                  <h1>{title}</h1>
+                </StaggerItem>
+                <StaggerItem className="pdp-highlights">
+                  <span className="pdp-highlight-item">
+                    <i className="ti ti-tree" aria-hidden="true" />
+                    Made from solid oak
+                  </span>
+                  <span className="pdp-highlight-item">
+                    <i className="ti ti-certificate" aria-hidden="true" />
+                    Handcrafted in our workshop
+                  </span>
+                  <span className="pdp-highlight-item">
+                    <i className="ti ti-package" aria-hidden="true" />
+                    Free UK delivery included
+                  </span>
+                </StaggerItem>
+                <StaggerItem className="pdp-price-big">
+                  <ProductPrice
+                    price={selectedVariant?.price}
+                    compareAtPrice={selectedVariant?.compareAtPrice}
                   />
-                </div>
-              </StaggerItem>
+                </StaggerItem>
+                {descriptionHtml && (
+                  <StaggerItem className={`pdp-sub-wrap${descExpanded ? ' pdp-sub-expanded' : ''}`}>
+                    <div className="pdp-sub" dangerouslySetInnerHTML={{__html: descriptionHtml}} />
+                    <button
+                      className="pdp-sub-toggle"
+                      onClick={() => setDescExpanded(v => !v)}
+                      aria-expanded={descExpanded}
+                    >
+                      {descExpanded ? 'Show less' : 'Show more'}
+                    </button>
+                  </StaggerItem>
+                )}
 
-              <div className="pdp-guarantee">
-                <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Secure checkout</span>
-                <span className="pdp-guarantee-sep">·</span>
-                <span>30-day returns</span>
-                <span className="pdp-guarantee-sep">·</span>
-                <span>Free UK delivery included</span>
-              </div>
+                <StaggerItem className="pdp-urgency">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  Made to order · 3 workshop slots left this month
+                </StaggerItem>
 
-              {/* Assurances */}
-              <div className="pdp-assure">
-                <div className="pdp-assure-item">
-                  <svg className="pdp-assure-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-                  <div>
-                    <strong className="pdp-assure-strong">{leadTime}</strong>
-                    <small className="pdp-assure-small">Made to order</small>
+                <StaggerItem>
+                  <div ref={ctaRef}>
+                    <ProductForm
+                      productOptions={productOptions}
+                      selectedVariant={selectedVariant}
+                      product={product}
+                      lines={cartLines}
+                      upsellGroupsData={upsellGroupsData}
+                      selectedUpsells={selectedUpsells}
+                      onUpsellChange={handleUpsellChange}
+                      quantity={quantity}
+                      onQuantityChange={setQuantity}
+                      sliderOptionOverrides={sliderOptionOverrides}
+                    />
                   </div>
-                </div>
-                <div className="pdp-assure-item">
-                  <svg className="pdp-assure-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
-                  <div>
-                    <strong className="pdp-assure-strong">Crafted Solid Oak</strong>
-                    <small className="pdp-assure-small">Shaped, sanded and finished</small>
-                  </div>
-                </div>
-                <div className="pdp-assure-item">
-                  <svg className="pdp-assure-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-                  <div>
-                    <strong className="pdp-assure-strong">Free UK delivery</strong>
-                    <small className="pdp-assure-small">Carefully packed for transit</small>
-                  </div>
-                </div>
-                <div className="pdp-assure-item">
-                  <svg className="pdp-assure-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
-                  <div>
-                    <strong className="pdp-assure-strong">Solid European Oak</strong>
-                    <small className="pdp-assure-small">Natural grain, unique character</small>
-                  </div>
-                </div>
-              </div>
+                </StaggerItem>
 
-              {/* Accordion */}
-              <div className="pdp-accordion">
-                <details className="pdp-acc" open>
-                  <summary>
-                    Product Details <svg className="pdp-acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                  </summary>
-                  <div className="pdp-acc-body" dangerouslySetInnerHTML={{__html: descriptionHtml}} />
-                </details>
-                <details className="pdp-acc">
-                  <summary>
-                    Production &amp; Delivery <svg className="pdp-acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                  </summary>
-                  <div className="pdp-acc-body">
-                    Each piece is made to order in our workshop, with a standard production lead time up to 5 working days. Your order is carefully packed and sent by courier, with free UK delivery included. Transit time is additional and depends on your location.
+                <ProductGuarantees />
+                <ProductAssurances leadTime={leadTime} />
+
+                {/* Accordion */}
+                <div className="pdp-accordion">
+                  <details className="pdp-acc" open>
+                    <summary>
+                      Product Details <svg className="pdp-acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </summary>
+                    <div className="pdp-acc-body" dangerouslySetInnerHTML={{__html: descriptionHtml}} />
+                  </details>
+                  <details className="pdp-acc">
+                    <summary>
+                      Production &amp; Delivery <svg className="pdp-acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </summary>
+                    <div className="pdp-acc-body">
+                      Each piece is made to order in our workshop, with a standard production lead time up to 5 working days. Your order is carefully packed and sent by courier, with free UK delivery included. Transit time is additional and depends on your location.
+                    </div>
+                  </details>
+                  <details className="pdp-acc">
+                    <summary>
+                      Care &amp; Finish <svg className="pdp-acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </summary>
+                    <div className="pdp-acc-body">
+                      Wipe with a soft cloth; re-oil every 18 months. Keep away from direct heat and standing water and the oak will only look better with age.
+                    </div>
+                  </details>
+                </div>
+              </StaggerGroup>
+            </motion.div>
+
+            {/* Main benefits */}
+              <div className="pdp-specs">
+                <Reveal className="pdp-specs-head">
+                  <div>
+                    <h2 className="pdp-specs-title">The honest specifications.</h2>
                   </div>
-                </details>
-                <details className="pdp-acc">
-                  <summary>
-                    Care &amp; Finish <svg className="pdp-acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                  </summary>
-                  <div className="pdp-acc-body">
-                    Wipe with a soft cloth; re-oil every 18 months. Keep away from direct heat and standing water and the oak will only look better with age.
-                  </div>
-                </details>
+                </Reveal>
+              <StaggerGroup className="pdp-specs-grid">
+                <StaggerItem className="pdp-spec-card">
+                  <svg className="pdp-spec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22V12"/><path d="M17 8l-5-6-5 6h3l-3 4h4l-3 4h8l-3-4h4l-3-4z"/></svg>
+                  <div className="pdp-spec-label">Wood</div>
+                  <div className="pdp-spec-val">Solid European Oak</div>
+                  <div className="pdp-spec-sub">Natural grain, unique character</div>
+                </StaggerItem>
+                <StaggerItem className="pdp-spec-card">
+                  <svg className="pdp-spec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M15 12l-8.5 8.5a2.12 2.12 0 1 1-3-3L12 9"/><path d="M17.64 15 22 10.64"/><path d="m20.91 11.7-1.25-1.25a2.4 2.4 0 0 1-.7-1.7V7.86L16.24 5.1a6 6 0 0 0-8.48 0L7 5.86l2.42 2.42a2.4 2.4 0 0 1 .7 1.7v.88l1.25 1.25"/></svg>
+                  <div className="pdp-spec-label">Craftsmanship</div>
+                  <div className="pdp-spec-val">Made in Our Workshop</div>
+                  <div className="pdp-spec-sub">Shaped, sanded and finished</div>
+                </StaggerItem>
+                <StaggerItem className="pdp-spec-card">
+                  <svg className="pdp-spec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                  <div className="pdp-spec-label">Delivery</div>
+                  <div className="pdp-spec-val">Free UK Delivery</div>
+                  <div className="pdp-spec-sub">Carefully packed for transit</div>
+                </StaggerItem>
+                <StaggerItem className="pdp-spec-card">
+                  <svg className="pdp-spec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></svg>
+                  <div className="pdp-spec-label">Options</div>
+                  <div className="pdp-spec-val">Sizes &amp; Oil Finishes</div>
+                  <div className="pdp-spec-sub">Choose what suits your home</div>
+                </StaggerItem>
+              </StaggerGroup>
+            </div>
+
+            {/* Maker strip */}
+            <Reveal className="maker">
+              <div className="ph">
+                {selectedVariant?.image && (
+                  <ProductImage image={selectedVariant.image} />
+                )}
               </div>
+              <div>
+                <div className="ey">Our workshop</div>
+                <h2>
+                  Crafted with <em>care and precision</em>.
+                </h2>
+                <p>
+                  We make each piece from solid European oak, shaping, sanding and oiling it in our own workshop. We work with the timber’s natural grain, knots and texture, giving every finished piece its own character. Choose your size and oil finish to create a piece that suits your home.
+                </p>
+                <div className="sig">— Craft Wood Furniture</div>
+              </div>
+            </Reveal>
+
+          </div>
+        </section>
+
+        <ReviewsSection reviews={productReviews.length > 0 ? productReviews : undefined} />
+
+        {/* Related */}
+        {recommendations.length > 0 && (
+          <div className="pdp-related">
+            <Reveal className="related-head">
+              <div>
+                <h2>Recommended for you.</h2>
+              </div>
+              <Link to="/collections/all">
+                Browse all pieces <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </Link>
+            </Reveal>
+            <StaggerGroup className="pgrid">
+              {recommendations.map((rec) => (
+                <StaggerItem key={rec.id}>
+                  <ProductItem product={rec} loading="lazy" />
+                </StaggerItem>
+              ))}
             </StaggerGroup>
-          </motion.div>
-
-          {/* Main benefits */}
-            <div className="pdp-specs">
-              <Reveal className="pdp-specs-head">
-                <div>
-                  <h2 className="pdp-specs-title">The honest specifications.</h2>
-                </div>
-              </Reveal>
-            <StaggerGroup className="pdp-specs-grid">
-              <StaggerItem className="pdp-spec-card">
-                <svg className="pdp-spec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22V12"/><path d="M17 8l-5-6-5 6h3l-3 4h4l-3 4h8l-3-4h4l-3-4z"/></svg>
-                <div className="pdp-spec-label">Wood</div>
-                <div className="pdp-spec-val">Solid European Oak</div>
-                <div className="pdp-spec-sub">Natural grain, unique character</div>
-              </StaggerItem>
-              <StaggerItem className="pdp-spec-card">
-                <svg className="pdp-spec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M15 12l-8.5 8.5a2.12 2.12 0 1 1-3-3L12 9"/><path d="M17.64 15 22 10.64"/><path d="m20.91 11.7-1.25-1.25a2.4 2.4 0 0 1-.7-1.7V7.86L16.24 5.1a6 6 0 0 0-8.48 0L7 5.86l2.42 2.42a2.4 2.4 0 0 1 .7 1.7v.88l1.25 1.25"/></svg>
-                <div className="pdp-spec-label">Craftsmanship</div>
-                <div className="pdp-spec-val">Made in Our Workshop</div>
-                <div className="pdp-spec-sub">Shaped, sanded and finished</div>
-              </StaggerItem>
-              <StaggerItem className="pdp-spec-card">
-                <svg className="pdp-spec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-                <div className="pdp-spec-label">Delivery</div>
-                <div className="pdp-spec-val">Free UK Delivery</div>
-                <div className="pdp-spec-sub">Carefully packed for transit</div>
-              </StaggerItem>
-              <StaggerItem className="pdp-spec-card">
-                <svg className="pdp-spec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></svg>
-                <div className="pdp-spec-label">Options</div>
-                <div className="pdp-spec-val">Sizes &amp; Oil Finishes</div>
-                <div className="pdp-spec-sub">Choose what suits your home</div>
-              </StaggerItem>
-            </StaggerGroup>
           </div>
+        )}
 
-          {/* Maker strip */}
-          <Reveal className="maker">
-            <div className="ph">
-              {selectedVariant?.image && (
-                <ProductImage image={selectedVariant.image} />
-              )}
+        <div className={`pdp-sticky-bar${showSticky ? ' visible' : ''}`} aria-hidden={!showSticky}>
+          <div className="pdp-sticky-inner">
+            <div className="pdp-sticky-info">
+              <span className="pdp-sticky-title">{title}</span>
+              <span className="pdp-sticky-price">
+                <ProductPrice price={selectedVariant?.price} compareAtPrice={selectedVariant?.compareAtPrice} />
+              </span>
             </div>
-            <div>
-              <div className="ey">Our workshop</div>
-              <h2>
-                Crafted with <em>care and precision</em>.
-              </h2>
-              <p>
-                We make each piece from solid European oak, shaping, sanding and oiling it in our own workshop. We work with the timber’s natural grain, knots and texture, giving every finished piece its own character. Choose your size and oil finish to create a piece that suits your home.
-              </p>
-              <div className="sig">— Craft Wood Furniture</div>
+            <div className="pdp-atc-wrap">
+              {/* Sends the shopper back up to the real buy box (variant options,
+                  quantity, upsells) instead of adding the current selection
+                  blind from the bottom of the page. */}
+              <button
+                type="button"
+                className="btn btn-primary btn-pill pdp-atc-btn"
+                onClick={scrollToTop}
+              >
+                {selectedVariant?.availableForSale ? 'Order now' : 'Sold out'}
+              </button>
             </div>
-          </Reveal>
-
-        </div>
-      </section>
-
-      <ReviewsSection reviews={productReviews.length > 0 ? productReviews : undefined} />
-
-      {/* Related */}
-      {recommendations.length > 0 && (
-        <div className="pdp-related">
-          <Reveal className="related-head">
-            <div>
-              <h2>Recommended for you.</h2>
-            </div>
-            <Link to="/collections/all">
-              Browse all pieces <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </Link>
-          </Reveal>
-          <StaggerGroup className="pgrid">
-            {recommendations.map((rec) => (
-              <StaggerItem key={rec.id}>
-                <ProductItem product={rec} loading="lazy" />
-              </StaggerItem>
-            ))}
-          </StaggerGroup>
-        </div>
-      )}
-
-      <div className={`pdp-sticky-bar${showSticky ? ' visible' : ''}`} aria-hidden={!showSticky}>
-        <div className="pdp-sticky-inner">
-          <div className="pdp-sticky-info">
-            <span className="pdp-sticky-title">{title}</span>
-            <span className="pdp-sticky-price">
-              <ProductPrice price={selectedVariant?.price} compareAtPrice={selectedVariant?.compareAtPrice} />
-            </span>
-          </div>
-          <div className="pdp-atc-wrap">
-            {/* Sends the shopper back up to the real buy box (variant options,
-                quantity, upsells) instead of adding the current selection
-                blind from the bottom of the page. */}
-            <button
-              type="button"
-              className="btn btn-primary btn-pill pdp-atc-btn"
-              onClick={scrollToTop}
-            >
-              {selectedVariant?.availableForSale ? 'Order now' : 'Sold out'}
-            </button>
           </div>
         </div>
+
+
+        <Analytics.ProductView
+          data={{
+            products: [
+              {
+                id: product.id,
+                title: product.title,
+                price: selectedVariant?.price.amount || '0',
+                vendor: product.vendor,
+                variantId: selectedVariant?.id || '',
+                variantTitle: selectedVariant?.title || '',
+                quantity: 1,
+              },
+            ],
+          }}
+        />
       </div>
-
-
-      <Analytics.ProductView
-        data={{
-          products: [
-            {
-              id: product.id,
-              title: product.title,
-              price: selectedVariant?.price.amount || '0',
-              vendor: product.vendor,
-              variantId: selectedVariant?.id || '',
-              variantTitle: selectedVariant?.title || '',
-              quantity: 1,
-            },
-          ],
-        }}
-      />
-    </div>
+      <EditToolbar />
+    </EditToolbarProvider>
   );
 }
 

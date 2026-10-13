@@ -47,6 +47,9 @@ export const COLLECTIONS_INDEX_SLUG = 'collections';
 export const COLLECTIONS_ALL_SLUG = 'collections-all';
 export const FAVOURITES_SLUG = 'favourites';
 export const LANDING_OAK_SLUG = 'landing-oak';
+/** One entry shared by every product page — the PDP's hand-written trust copy
+ *  (assurance tiles, guarantee strip) is the same on all products. */
+export const PRODUCT_SLUG = 'product';
 
 /** Builds a stable dotted field id — `fieldId('hero', 0, 'blurb')`. */
 export function fieldId(...parts: Array<string | number>): string {

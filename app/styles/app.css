@@ -3153,7 +3153,11 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 /* Merchant-written description HTML (Shopify rich text): the global reset
    strips list markers and paragraph spacing, so restore readable defaults for
    paragraphs, lists, headings and links — in both places it renders. */
-.pdp-sub p, .pdp-acc-body p { margin: 0 0 12px; }
+/* Inherit the container's size: the global `p { font-size: 1rem }` would
+   otherwise blow every paragraph up to 17px. */
+.pdp-sub p, .pdp-acc-body p { margin: 0 0 12px; font-size: inherit; line-height: inherit; }
+/* Shopify's rich text wraps each list item in a <p>; keep lists tight. */
+.pdp-sub li > p, .pdp-acc-body li > p { margin: 0; }
 .pdp-sub > :last-child, .pdp-acc-body > :last-child { margin-bottom: 0; }
 .pdp-sub strong, .pdp-acc-body strong,
 .pdp-sub b, .pdp-acc-body b { color: var(--cwf-ink-strong); font-weight: 700; }
@@ -4013,23 +4017,6 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .step h3 { font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif; font-weight: 500; letter-spacing: -.025em; color: var(--cwf-primary); margin-top: 4px; }
 .step p { font-size: 14px; color: rgba(53,47,42,.65); line-height: 1.6; }
 
-/* ---- Testimonials ---- */
-.tgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-@media (max-width: 980px) { .tgrid { grid-template-columns: 1fr; } }
-@media (max-width: 767px) {
-  .tgrid { display: flex; overflow-x: scroll; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; gap: 12px; }
-  .tgrid::-webkit-scrollbar { display: none; }
-  .tgrid .tcard { flex: 0 0 calc(100% / 1.4 - 8px); scroll-snap-align: start; }
-}
-.tcard { background: #fff; border: .5px solid var(--cwf-line); border-radius: 18px; padding: 24px; }
-.tcard .stars { color: var(--cwf-star); font-size: 14px; letter-spacing: 2px; }
-.tcard q { display: block; font-size: 15px; line-height: 1.6; color: var(--cwf-primary); quotes: none; margin-top: 12px; }
-.tcard q::before, .tcard q::after { content: ""; }
-.tcard .who { margin-top: 18px; padding-top: 16px; border-top: .5px solid var(--cwf-line); display: flex; align-items: center; gap: 12px; }
-.tcard .av { width: 36px; height: 36px; border-radius: 50%; background: repeating-linear-gradient(135deg, #e8dfd1 0 6px, #ddd2c0 6px 12px); flex-shrink: 0; }
-.tcard .nm { font-size: 14px; font-weight: 600; color: var(--cwf-primary); }
-.tcard .rl { font-size: 12px; color: color-mix(in srgb, var(--cwf-ink-strong) 55%, transparent); }
-
 /* ---- Newsletter (dark card) ---- */
 .news { background: var(--cwf-dark); color: #f3efea; border-radius: 24px; padding: 64px 56px; display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px; align-items: center; position: relative; overflow: hidden; box-shadow: 0 32px 64px -32px rgba(28,20,14,.35); }
 .news .bg-mark { position: absolute; right: -40px; top: -40px; opacity: .06; color: var(--cwf-accent); }
@@ -4188,11 +4175,9 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
  * Landing page section utilities & component classes
  * ------------------------------------------------------- */
 .section-linen { background: var(--cwf-surface); border-top: 1px solid var(--cwf-line); padding: 64px 0 96px; }
-.section-linen-cont { background: var(--cwf-surface); padding: 80px 0; }
 .section-white { background: #fff; padding: 64px 0 96px; }
 .section-white-cont { background: #fff; padding: 80px 0; }
 @media (max-width: 767px) { .section-white-cont { padding: 48px 0; } }
-@media (max-width: 767px) { .section-linen-cont { padding: 48px 0; } }
 @media (max-width: 767px) { .section-linen { padding: 40px 0 48px; } }
 @media (max-width: 767px) { .section-white { padding: 40px 0 48px; } }
 .craft-appt { font-size: 13px; color: rgba(243,239,234,.5); }
@@ -4200,29 +4185,6 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .cell-label + h3 { margin-top: 8px; }
 .cell .meta i { font-size: 18px; }
 .stat-unit { font-size: .5em; }
-.tgrid-rating { color: var(--cwf-star); font-size: 14px; letter-spacing: 2px; }
-.tgrid-count { font-size: 13px; color: var(--cwf-ink-strong); font-weight: 600; }
-
-/* Marquee reviews */
-@keyframes marquee-left  { from { transform: translateX(0); }    to { transform: translateX(-50%); } }
-@keyframes marquee-right { from { transform: translateX(-50%); } to { transform: translateX(0); }    }
-
-.rev-marquee-section { display: flex; flex-direction: column; gap: 14px; overflow: hidden; margin-top: 40px; padding-bottom: 4px; }
-.rev-marquee-wrap { overflow: hidden; width: 100%; }
-.rev-marquee-track { display: flex; gap: 14px; width: max-content; will-change: transform; }
-.rev-marquee-left  { animation: marquee-left  45s linear infinite; }
-.rev-marquee-right { animation: marquee-right 45s linear infinite; }
-.rev-marquee-wrap:hover .rev-marquee-track { animation-play-state: paused; }
-.rev-marquee-card { width: 380px; flex-shrink: 0; }
-@media (max-width: 767px) { .rev-marquee-card { width: 280px; } }
-
-/* Review image thumbnails */
-.rev-images { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
-.rev-img-btn { background: none; border: none; padding: 0; cursor: zoom-in; border-radius: 8px; overflow: hidden; flex-shrink: 0; }
-.rev-img-thumb { display: block; width: 72px; height: 72px; object-fit: cover; border-radius: 8px; border: .5px solid var(--cwf-line); transition: opacity .2s; }
-.rev-img-btn:hover .rev-img-thumb { opacity: .82; }
-.rev-product-link { color: inherit; text-decoration: none; }
-.rev-product-link:hover { text-decoration: underline; text-underline-offset: 2px; }
 .news-content { position: relative; z-index: 1; }
 .news-form-wrap { position: relative; z-index: 1; }
 .pcard-skeleton { aspect-ratio: 1/1.3; }
