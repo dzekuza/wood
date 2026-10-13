@@ -38,6 +38,17 @@ const FOOTER_COLS = [
   },
 ];
 
+/** Shopify's written policies (Admin → Settings → Policies), served by
+ *  `policies.$handle.tsx`. Legal notice is left out until one is set there —
+ *  an unset policy 404s. */
+const POLICY_LINKS = [
+  {title: 'Returns & refunds', url: '/policies/refund-policy'},
+  {title: 'Shipping', url: '/policies/shipping-policy'},
+  {title: 'Privacy', url: '/policies/privacy-policy'},
+  {title: 'Terms', url: '/policies/terms-of-service'},
+  {title: 'Contact information', url: '/policies/contact-information'},
+];
+
 export function Footer({footer: footerPromise, header, publicStoreDomain}: FooterProps) {
   return (
     <Suspense>
@@ -77,9 +88,12 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}: Foote
             <div className="footer-bottom">
               <div className="footer-bottom-inner">
                 <span className="footer-copy">© Craft Wood Furniture Ltd</span>
-                <nav className="footer-bottom-links">
-                  <NavLink prefetch="intent" to="/policies/privacy-policy">Privacy</NavLink>
-                  <NavLink prefetch="intent" to="/policies/terms-of-service">Terms</NavLink>
+                <nav className="footer-bottom-links" aria-label="Policies">
+                  {POLICY_LINKS.map((link) => (
+                    <NavLink key={link.url} prefetch="intent" to={link.url}>
+                      {link.title}
+                    </NavLink>
+                  ))}
                 </nav>
               </div>
             </div>

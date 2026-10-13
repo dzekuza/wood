@@ -1207,7 +1207,8 @@ button.reset > * {
 
 .footer-bottom-links {
   display: flex;
-  gap: 24px;
+  flex-wrap: wrap;
+  gap: 8px 24px;
 }
 
 .footer-bottom-links a {

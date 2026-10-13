@@ -1758,6 +1758,7 @@ export type PolicyQueryVariables = StorefrontAPI.Exact<{
   refundPolicy: StorefrontAPI.Scalars['Boolean']['input'];
   shippingPolicy: StorefrontAPI.Scalars['Boolean']['input'];
   termsOfService: StorefrontAPI.Scalars['Boolean']['input'];
+  contactInformation: StorefrontAPI.Scalars['Boolean']['input'];
 }>;
 
 export type PolicyQuery = {
@@ -1772,6 +1773,9 @@ export type PolicyQuery = {
       Pick<StorefrontAPI.ShopPolicy, 'body' | 'handle' | 'id' | 'title' | 'url'>
     >;
     refundPolicy?: StorefrontAPI.Maybe<
+      Pick<StorefrontAPI.ShopPolicy, 'body' | 'handle' | 'id' | 'title' | 'url'>
+    >;
+    contactInformation?: StorefrontAPI.Maybe<
       Pick<StorefrontAPI.ShopPolicy, 'body' | 'handle' | 'id' | 'title' | 'url'>
     >;
   };
@@ -2579,7 +2583,7 @@ interface GeneratedQueryTypes {
     return: PageQuery;
     variables: PageQueryVariables;
   };
-  '#graphql\n  fragment Policy on ShopPolicy {\n    body\n    handle\n    id\n    title\n    url\n  }\n  query Policy(\n    $country: CountryCode\n    $language: LanguageCode\n    $privacyPolicy: Boolean!\n    $refundPolicy: Boolean!\n    $shippingPolicy: Boolean!\n    $termsOfService: Boolean!\n  ) @inContext(language: $language, country: $country) {\n    shop {\n      privacyPolicy @include(if: $privacyPolicy) {\n        ...Policy\n      }\n      shippingPolicy @include(if: $shippingPolicy) {\n        ...Policy\n      }\n      termsOfService @include(if: $termsOfService) {\n        ...Policy\n      }\n      refundPolicy @include(if: $refundPolicy) {\n        ...Policy\n      }\n    }\n  }\n': {
+  '#graphql\n  fragment Policy on ShopPolicy {\n    body\n    handle\n    id\n    title\n    url\n  }\n  query Policy(\n    $country: CountryCode\n    $language: LanguageCode\n    $privacyPolicy: Boolean!\n    $refundPolicy: Boolean!\n    $shippingPolicy: Boolean!\n    $termsOfService: Boolean!\n    $contactInformation: Boolean!\n  ) @inContext(language: $language, country: $country) {\n    shop {\n      privacyPolicy @include(if: $privacyPolicy) {\n        ...Policy\n      }\n      shippingPolicy @include(if: $shippingPolicy) {\n        ...Policy\n      }\n      termsOfService @include(if: $termsOfService) {\n        ...Policy\n      }\n      refundPolicy @include(if: $refundPolicy) {\n        ...Policy\n      }\n      contactInformation @include(if: $contactInformation) {\n        ...Policy\n      }\n    }\n  }\n': {
     return: PolicyQuery;
     variables: PolicyQueryVariables;
   };

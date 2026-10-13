@@ -39,6 +39,14 @@ updated: 2026-10-13
   "Crafted with care and precision." and "Recommended for you." now match
   the reviews heading on the same page (homepage section scale), instead of the
   site-wide 56px. See [[../frontend/design-system]] for the exception.
+- **Footer policy links**: the bottom bar now links all five published Shopify
+  policies: Returns & refunds, Shipping, Privacy, Terms, Contact information.
+  `policies.$handle.tsx` gained `contactInformation` (`/policies/contact-information`).
+  Legal notice is skipped until one is set in Admin. The links wrap on mobile.
+- **Checkout 404 fixed (production)**: checkout links on
+  `craftwoodfurniture.co.uk/cart/c/…` hit Hydrogen, which has no checkout. A
+  new `cart.c.$.tsx` route redirects them to the myshopify domain.
+  [[decisions-log#ADR-0017]] covers the proper checkout-subdomain fix.
 
 ## 2026-10-12 — PDP rating row uses the real per-product rating
 
