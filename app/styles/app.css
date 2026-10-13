@@ -3199,6 +3199,12 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .pdp-specs-head .eyebrow { color: var(--cwf-ink-strong); display: inline-flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; }
 .pdp-specs-head .eyebrow::before { content: ""; width: 24px; height: 1px; background: var(--cwf-accent); }
 .pdp-specs-title { margin-top: 10px; }
+/* PDP section headings use the homepage section scale (demo.css h2: 36px,
+   leading 1.1667) to match the reviews heading on the same page — not the
+   site-wide flat 56px, which overpowered the product info above them. */
+.pdp-specs-title,
+.maker h2,
+.pdp-related .related-head h2 { font-size: clamp(28px, 3vw, 36px); line-height: 1.1667; }
 .pdp-specs-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
 @media (max-width: 780px) { .pdp-specs-grid { grid-template-columns: repeat(2, 1fr); } }
 .pdp-spec-card { background: #fff; border: .5px solid var(--cwf-line); border-radius: 14px; padding: 22px; }

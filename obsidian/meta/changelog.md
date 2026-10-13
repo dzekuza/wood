@@ -35,6 +35,10 @@ updated: 2026-10-13
   dropdown. Updated the three metafields to `["Beam Length"]` (Admin API), and
   `isSliderOption` now treats "lenght" and "length" as the same so a spelling
   fix can't break it again.
+- **PDP section headings 56px → 36px**: "The honest specifications.",
+  "Crafted with care and precision." and "Recommended for you." now match
+  the reviews heading on the same page (homepage section scale), instead of the
+  site-wide 56px. See [[../frontend/design-system]] for the exception.
 
 ## 2026-10-12 — PDP rating row uses the real per-product rating
 

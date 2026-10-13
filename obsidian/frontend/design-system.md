@@ -71,6 +71,11 @@ Two display faces now, not one — see `DESIGN.md` §3 for the full rationale:
   `.archive-faq-title`, `.demo-*-head h2`, etc). All of them share one flat
   size — 56px desktop, 36px mobile — regardless of heading level; hierarchy
   comes from weight/color/layout, not size.
+  **Exception (2026-10-13): PDP section headings** — `.pdp-specs-title`,
+  `.maker h2` and `.pdp-related .related-head h2` use the homepage section
+  scale, `clamp(28px, 3vw, 36px)` / leading `1.1667`. The PDP shows the
+  homepage reviews marquee (36px heading), and at 56px the other section
+  headings overpowered the product info and looked out of step with it.
 > [!warning] The self-hosted faces cover ONE weight each
 > `@font-face` in `app.css` declares Outfit at **500** and Mark Bold at **700**
 > — nothing else. Any other weight is synthesised by the browser unless that
