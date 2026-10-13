@@ -24,6 +24,7 @@ export default function Page() { return <AboutView />; }
 | Route | View | Status |
 |-------|------|--------|
 | `/` | | #wip |
+| `/cart/c/*` | `cart.c.$.tsx`: resource route, 302 to `https://<myshopify domain>/cart/c/…` (Shopify checkout). See [[../meta/decisions-log#ADR-0017]] | live |
 
 ## Conventions
 

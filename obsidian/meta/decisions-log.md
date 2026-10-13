@@ -10,6 +10,30 @@ consequences. Use [[templates/adr-note]] for new entries. Newest first.
 
 ---
 
+## ADR-0017 — Checkout links redirect to the myshopify domain until a checkout subdomain exists
+
+- **Status:** Accepted (interim)
+- **Date:** 2026-10-13
+
+**Context.** `cart.checkoutUrl` comes back as
+`https://craftwoodfurniture.co.uk/cart/c/<token>?key=…`. That domain targets
+the Hydrogen storefront, which has no checkout, so every checkout 404'd in
+production. Settings → Domains has no subdomain pointed at the Online Store,
+and the shop's primary Online Store domain is still `wood-123252.myshopify.com`.
+The same path on the myshopify domain opens the real checkout.
+
+**Decision.** `app/routes/cart.c.$.tsx` 302s `/cart/c/*` (path + query
+intact) to `SHOPIFY_ADMIN_SHOP_DOMAIN || PUBLIC_STORE_DOMAIN`, and 404s rather
+than loop if that resolves to the request's own host.
+
+**Consequences.** Checkout works, but on the `myshopify.com` address, so
+storefront cookies (consent, analytics `_shopify_y`/`_shopify_s`) don't carry
+over. **The proper fix** (Shopify's documented Hydrogen setup): add
+`checkout.craftwoodfurniture.co.uk` in DNS (CNAME → `shops.myshopify.com`),
+connect it in Settings → Domains with target **Online Store**, and set it as
+the Online Store's primary domain. Checkout URLs are then built on that
+subdomain and this route goes unused, but it's harmless to keep.
+
 ## ADR-0016 — PDP trust copy joins the edit toolbar under one shared `product` slug
 
 - **Status:** Accepted
