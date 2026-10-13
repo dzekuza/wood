@@ -47,6 +47,10 @@ updated: 2026-10-13
   `craftwoodfurniture.co.uk/cart/c/…` hit Hydrogen, which has no checkout. A
   new `cart.c.$.tsx` route redirects them to the myshopify domain.
   [[decisions-log#ADR-0017]] covers the proper checkout-subdomain fix.
+- **PDP hides the placeholder "Title" option**: products without variants
+  (e.g. 5.2 Solid Oak Shelf with Brackets) showed "Title: Default" because the
+  placeholder value was renamed from "Default Title". `ProductForm` now skips
+  any single-value option named `Title`.
 
 ## 2026-10-12 — PDP rating row uses the real per-product rating
 

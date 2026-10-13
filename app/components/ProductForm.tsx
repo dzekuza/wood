@@ -76,6 +76,13 @@ export function ProductForm({
       {productOptions.map((option) => {
         const selectedValue = option.optionValues.find((v) => v.selected);
 
+        // A product with no variants still has one placeholder option,
+        // "Title", whose single value is "Default Title" — or whatever it was
+        // renamed to (e.g. "Default"). It describes nothing, so skip it.
+        if (option.name === 'Title' && option.optionValues.length === 1) {
+          return null;
+        }
+
         // Single-value option: show as read-only info label, not interactive
         if (option.optionValues.length === 1) {
           return (
