@@ -29,6 +29,11 @@ issues to a few code gaps. Fixed:
   CSS selectors moved with them, with `line-height`/`margin` pinned so the
   rendered styles match the old tags exactly (checked against live).
 
+- **Re-audit** (same day, 76 pages): warnings fell from 192 to 11 and every
+  critical issue was gone. The one code-side leftover, `/blogs` and
+  `/blogs/news` both titled "Advice & Inspiration", was fixed by titling
+  `/blogs` after its h1, "Stories from the Bench".
+
 Not code issues, left for Admin: three orphan products
 (`working-type-surcharge`, `aaa-types-of-corbels`, `coat-racks`) and product
 titles carrying numbering such as "4.1." or running past 60 characters.

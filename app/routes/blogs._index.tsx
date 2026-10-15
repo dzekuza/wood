@@ -7,7 +7,9 @@ import {seoMeta} from '~/lib/seo';
 
 export const meta: Route.MetaFunction = () => {
   return seoMeta({
-    title: `${BLOG_LABEL} | ${SITE_NAME}`,
+    // Matches this page's h1 so it doesn't share a title with the blog it
+    // lists (/blogs/news is titled BLOG_LABEL).
+    title: `Stories from the Bench | ${SITE_NAME}`,
     description:
       'Advice and inspiration from the Craft Wood Furniture workshop: caring for solid oak, choosing a mantel beam, and styling handmade timber at home.',
     path: '/blogs',

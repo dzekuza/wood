@@ -38,7 +38,7 @@ updated: 2026-10-15
 | `collections.$handle` | `seo.title` → collection title | `seo.description` → `description` → default | `/collections/{handle}` |
 | `collections._index` | "Shop by Category" | Hard-coded | `/collections` |
 | `collections.all` | "All Products" | Hard-coded | `/collections/all` |
-| `blogs._index` | `BLOG_LABEL` | Hard-coded | `/blogs` |
+| `blogs._index` | "Stories from the Bench" (its h1, so it doesn't duplicate `/blogs/news`) | Hard-coded | `/blogs` |
 | `blogs.$blogHandle._index` | `seo.title` → blog title | `seo.description` → default | `/blogs/{handle}` |
 | `pages.$handle` | `seo.title` → page title | `seo.description` | — |
 | `about`, `contact` | Hard-coded | Hard-coded | — |
