@@ -1,6 +1,6 @@
 ---
 tags: [architecture, wip]
-updated: 2026-08-25
+updated: 2026-10-15
 ---
 
 # Environment Variables
@@ -18,7 +18,6 @@ updated: 2026-08-25
 
 | Name | Scope | Required | Purpose |
 |------|-------|----------|---------|
-| `SITE_PASSWORD` | server | no | When set, gates the whole storefront behind `/coming-soon`. Currently set **in the Oxygen environment**, so it applies to local dev too |
 | `SHOPIFY_ADMIN_TOKEN` | server | for the edit toolbar | Admin API access token (`shpat_…`). Bypasses every Storefront visibility rule — server-only, never import `*.server.ts` from a component. Also used by `scripts/*.mjs` |
 | `SHOPIFY_ADMIN_SHOP_DOMAIN` | server | no | The real `*.myshopify.com` handle. Only needed if `PUBLIC_STORE_DOMAIN` is a custom/alias domain, which the Admin API does not answer on; otherwise it falls back to `PUBLIC_STORE_DOMAIN` |
 | `ADMIN_ALLOWLIST_EMAILS` | server | for the edit toolbar | Comma-separated Customer Account emails allowed to use the [[../frontend/edit-toolbar|edit toolbar]]. Empty or unset = nobody is an admin |

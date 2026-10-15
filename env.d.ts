@@ -8,8 +8,6 @@ import '@total-typescript/ts-reset';
 
 declare global {
   interface Env {
-    /** When set, gates the whole storefront behind /coming-soon until this password is submitted. */
-    SITE_PASSWORD?: string;
     /** Admin API access token (`shpat_…`). Server-only — it bypasses every
      *  Storefront visibility rule. Also used by the `scripts/*.mjs` tools. */
     SHOPIFY_ADMIN_TOKEN?: string;

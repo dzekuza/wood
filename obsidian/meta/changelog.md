@@ -1,7 +1,16 @@
 ---
 tags: [meta, changelog]
-updated: 2026-10-13
+updated: 2026-10-15
 ---
+
+## 2026-10-15 — Coming-soon password gate removed
+
+- The storefront is public. The `SITE_PASSWORD` check in the `root.tsx`
+  loader, the `/coming-soon` route, its `App` render branch, the
+  `.coming-soon*` CSS and the `Env.SITE_PASSWORD` type are all gone.
+  `/coming-soon` now falls through to the `$.tsx` 404.
+- `SITE_PASSWORD` is still set in the Oxygen environment. The code no longer
+  reads it, so it does nothing; the owner can delete it.
 
 ## 2026-10-13 — PDP assurance icons; category sort order seeded
 

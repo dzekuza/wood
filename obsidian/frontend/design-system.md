@@ -39,13 +39,12 @@ A page heading renders in a single colour. The `<em>` inside one (`Browse
 takes `color: inherit`, never its own value. Do not reintroduce the
 `color: var(--cwf-accent)` split that `.page-header h1 em`, `.pdp-info h1 em`,
 `.pdp-maker h2 em`, `.hero h1 em`, `.archive-hero-title em`, `.news h2 em`,
-`.maker h2 em` and `.coming-soon-title em` all carried until 2026-09-02 — that
+`.maker h2 em` and the (since removed) `.coming-soon-title em` all carried until 2026-09-02 — that
 pale gold on a light ground was the weakest text on the page, and it landed on
 the one word the heading was trying to stress.
 
 On a light ground a heading is `--cwf-ink-strong` (`#352f2a`); on a dark one it
-keeps its light value (`#f3efea` for `.pdp-maker`/`.news`/`.maker`, and
-`.coming-soon-title` on `--cwf-ink`). Either way the `em` inherits, so a heading
+keeps its light value (`#f3efea` for `.pdp-maker`/`.news`/`.maker`). Either way the `em` inherits, so a heading
 moved between grounds stays correct with no second edit.
 
 ## Adding a token
