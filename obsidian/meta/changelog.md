@@ -3,6 +3,36 @@ tags: [meta, changelog]
 updated: 2026-10-15
 ---
 
+## 2026-10-15 — SEO fixes from the first OpenSEO audit
+
+The OpenSEO audit of the newly public store (85 pages, 284 issues) traced most
+issues to a few code gaps. Fixed:
+
+- **Canonicals** ([[decisions-log#ADR-0018]]): collection, category, all
+  products and blog listings now emit an absolute, path-only canonical, so
+  filter, sort and pagination variants stop counting as duplicates. The PDP
+  already had one, but it rendered as `<meta rel="canonical">` and was
+  ignored; it is now a real `<link>`.
+- **Meta descriptions**: products and collections use the Shopify SEO field,
+  then their own description, then a written default; `/collections`,
+  `/collections/all`, `/blogs` and `/blogs/{handle}` got hard-coded ones. All
+  of this goes through the new `app/lib/seo.ts` helpers (see [[../frontend/utils]]).
+- **`/collections` title**: the route had no `meta` export; it is now "Shop by
+  Category".
+- **Broken previous-page links**: the filter, price, clear-filters and sort
+  URL builders deleted `cursor` but kept `direction`, producing
+  `?direction=previous` URLs that 404. They now drop both, and
+  `collections.$handle` 301s any existing cursorless `direction` URL.
+- **Heading order**: every page jumped levels before the `<h1>` (drawer titles
+  were `h3`, search labels `h5`) and the shop sidebar used `h4` under the `h1`.
+  `Aside` titles are now `h2`, search labels `h3`, and sidebar labels `h2`. The
+  CSS selectors moved with them, with `line-height`/`margin` pinned so the
+  rendered styles match the old tags exactly (checked against live).
+
+Not code issues, left for Admin: three orphan products
+(`working-type-surcharge`, `aaa-types-of-corbels`, `coat-racks`) and product
+titles carrying numbering such as "4.1." or running past 60 characters.
+
 ## 2026-10-15 — Coming-soon password gate removed
 
 - The storefront is public. The `SITE_PASSWORD` check in the `root.tsx`

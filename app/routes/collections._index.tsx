@@ -10,7 +10,8 @@ import {EditToolbar} from '~/components/EditToolbar';
 import {EditToolbarProvider} from '~/components/EditToolbarProvider';
 import {COLLECTIONS_INDEX_SLUG} from '~/lib/pageContent';
 import {loadPageContentState} from '~/lib/pageContent.server';
-import {compareCategories, shouldHideCollection} from '~/lib/site';
+import {compareCategories, shouldHideCollection, SITE_NAME} from '~/lib/site';
+import {seoMeta} from '~/lib/seo';
 import demoStyles from '~/styles/demo.css?url';
 
 /** The cards are `.demo-cat-card`, which lives in `demo.css` — the homepage's
@@ -19,6 +20,14 @@ import demoStyles from '~/styles/demo.css?url';
 export function links() {
   return [{rel: 'stylesheet', href: demoStyles}];
 }
+
+export const meta: Route.MetaFunction = () =>
+  seoMeta({
+    title: `Shop by Category | ${SITE_NAME}`,
+    description:
+      'Browse every Craft Wood Furniture category: solid oak mantel beams, shelves, fireplace surrounds, console tables, coat racks and door stops, all handmade.',
+    path: '/collections',
+  });
 
 export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte

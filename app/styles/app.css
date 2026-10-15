@@ -277,7 +277,7 @@ select:focus {
   padding: 22px 28px 20px;
 }
 
-.overlay aside header h3 {
+.overlay aside header h2 {
   margin: 0;
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 13px;
@@ -766,7 +766,11 @@ button.reset > * {
    handful of best sellers, so the panel is never empty on focus. */
 .search-suggestions { display: flex; flex-direction: column; gap: 24px; }
 
-.search-suggestions-section h5 {
+/* An h3 under the search drawer's h2 title, styled as a small label.
+ * `margin-top` and `line-height` match the h5 it replaced. */
+.search-suggestions-section h3 {
+  margin-top: 0;
+  line-height: inherit;
   text-transform: uppercase;
   font-size: 10px;
   letter-spacing: .14em;
@@ -1738,7 +1742,9 @@ input.search-input:focus { border: none; box-shadow: none; }
   margin-bottom: 28px;
 }
 
-.predictive-search-result h5 {
+.predictive-search-result h3 {
+  margin-top: 0;
+  line-height: inherit;
   text-transform: uppercase;
   font-size: 10px;
   letter-spacing: .14em;
@@ -4053,7 +4059,9 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
    mobile drawer (.mob-filter-body); both render the same <CollectionFilters>,
    whose root is always `.filters-content`, so style that instead of the
    container it happens to sit in. */
-.filters-content h4 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--cwf-ink-strong); padding-bottom: 12px; }
+/* Sidebar section labels are h2s (siblings under the page h1), styled as small
+ * eyebrow labels; margin and line-height match the h4s they replaced. */
+.filters-content h2 { margin: 0; line-height: inherit; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--cwf-ink-strong); padding-bottom: 12px; }
 .filters-content .fblock { margin-bottom: 32px; }
 .filters-content ul { list-style: none; display: flex; flex-direction: column; gap: 0; }
 .filters-content li { margin: 0; }

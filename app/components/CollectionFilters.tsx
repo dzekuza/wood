@@ -60,7 +60,7 @@ function PriceFilterBlock({priceFilter}: {priceFilter: Filter | undefined}) {
 
   return (
     <div className="fblock">
-      <h4>Price</h4>
+      <h2>Price</h2>
       <form
         className="price-range"
         onSubmit={(event) => {
@@ -153,7 +153,7 @@ export function CollectionFilters({
 
       {listFilters.map((filter) => (
         <div className="fblock" key={filter.id}>
-          <h4>{filter.label}</h4>
+          <h2>{filter.label}</h2>
           <ul>
             {filter.values.map((value) => (
               <FilterValueRow key={value.id} filterId={filter.id} value={value} />

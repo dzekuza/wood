@@ -14,11 +14,24 @@ import {
 import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {parseFiltersFromSearchParams} from '~/lib/collectionFilters';
 import {SITE_NAME} from '~/lib/site';
+import {seoMeta, toMetaDescription} from '~/lib/seo';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 import type {SortValue} from '~/components/SortDropdown';
 
-export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `${data?.collection.title ?? 'Category'} | ${SITE_NAME}`}];
+export const meta: Route.MetaFunction = ({data, params}) => {
+  const collection = data?.collection;
+  const title = collection?.seo.title || collection?.title || 'Category';
+
+  return seoMeta({
+    title: `${title} | ${SITE_NAME}`,
+    description: toMetaDescription(
+      collection?.seo.description,
+      collection?.description,
+      collection &&
+        `Shop handmade solid oak ${collection.title.toLowerCase()} from ${SITE_NAME}. Cut, joined and finished in our own workshop, with free UK delivery.`,
+    ),
+    path: `/collections/${collection?.handle ?? params.handle}`,
+  });
 };
 
 export async function loader(args: Route.LoaderArgs) {
@@ -57,6 +70,15 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   }
 
   const url = new URL(request.url);
+
+  // `direction` without a `cursor` asks the API for the last page before
+  // nothing, which comes back empty and 404s. Old filter links produced these
+  // URLs and crawlers have them, so send them to the same listing without it.
+  if (url.searchParams.has('direction') && !url.searchParams.has('cursor')) {
+    url.searchParams.delete('direction');
+    throw redirect(`${url.pathname}${url.search}`, 301);
+  }
+
   const sortParam = (url.searchParams.get('sort') ?? 'featured') as SortValue;
   const {sortKey, reverse} = SORT_MAP[sortParam] ?? SORT_MAP.featured;
   const filters = parseFiltersFromSearchParams(url.searchParams);
@@ -313,6 +335,10 @@ const COLLECTION_QUERY = `#graphql
       handle
       title
       description
+      seo {
+        title
+        description
+      }
       products(
         first: $first,
         last: $last,

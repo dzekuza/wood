@@ -90,7 +90,7 @@ function SearchResultsPredictiveArticles({
 
   return (
     <div className="predictive-search-result" key="articles">
-      <h5>Articles</h5>
+      <h3>Articles</h3>
       <ul>
         {articles.map((article) => {
           const articleUrl = urlWithTrackingParams({
@@ -131,7 +131,7 @@ function SearchResultsPredictiveCollections({
 
   return (
     <div className="predictive-search-result" key="collections">
-      <h5>Categories</h5>
+      <h3>Categories</h3>
       <ul>
         {collections.map((collection) => {
           const collectionUrl = urlWithTrackingParams({
@@ -172,7 +172,7 @@ function SearchResultsPredictivePages({
 
   return (
     <div className="predictive-search-result" key="pages">
-      <h5>Pages</h5>
+      <h3>Pages</h3>
       <ul>
         {pages.map((page) => {
           const pageUrl = urlWithTrackingParams({
@@ -205,7 +205,7 @@ function SearchResultsPredictiveProducts({
 
   return (
     <div className="predictive-search-result" key="products">
-      <h5>Products</h5>
+      <h3>Products</h3>
       <ul>
         {products.map((product) => {
           const productUrl = urlWithTrackingParams({
@@ -249,7 +249,7 @@ function SearchResultsPredictiveQueries({
 
   return (
     <div className="predictive-search-result predictive-search-suggestions" key="queries">
-      <h5>Suggestions</h5>
+      <h3>Suggestions</h3>
       <ul>
       {queries.map((suggestion) => {
         if (!suggestion) return null;

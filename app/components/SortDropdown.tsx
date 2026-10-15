@@ -34,6 +34,7 @@ export function SortDropdown({current}: {current: SortValue}) {
     const params = new URLSearchParams(searchParams);
     params.set('sort', value);
     params.delete('cursor');
+    params.delete('direction');
     void navigate(`?${params.toString()}`);
     setOpen(false);
   }

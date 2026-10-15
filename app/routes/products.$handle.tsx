@@ -16,6 +16,7 @@ import {ProductModel3D} from '~/components/ProductModel3D';
 import {ProductForm} from '~/components/ProductForm';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {SITE_NAME} from '~/lib/site';
+import {seoMeta, toMetaDescription} from '~/lib/seo';
 import {ProductItem} from '~/components/ProductItem';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {ReviewsSection, type ProductReview} from '~/components/ReviewsSection';
@@ -38,14 +39,20 @@ export function links() {
   return [{rel: 'stylesheet', href: demoStyles}];
 }
 
-export const meta: Route.MetaFunction = ({data}) => {
-  return [
-    {title: `${data?.product.title ?? 'Product'} | ${SITE_NAME}`},
-    {
-      rel: 'canonical',
-      href: `/products/${data?.product.handle}`,
-    },
-  ];
+export const meta: Route.MetaFunction = ({data, params}) => {
+  const product = data?.product;
+  const title = product?.seo.title || product?.title || 'Product';
+
+  return seoMeta({
+    title: `${title} | ${SITE_NAME}`,
+    description: toMetaDescription(
+      product?.seo.description,
+      product?.description,
+      product &&
+        `${product.title}, handmade in solid oak by ${SITE_NAME}. Free UK delivery on all orders.`,
+    ),
+    path: `/products/${product?.handle ?? params.handle}`,
+  });
 };
 
 

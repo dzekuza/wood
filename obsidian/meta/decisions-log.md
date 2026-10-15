@@ -1,6 +1,6 @@
 ---
 tags: [meta, decision]
-updated: 2026-10-13
+updated: 2026-10-15
 ---
 
 # Decisions Log (ADRs)
@@ -9,6 +9,27 @@ Architecture Decision Records. Each entry captures a choice, its context, and it
 consequences. Use [[templates/adr-note]] for new entries. Newest first.
 
 ---
+
+## ADR-0018 — Listing variants canonicalise to the clean listing URL
+
+- **Status:** Accepted
+- **Date:** 2026-10-15
+
+**Context.** The first OpenSEO audit (2026-10-15, 85 pages) counted 58
+duplicate titles and 42 duplicate-content pages, nearly all of them filter,
+sort and pagination variants of the same collection
+(`?filter={"available":true}`, `?cursor=…&direction=…`). Collection pages had
+no canonical, and the PDP canonical rendered as an ignored `<meta>` tag.
+
+**Decision.** Every indexable route emits an absolute, path-only
+`<link rel="canonical">` through `seoMeta()` (`app/lib/seo.ts`). Variants are
+left crawlable and not `noindex`ed, so links on them still pass equity, but
+each one names the clean listing as the page to index.
+
+**Consequences.** Search engines fold the variants into one URL per listing.
+Pagination pages also canonicalise to page 1. That is acceptable here because
+the grid uses Hydrogen's load-more pagination and every product is reachable
+from the sitemap. Revisit if a collection grows past a few pages.
 
 ## ADR-0017 — Checkout links redirect to the myshopify domain until a checkout subdomain exists
 

@@ -62,6 +62,7 @@ export function getFilterValueUrl(searchParams: URLSearchParams, input: string) 
   }
   if (!active) params.append(FILTER_PARAM, input);
   params.delete('cursor');
+  params.delete('direction');
   return `?${params.toString()}`;
 }
 
@@ -75,6 +76,7 @@ export function getPriceRangeUrl(
   if (range.max) params.set(PRICE_MAX_PARAM, range.max);
   else params.delete(PRICE_MAX_PARAM);
   params.delete('cursor');
+  params.delete('direction');
   return `?${params.toString()}`;
 }
 
@@ -84,6 +86,7 @@ export function getClearFiltersUrl(searchParams: URLSearchParams) {
   params.delete(PRICE_MIN_PARAM);
   params.delete(PRICE_MAX_PARAM);
   params.delete('cursor');
+  params.delete('direction');
   return `?${params.toString()}`;
 }
 

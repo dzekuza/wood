@@ -60,7 +60,7 @@ export function CollectionCategoryNav({
 
   return (
     <div className="fblock category-nav">
-      <h4>Categories</h4>
+      <h2>Categories</h2>
       <div className="sidebar-category-list">
         {categories.map((category) => (
           <Link

@@ -3,9 +3,15 @@ import type {Route} from './+types/blogs._index';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {ArticleCard} from '~/components/ArticleCard';
 import {BLOG_LABEL, SITE_NAME} from '~/lib/site';
+import {seoMeta} from '~/lib/seo';
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: `${BLOG_LABEL} | ${SITE_NAME}`}];
+  return seoMeta({
+    title: `${BLOG_LABEL} | ${SITE_NAME}`,
+    description:
+      'Advice and inspiration from the Craft Wood Furniture workshop: caring for solid oak, choosing a mantel beam, and styling handmade timber at home.',
+    path: '/blogs',
+  });
 };
 
 export async function loader(args: Route.LoaderArgs) {

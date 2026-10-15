@@ -17,13 +17,18 @@ import {applyLocalFilters, buildLocalFilters} from '~/lib/collectionFilters';
 import {COLLECTIONS_ALL_SLUG} from '~/lib/pageContent';
 import {loadPageContentState} from '~/lib/pageContent.server';
 import {SITE_NAME} from '~/lib/site';
+import {seoMeta} from '~/lib/seo';
 import type {SortValue} from '~/components/SortDropdown';
 import type {CollectionItemFragment} from 'storefrontapi.generated';
 import {EXCLUDE_HIDDEN_PRODUCTS_QUERY, filterHiddenProducts} from '~/lib/upsells';
 
-export const meta: Route.MetaFunction = () => [
-  {title: `All Products | ${SITE_NAME}`},
-];
+export const meta: Route.MetaFunction = () =>
+  seoMeta({
+    title: `All Products | ${SITE_NAME}`,
+    description:
+      'Every handmade solid oak piece from Craft Wood Furniture in one place: mantel beams, shelves, fireplace surrounds, console tables and more. Free UK delivery.',
+    path: '/collections/all',
+  });
 
 export async function loader(args: Route.LoaderArgs) {
   const criticalData = await loadCriticalData(args);

@@ -1,5 +1,6 @@
 import {useLoaderData} from 'react-router';
-import {BLOG_LABEL} from '~/lib/site';
+import {BLOG_LABEL, SITE_NAME} from '~/lib/site';
+import {seoMeta, toMetaDescription} from '~/lib/seo';
 import type {Route} from './+types/blogs.$blogHandle._index';
 import {getPaginationVariables} from '@shopify/hydrogen';
 import type {ArticleItemFragment} from 'storefrontapi.generated';
@@ -8,8 +9,17 @@ import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {ArticleCard} from '~/components/ArticleCard';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 
-export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `${data?.blog.title ?? BLOG_LABEL} | CraftWoodFurniture`}];
+export const meta: Route.MetaFunction = ({data, params}) => {
+  const blog = data?.blog;
+
+  return seoMeta({
+    title: `${blog?.seo?.title || blog?.title || BLOG_LABEL} | ${SITE_NAME}`,
+    description: toMetaDescription(
+      blog?.seo?.description,
+      `${BLOG_LABEL} from the ${SITE_NAME} workshop: caring for solid oak, choosing the right piece, and styling handmade timber at home.`,
+    ),
+    path: `/blogs/${blog?.handle ?? params.blogHandle}`,
+  });
 };
 
 export async function loader(args: Route.LoaderArgs) {
