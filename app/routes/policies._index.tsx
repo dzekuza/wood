@@ -1,6 +1,15 @@
 import {useLoaderData, Link} from 'react-router';
 import type {Route} from './+types/policies._index';
+import {seoMeta} from '~/lib/seo';
+import {SITE_NAME} from '~/lib/site';
 import type {PoliciesQuery, PolicyItemFragment} from 'storefrontapi.generated';
+
+export const meta: Route.MetaFunction = () =>
+  seoMeta({
+    title: `Policies | ${SITE_NAME}`,
+    description: `Delivery, returns, privacy and terms for ${SITE_NAME}.`,
+    path: '/policies',
+  });
 
 export async function loader({context}: Route.LoaderArgs) {
   const data: PoliciesQuery = await context.storefront.query(POLICIES_QUERY);

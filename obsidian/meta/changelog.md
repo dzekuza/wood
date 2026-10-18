@@ -3,6 +3,18 @@ tags: [meta, changelog]
 updated: 2026-10-18
 ---
 
+## 2026-10-18 — SEO audit round: schema, social tags, canonicals
+
+Fixes from a full audit: JSON-LD (Organization, WebSite, Product with offer and
+rating, Article, BreadcrumbList), Open Graph and Twitter tags on every page,
+canonical + title + description on the article, About, Contact, policies and
+generic pages, `noindex` on `/pages/favourites` and `/landing-oak`,
+`<html lang="en-GB">`, `/llms.txt`, and the sitemap now lists `/contact` and
+`/about` instead of the redirecting `/pages/contact`. See [[seo-metadata]].
+Still open: product SEO fields in Shopify are empty (drafts agreed, not yet
+written), collection descriptions are templated, and the About page still has
+unverified stats ("25 years of repair cover", "120+ hours in a dining table").
+
 ## 2026-10-18 — Removed the remaining "Cotswolds" claims
 
 The owner confirmed the workshop is not in the Cotswolds. Removed from the

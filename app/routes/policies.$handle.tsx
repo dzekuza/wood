@@ -3,6 +3,7 @@ import type {Route} from './+types/policies.$handle';
 import {type Shop} from '@shopify/hydrogen/storefront-api-types';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {SITE_NAME} from '~/lib/site';
+import {seoMeta} from '~/lib/seo';
 
 type SelectedPolicies = keyof Pick<
   Shop,
@@ -13,8 +14,13 @@ type SelectedPolicies = keyof Pick<
   | 'contactInformation'
 >;
 
-export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `${data?.policy.title ?? 'Policy'} | ${SITE_NAME}`}];
+export const meta: Route.MetaFunction = ({data, params}) => {
+  const policyTitle = data?.policy.title ?? 'Policy';
+  return seoMeta({
+    title: `${policyTitle} | ${SITE_NAME}`,
+    description: `Read the ${SITE_NAME} ${policyTitle.toLowerCase()}: how ordering, delivery and returns work.`,
+    path: `/policies/${params.handle}`,
+  });
 };
 
 export async function loader({params, context}: Route.LoaderArgs) {

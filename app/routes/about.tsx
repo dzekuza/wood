@@ -7,6 +7,7 @@ import {EditToolbarProvider} from '~/components/EditToolbarProvider';
 import {ABOUT_SLUG} from '~/lib/pageContent';
 import {loadPageContentState} from '~/lib/pageContent.server';
 import {SITE_NAME} from '~/lib/site';
+import {seoMeta} from '~/lib/seo';
 
 const ABOUT_PILLARS = [
   {
@@ -29,14 +30,13 @@ const ABOUT_FACTS = [
   {value: '120+', label: 'hours in a dining table'},
 ];
 
-export const meta: Route.MetaFunction = () => [
-  {title: `About the Workshop | ${SITE_NAME}`},
-  {
-    name: 'description',
-    content:
+export const meta: Route.MetaFunction = () =>
+  seoMeta({
+    title: `About the Workshop | ${SITE_NAME}`,
+    description:
       'Meet the workshop behind Craft Wood Furniture and learn how each solid-timber piece is joined, finished, and built for long ownership.',
-  },
-];
+    path: '/about',
+  });
 
 export async function loader({context, request}: Route.LoaderArgs) {
   return {

@@ -5,9 +5,41 @@ import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {ArticleCard} from '~/components/ArticleCard';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {BLOG_LABEL, SITE_NAME} from '~/lib/site';
+import {seoMeta, toMetaDescription} from '~/lib/seo';
+import {articleJsonLd, breadcrumbJsonLd} from '~/lib/structuredData';
 
-export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `${data?.article.title ?? BLOG_LABEL} | ${SITE_NAME}`}];
+export const meta: Route.MetaFunction = ({data, params}) => {
+  const article = data?.article;
+  const title = article?.seo?.title || article?.title || BLOG_LABEL;
+  const path = `/blogs/${params.blogHandle}/${article?.handle ?? params.articleHandle}`;
+  const description = toMetaDescription(
+    article?.seo?.description,
+    article?.contentHtml.replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' '),
+  );
+
+  return seoMeta({
+    title: `${title} | ${SITE_NAME}`,
+    description,
+    path,
+    type: 'article',
+    image: article?.image,
+    jsonLd: article
+      ? [
+          articleJsonLd({
+            headline: article.title,
+            description,
+            path,
+            image: article.image?.url,
+            publishedAt: article.publishedAt,
+            authorName: article.author?.name,
+          }),
+          breadcrumbJsonLd([
+            {name: BLOG_LABEL, path: '/blogs'},
+            {name: article.title, path},
+          ]),
+        ]
+      : [],
+  });
 };
 
 export async function loader(args: Route.LoaderArgs) {

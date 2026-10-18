@@ -7,15 +7,15 @@ import {EditToolbarProvider} from '~/components/EditToolbarProvider';
 import {CONTACT_SLUG} from '~/lib/pageContent';
 import {loadPageContentState} from '~/lib/pageContent.server';
 import {CONTACT_EMAIL, SITE_NAME} from '~/lib/site';
+import {seoMeta} from '~/lib/seo';
 
-export const meta: Route.MetaFunction = () => [
-  {title: `Contact | ${SITE_NAME}`},
-  {
-    name: 'description',
-    content:
+export const meta: Route.MetaFunction = () =>
+  seoMeta({
+    title: `Contact | ${SITE_NAME}`,
+    description:
       'Speak with Craft Wood Furniture about commissions, lead times, and solid-timber pieces currently in production.',
-  },
-];
+    path: '/contact',
+  });
 
 export async function loader({context, request}: Route.LoaderArgs) {
   return {

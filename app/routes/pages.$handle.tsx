@@ -2,16 +2,17 @@ import {useLoaderData} from 'react-router';
 import type {Route} from './+types/pages.$handle';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {getFlagshipPagePath, SITE_NAME} from '~/lib/site';
+import {seoMeta} from '~/lib/seo';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
 
-export const meta: Route.MetaFunction = ({data}) => {
+export const meta: Route.MetaFunction = ({data, params}) => {
   const title = data?.page.seo?.title || data?.page.title;
-  const description = data?.page.seo?.description;
 
-  return [
-    {title: title ? `${title} | ${SITE_NAME}` : SITE_NAME},
-    ...(description ? [{name: 'description', content: description}] : []),
-  ];
+  return seoMeta({
+    title: title ? `${title} | ${SITE_NAME}` : SITE_NAME,
+    description: data?.page.seo?.description ?? undefined,
+    path: `/pages/${params.handle}`,
+  });
 };
 
 export async function loader(args: Route.LoaderArgs) {

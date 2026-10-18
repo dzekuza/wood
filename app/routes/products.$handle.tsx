@@ -19,6 +19,7 @@ import {SITE_NAME} from '~/lib/site';
 import {getStockLimit} from '~/lib/inventory';
 import {getDescriptionSummary} from '~/lib/description';
 import {seoMeta, toMetaDescription} from '~/lib/seo';
+import {breadcrumbJsonLd, productJsonLd} from '~/lib/structuredData';
 import {ProductItem} from '~/components/ProductItem';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {ReviewsSection, type ProductReview} from '~/components/ReviewsSection';
@@ -44,25 +45,50 @@ export function links() {
 export const meta: Route.MetaFunction = ({data, params}) => {
   const product = data?.product;
   const title = product?.seo.title || product?.title || 'Product';
-
+  const handle = product?.handle ?? params.handle;
+  const path = `/products/${handle}`;
   const isAddon = product?.tags.includes(ADDON_TAG) ?? false;
+  const description = toMetaDescription(
+    product?.seo.description,
+    product?.description,
+    product &&
+      `${product.title}, handmade in solid oak by ${SITE_NAME}. Free UK delivery on all orders.`,
+  );
+  const images = (product?.media.nodes ?? []).flatMap((node) =>
+    node.__typename === 'MediaImage' && node.image ? [node.image] : [],
+  );
+  const variant = product?.selectedOrFirstAvailableVariant;
 
   return [
     // Add-on (surcharge) products are checkout plumbing, not catalogue items.
     ...(isAddon ? [{name: 'robots', content: 'noindex, nofollow'}] : []),
     ...seoMeta({
       title: `${title} | ${SITE_NAME}`,
-      description: toMetaDescription(
-        product?.seo.description,
-        product?.description,
-        product &&
-          `${product.title}, handmade in solid oak by ${SITE_NAME}. Free UK delivery on all orders.`,
-      ),
-      path: `/products/${product?.handle ?? params.handle}`,
+      description,
+      path,
+      type: 'product',
+      image: images[0],
+      jsonLd: product
+        ? [
+            productJsonLd({
+              name: product.title,
+              description,
+              path,
+              images: images.slice(0, 6).map((image) => image.url),
+              sku: variant?.sku,
+              price: variant?.price,
+              availableForSale: variant?.availableForSale,
+              rating: getRatingSummary(product.metafield?.value),
+            }),
+            breadcrumbJsonLd([
+              {name: 'Categories', path: '/collections/all'},
+              {name: product.title, path},
+            ]),
+          ]
+        : [],
     }),
   ];
 };
-
 
 export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte

@@ -30,6 +30,7 @@ import {
   STORE_REVIEW_COUNT,
 } from '~/lib/site';
 import {seoMeta} from '~/lib/seo';
+import {organizationJsonLd, websiteJsonLd} from '~/lib/structuredData';
 import {filterHiddenProducts} from '~/lib/upsells';
 import {LANDING_SLUG} from '~/lib/pageContent';
 import {loadPageContentState} from '~/lib/pageContent.server';
@@ -41,6 +42,7 @@ export const meta: Route.MetaFunction = ({data}) => {
     title: `${SITE_NAME} | ${seo.title}`,
     description: seo.description,
     path: '/',
+    jsonLd: [organizationJsonLd(), websiteJsonLd()],
   });
 };
 

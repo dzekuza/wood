@@ -9,11 +9,16 @@ import {EditToolbar} from '~/components/EditToolbar';
 import {EditToolbarProvider} from '~/components/EditToolbarProvider';
 import {FAVOURITES_SLUG} from '~/lib/pageContent';
 import {loadPageContentState} from '~/lib/pageContent.server';
+import {seoMeta} from '~/lib/seo';
+import {SITE_NAME} from '~/lib/site';
 
-export const meta = () => [
-  {title: 'Favourites — CraftWoodFurniture'},
-  {name: 'description', content: 'Your saved pieces from CraftWoodFurniture.'},
-];
+export const meta = () =>
+  seoMeta({
+    title: `Favourites | ${SITE_NAME}`,
+    description: `Your saved pieces from ${SITE_NAME}.`,
+    path: '/pages/favourites',
+    noindex: true,
+  });
 
 export async function loader({context, request}: Route.LoaderArgs) {
   return {

@@ -1,6 +1,6 @@
 ---
 tags: [frontend]
-updated: 2026-10-15
+updated: 2026-10-18
 ---
 
 # SEO & Metadata
@@ -28,6 +28,20 @@ updated: 2026-10-15
   `direction`.
 - `robots.txt` and the sitemaps are the `[robots.txt].tsx`, `[sitemap.xml].tsx`
   and `sitemap.$type.$page[.xml].tsx` routes.
+
+## Social tags and structured data (2026-10-18)
+
+`seoMeta()` now also emits Open Graph and Twitter tags (`og:*`, `twitter:*`;
+the image is the route's own, else `DEFAULT_SHARE_IMAGE`), a `noindex, follow`
+robots tag when `noindex: true`, and JSON-LD blocks passed as `jsonLd`
+(`{'script:ld+json': …}`). The builders live in `app/lib/structuredData.ts`:
+`organizationJsonLd` and `websiteJsonLd` (homepage), `productJsonLd` (offer for
+the selected variant, plus `aggregateRating` from the reviews metafield),
+`articleJsonLd`, `breadcrumbJsonLd` (products, articles, collections). Every
+route with a `meta` export now goes through `seoMeta`; `/pages/favourites` and
+`/landing-oak` are `noindex`. `/llms.txt` is `app/routes/[llms.txt].tsx`.
+Validate in Google's Rich Results Test, not curl — but ours is server-rendered,
+so curl does see it.
 
 ## Per-route metadata
 

@@ -14,6 +14,7 @@ import {
 import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {parseFiltersFromSearchParams} from '~/lib/collectionFilters';
 import {SITE_NAME} from '~/lib/site';
+import {breadcrumbJsonLd} from '~/lib/structuredData';
 import {seoMeta, toMetaDescription} from '~/lib/seo';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 import type {SortValue} from '~/components/SortDropdown';
@@ -31,6 +32,14 @@ export const meta: Route.MetaFunction = ({data, params}) => {
         `Shop handmade solid oak ${collection.title.toLowerCase()} from ${SITE_NAME}. Cut, joined and finished in our own workshop, with free UK delivery.`,
     ),
     path: `/collections/${collection?.handle ?? params.handle}`,
+    jsonLd: collection
+      ? [
+          breadcrumbJsonLd([
+            {name: 'Categories', path: '/collections'},
+            {name: collection.title, path: `/collections/${collection.handle}`},
+          ]),
+        ]
+      : [],
   });
 };
 

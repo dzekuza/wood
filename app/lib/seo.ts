@@ -1,4 +1,4 @@
-import {CANONICAL_HOST} from '~/lib/site';
+import {CANONICAL_HOST, SITE_NAME} from '~/lib/site';
 
 /** Google truncates snippets at roughly this length. */
 const META_DESCRIPTION_MAX = 155;
@@ -27,19 +27,65 @@ export function toMetaDescription(...candidates: Array<string | null | undefined
   return `${(lastSpace > 0 ? cut.slice(0, lastSpace) : cut).replace(/[\s,.;:–—-]+$/, '')}…`;
 }
 
-/** Title, description and canonical link for a route's `meta` export. */
+export type SeoImage = {
+  url: string;
+  altText?: string | null;
+  width?: number | null;
+  height?: number | null;
+};
+
+/** Share-card fallback for pages without a picture of their own. */
+export const DEFAULT_SHARE_IMAGE: SeoImage = {
+  url: `https://${CANONICAL_HOST}/demo/hero-1.png`,
+  altText: 'Handmade solid oak furniture',
+  width: 2138,
+  height: 1113,
+};
+
+/**
+ * Everything a route's `meta` export needs for search and sharing: title,
+ * description, canonical link, Open Graph and Twitter tags, an optional
+ * `noindex`, and any JSON-LD blocks (see `~/lib/structuredData`).
+ */
 export function seoMeta({
   title,
   description,
   path,
+  image,
+  type = 'website',
+  noindex = false,
+  jsonLd = [],
 }: {
   title: string;
   description?: string;
   path: string;
+  image?: SeoImage | null;
+  type?: 'website' | 'article' | 'product';
+  noindex?: boolean;
+  jsonLd?: Array<Record<string, unknown>>;
 }) {
+  const url = getCanonicalUrl(path);
+  const share = image ?? DEFAULT_SHARE_IMAGE;
+
   return [
     {title},
     ...(description ? [{name: 'description', content: description}] : []),
-    {tagName: 'link', rel: 'canonical', href: getCanonicalUrl(path)},
+    {tagName: 'link', rel: 'canonical', href: url},
+    ...(noindex ? [{name: 'robots', content: 'noindex, follow'}] : []),
+    {property: 'og:site_name', content: SITE_NAME},
+    {property: 'og:locale', content: 'en_GB'},
+    {property: 'og:type', content: type === 'product' ? 'og:product' : type},
+    {property: 'og:title', content: title},
+    ...(description ? [{property: 'og:description', content: description}] : []),
+    {property: 'og:url', content: url},
+    {property: 'og:image', content: share.url},
+    ...(share.altText ? [{property: 'og:image:alt', content: share.altText}] : []),
+    ...(share.width ? [{property: 'og:image:width', content: String(share.width)}] : []),
+    ...(share.height ? [{property: 'og:image:height', content: String(share.height)}] : []),
+    {name: 'twitter:card', content: 'summary_large_image'},
+    {name: 'twitter:title', content: title},
+    ...(description ? [{name: 'twitter:description', content: description}] : []),
+    {name: 'twitter:image', content: share.url},
+    ...jsonLd.map((data) => ({'script:ld+json': data})),
   ];
 }

@@ -25,12 +25,26 @@ function removeProductUrls(xml: string, handles: string[]) {
 
 /** Real pages that Shopify's resource sitemap never lists: the homepage and the
  *  listing routes this storefront builds itself. Served in the `pages` sitemap. */
-const STATIC_PATHS = ['/', '/collections', '/collections/all', '/blogs'];
+const STATIC_PATHS = [
+  '/',
+  '/collections',
+  '/collections/all',
+  '/blogs',
+  '/about',
+  '/contact',
+];
+
+/** Shopify lists these pages under /pages/, but the storefront serves them (or
+ *  redirects them) elsewhere. Listing a redirecting URL wastes crawl budget. */
+const PAGE_PATH_OVERRIDES: Record<string, string> = {'/pages/contact': '/contact'};
 
 /** The shop has a single blog; the article sitemap only gives the article handle. */
 const ARTICLE_BLOG_HANDLE = 'news';
 
 function addStaticUrls(xml: string, baseUrl: string) {
+  for (const [from, to] of Object.entries(PAGE_PATH_OVERRIDES)) {
+    xml = xml.replace(`<loc>${baseUrl}${from}</loc>`, `<loc>${baseUrl}${to}</loc>`);
+  }
   const entries = STATIC_PATHS.filter(
     (path) => !xml.includes(`<loc>${baseUrl}${path}</loc>`),
   ).map(

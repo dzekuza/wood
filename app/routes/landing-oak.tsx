@@ -17,19 +17,18 @@ import {HOMEPAGE_REVIEWS} from '~/lib/reviews';
 import {LANDING_OAK_SLUG} from '~/lib/pageContent';
 import {loadPageContentState} from '~/lib/pageContent.server';
 import {SITE_NAME} from '~/lib/site';
+import {seoMeta} from '~/lib/seo';
 import {EXCLUDE_HIDDEN_PRODUCTS_QUERY, filterHiddenProducts} from '~/lib/upsells';
 import demoStyles from '~/styles/demo.css?url';
 
-export const meta: Route.MetaFunction = () => {
-  return [
-    {title: `${SITE_NAME} | Solid oak, handcrafted for you`},
-    {
-      name: 'description',
-      content:
-        'Handmade solid oak furniture: mantel beams, shelves, coat racks and more. Made to order in our workshop, with free UK delivery.',
-    },
-  ];
-};
+export const meta: Route.MetaFunction = () =>
+  seoMeta({
+    title: `${SITE_NAME} | Solid oak, handcrafted for you`,
+    description:
+      'Handmade solid oak furniture: mantel beams, shelves, coat racks and more. Made to order in our workshop, with free UK delivery.',
+    path: '/landing-oak',
+    noindex: true,
+  });
 
 export function links() {
   return [
