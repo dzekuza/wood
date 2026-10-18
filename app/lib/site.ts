@@ -1,11 +1,16 @@
 export const SITE_NAME = 'Craft Wood Furniture';
 export const SITE_DOMAIN = 'craftwoodfurniture.co.uk';
 
+/** The one host canonical links point at. Must match the primary domain set in
+ *  Shopify/Oxygen, whose 301 sends the bare domain here — if they disagree,
+ *  Google may ignore both. */
+export const CANONICAL_HOST = `www.${SITE_DOMAIN}`;
+
 /** True only for the public domain. Every other host that serves the storefront
  *  (the `*.myshopify.dev` Oxygen URL, preview deployments) must stay out of
  *  Google, or it competes with the real site as duplicate content. */
 export function isPublicHost(hostname: string): boolean {
-  return hostname === SITE_DOMAIN || hostname === `www.${SITE_DOMAIN}`;
+  return hostname === SITE_DOMAIN || hostname === CANONICAL_HOST;
 }
 
 /** Email is the shop's only contact channel — there is no phone line. Do not

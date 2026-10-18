@@ -1,4 +1,4 @@
-import {SITE_DOMAIN} from '~/lib/site';
+import {CANONICAL_HOST} from '~/lib/site';
 
 /** Google truncates snippets at roughly this length. */
 const META_DESCRIPTION_MAX = 155;
@@ -7,7 +7,7 @@ const META_DESCRIPTION_MAX = 155;
  *  filter, sort or pagination query string is deliberately left off, so every
  *  variant of a listing points search engines back at the one clean URL. */
 export function getCanonicalUrl(path: string) {
-  return `https://${SITE_DOMAIN}${path}`;
+  return `https://${CANONICAL_HOST}${path}`;
 }
 
 /**

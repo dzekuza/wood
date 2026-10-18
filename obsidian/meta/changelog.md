@@ -3,6 +3,16 @@ tags: [meta, changelog]
 updated: 2026-10-18
 ---
 
+## 2026-10-18 — Canonical host is `www.craftwoodfurniture.co.uk`
+
+Search Console showed ~97% of impressions on the `www` host while canonicals
+pointed at the bare domain. Canonicals now use `CANONICAL_HOST`
+(`www.${SITE_DOMAIN}`, `app/lib/site.ts`); both hosts still count as public for
+the noindex rule. **Must be paired with the primary domain in Shopify/Oxygen
+being set to `www` (bare domain 301s to it)** — deploy first, then switch the
+domain, so canonicals and redirect never disagree. Sitemap and robots.txt build
+URLs from the request origin, so they follow whichever host serves them.
+
 ## 2026-10-18 — Homepage SEO title and description editable in Admin
 
 `home_page` metaobject gained two fields, **SEO title** (`seo_title`) and **SEO
