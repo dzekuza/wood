@@ -4462,6 +4462,8 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .article-page { padding: 48px 0 88px; }
 .article-page-image { display: block; width: 100%; max-width: 800px; margin: 0 auto 32px; border-radius: 18px; }
 .article-body { max-width: 800px; margin: 0 auto; }
+/* Header lines up with the image and body column below it. */
+.article-head { max-width: 800px; margin: 0 auto; }
 
 .cms-page-shell { padding: 48px 0 88px; }
 .cms-page-body { max-width: 820px; font-size: 16px; line-height: 1.75; color: color-mix(in srgb, var(--cwf-ink-strong) 78%, transparent); }

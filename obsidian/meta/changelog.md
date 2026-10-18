@@ -3,6 +3,13 @@ tags: [meta, changelog]
 updated: 2026-10-18
 ---
 
+## 2026-10-18 — Article header matches the content column
+
+The article title and date on `blogs.$blogHandle.$articleHandle` sit in a new
+`.article-head` wrapper capped at 800px, the same width as `.article-body` and
+`.article-page-image`, so the header, image and text share one left edge.
+Other archive heroes are unchanged. Breadcrumbs stay full width.
+
 ## 2026-10-18 — New favicon (oak mark)
 
 The oak X mark replaces the old SVG favicon. `public/` now has `favicon.ico`

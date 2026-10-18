@@ -94,10 +94,12 @@ export default function Article() {
       />
       <div className="archive-hero">
         <div className="archive-wrap">
-          <div className="archive-hero-inner">
-            <h1 className="archive-hero-title">{title}</h1>
+          <div className="article-head">
+            <div className="archive-hero-inner">
+              <h1 className="archive-hero-title">{title}</h1>
+            </div>
+            <p className="archive-hero-blurb">{publishedDate}{author?.name ? ` · ${author.name}` : ''}</p>
           </div>
-          <p className="archive-hero-blurb">{publishedDate}{author?.name ? ` · ${author.name}` : ''}</p>
         </div>
       </div>
       <article className="article-page">
