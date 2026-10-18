@@ -55,7 +55,7 @@ export default function AboutPage() {
           <div className="archive-wrap">
             <div className="archive-hero-inner">
               <EditableText as="h1" className="archive-hero-title" field="about.hero.heading">
-                Made slowly, by hand, in the Cotswolds.
+                Made slowly, by hand.
               </EditableText>
             </div>
             <EditableText as="p" className="archive-hero-blurb" field="about.hero.blurb">

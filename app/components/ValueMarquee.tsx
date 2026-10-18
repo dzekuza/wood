@@ -4,7 +4,7 @@ const VALUE_PROPS = [
   'Solid European Oak',
   'Handcrafted Since 2014',
   'Free UK Delivery',
-  'Made in the Cotswolds',
+  'Made to Order',
 ];
 
 export function ValueMarquee() {

@@ -78,7 +78,7 @@ export const HOME_CONTENT_DEFAULTS: HomeContent = {
   seo: {
     title: 'Handcrafted solid timber furniture',
     description:
-      'Solid timber furniture, made by hand in a small Cotswolds workshop. No flat-pack, no veneers, just patient joinery and pieces built to last.',
+      'Handmade solid oak furniture: mantel beams, shelves, coat racks and more. Made to order in our workshop, with free UK delivery.',
   },
   heroSlides: [
     {

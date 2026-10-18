@@ -4,7 +4,7 @@ import {EditableText} from '~/components/EditableText';
 const FAQS = [
   {
     q: 'What kind of wood do you use?',
-    a: 'All our pieces are cut from solid European oak — no MDF, veneer or particleboard. Each board is hand-selected in our Cotswolds workshop for grain and character.',
+    a: 'All our pieces are cut from solid European oak — no MDF, veneer or particleboard. Each board is hand-selected in our workshop for grain and character.',
   },
   {
     q: 'Do you offer custom sizes?',

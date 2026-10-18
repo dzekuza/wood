@@ -26,7 +26,7 @@ export const meta: Route.MetaFunction = () => {
     {
       name: 'description',
       content:
-        'Solid timber furniture, made by hand in a small Cotswolds workshop. No flat-pack, no veneers, just patient joinery and pieces built to last.',
+        'Handmade solid oak furniture: mantel beams, shelves, coat racks and more. Made to order in our workshop, with free UK delivery.',
     },
   ];
 };
@@ -143,7 +143,7 @@ export default function LandingOak() {
         <OakBenefits />
         <CraftmanshipProcess />
         <div className="demo-fullbleed">
-          <img src="/demo/hero-1.png" alt="Solid oak furniture styled in a Cotswolds home" loading="lazy" />
+          <img src="/demo/hero-1.png" alt="Solid oak furniture styled in a home" loading="lazy" />
         </div>
         <ValueMarquee />
         <ReviewQuoteGrid reviews={HOMEPAGE_REVIEWS} />

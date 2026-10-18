@@ -3,6 +3,16 @@ tags: [meta, changelog]
 updated: 2026-10-18
 ---
 
+## 2026-10-18 — Removed the remaining "Cotswolds" claims
+
+The owner confirmed the workshop is not in the Cotswolds. Removed from the
+homepage and landing-oak meta descriptions (`HOME_CONTENT_DEFAULTS.seo`), the
+`ValueMarquee` ("Made to Order"), the FAQ answer, the landing-oak image alt
+text and the `/about` heading. Copy edited through the [[edit-toolbar]] is
+stored in `page_content` and overrides these defaults — if "Cotswolds" still
+shows live, clear that override. No location is stated anywhere now; do not
+reintroduce one without the owner giving the real town.
+
 ## 2026-10-18 — Sitemap: missing pages added, article URL fixed
 
 `sitemap.$type.$page[.xml].tsx` now appends `/`, `/collections`,
