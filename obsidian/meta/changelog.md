@@ -3,6 +3,16 @@ tags: [meta, changelog]
 updated: 2026-10-18
 ---
 
+## 2026-10-18 — Sitemap: missing pages added, article URL fixed
+
+`sitemap.$type.$page[.xml].tsx` now appends `/`, `/collections`,
+`/collections/all` and `/blogs` to the `pages` sitemap (Shopify's resource
+sitemap never lists them; Google had `/collections/all` as "unknown"). The
+`articles` sitemap listed `/articles/{handle}`, which 404s — links now use
+`/blogs/news/{handle}`. The blog handle `news` is a constant in that file
+(`ARTICLE_BLOG_HANDLE`) because the sitemap only supplies the article handle;
+change it if a second blog is ever added.
+
 ## 2026-10-18 — Add-on products out of Google; sitemap cleanup
 
 - Products tagged `addon` (surcharge, "Hooks Colours", "Types of Corbels") now

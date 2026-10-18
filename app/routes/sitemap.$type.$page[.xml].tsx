@@ -23,6 +23,23 @@ function removeProductUrls(xml: string, handles: string[]) {
   });
 }
 
+/** Real pages that Shopify's resource sitemap never lists: the homepage and the
+ *  listing routes this storefront builds itself. Served in the `pages` sitemap. */
+const STATIC_PATHS = ['/', '/collections', '/collections/all', '/blogs'];
+
+/** The shop has a single blog; the article sitemap only gives the article handle. */
+const ARTICLE_BLOG_HANDLE = 'news';
+
+function addStaticUrls(xml: string, baseUrl: string) {
+  const entries = STATIC_PATHS.filter(
+    (path) => !xml.includes(`<loc>${baseUrl}${path}</loc>`),
+  ).map(
+    (path) =>
+      `<url>\n  <loc>${baseUrl}${path}</loc>\n  <changefreq>weekly</changefreq>\n</url>\n`,
+  );
+  return xml.replace('</urlset>', `${entries.join('')}</urlset>`);
+}
+
 export async function loader({
   request,
   params,
@@ -34,11 +51,24 @@ export async function loader({
     params,
     // One market, one language — no /EN-US/... alternates (they 404).
     locales: [],
-    getLink: ({type, baseUrl, handle}) => `${baseUrl}/${type}/${handle}`,
+    getLink: ({type, baseUrl, handle}) =>
+      type === 'articles'
+        ? `${baseUrl}/blogs/${ARTICLE_BLOG_HANDLE}/${handle}`
+        : `${baseUrl}/${type}/${handle}`,
   });
 
+  const cacheHeaders = {
+    'Content-Type': 'application/xml',
+    'Cache-Control': `max-age=${60 * 60 * 24}`,
+  };
+
+  if (params.type === 'pages') {
+    const xml = addStaticUrls(await response.text(), new URL(request.url).origin);
+    return new Response(xml, {status: response.status, headers: cacheHeaders});
+  }
+
   if (params.type !== 'products') {
-    response.headers.set('Cache-Control', `max-age=${60 * 60 * 24}`);
+    response.headers.set('Cache-Control', cacheHeaders['Cache-Control']);
     return response;
   }
 
@@ -46,11 +76,5 @@ export async function loader({
   const addonHandles = products.nodes.map((node) => node.handle);
   const xml = removeProductUrls(await response.text(), addonHandles);
 
-  return new Response(xml, {
-    status: response.status,
-    headers: {
-      'Content-Type': 'application/xml',
-      'Cache-Control': `max-age=${60 * 60 * 24}`,
-    },
-  });
+  return new Response(xml, {status: response.status, headers: cacheHeaders});
 }
