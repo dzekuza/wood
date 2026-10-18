@@ -17,6 +17,7 @@ import {ProductForm} from '~/components/ProductForm';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {SITE_NAME} from '~/lib/site';
 import {getStockLimit} from '~/lib/inventory';
+import {getDescriptionSummary} from '~/lib/description';
 import {seoMeta, toMetaDescription} from '~/lib/seo';
 import {ProductItem} from '~/components/ProductItem';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
@@ -170,6 +171,7 @@ export default function Product() {
   });
 
   const {title, descriptionHtml} = product;
+  const descriptionSummary = getDescriptionSummary(descriptionHtml);
   const rating = getRatingSummary(product.metafield?.value);
 
   const [requestedQuantity, setQuantity] = useState(1);
@@ -282,7 +284,6 @@ export default function Product() {
     const index = lightboxImages.findIndex((img) => img.src === item.image.url);
     if (index !== -1) setLightboxIndex(index);
   }
-  const [descExpanded, setDescExpanded] = useState(false);
   const [showSticky, setShowSticky] = useState(false);
   const [viewingCount, setViewingCount] = useState<number | null>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
@@ -549,16 +550,9 @@ export default function Product() {
                     compareAtPrice={selectedVariant?.compareAtPrice}
                   />
                 </StaggerItem>
-                {descriptionHtml && (
-                  <StaggerItem className={`pdp-sub-wrap${descExpanded ? ' pdp-sub-expanded' : ''}`}>
-                    <div className="pdp-sub" dangerouslySetInnerHTML={{__html: descriptionHtml}} />
-                    <button
-                      className="pdp-sub-toggle"
-                      onClick={() => setDescExpanded(v => !v)}
-                      aria-expanded={descExpanded}
-                    >
-                      {descExpanded ? 'Show less' : 'Show more'}
-                    </button>
+                {descriptionSummary && (
+                  <StaggerItem>
+                    <div className="pdp-sub" dangerouslySetInnerHTML={{__html: descriptionSummary}} />
                   </StaggerItem>
                 )}
 

@@ -3,6 +3,14 @@ tags: [meta, changelog]
 updated: 2026-10-18
 ---
 
+## 2026-10-18 — PDP buy box shows a description summary, not the full text
+
+Client CRO feedback: the full description above the Order-now button pushed it
+far down the page, and the same text is repeated in the "Product Details"
+accordion. The buy box now shows only the first paragraph
+(`getDescriptionSummary` in `app/lib/description.ts`); the "Show more" toggle
+and its CSS were removed. Full text stays in Product Details.
+
 ## 2026-10-18 — Cart quantity capped to real inventory
 
 PDP quantity `+`, the Order-now button and the cart-line `+` now respect the
