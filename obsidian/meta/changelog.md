@@ -3,6 +3,18 @@ tags: [meta, changelog]
 updated: 2026-10-18
 ---
 
+## 2026-10-18 — Homepage SEO title and description editable in Admin
+
+`home_page` metaobject gained two fields, **SEO title** (`seo_title`) and **SEO
+description** (`seo_description`), added to the live definition on `wood-123252`
+via the Admin API. Edit them in Admin → Content → Metaobjects → Home page. The
+title is rendered as "Craft Wood Furniture | {SEO title}". Blank falls back to
+`HOME_CONTENT_DEFAULTS.seo` (the previous hard-coded text, so nothing changed on
+deploy). The homepage `meta` now goes through `seoMeta`, so it also emits a
+canonical link (`https://craftwoodfurniture.co.uk/`), which it lacked. See
+[[homepage-content]]. Any other storefront needs the two fields added to its own
+definition.
+
 ## 2026-10-18 — Article header matches the content column
 
 The article title and date on `blogs.$blogHandle.$articleHandle` sit in a new

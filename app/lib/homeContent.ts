@@ -54,6 +54,7 @@ export interface HomeSectionHead {
 }
 
 export interface HomeContent {
+  seo: {title: string; description: string};
   heroSlides: HomeHeroSlide[];
   categories: HomeSectionHead;
   popular: {heading: string; ctaLabel: string};
@@ -74,6 +75,11 @@ export interface HomeContent {
  * source of truth — edit the metaobject in Admin, not this file. */
 
 export const HOME_CONTENT_DEFAULTS: HomeContent = {
+  seo: {
+    title: 'Handcrafted solid timber furniture',
+    description:
+      'Solid timber furniture, made by hand in a small Cotswolds workshop. No flat-pack, no veneers, just patient joinery and pieces built to last.',
+  },
   heroSlides: [
     {
       image: '/demo/hero-1.png',
@@ -224,6 +230,10 @@ export function buildHomeContent(
   const processImage = home.processImage?.reference?.image;
 
   return {
+    seo: {
+      title: text(home.seoTitle, defaults.seo.title),
+      description: text(home.seoDescription, defaults.seo.description),
+    },
     heroSlides: parseHeroSlides(home),
     categories: {
       heading: text(home.categoriesHeading, defaults.categories.heading),
@@ -282,6 +292,8 @@ export const HOME_CONTENT_QUERY = `#graphql
     @inContext(country: $country, language: $language) {
     home: metaobject(handle: {type: "home_page", handle: "main"}) {
       id
+      seoTitle: field(key: "seo_title") { value }
+      seoDescription: field(key: "seo_description") { value }
       heroSlides: field(key: "hero_slides") {
         references(first: 12) {
           nodes {

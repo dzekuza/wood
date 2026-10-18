@@ -19,6 +19,7 @@ import {HOMEPAGE_REVIEWS} from '~/lib/reviews';
 import {aggregateRatings} from '~/lib/reviewStats';
 import {
   buildHomeContent,
+  HOME_CONTENT_DEFAULTS,
   HOME_CONTENT_QUERY,
   type HomeContent,
 } from '~/lib/homeContent';
@@ -28,20 +29,19 @@ import {
   SITE_NAME,
   STORE_REVIEW_COUNT,
 } from '~/lib/site';
+import {seoMeta} from '~/lib/seo';
 import {filterHiddenProducts} from '~/lib/upsells';
 import {LANDING_SLUG} from '~/lib/pageContent';
 import {loadPageContentState} from '~/lib/pageContent.server';
 import demoStyles from '~/styles/demo.css?url';
 
-export const meta: Route.MetaFunction = () => {
-  return [
-    {title: `${SITE_NAME} | Handcrafted solid timber furniture`},
-    {
-      name: 'description',
-      content:
-        'Solid timber furniture, made by hand in a small Cotswolds workshop. No flat-pack, no veneers, just patient joinery and pieces built to last.',
-    },
-  ];
+export const meta: Route.MetaFunction = ({data}) => {
+  const seo = data?.content.seo ?? HOME_CONTENT_DEFAULTS.seo;
+  return seoMeta({
+    title: `${SITE_NAME} | ${seo.title}`,
+    description: seo.description,
+    path: '/',
+  });
 };
 
 export function links() {
