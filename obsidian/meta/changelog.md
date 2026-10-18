@@ -1,7 +1,17 @@
 ---
 tags: [meta, changelog]
-updated: 2026-10-15
+updated: 2026-10-18
 ---
+
+## 2026-10-18 — Cart quantity capped to real inventory
+
+PDP quantity `+`, the Order-now button and the cart-line `+` now respect the
+variant's `quantityAvailable` (helper `getStockLimit` in `app/lib/inventory.ts`;
+`null` = untracked/backorder = no cap). The PDP shows "N left in stock" at 5 or
+fewer and re-clamps the quantity when a lower-stock variant is picked. **Needs
+the `unauthenticated_read_product_inventory` Storefront scope** on the Headless
+channel — without it the field is null, nothing is capped, and the dev log shows
+"Access denied for quantityAvailable". See [[decisions-log#ADR-0019]].
 
 ## 2026-10-15 — SEO fixes from the first OpenSEO audit
 

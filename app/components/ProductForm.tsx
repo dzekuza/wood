@@ -19,6 +19,8 @@ import {
   isHardwareColourOption,
 } from '~/lib/swatches';
 
+import {getStockLimit} from '~/lib/inventory';
+
 export function ProductForm({
   productOptions,
   selectedVariant,
@@ -57,6 +59,9 @@ export function ProductForm({
     const amount = selectedOption?.variant ? parseFloat(selectedOption.variant.price.amount) : 0;
     return sum + amount;
   }, 0);
+
+  const stockLimit = getStockLimit(selectedVariant);
+  const atStockLimit = stockLimit !== null && quantity >= stockLimit;
 
   const totalPrice = selectedVariant?.price
     ? {
@@ -383,7 +388,12 @@ export function ProductForm({
             type="button"
             className="pdp-qty-btn"
             aria-label="Increase quantity"
-            onClick={() => onQuantityChange(quantity + 1)}
+            disabled={atStockLimit}
+            onClick={() =>
+              onQuantityChange(
+                stockLimit === null ? quantity + 1 : Math.min(stockLimit, quantity + 1),
+              )
+            }
           >
             +
           </button>
@@ -391,7 +401,7 @@ export function ProductForm({
         <div className="pdp-atc-wrap">
           <AddToCartButton
             className="btn btn-primary btn-pill pdp-atc-btn"
-            disabled={!selectedVariant || !selectedVariant.availableForSale}
+            disabled={!selectedVariant || !selectedVariant.availableForSale || quantity > (stockLimit ?? Infinity)}
             onClick={() => {
               open('cart');
             }}
@@ -426,6 +436,11 @@ export function ProductForm({
           <svg width="18" height="18" viewBox="0 0 24 24" fill={saved ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         </button>
       </div>
+      {stockLimit !== null && stockLimit > 0 && stockLimit <= 5 && (
+        <p className="pdp-stock-note">
+          {atStockLimit ? `Only ${stockLimit} in stock` : `${stockLimit} left in stock`}
+        </p>
+      )}
     </div>
   );
 }

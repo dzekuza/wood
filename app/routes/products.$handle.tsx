@@ -16,6 +16,7 @@ import {ProductModel3D} from '~/components/ProductModel3D';
 import {ProductForm} from '~/components/ProductForm';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {SITE_NAME} from '~/lib/site';
+import {getStockLimit} from '~/lib/inventory';
 import {seoMeta, toMetaDescription} from '~/lib/seo';
 import {ProductItem} from '~/components/ProductItem';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
@@ -171,7 +172,13 @@ export default function Product() {
   const {title, descriptionHtml} = product;
   const rating = getRatingSummary(product.metafield?.value);
 
-  const [quantity, setQuantity] = useState(1);
+  const [requestedQuantity, setQuantity] = useState(1);
+  // Never exceed stock — also re-clamps when a variant with less stock is picked.
+  const stockLimit = getStockLimit(selectedVariant);
+  const quantity = Math.max(
+    1,
+    stockLimit === null ? requestedQuantity : Math.min(requestedQuantity, stockLimit),
+  );
 
   const [selectedUpsells, setSelectedUpsells] = useState<Record<string, string>>(
     () =>
@@ -736,6 +743,8 @@ export default function Product() {
 const PRODUCT_VARIANT_FRAGMENT = `#graphql
   fragment ProductVariant on ProductVariant {
     availableForSale
+    quantityAvailable
+    currentlyNotInStock
     compareAtPrice {
       amount
       currencyCode

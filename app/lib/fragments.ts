@@ -26,6 +26,8 @@ export const CART_QUERY_FRAGMENT = `#graphql
       ... on ProductVariant {
         id
         availableForSale
+        quantityAvailable
+        currentlyNotInStock
         compareAtPrice {
           ...Money
         }
@@ -82,6 +84,8 @@ export const CART_QUERY_FRAGMENT = `#graphql
       ... on ProductVariant {
         id
         availableForSale
+        quantityAvailable
+        currentlyNotInStock
         compareAtPrice {
           ...Money
         }

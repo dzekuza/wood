@@ -10,6 +10,15 @@ consequences. Use [[templates/adr-note]] for new entries. Newest first.
 
 ---
 
+## ADR-0019 — Stock caps come from `quantityAvailable`, enforced in the UI and by Shopify
+
+**Context:** shoppers could set 100 on a product with 2 in stock.
+**Decision:** query `quantityAvailable`/`currentlyNotInStock` on PDP variants and
+cart lines; disable `+` at the cap. Untracked or oversell-allowed variants are
+uncapped. Shopify's cart API remains the final authority (it rejects/clamps
+over-stock lines), so the UI cap is a convenience, not the only guard.
+**Consequence:** the Storefront token needs the product-inventory scope.
+
 ## ADR-0018 — Listing variants canonicalise to the clean listing URL
 
 - **Status:** Accepted

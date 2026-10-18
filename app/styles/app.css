@@ -3131,6 +3131,7 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .pdp-sticky-bar .pdp-atc-btn:hover { background: var(--cwf-sand); border-color: var(--cwf-sand); }
 @media (max-width: 600px) { .pdp-sticky-bar { padding: 10px 16px; } .pdp-sticky-title { display: none; } .pdp-sticky-bar .pdp-atc-wrap { min-width: 0; flex: 1; } }
 
+.pdp-stock-note { margin-top: 10px; font-size: 13px; color: var(--accent-deep); }
 .pdp-cta-row { margin-top: 36px; display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: stretch; }
 /* Layout-only — color/hover/focus/disabled chrome comes from .btn.btn-primary */
 .pdp-atc-btn { gap: 8px; padding: 14px 22px; border-radius: 10px; width: 100%; white-space: nowrap; }

@@ -2,6 +2,7 @@ import type {CartLineUpdateInput} from '@shopify/hydrogen/storefront-api-types';
 import type {CartLayout, LineItemChildrenMap} from '~/components/CartMain';
 import {CartForm, Image, Money, type OptimisticCartLine} from '@shopify/hydrogen';
 import {useVariantUrl} from '~/lib/variants';
+import {getStockLimit} from '~/lib/inventory';
 import {Link} from 'react-router';
 import {ProductPrice} from './ProductPrice';
 import {useAside} from './Aside';
@@ -150,6 +151,8 @@ function CartLineQuantity({
   ];
   const prevQuantity = Number(Math.max(0, quantity - 1).toFixed(0));
   const nextQuantity = Number((quantity + 1).toFixed(0));
+  const stockLimit = getStockLimit(line.merchandise);
+  const atStockLimit = stockLimit !== null && quantity >= stockLimit;
 
   return (
     <div className="cart-line-actions">
@@ -170,7 +173,7 @@ function CartLineQuantity({
             aria-label="Increase quantity"
             name="increase-quantity"
             value={nextQuantity}
-            disabled={!!isOptimistic}
+            disabled={!!isOptimistic || atStockLimit}
           >
             +
           </button>
