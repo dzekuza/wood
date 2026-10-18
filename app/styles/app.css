@@ -1209,6 +1209,15 @@ button.reset > * {
   color: rgba(243,239,234,0.3);
 }
 
+.footer-legal {
+  max-width: 1320px;
+  margin: 16px auto 0;
+  padding: 0 32px;
+  font-size: 0.6875rem;
+  line-height: 1.6;
+  color: rgba(243,239,234,0.3);
+}
+
 .footer-bottom-links {
   display: flex;
   flex-wrap: wrap;
@@ -4506,6 +4515,8 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .story-cta-actions { display: flex; gap: 12px; flex-wrap: wrap; }
 
 .contact-email-card { display: grid; grid-template-columns: auto 1fr auto; gap: 20px; align-items: center; max-width: 880px; background: var(--cwf-surface); border-radius: 20px; padding: 32px; transition: box-shadow .15s; }
+.contact-company { display: grid; gap: 4px; max-width: 880px; margin-top: 24px; padding: 0 32px; font-style: normal; font-size: 0.875rem; line-height: 1.6; color: color-mix(in srgb, var(--cwf-ink-strong) 65%, transparent); }
+.contact-company strong { color: var(--cwf-ink-strong); }
 .contact-email-card:hover { box-shadow: 0 0 0 1px var(--cwf-accent); }
 .contact-email-card .contact-channel-copy strong { color: var(--cwf-primary); font-size: 18px; }
 @media (max-width: 720px) {

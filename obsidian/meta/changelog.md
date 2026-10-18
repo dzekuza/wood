@@ -3,6 +3,19 @@ tags: [meta, changelog]
 updated: 2026-10-18
 ---
 
+## 2026-10-18 — Company identity published
+
+The owner supplied the trading company's public details (as listed on the Etsy
+shop): CRAFTWOOD FURNITURE LTD, company no. 11805480, VAT GB 367201410,
+17 Sherwood Street, Llwynpia, Tonypandy, CF40 2TB. They are now one constant,
+`COMPANY` in `app/lib/site.ts`, used by the footer legal line, a details block
+on `/contact`, the `Organization` JSON-LD (`legalName`, `vatID`, `identifier`,
+`address`) and `/llms.txt`. Prompted by an AI-answer audit: ChatGPT could not
+tell who ran the site, matched a different "Craftwood UK Interiors" company in
+Hampshire, and called the shop "higher-risk". The address is described as the
+business address — it is **not** stated to be the workshop; confirm with the
+owner before writing "made in …" copy.
+
 ## 2026-10-18 — SEO audit round: schema, social tags, canonicals
 
 Fixes from a full audit: JSON-LD (Organization, WebSite, Product with offer and

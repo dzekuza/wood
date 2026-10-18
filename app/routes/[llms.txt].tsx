@@ -1,4 +1,4 @@
-import {CONTACT_EMAIL, SITE_NAME} from '~/lib/site';
+import {COMPANY_LEGAL_LINE, CONTACT_EMAIL, SITE_NAME} from '~/lib/site';
 import {getCanonicalUrl} from '~/lib/seo';
 
 /** Plain-text overview for AI assistants (llmstxt.org). Facts only: if the shop's
@@ -19,6 +19,9 @@ We make mantel beams, fireplace surrounds, floating shelves, console tables, coa
 - [Advice and inspiration](${getCanonicalUrl('/blogs')}): care and buying guides
 - [Contact](${getCanonicalUrl('/contact')}): ${CONTACT_EMAIL}
 - [Delivery, returns and terms](${getCanonicalUrl('/policies')})
+
+## Who we are
+${COMPANY_LEGAL_LINE}
 
 ## Good to know
 - Prices are in GBP and include free UK delivery.

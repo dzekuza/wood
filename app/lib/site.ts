@@ -13,6 +13,25 @@ export function isPublicHost(hostname: string): boolean {
   return hostname === SITE_DOMAIN || hostname === CANONICAL_HOST;
 }
 
+/** The trading company, from its public business details. Shown in the footer
+ *  and on the contact page, and published as `Organization` schema. The street
+ *  address is the registered business address, not necessarily the workshop. */
+export const COMPANY = {
+  legalName: 'CRAFTWOOD FURNITURE LTD',
+  companyNumber: '11805480',
+  vatNumber: 'GB 367201410',
+  address: {
+    street: '17 Sherwood Street',
+    locality: 'Tonypandy',
+    area: 'Llwynpia, Rhondda Cynon Taf',
+    postcode: 'CF40 2TB',
+    country: 'GB',
+  },
+} as const;
+
+/** One-line form for the footer and plain-text files. */
+export const COMPANY_LEGAL_LINE = `${COMPANY.legalName} · Company no. ${COMPANY.companyNumber} · VAT no. ${COMPANY.vatNumber} · ${COMPANY.address.street}, ${COMPANY.address.area.split(',')[0]}, ${COMPANY.address.locality} ${COMPANY.address.postcode}`;
+
 /** Email is the shop's only contact channel — there is no phone line. Do not
  *  reintroduce a `tel:` link without a real, answered number. */
 export const CONTACT_EMAIL = 'hello@craftwoodfurniture.co.uk';

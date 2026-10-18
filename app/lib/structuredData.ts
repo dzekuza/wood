@@ -1,4 +1,4 @@
-import {CONTACT_EMAIL, SITE_NAME, SOCIAL_LINKS} from '~/lib/site';
+import {COMPANY, CONTACT_EMAIL, SITE_NAME, SOCIAL_LINKS} from '~/lib/site';
 import {getCanonicalUrl} from '~/lib/seo';
 
 /** JSON-LD builders. Each returns one schema.org node for `seoMeta({jsonLd})`. */
@@ -10,7 +10,18 @@ export function organizationJsonLd() {
     '@context': CONTEXT,
     '@type': 'Organization',
     name: SITE_NAME,
+    legalName: COMPANY.legalName,
     url: getCanonicalUrl('/'),
+    vatID: COMPANY.vatNumber,
+    identifier: COMPANY.companyNumber,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: COMPANY.address.street,
+      addressLocality: COMPANY.address.locality,
+      addressRegion: 'Rhondda Cynon Taf',
+      postalCode: COMPANY.address.postcode,
+      addressCountry: COMPANY.address.country,
+    },
     logo: getCanonicalUrl('/favicon-192.png'),
     email: CONTACT_EMAIL,
     sameAs: SOCIAL_LINKS.map((link) => link.url),

@@ -2,7 +2,7 @@ import {Suspense} from 'react';
 import {Await, NavLink} from 'react-router';
 import type {FooterQuery, HeaderQuery} from 'storefrontapi.generated';
 import {SocialLinks} from '~/components/SocialLinks';
-import {BLOG_LABEL, FLAGSHIP_PAGE_ROUTES} from '~/lib/site';
+import {BLOG_LABEL, COMPANY, COMPANY_LEGAL_LINE, FLAGSHIP_PAGE_ROUTES} from '~/lib/site';
 
 interface FooterProps {
   footer: Promise<FooterQuery | null>;
@@ -87,7 +87,7 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}: Foote
             {/* Bottom bar */}
             <div className="footer-bottom">
               <div className="footer-bottom-inner">
-                <span className="footer-copy">© Craft Wood Furniture Ltd</span>
+                <span className="footer-copy">© {COMPANY.legalName}</span>
                 <nav className="footer-bottom-links" aria-label="Policies">
                   {POLICY_LINKS.map((link) => (
                     <NavLink key={link.url} prefetch="intent" to={link.url}>
@@ -96,6 +96,7 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}: Foote
                   ))}
                 </nav>
               </div>
+                <p className="footer-legal">{COMPANY_LEGAL_LINE}</p>
             </div>
           </footer>
         )}
