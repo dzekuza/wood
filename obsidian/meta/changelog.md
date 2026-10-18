@@ -3,6 +3,19 @@ tags: [meta, changelog]
 updated: 2026-10-18
 ---
 
+## 2026-10-18 — Add-on products out of Google; sitemap cleanup
+
+- Products tagged `addon` (surcharge, "Hooks Colours", "Types of Corbels") now
+  emit `<meta name="robots" content="noindex, nofollow">` on their PDP and are
+  removed from `/sitemap/products/*.xml`. They stay active and public — the
+  upsell pricing still reads them. The sitemap route fetches the `addon`
+  handles and trims their `<url>` blocks, because Hydrogen's `getSitemap` has no
+  tag filter. The tag in the sitemap query is spelled out (`tag:addon`) since
+  codegen cannot interpolate `ADDON_TAG`.
+- Sitemap no longer lists hreflang alternates (`/EN-US/…`, `/EN-CA/…`,
+  `/FR-CA/…`): the shop is one market and those URLs 404. `locales: []`.
+- Four product handles shortened with redirects (done in Admin via MCP).
+
 ## 2026-10-18 — Canonical host is `www.craftwoodfurniture.co.uk`
 
 Search Console showed ~97% of impressions on the `www` host while canonicals

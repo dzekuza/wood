@@ -24,7 +24,7 @@ import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {ReviewsSection, type ProductReview} from '~/components/ReviewsSection';
 import {getRatingSummary} from '~/lib/reviewStats';
 import {Lightbox} from '~/components/Lightbox';
-import {buildUpsellGroups} from '~/lib/upsells';
+import {ADDON_TAG, buildUpsellGroups} from '~/lib/upsells';
 import {Reveal} from '~/components/animate-ui/Reveal';
 import {StaggerGroup, StaggerItem} from '~/components/animate-ui/StaggerGroup';
 import {DURATION, EASE_OUT} from '~/lib/motion';
@@ -45,16 +45,22 @@ export const meta: Route.MetaFunction = ({data, params}) => {
   const product = data?.product;
   const title = product?.seo.title || product?.title || 'Product';
 
-  return seoMeta({
-    title: `${title} | ${SITE_NAME}`,
-    description: toMetaDescription(
-      product?.seo.description,
-      product?.description,
-      product &&
-        `${product.title}, handmade in solid oak by ${SITE_NAME}. Free UK delivery on all orders.`,
-    ),
-    path: `/products/${product?.handle ?? params.handle}`,
-  });
+  const isAddon = product?.tags.includes(ADDON_TAG) ?? false;
+
+  return [
+    // Add-on (surcharge) products are checkout plumbing, not catalogue items.
+    ...(isAddon ? [{name: 'robots', content: 'noindex, nofollow'}] : []),
+    ...seoMeta({
+      title: `${title} | ${SITE_NAME}`,
+      description: toMetaDescription(
+        product?.seo.description,
+        product?.description,
+        product &&
+          `${product.title}, handmade in solid oak by ${SITE_NAME}. Free UK delivery on all orders.`,
+      ),
+      path: `/products/${product?.handle ?? params.handle}`,
+    }),
+  ];
 };
 
 
@@ -777,6 +783,7 @@ const PRODUCT_FRAGMENT = `#graphql
   fragment Product on Product {
     id
     title
+    tags
     vendor
     handle
     descriptionHtml
