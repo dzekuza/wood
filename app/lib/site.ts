@@ -1,6 +1,13 @@
 export const SITE_NAME = 'Craft Wood Furniture';
 export const SITE_DOMAIN = 'craftwoodfurniture.co.uk';
 
+/** True only for the public domain. Every other host that serves the storefront
+ *  (the `*.myshopify.dev` Oxygen URL, preview deployments) must stay out of
+ *  Google, or it competes with the real site as duplicate content. */
+export function isPublicHost(hostname: string): boolean {
+  return hostname === SITE_DOMAIN || hostname === `www.${SITE_DOMAIN}`;
+}
+
 /** Email is the shop's only contact channel — there is no phone line. Do not
  *  reintroduce a `tel:` link without a real, answered number. */
 export const CONTACT_EMAIL = 'hello@craftwoodfurniture.co.uk';

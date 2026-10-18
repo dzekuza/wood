@@ -6,6 +6,7 @@ import {
   type HydrogenRouterContextProvider,
 } from '@shopify/hydrogen';
 import type {EntryContext} from 'react-router';
+import {isPublicHost} from '~/lib/site';
 
 export default async function handleRequest(
   request: Request,
@@ -57,6 +58,10 @@ export default async function handleRequest(
 
   responseHeaders.set('Content-Type', 'text/html');
   responseHeaders.set('Content-Security-Policy', header);
+  // Header, not robots.txt Disallow: Google must be able to crawl a page to see noindex.
+  if (!isPublicHost(new URL(request.url).hostname)) {
+    responseHeaders.set('X-Robots-Tag', 'noindex, nofollow');
+  }
 
   return new Response(body, {
     headers: responseHeaders,

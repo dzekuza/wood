@@ -3,6 +3,13 @@ tags: [meta, changelog]
 updated: 2026-10-18
 ---
 
+## 2026-10-18 — Non-public hosts send `X-Robots-Tag: noindex`
+
+Any host other than `craftwoodfurniture.co.uk` / `www.` (the `*.myshopify.dev`
+Oxygen URL, previews, localhost) now gets `X-Robots-Tag: noindex, nofollow` from
+`entry.server.tsx`, via `isPublicHost` in `app/lib/site.ts`. Deliberately not a
+robots.txt `Disallow`, because Google has to crawl a page to see its noindex.
+
 ## 2026-10-18 — PDP buy box shows a description summary, not the full text
 
 Client CRO feedback: the full description above the Order-now button pushed it
