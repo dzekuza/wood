@@ -69,7 +69,10 @@ export function links() {
     },
 
     {rel: 'stylesheet', href: tablerStyles},
-    {rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg'},
+    {rel: 'icon', href: '/favicon.ico', sizes: '48x48'},
+    {rel: 'icon', type: 'image/png', href: '/favicon-48.png', sizes: '48x48'},
+    {rel: 'icon', type: 'image/png', href: '/favicon-192.png', sizes: '192x192'},
+    {rel: 'apple-touch-icon', href: '/apple-touch-icon.png'},
   ];
 }
 

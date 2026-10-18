@@ -3,6 +3,14 @@ tags: [meta, changelog]
 updated: 2026-10-18
 ---
 
+## 2026-10-18 — New favicon (oak mark)
+
+The oak X mark replaces the old SVG favicon. `public/` now has `favicon.ico`
+(16/32/48), `favicon-48.png`, `favicon-192.png` (transparent) and
+`apple-touch-icon.png` (180px, white background); `root.tsx` `links()` wires
+them. Google wants a favicon in a multiple of 48px, hence the 48 and 192.
+`public/favicon.svg` was deleted.
+
 ## 2026-10-18 — Non-public hosts send `X-Robots-Tag: noindex`
 
 Any host other than `craftwoodfurniture.co.uk` / `www.` (the `*.myshopify.dev`
