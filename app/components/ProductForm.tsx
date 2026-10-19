@@ -186,8 +186,9 @@ export function ProductForm({
             values.length > 1 ? (Math.max(selectedIndex, 0) / (values.length - 1)) * 100 : 0;
 
           const selectValue = (value: (typeof values)[number]) => {
-            if (value.selected || !value.exists) return;
+            if (!value.exists) return;
             markTouched(option.name);
+            if (value.selected) return;
             const to = value.isDifferentProduct
               ? `/products/${value.handle}?${value.variantUriQuery}`
               : `?${value.variantUriQuery}`;
@@ -255,6 +256,7 @@ export function ProductForm({
               <select
                 className="product-opt-select"
                 value={selectedValue?.name ?? ''}
+                onFocus={() => markTouched(option.name)}
                 onChange={(e) => {
                   const value = option.optionValues.find((v) => v.name === e.target.value);
                   if (!value || value.selected) return;

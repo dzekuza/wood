@@ -72,8 +72,13 @@ They are excluded two ways, both keyed on the `addon` tag:
 
 ## Cart
 
-Untouched by this design and fully attribute-driven. A chosen paid option adds
-a **second cart line** for the add-on variant, tagged with `Surcharge for` =
+Fully attribute-driven. **2026-10-19: a £0 option (a free choice, or an add-on
+variant priced 0) adds no cart line at all** — it never counts toward the cart
+quantity, is never shown as its own row, and can't outlive the product it
+belongs to. The choice is still recorded as `{group label: option}` on the
+main line's attributes, so it reaches the order for production (client
+request). A chosen option with a price above 0 adds a
+**second cart line** for the add-on variant, tagged with `Surcharge for` =
 the parent product title; `CartMain` pairs it back to the parent line (preferring
 the one whose `{group label: option}` attribute matches) so it renders as a
 "+ Group: Option · price" row under the product rather than as its own line.

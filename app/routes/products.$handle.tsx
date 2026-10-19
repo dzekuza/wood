@@ -243,8 +243,11 @@ export default function Product() {
             value: selected.option.label,
           })),
         },
+        // A £0 surcharge is not a purchase: no cart line (so it never counts in
+        // the cart quantity or lingers after the product is removed). The
+        // choice still travels on the main line's `attributes` above.
         ...selectedUpsellEntries.flatMap(({group, selected}) =>
-          selected.variant
+          selected.variant && parseFloat(selected.variant.price.amount) > 0
             ? [
                 {
                   merchandiseId: selected.variant.id,

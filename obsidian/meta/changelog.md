@@ -3,6 +3,19 @@ tags: [meta, changelog]
 updated: 2026-10-19
 ---
 
+## 2026-10-19 — £0 surcharge options no longer become cart lines
+
+Client request: add-on choices that come from surcharge variants priced £0
+(e.g. "Types of Corbels: Type A", "Working type: Sanded") must not show as
+separate cart/checkout lines, must not count toward the cart quantity, and must
+not be left behind when the product is removed. `products.$handle.tsx` now only
+adds a surcharge line when its variant price is above 0; the choice is still
+stored as an attribute on the main product line. Paid surcharges are unchanged.
+
+Also fixed in `ProductForm`'s mobile "choose an option first" check: clicking
+the already-selected slider step, or focusing a dropdown, now counts as choosing
+it (previously a shopper who accepted a default value stayed blocked).
+
 ## 2026-10-19 — PDP carousel slide made square
 
 `.pdp-carousel-slide` (mobile/tablet gallery) had `aspect-ratio: 1/1.05` while
