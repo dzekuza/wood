@@ -1,4 +1,6 @@
-import {Link, useNavigate} from 'react-router';
+import {useEffect, useRef, useState} from 'react';
+import {createPortal} from 'react-dom';
+import {Link, useNavigate, useSearchParams} from 'react-router';
 import {type MappedProductOptions, type OptimisticCartLineInput, Money} from '@shopify/hydrogen';
 import type {
   Maybe,
@@ -52,6 +54,61 @@ export function ProductForm({
   const {isFavourite, toggleFavourite} = useFavourites();
   const saved = product ? isFavourite(product.id) : false;
   const {unit} = useUnitSystem();
+  const formRef = useRef<HTMLDivElement>(null);
+  const [searchParams] = useSearchParams();
+
+  // Hydrogen pre-selects the first available variant, so "selected" can't be
+  // read from the variant. An option counts as chosen once the shopper picks a
+  // value, or when the page was opened on a link that already names the
+  // options (the first render, before useSelectedOptionInUrlParam fills them).
+  const openedWithOptions = useRef(
+    productOptions.some((o) => searchParams.has(o.name)),
+  ).current;
+  // On mobile the CTA row docks to the viewport. It is portalled to <body>
+  // because the PDP's reveal animations leave transformed ancestors, which
+  // would turn `position: fixed` into "fixed to that ancestor".
+  const [dockTarget, setDockTarget] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 768px)');
+    const sync = () => setDockTarget(mq.matches ? document.body : null);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
+  const [touched, setTouched] = useState<ReadonlySet<string>>(new Set());
+  const markTouched = (name: string) =>
+    setTouched((prev) => (prev.has(name) ? prev : new Set(prev).add(name)));
+
+  const pendingOption = openedWithOptions
+    ? undefined
+    : productOptions.find(
+        (o) =>
+          o.optionValues.length > 1 &&
+          !touched.has(o.name) &&
+          !(o.name === 'Title' && o.optionValues.length === 1),
+      );
+
+  /** Mobile CTA dock only: send the shopper to the first unpicked option. */
+  const handleOrderClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    if (!pendingOption || !window.matchMedia('(max-width: 768px)').matches) {
+      open('cart');
+      return;
+    }
+    event.preventDefault();
+    const group = Array.from(
+      formRef.current?.querySelectorAll<HTMLElement>('[data-option]') ?? [],
+    ).find((el) => el.dataset.option === pendingOption.name);
+    if (!group) return;
+    group.scrollIntoView({
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        ? 'auto'
+        : 'smooth',
+      block: 'center',
+    });
+    group.classList.remove('is-prompted');
+    void group.offsetWidth;
+    group.classList.add('is-prompted');
+  };
 
   const upsellSurcharge = upsellGroupsData.reduce((sum, {group, options}) => {
     const selectedKey = selectedUpsells[group.id];
@@ -71,7 +128,7 @@ export function ProductForm({
     : undefined;
 
   return (
-    <div className="product-form">
+    <div className="product-form" ref={formRef}>
       <div className="product-opts product-opts-unit">
         <div className="product-opt-label">
           Units
@@ -130,6 +187,7 @@ export function ProductForm({
 
           const selectValue = (value: (typeof values)[number]) => {
             if (value.selected || !value.exists) return;
+            markTouched(option.name);
             const to = value.isDifferentProduct
               ? `/products/${value.handle}?${value.variantUriQuery}`
               : `?${value.variantUriQuery}`;
@@ -137,7 +195,7 @@ export function ProductForm({
           };
 
           return (
-            <div className="product-opts" key={option.name}>
+            <div className="product-opts" data-option={option.name} key={option.name}>
               <div className="product-opt-label">
                 {option.name}
                 {selectedValue && (
@@ -187,7 +245,7 @@ export function ProductForm({
         // Other size-like options (no swatches, e.g. Height x Depth, Width) render as a dropdown
         if (!hasSwatches) {
           return (
-            <div className="product-opts" key={option.name}>
+            <div className="product-opts" data-option={option.name} key={option.name}>
               <div className="product-opt-label">
                 {option.name}
                 {selectedValue && (
@@ -200,6 +258,7 @@ export function ProductForm({
                 onChange={(e) => {
                   const value = option.optionValues.find((v) => v.name === e.target.value);
                   if (!value || value.selected) return;
+                  markTouched(option.name);
                   const to = value.isDifferentProduct
                     ? `/products/${value.handle}?${value.variantUriQuery}`
                     : `?${value.variantUriQuery}`;
@@ -217,7 +276,7 @@ export function ProductForm({
         }
 
         return (
-          <div className="product-opts" key={option.name}>
+          <div className="product-opts" data-option={option.name} key={option.name}>
             <div className="product-opt-label">
               {option.name}
               {selectedValue && (
@@ -244,6 +303,7 @@ export function ProductForm({
                       prefetch="intent"
                       preventScrollReset
                       replace
+                      onClick={() => markTouched(option.name)}
                       to={`/products/${handle}?${variantUriQuery}`}
                       data-selected={selected ? 'true' : 'false'}
                       className={`product-optn${available ? '' : ' is-unavailable'}`}
@@ -265,6 +325,7 @@ export function ProductForm({
                       data-selected={selected ? 'true' : 'false'}
                       disabled={!exists}
                       onClick={() => {
+                        markTouched(option.name);
                         if (!selected) {
                           void navigate(`?${variantUriQuery}`, {
                             replace: true,
@@ -372,7 +433,20 @@ export function ProductForm({
         );
       })}
 
-      <div className="pdp-cta-row">
+      <div className="pdp-cta-dock">
+      {renderCtaRow()}
+      </div>
+      {stockLimit !== null && stockLimit > 0 && stockLimit <= 5 && (
+        <p className="pdp-stock-note">
+          {atStockLimit ? `Only ${stockLimit} in stock` : `${stockLimit} left in stock`}
+        </p>
+      )}
+    </div>
+  );
+
+  function renderCtaRow() {
+    const row = (
+      <div className={`pdp-cta-row${dockTarget ? ' is-docked' : ''}`}>
         <div className="pdp-qty">
           <button
             type="button"
@@ -402,9 +476,7 @@ export function ProductForm({
           <AddToCartButton
             className="btn btn-primary btn-pill pdp-atc-btn"
             disabled={!selectedVariant || !selectedVariant.availableForSale || quantity > (stockLimit ?? Infinity)}
-            onClick={() => {
-              open('cart');
-            }}
+            onClick={handleOrderClick}
             lines={lines}
           >
             {selectedVariant?.availableForSale ? (
@@ -436,13 +508,9 @@ export function ProductForm({
           <svg width="18" height="18" viewBox="0 0 24 24" fill={saved ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         </button>
       </div>
-      {stockLimit !== null && stockLimit > 0 && stockLimit <= 5 && (
-        <p className="pdp-stock-note">
-          {atStockLimit ? `Only ${stockLimit} in stock` : `${stockLimit} left in stock`}
-        </p>
-      )}
-    </div>
-  );
+    );
+    return dockTarget ? createPortal(row, dockTarget) : row;
+  }
 }
 
 function ProductOptionSwatch({

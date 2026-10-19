@@ -1,7 +1,22 @@
 ---
 tags: [meta, changelog]
-updated: 2026-10-18
+updated: 2026-10-19
 ---
+
+## 2026-10-19 — Sticky mobile order bar
+
+On mobile the PDP's quantity + Order now + heart row is fixed to the bottom of
+the viewport (`ProductForm`, `.pdp-cta-row.is-docked`). If the shopper hasn't
+picked an option yet, Order now scrolls to and highlights the first unpicked
+option instead of adding to cart. The old scroll-triggered sticky bar is hidden
+on mobile.
+
+## 2026-10-19 — Cookie consent banner enabled
+
+`withPrivacyBanner` set to `true` in the root loader (`app/root.tsx`), so
+Hydrogen loads Shopify's customer-privacy banner and gates Shopify analytics
+on the visitor's choice. Regional banner behaviour is configured in Shopify
+admin (Settings → Customer privacy). No custom UI added.
 
 ## 2026-10-18 — Company identity published
 

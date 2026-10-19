@@ -648,3 +648,16 @@ explicit shopper-chosen sorts via the dropdown, unaffected. Since
 required a mapping in both `SORT_MAP` records — the type system caught this
 immediately (`Record<SortValue, ...>` failed to compile until both were
 updated).
+
+## ADR-0008 — Use Shopify's built-in privacy banner for cookie consent
+
+**Context.** The store sent Shopify analytics with no consent prompt
+(`withPrivacyBanner: false`) while selling to UK/EU visitors.
+
+**Decision.** Set `withPrivacyBanner: true` and manage regional rules in
+Shopify admin, rather than building a custom banner. No third-party trackers
+exist in the repo today.
+
+**Consequences.** Smallest change, consent state is handled by Hydrogen's
+`Analytics.Provider`. If GA4/pixels are added later, or a CWF-styled banner is
+wanted, switch to a custom banner using `useCustomerPrivacy`.

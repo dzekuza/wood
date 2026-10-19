@@ -3107,6 +3107,17 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .pdp-sticky-bar .pdp-atc-btn:hover { background: var(--cwf-sand); border-color: var(--cwf-sand); }
 @media (max-width: 600px) { .pdp-sticky-bar { padding: 10px 16px; } .pdp-sticky-title { display: none; } .pdp-sticky-bar .pdp-atc-wrap { min-width: 0; flex: 1; } }
 
+/* Mobile: the qty + order row docks to the bottom of the viewport. The dock
+   keeps the row's height in the flow so nothing jumps when it goes fixed. */
+@media (max-width: 768px) {
+  .pdp-cta-dock { min-height: 52px; margin-top: 36px; }
+  .pdp-cta-row.is-docked { position: fixed; left: 0; right: 0; bottom: 0; z-index: 150; margin-top: 0; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: var(--cwf-surface); border-top: 1px solid var(--cwf-line); box-shadow: 0 -4px 20px rgba(53, 47, 42, .1); }
+  .pdp-sticky-bar { display: none; }
+}
+.product-opts.is-prompted { animation: opts-prompt .9s ease-out; }
+@keyframes opts-prompt { 0%, 60% { box-shadow: 0 0 0 3px color-mix(in srgb, var(--cwf-accent) 55%, transparent); border-radius: 10px; } 100% { box-shadow: 0 0 0 3px transparent; border-radius: 10px; } }
+@media (prefers-reduced-motion: reduce) { .product-opts.is-prompted { animation: none; } }
+
 .pdp-stock-note { margin-top: 10px; font-size: 13px; color: var(--accent-deep); }
 .pdp-cta-row { margin-top: 36px; display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: stretch; }
 /* Layout-only — color/hover/focus/disabled chrome comes from .btn.btn-primary */
