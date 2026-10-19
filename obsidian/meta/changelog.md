@@ -3,6 +3,13 @@ tags: [meta, changelog]
 updated: 2026-10-19
 ---
 
+## 2026-10-19 — PDP carousel slide made square
+
+`.pdp-carousel-slide` (mobile/tablet gallery) had `aspect-ratio: 1/1.05` while
+the product image renders as a 1:1 square (`ProductImage` sets
+`aspect-ratio:1/1`, Shopify crops are square), leaving sand-coloured bands above
+and below the photo. The slide is now `1/1`, so the image fills it.
+
 ## 2026-10-19 — Street address removed from company info
 
 The owner asked for the street and house number to come off the site. `COMPANY.address`

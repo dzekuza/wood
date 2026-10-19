@@ -2991,7 +2991,7 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .pdp-carousel-stage { position: relative; }
 .pdp-carousel-track { display: flex; overflow-x: scroll; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; border-radius: 16px; }
 .pdp-carousel-track::-webkit-scrollbar { display: none; }
-.pdp-carousel-slide { flex: 0 0 100%; scroll-snap-align: start; aspect-ratio: 1/1.05; position: relative; overflow: hidden; border-radius: 16px; background: var(--cwf-sand); border: .5px solid var(--cwf-line); }
+.pdp-carousel-slide { flex: 0 0 100%; scroll-snap-align: start; aspect-ratio: 1/1; position: relative; overflow: hidden; border-radius: 16px; background: var(--cwf-sand); border: .5px solid var(--cwf-line); }
 .pdp-carousel-slide img, .pdp-carousel-slide > div { width: 100%; height: 100%; }
 .pdp-carousel-slide img { object-fit: cover; }
 .pdp-carousel-dots { display: flex; justify-content: center; gap: 6px; margin-top: 12px; }
