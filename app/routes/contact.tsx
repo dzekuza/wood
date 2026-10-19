@@ -73,7 +73,6 @@ export default function ContactPage() {
             <address className="contact-company">
               <strong>{COMPANY.legalName}</strong>
               <span>
-                {COMPANY.address.street}, {COMPANY.address.area},{' '}
                 {COMPANY.address.locality} {COMPANY.address.postcode}
               </span>
               <span>

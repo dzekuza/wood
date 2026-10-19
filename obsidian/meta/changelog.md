@@ -3,6 +3,15 @@ tags: [meta, changelog]
 updated: 2026-10-19
 ---
 
+## 2026-10-19 — Street address removed from company info
+
+The owner asked for the street and house number to come off the site. `COMPANY.address`
+in `app/lib/site.ts` now holds only `locality` (Tonypandy), `postcode` (CF40 2TB)
+and `country`; `street` and `area` (Llwynpia) are gone. The footer legal line,
+`/contact` company block, `/llms.txt` and the `Organization` JSON-LD (no
+`streetAddress`) all follow from that one constant. Email, company no. and VAT
+no. are unchanged. The site has no phone number anywhere, so none is shown.
+
 ## 2026-10-19 — Sticky mobile order bar
 
 On mobile the PDP's quantity + Order now + heart row is fixed to the bottom of
