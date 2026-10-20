@@ -7,6 +7,7 @@ import type {ArticleItemFragment} from 'storefrontapi.generated';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {ArticleCard} from '~/components/ArticleCard';
+import {BlogIntro} from '~/components/BlogIntro';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 
 export const meta: Route.MetaFunction = ({data, params}) => {
@@ -90,6 +91,7 @@ export default function Blog() {
           <div className="archive-hero-inner">
             <h1 className="archive-hero-title">{blog.title}</h1>
           </div>
+          <BlogIntro />
         </div>
       </div>
       <div className="archive-wrap blog-index-section">
@@ -102,6 +104,7 @@ export default function Blog() {
               article={article}
               key={article.id}
               loading={index < 3 ? 'eager' : 'lazy'}
+              headingLevel="h2"
             />
           )}
         </PaginatedResourceSection>

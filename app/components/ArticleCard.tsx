@@ -22,9 +22,13 @@ export type ArticleCardData = {
 export function ArticleCard({
   article,
   loading,
+  headingLevel: Heading = 'h3',
 }: {
   article: ArticleCardData;
   loading?: HTMLImageElement['loading'];
+  /** `h2` when the card sits directly under the page's h1 (the blog listings),
+   *  so heading levels do not skip. */
+  headingLevel?: 'h2' | 'h3';
 }) {
   const publishedAt = new Intl.DateTimeFormat('en-GB', {
     year: 'numeric',
@@ -51,7 +55,7 @@ export function ArticleCard({
       )}
       <div className="art-card-body">
         <div className="art-card-date">{publishedAt}</div>
-        <h3 className="art-card-title">{article.title}</h3>
+        <Heading className="art-card-title">{article.title}</Heading>
         <span className="art-card-cta">
           Read more <i className="ti ti-arrow-right" />
         </span>

@@ -2,6 +2,7 @@ import {useLoaderData} from 'react-router';
 import type {Route} from './+types/blogs._index';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {ArticleCard} from '~/components/ArticleCard';
+import {BlogIntro} from '~/components/BlogIntro';
 import {BLOG_LABEL, SITE_NAME} from '~/lib/site';
 import {seoMeta} from '~/lib/seo';
 
@@ -52,6 +53,7 @@ export default function Blogs() {
             <h1 className="archive-hero-title">Stories from the bench.</h1>
           </div>
           <p className="archive-hero-blurb">Finish notes, workshop process, and interiors that are meant to age well.</p>
+          <BlogIntro />
         </div>
       </div>
       <section className="blog-index-section">
@@ -62,6 +64,7 @@ export default function Blogs() {
                 key={article.id}
                 article={article}
                 loading={index < 3 ? 'eager' : 'lazy'}
+                headingLevel="h2"
               />
             ))}
           </div>
