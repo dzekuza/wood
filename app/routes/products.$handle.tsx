@@ -629,7 +629,7 @@ export default function Product() {
                       Production &amp; Delivery <svg className="pdp-acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                     </summary>
                     <div className="pdp-acc-body">
-                      Each piece is made to order in our workshop, with a standard production lead time up to 5 working days. Your order is carefully packed and sent by courier, with free UK delivery included. Transit time is additional and depends on your location.
+                      Each piece is made to order in our workshop, with a standard production lead time of {leadTime}. Your order is carefully packed and sent by courier, with free UK delivery included. Transit time is additional and depends on your location.
                     </div>
                   </details>
                   <details className="pdp-acc">

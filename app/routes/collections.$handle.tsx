@@ -13,31 +13,40 @@ import {
 } from '~/components/CollectionCategoryNav';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {parseFiltersFromSearchParams} from '~/lib/collectionFilters';
-import {SITE_NAME} from '~/lib/site';
-import {breadcrumbJsonLd} from '~/lib/structuredData';
+import {CollectionGuide} from '~/components/CollectionGuide';
+import {COLLECTION_CONTENT} from '~/lib/collectionContent';
+import {SITE_NAME, shouldHideCollection} from '~/lib/site';
+import {breadcrumbJsonLd, faqJsonLd} from '~/lib/structuredData';
 import {seoMeta, toMetaDescription} from '~/lib/seo';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 import type {SortValue} from '~/components/SortDropdown';
 
 export const meta: Route.MetaFunction = ({data, params}) => {
   const collection = data?.collection;
-  const title = collection?.seo.title || collection?.title || 'Category';
+  const content = collection ? COLLECTION_CONTENT[collection.handle] : undefined;
+  const title =
+    collection?.seo.title || content?.seoTitle || collection?.title || 'Category';
 
   return seoMeta({
     title: `${title} | ${SITE_NAME}`,
     description: toMetaDescription(
       collection?.seo.description,
+      content?.seoDescription,
       collection?.description,
       collection &&
         `Shop handmade solid oak ${collection.title.toLowerCase()} from ${SITE_NAME}. Cut, joined and finished in our own workshop, with free UK delivery.`,
     ),
     path: `/collections/${collection?.handle ?? params.handle}`,
+    // Curated merchandising lists (e.g. "Most popular") duplicate the real
+    // categories, so they stay out of search results.
+    noindex: collection ? shouldHideCollection(collection) : false,
     jsonLd: collection
       ? [
           breadcrumbJsonLd([
             {name: 'Categories', path: '/collections'},
             {name: collection.title, path: `/collections/${collection.handle}`},
           ]),
+          ...(content ? [faqJsonLd(content.faqs)] : []),
         ]
       : [],
   });
@@ -132,6 +141,7 @@ export default function Collection() {
   const {collection, sidebarCategories, sortParam} = useLoaderData<typeof loader>();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const filters = collection.products.filters ?? [];
+  const content = COLLECTION_CONTENT[collection.handle];
 
   return (
     <div className="archive-page">
@@ -207,6 +217,8 @@ export default function Collection() {
           </div>
         </div>
       </div>
+
+      {content && <CollectionGuide content={content} />}
 
       {mobileFiltersOpen && (
         <div className="mob-filter-overlay" role="presentation">

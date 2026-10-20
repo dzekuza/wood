@@ -12,7 +12,7 @@ const FAQS = [
   },
   {
     q: 'How long does delivery take?',
-    a: "Because everything is made to order, most pieces ship within 2–3 weeks. Larger commissions and fireplace surrounds can take a little longer — we'll confirm a timeline when you order.",
+    a: "Because everything is made to order, most pieces dispatch within 5–10 working days. Larger commissions can take a little longer — we'll confirm a timeline when you order.",
   },
   {
     q: 'How do I care for my oak furniture?',

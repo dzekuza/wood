@@ -76,9 +76,9 @@ export interface HomeContent {
 
 export const HOME_CONTENT_DEFAULTS: HomeContent = {
   seo: {
-    title: 'Handcrafted solid timber furniture',
+    title: 'Handmade Solid Oak Furniture UK',
     description:
-      'Handmade solid oak furniture: mantel beams, shelves, coat racks and more. Made to order in our workshop, with free UK delivery.',
+      'Handmade solid oak furniture: mantel beams, fireplace surrounds, shelves, coat racks and console tables. Made to order in our UK workshop, with free UK delivery.',
   },
   heroSlides: [
     {

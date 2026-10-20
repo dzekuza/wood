@@ -39,7 +39,7 @@ import demoStyles from '~/styles/demo.css?url';
 export const meta: Route.MetaFunction = ({data}) => {
   const seo = data?.content.seo ?? HOME_CONTENT_DEFAULTS.seo;
   return seoMeta({
-    title: `${SITE_NAME} | ${seo.title}`,
+    title: `${seo.title} | ${SITE_NAME}`,
     description: seo.description,
     path: '/',
     jsonLd: [organizationJsonLd(), websiteJsonLd()],
