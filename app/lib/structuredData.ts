@@ -23,6 +23,14 @@ export function organizationJsonLd() {
     },
     logo: getCanonicalUrl('/favicon-192.png'),
     email: CONTACT_EMAIL,
+    areaServed: 'GB',
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'customer service',
+      email: CONTACT_EMAIL,
+      areaServed: 'GB',
+      availableLanguage: 'en',
+    },
     sameAs: SOCIAL_LINKS.map((link) => link.url),
   };
 }
@@ -96,6 +104,8 @@ export function productJsonLd({
     ...(sku ? {sku} : {}),
     url,
     brand: {'@type': 'Brand', name: SITE_NAME},
+    // Every product in the shop is made from solid European oak.
+    material: 'Solid European oak',
     ...(price
       ? {
           offers: {
@@ -106,6 +116,12 @@ export function productJsonLd({
             itemCondition: `${CONTEXT}/NewCondition`,
             availability: `${CONTEXT}/${availableForSale ? 'InStock' : 'OutOfStock'}`,
             seller: {'@type': 'Organization', name: SITE_NAME},
+            // Delivery is free on every UK order, with no minimum spend.
+            shippingDetails: {
+              '@type': 'OfferShippingDetails',
+              shippingRate: {'@type': 'MonetaryAmount', value: '0', currency: 'GBP'},
+              shippingDestination: {'@type': 'DefinedRegion', addressCountry: 'GB'},
+            },
           },
         }
       : {}),

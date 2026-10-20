@@ -12,7 +12,14 @@ We make mantel beams, fireplace surrounds, floating shelves, console tables, coa
 
 ## Shop
 - [All products](${getCanonicalUrl('/collections/all')}): every piece in one list
-- [Categories](${getCanonicalUrl('/collections')}): mantel beams, shelves, coat racks, fireplace surrounds, console tables, cube blocks and door stops
+- [Categories](${getCanonicalUrl('/collections')}): all ranges
+- [Oak mantel beams](${getCanonicalUrl('/collections/solid-oak-mantel-beams')}): solid oak fireplace beams in a choice of sizes, plain or flamed, with and without corbels
+- [Oak fireplace surrounds](${getCanonicalUrl('/collections/solid-oak-fireplace-surrounds')}): solid oak surrounds made to order
+- [Oak shelves](${getCanonicalUrl('/collections/solid-oak-shelves')}): solid oak floating shelves
+- [Oak coat racks](${getCanonicalUrl('/collections/solid-oak-coat-racks')}): wall-mounted solid oak coat racks
+- [Oak console tables](${getCanonicalUrl('/collections/console-tables')}): solid oak console tables for halls and landings
+- [Oak cube blocks](${getCanonicalUrl('/collections/solid-oak-cube-blocks')}): block side tables
+- [Oak door stops](${getCanonicalUrl('/collections/solid-oak-door-stops')}): solid oak door stops
 
 ## About and help
 - [About the workshop](${getCanonicalUrl('/about')})
@@ -20,8 +27,16 @@ We make mantel beams, fireplace surrounds, floating shelves, console tables, coa
 - [Contact](${getCanonicalUrl('/contact')}): ${CONTACT_EMAIL}
 - [Delivery, returns and terms](${getCanonicalUrl('/policies')})
 
+## Common questions
+- Is it solid oak? Yes. Every piece is solid European oak, not veneer or oak-effect board.
+- Where do you deliver? Delivery is free across the UK, with no minimum spend.
+- How long does it take? Each piece is made to order and normally dispatches within 5 to 10 working days. Transit time is additional.
+- Can I order a custom size? Yes. Custom sizes are available on request before ordering: email ${CONTACT_EMAIL}.
+- What finishes are there? Most pieces come in a choice of six oil colours.
+- Can I fit a mantel beam above a stove? It depends on the stove and the distance. Follow the stove manufacturer's clearance guidance for timber.
+
 ## Who we are
-${COMPANY_LEGAL_LINE}
+${COMPANY_LEGAL_LINE}. The company is registered in Tonypandy, Wales, United Kingdom.
 
 ## Good to know
 - Prices are in GBP and include free UK delivery.
