@@ -5,6 +5,7 @@ import {ArticleCard} from '~/components/ArticleCard';
 import {BlogIntro} from '~/components/BlogIntro';
 import {BLOG_LABEL, SITE_NAME} from '~/lib/site';
 import {seoMeta} from '~/lib/seo';
+import {breadcrumbJsonLd} from '~/lib/structuredData';
 
 export const meta: Route.MetaFunction = () => {
   return seoMeta({
@@ -14,6 +15,7 @@ export const meta: Route.MetaFunction = () => {
     description:
       'Advice and inspiration from the Craft Wood Furniture workshop: caring for solid oak, choosing a mantel beam, and styling handmade timber at home.',
     path: '/blogs',
+    jsonLd: [breadcrumbJsonLd([{name: 'Blog', path: '/blogs'}])],
   });
 };
 

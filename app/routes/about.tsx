@@ -8,6 +8,7 @@ import {ABOUT_SLUG} from '~/lib/pageContent';
 import {loadPageContentState} from '~/lib/pageContent.server';
 import {SITE_NAME} from '~/lib/site';
 import {seoMeta} from '~/lib/seo';
+import {breadcrumbJsonLd} from '~/lib/structuredData';
 
 const ABOUT_PILLARS = [
   {
@@ -36,6 +37,7 @@ export const meta: Route.MetaFunction = () =>
     description:
       'Meet the workshop behind Craft Wood Furniture and learn how each solid-timber piece is joined, finished, and built for long ownership.',
     path: '/about',
+    jsonLd: [breadcrumbJsonLd([{name: 'About', path: '/about'}])],
   });
 
 export async function loader({context, request}: Route.LoaderArgs) {
