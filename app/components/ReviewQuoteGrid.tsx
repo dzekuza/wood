@@ -15,7 +15,11 @@ export function ReviewQuoteGrid({reviews}: {reviews: ProductReview[]}) {
         {featured.map((review) => (
           <article className="demo-quote-card" key={review.author}>
             <div className="demo-quote-photo">
-              <img src={review.images![0]} alt="" loading="lazy" />
+              <img
+                src={review.images![0]}
+                alt={`${review.product} in a customer's home, photo from ${review.author}'s review`}
+                loading="lazy"
+              />
             </div>
             <div className="demo-quote-body">
               <p className="demo-quote-attr">
