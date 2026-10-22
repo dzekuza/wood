@@ -661,3 +661,21 @@ exist in the repo today.
 **Consequences.** Smallest change, consent state is handled by Hydrogen's
 `Analytics.Provider`. If GA4/pixels are added later, or a CWF-styled banner is
 wanted, switch to a custom banner using `useCustomerPrivacy`.
+
+## ADR-0009 — GA4 via a consent-gated gtag component, not Shopify's Google & YouTube channel alone
+
+**Context.** A GA4 property (`G-QFCQSRXYTR`) existed but the headless site never
+sent it data: no tag in the code, and the Google & YouTube channel's pixel does
+not cover a Hydrogen storefront. ADR-0008 made Shopify's privacy banner the
+consent source.
+
+**Decision.** `GoogleAnalytics` listens to Hydrogen's analytics events and loads
+`gtag.js` only once `canTrack()` is true (analytics consent). The ID comes from
+`PUBLIC_GA_MEASUREMENT_ID`; unset means nothing loads. No Consent Mode
+pings before consent.
+
+**Consequences.** UK/EU visitors who decline are invisible to GA4, so numbers
+under-count. `purchase` is not sent: checkout runs on
+`checkout.craftwoodfurniture.co.uk`, so revenue needs a Shopify checkout pixel
+or the Google & YouTube channel's GA4 link. Revisit with Consent Mode v2 if
+modelled conversions are wanted.

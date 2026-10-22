@@ -17,6 +17,7 @@ import {EXCLUDE_HIDDEN_PRODUCTS_QUERY} from '~/lib/upsells';
 import tablerStyles from '@tabler/icons-webfont/dist/tabler-icons.min.css?url';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
+import {GoogleAnalytics} from './components/GoogleAnalytics';
 import {PageLayout} from './components/PageLayout';
 
 export type RootLoader = typeof loader;
@@ -89,6 +90,7 @@ export async function loader(args: Route.LoaderArgs) {
     ...deferredData,
     ...criticalData,
     publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
+    gaMeasurementId: env.PUBLIC_GA_MEASUREMENT_ID,
     shop: getShopAnalytics({
       storefront,
       publicStorefrontId: env.PUBLIC_STOREFRONT_ID,
@@ -216,6 +218,9 @@ export default function App() {
       shop={data.shop}
       consent={data.consent}
     >
+      {data.gaMeasurementId && (
+        <GoogleAnalytics measurementId={data.gaMeasurementId} />
+      )}
       <PageLayout {...data}>
         <Outlet />
       </PageLayout>

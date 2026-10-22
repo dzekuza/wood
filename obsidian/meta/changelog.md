@@ -1,7 +1,41 @@
 ---
 tags: [meta, changelog]
-updated: 2026-10-19
+updated: 2026-10-22
 ---
+
+## 2026-10-22 — GA4 added, consent-aware
+
+The GA4 property existed but nothing on the site sent data to it. Added
+`GoogleAnalytics` (`app/components/GoogleAnalytics.tsx`), mounted in `root.tsx`
+when `PUBLIC_GA_MEASUREMENT_ID` is set. `gtag.js` only loads after the visitor
+accepts analytics in Shopify's privacy banner. Sends `page_view`, `view_item`,
+`add_to_cart`. `entry.server.tsx` CSP now allows Google Tag Manager and Google
+Analytics hosts. New `PUBLIC_GA_MEASUREMENT_ID` in `env.d.ts`, plus a new
+`.env.example` listing every variable (none existed). Tracking stays off until
+the variable is added to `.env` and to the Oxygen environment. `purchase` is
+not tracked (checkout is on Shopify's domain). Also shortened the 8 collection
+SEO titles in Shopify: the site appends " | Craft Wood Furniture", so the
+brand was showing twice.
+
+## 2026-10-22 — SEO fields written in Shopify, rank tracker extended
+
+No code change. In Shopify admin (via MCP) all 8 collections now have an SEO
+title and description, and 7 have a short intro (Mantel Beams, Coat Racks,
+Shelves, Door Stops, Fireplace Surrounds, Console Tables, Cube Blocks;
+"Most popular" has SEO fields only). `solid-oak-fireplace-surround` and
+`solid-oak-block-side-table` got SEO titles, and 8 images missing alt text
+(mantel beam, `coat-racks`, `aaa-types-of-corbels`) got alt text.
+
+OpenSEO rank tracker (CraftedWood project) gained 7 keywords: oak mantel shelf,
+oak shelf with black brackets, oak coat rack with shelf, oak block side table,
+solid oak door stop, craftwood furniture, craft wood furniture. It still checks
+mobile only, depth 40, monthly; desktop and depth 100 need the OpenSEO app.
+
+Open: `coat-racks` and `aaa-types-of-corbels` are still published to Wood
+Headless (the Shopify MCP blocks unpublishing; do it in admin). The
+`working-type-surcharge` and `height-allowance-surcharge` products must stay
+published — they are the cart surcharge add-ons. 22 draft products (mostly
+duplicates) are not yet cleaned up.
 
 ## 2026-10-19 — £0 surcharge options no longer become cart lines
 

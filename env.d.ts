@@ -18,5 +18,8 @@ declare global {
     /** Comma-separated Customer Account emails allowed to use the edit
      *  toolbar. Empty or unset means nobody is an admin. */
     ADMIN_ALLOWLIST_EMAILS?: string;
+    /** GA4 measurement ID (`G-…`). Public — it ships to the browser. Unset
+     *  means GA4 is not loaded. Only fires after analytics consent. */
+    PUBLIC_GA_MEASUREMENT_ID?: string;
   }
 }
