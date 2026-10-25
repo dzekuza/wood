@@ -3,6 +3,34 @@ tags: [meta, changelog]
 updated: 2026-10-25
 ---
 
+## 2026-10-25 — SEO round: category facts, return-policy schema, lighter share image
+
+- **Category pages** (mantel beams, fireplace surrounds, shelves, coat racks,
+  console tables): each guide now opens with an answer-first paragraph, an "at a
+  glance" spec list and an "Explore more" link row (`specs` / `links` in
+  `app/lib/collectionContent.ts`, rendered by `CollectionGuide`). Every spec is
+  copied from the live product option lists (sizes, lengths, oil colours, surface
+  styles, hook colours, 4cm tops); re-check them when the Shopify options change.
+  The mantel collection and the home page ("Fitting a fireplace?" note under the
+  popular products) now link to `/products/solid-oak-mantel-beam`.
+- **Product JSON-LD**: `Offer.hasMerchantReturnPolicy` (30-day window, GB, links
+  `/policies/refund-policy`), `mpn` from the SKU, and `gtin` when the variant
+  barcode is 8 or 12-14 digits (`barcode` added to the variant fragment, types
+  regenerated). `priceValidUntil` is not emitted: the shop has no price end date.
+- **Default share image** is now `public/images/share-default.jpg` (1200x630,
+  ~135 KB) instead of the 2.8 MB `/demo/hero-1.png`.
+- **AI visibility baseline** (OpenSEO, ChatGPT + Google AI Overviews, 8 prompts,
+  96 credits): CraftWood was mentioned in 0 of 14 answered results. Cited
+  instead: Off the Grain (6), Celtic Timber (4), Only Oak Furniture (2), House of
+  Oak (1), Traditional Beams (1). For the brand-name prompt the engines cited
+  `craftwood-uk.com` (a different company) and Etsy.
+- **Open for the owner**: `/policies/refund-policy` lists custom products as
+  non-returnable while product pages say "30-day returns" (the schema follows the
+  30 days); it names `craftwoodfurnitureuk@gmail.com` while the site publishes
+  `hello@craftwoodfurniture.co.uk`; the policy page shows the mantel beam at
+  £99 while the PDP shows £109. Guides that need finish, repair-cover or
+  workshop-location claims are not written until those facts are confirmed.
+
 ## 2026-10-25 — /policies index restyled
 
 `/policies` rendered unstyled (oversized H1, stacked bare links). It now uses
