@@ -159,6 +159,10 @@ export default function Homepage() {
   );
 }
 
+const MANTEL_NOTE_PREFIX = 'Fitting a fireplace? Start with our';
+const MANTEL_NOTE_LINK = 'solid oak mantel beam';
+const MANTEL_NOTE_SUFFIX = ', made to size in 30 sizes.';
+
 function PopularProductsSection({
   products,
   content,
@@ -190,6 +194,14 @@ function PopularProductsSection({
             />
           ))}
         </div>
+
+        <p className="demo-popular-note">
+          {MANTEL_NOTE_PREFIX}{' '}
+          <Link to="/products/solid-oak-mantel-beam" prefetch="intent">
+            {MANTEL_NOTE_LINK}
+          </Link>
+          {MANTEL_NOTE_SUFFIX}
+        </p>
 
         <Link to="/collections/all" className="demo-btn demo-btn-outline-dark">
           <EditableText field="popular.ctaLabel">

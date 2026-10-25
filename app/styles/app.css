@@ -3735,6 +3735,19 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .archive-guide-body { max-width: 720px; margin-bottom: 56px; }
 .archive-guide-body p { font-size: 16px; line-height: 1.7; color: rgba(53, 47, 42, .7); margin-bottom: 16px; }
 
+.archive-specs { max-width: 720px; margin: 0 0 40px; border: 1px solid var(--cwf-line); border-radius: 16px; overflow: hidden; }
+.archive-spec { display: grid; grid-template-columns: minmax(140px, 1fr) 2fr; gap: 16px; padding: 14px 20px; border-bottom: 1px solid var(--cwf-line); font-size: 15px; line-height: 1.5; }
+.archive-spec:last-child { border-bottom: none; }
+.archive-spec dt { font-weight: 600; color: var(--cwf-primary); }
+.archive-spec dd { margin: 0; color: rgba(53, 47, 42, .7); }
+.archive-related { max-width: 720px; margin-bottom: 56px; }
+.archive-related-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: 15px; color: var(--cwf-primary); margin-bottom: 12px; }
+.archive-related ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 20px; }
+.archive-related a { color: var(--cwf-accent-deep); text-decoration: underline; text-underline-offset: 3px; font-size: 15px; }
+@media (max-width: 560px) { .archive-spec { grid-template-columns: 1fr; gap: 4px; } }
+.demo-popular-note { margin: 24px 0 0; font-size: 15px; line-height: 1.6; color: rgba(53, 47, 42, .7); }
+.demo-popular-note a { color: var(--cwf-accent-deep); text-decoration: underline; text-underline-offset: 3px; }
+
 /* ---- Archive FAQ ---- */
 .archive-faq { padding: 64px 0; border-top: .5px solid var(--cwf-line); }
 .archive-faq-title { font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif; font-weight: 500; font-size: clamp(28px, 3.4vw, 56px); color: var(--cwf-primary); text-align: center; margin-bottom: 40px; }
