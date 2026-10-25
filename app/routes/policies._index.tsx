@@ -1,5 +1,6 @@
 import {useLoaderData, Link} from 'react-router';
 import type {Route} from './+types/policies._index';
+import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {seoMeta} from '~/lib/seo';
 import {SITE_NAME} from '~/lib/site';
 import type {PoliciesQuery, PolicyItemFragment} from 'storefrontapi.generated';
@@ -34,15 +35,29 @@ export default function Policies() {
   const {policies} = useLoaderData<typeof loader>();
 
   return (
-    <div className="policies">
-      <h1>Policies</h1>
-      <div>
-        {policies.map((policy) => (
-          <fieldset key={policy.id}>
-            <Link to={`/policies/${policy.handle}`}>{policy.title}</Link>
-          </fieldset>
-        ))}
+    <div className="archive-page">
+      <Breadcrumbs items={[{label: 'Policies'}]} />
+      <div className="archive-hero">
+        <div className="archive-wrap">
+          <div className="archive-hero-inner">
+            <h1 className="archive-hero-title">Policies</h1>
+          </div>
+        </div>
       </div>
+      <section className="cms-page-shell">
+        <div className="archive-wrap">
+          <ul className="policy-list">
+            {policies.map((policy) => (
+              <li key={policy.id}>
+                <Link to={`/policies/${policy.handle}`} className="policy-list-link">
+                  <span>{policy.title}</span>
+                  <i className="ti ti-arrow-right" aria-hidden="true" />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
     </div>
   );
 }

@@ -1,7 +1,14 @@
 ---
 tags: [meta, changelog]
-updated: 2026-10-22
+updated: 2026-10-25
 ---
+
+## 2026-10-25 — /policies index restyled
+
+`/policies` rendered unstyled (oversized H1, stacked bare links). It now uses
+the same shell as `/policies/:handle`: `Breadcrumbs`, `.archive-hero`, and a
+`.policy-list` of bordered link rows with an arrow icon (new classes in
+`app.css`).
 
 ## 2026-10-22 — GA4 added, consent-aware
 
