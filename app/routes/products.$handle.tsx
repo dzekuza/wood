@@ -76,6 +76,7 @@ export const meta: Route.MetaFunction = ({data, params}) => {
               path,
               images: images.slice(0, 6).map((image) => image.url),
               sku: variant?.sku,
+              gtin: variant?.barcode,
               price: variant?.price,
               availableForSale: variant?.availableForSale,
               rating: getRatingSummary(product.metafield?.value),
@@ -800,6 +801,7 @@ const PRODUCT_VARIANT_FRAGMENT = `#graphql
       value
     }
     sku
+    barcode
     title
     unitPrice {
       amount

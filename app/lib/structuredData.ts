@@ -80,6 +80,7 @@ export function productJsonLd({
   path,
   images,
   sku,
+  gtin,
   price,
   availableForSale,
   rating,
@@ -89,6 +90,8 @@ export function productJsonLd({
   path: string;
   images: string[];
   sku?: string | null;
+  /** Barcode from the variant; only emitted when it is a valid GTIN length. */
+  gtin?: string | null;
   price?: {amount: string; currencyCode: string} | null;
   availableForSale?: boolean;
   rating?: {average: number; count: number} | null;
@@ -101,7 +104,8 @@ export function productJsonLd({
     name,
     ...(description ? {description} : {}),
     ...(images.length ? {image: images} : {}),
-    ...(sku ? {sku} : {}),
+    ...(sku ? {sku, mpn: sku} : {}),
+    ...(gtin && /^(\d{8}|\d{12,14})$/.test(gtin.trim()) ? {gtin: gtin.trim()} : {}),
     url,
     brand: {'@type': 'Brand', name: SITE_NAME},
     // Every product in the shop is made from solid European oak.
@@ -121,6 +125,14 @@ export function productJsonLd({
               '@type': 'OfferShippingDetails',
               shippingRate: {'@type': 'MonetaryAmount', value: '0', currency: 'GBP'},
               shippingDestination: {'@type': 'DefinedRegion', addressCountry: 'GB'},
+            },
+            // Mirrors /policies/refund-policy: 30 days to request a return.
+            hasMerchantReturnPolicy: {
+              '@type': 'MerchantReturnPolicy',
+              applicableCountry: 'GB',
+              returnPolicyCategory: `${CONTEXT}/MerchantReturnFiniteReturnWindow`,
+              merchantReturnDays: 30,
+              merchantReturnLink: getCanonicalUrl('/policies/refund-policy'),
             },
           },
         }
