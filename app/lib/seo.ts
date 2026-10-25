@@ -34,12 +34,14 @@ export type SeoImage = {
   height?: number | null;
 };
 
-/** Share-card fallback for pages without a picture of their own. */
+/** Share-card fallback for pages without a picture of their own. A 1200x630
+ *  crop of the hero photo (~135 KB); the full hero is 2.8 MB, which some
+ *  platforms refuse to fetch for link previews. */
 export const DEFAULT_SHARE_IMAGE: SeoImage = {
-  url: `https://${CANONICAL_HOST}/demo/hero-1.png`,
+  url: `https://${CANONICAL_HOST}/images/share-default.jpg`,
   altText: 'Handmade solid oak furniture',
-  width: 2138,
-  height: 1113,
+  width: 1200,
+  height: 630,
 };
 
 /**
