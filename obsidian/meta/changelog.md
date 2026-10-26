@@ -1,7 +1,28 @@
 ---
 tags: [meta, changelog]
-updated: 2026-10-25
+updated: 2026-10-26
 ---
+
+## 2026-10-26 — Merchant Center misrepresentation: remove contradicting claims
+
+Google suspended all UK products for "Misrepresentation" (manual check). Audit
+found site copy that contradicted the written policies. Code fixes:
+
+- Home categories subheading "Delivery in days—not months…" → "Made to order in
+  5 to 10 working days, with free UK delivery." (`app/lib/homeContent.ts`).
+- PDP guarantee strip: "30-day returns" → "Made to order"
+  (`ProductAssurances.tsx`), because the refund policy excludes custom orders and
+  every product is made to order. Product JSON-LD still states the 30-day window
+  to match the written policy.
+- About page stats: removed unverifiable "4 makers", "25 years of repair cover",
+  "120+ hours" for facts the shop can show (5–10 working days, 6 oil finishes,
+  free UK delivery) (`app/routes/about.tsx`).
+- Contact policy email/address updated in Shopify Admin (hello@…, "Tonypandy CF40 2TB").
+
+**Still open (Shopify Admin / owner, connector lacks `write_legal_policies`):**
+rewrite Refund and Shipping policies to match made-to-order reality, save the
+Terms text, fix the Privacy policy address, check Merchant Center business info,
+decide on publishing a street address, then request review.
 
 ## 2026-10-25 — SEO round: category facts, return-policy schema, lighter share image
 

@@ -49,7 +49,7 @@ const ASSURANCES: Assurance[] = [
   {icon: ICONS.leaf, title: 'Solid European Oak', detail: 'Natural grain, unique character'},
 ];
 
-const GUARANTEES = ['Secure checkout', '30-day returns', 'Free UK delivery included'];
+const GUARANTEES = ['Secure checkout', 'Made to order', 'Free UK delivery included'];
 
 function LockIcon() {
   return (
@@ -60,7 +60,7 @@ function LockIcon() {
   );
 }
 
-/** "Secure checkout · 30-day returns · …" strip under the add-to-cart row. */
+/** "Secure checkout · Made to order · …" strip under the add-to-cart row. */
 export function ProductGuarantees() {
   return (
     <div className="pdp-guarantee">

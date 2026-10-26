@@ -26,9 +26,9 @@ const ABOUT_PILLARS = [
 ];
 
 const ABOUT_FACTS = [
-  {value: '4', label: 'makers on the bench'},
-  {value: '25', label: 'years of repair cover'},
-  {value: '120+', label: 'hours in a dining table'},
+  {value: '5–10', label: 'working days to make your order'},
+  {value: '6', label: 'oak oil finishes to choose from'},
+  {value: '£0', label: 'UK delivery, on every order'},
 ];
 
 export const meta: Route.MetaFunction = () =>

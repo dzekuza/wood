@@ -1,12 +1,28 @@
 ---
 tags: [meta, decision]
-updated: 2026-10-15
+updated: 2026-10-26
 ---
 
 # Decisions Log (ADRs)
 
 Architecture Decision Records. Each entry captures a choice, its context, and its
 consequences. Use [[templates/adr-note]] for new entries. Newest first.
+
+---
+
+## ADR-0020 — On-site claims must match the written policies (Merchant Center)
+
+**Context.** Google's manual Misrepresentation review flags stores whose
+advertised terms differ from their policies. Ours said "30-day returns" and
+"delivery in days" while the policies excluded custom orders and quoted 3-day
+processing.
+
+**Decision.** Storefront copy may only state what the policies and product data
+support; unverifiable stats are not published. Delivery wording is fixed to
+"made to order, 5–10 working days, free UK delivery".
+
+**Consequences.** Change policy text and site copy together. The returns badge is
+gone until the owner confirms the real returns rules.
 
 ---
 

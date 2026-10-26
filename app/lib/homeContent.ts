@@ -92,7 +92,7 @@ export const HOME_CONTENT_DEFAULTS: HomeContent = {
   ],
   categories: {
     heading: 'Our Categories',
-    subheading: 'Delivery in days—not months. Welcome to the new standard.',
+    subheading: 'Made to order in 5 to 10 working days, with free UK delivery.',
     linkLabel: 'All Categories',
   },
   popular: {heading: 'Most popular', ctaLabel: 'Explore Categories'},
