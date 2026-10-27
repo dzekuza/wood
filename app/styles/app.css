@@ -2032,6 +2032,8 @@ input.search-input:focus { border: none; box-shadow: none; }
   border-radius: 12px;
 }
 
+.product-price-from { display: flex; align-items: baseline; gap: 8px; }
+.product-price-eyebrow { font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--cwf-ink-strong); }
 .product-price-on-sale {
   display: flex;
   gap: 0.5rem;
@@ -3100,6 +3102,7 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .pdp-sticky-inner { max-width: 1320px; margin: 0 auto; display: flex; align-items: center; gap: 20px; justify-content: space-between; }
 .pdp-sticky-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .pdp-sticky-title { font-size: 14px; font-weight: 600; color: rgba(243, 239, 234, .7); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Mark Bold', 'Plus Jakarta Sans', sans-serif; }
+.pdp-sticky-price .product-price-eyebrow { color: color-mix(in srgb, var(--cwf-surface) 70%, transparent); }
 .pdp-sticky-price { font-size: 18px; font-weight: 700; color: var(--cwf-surface); font-family: 'Mark Bold', 'Plus Jakarta Sans', sans-serif; letter-spacing: -.02em; }
 .pdp-sticky-bar .pdp-atc-wrap { width: auto; min-width: 200px; }
 /* Swap to a light pill button on the dark bar — .btn-primary's brown-on-brown reads too low-contrast here. */
@@ -3188,9 +3191,9 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .pdp-maker p { color: rgba(243, 239, 234, .7); font-size: 15px; line-height: 1.7; margin-top: 18px; }
 .pdp-maker-sig { font-family: 'Mark Bold', 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 24px; letter-spacing: -.04em; color: var(--cwf-accent); margin-top: 24px; font-style: italic; }
 .pdp-maker-by { font-size: 12px; color: rgba(243, 239, 234, .5); letter-spacing: .1em; text-transform: uppercase; margin-top: 4px; }
-.pdp-specs { margin-top: 64px; background: var(--cwf-surface); border-radius: 24px; padding: 48px; }
-@media (max-width: 767px) { .pdp-specs { margin-top: 40px; padding: 28px 20px; border-radius: 18px; } }
-.pdp-specs-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; margin-bottom: 32px; }
+.pdp-specs { margin-top: 64px; background: var(--cwf-surface); border-radius: 24px; padding: 32px; }
+@media (max-width: 767px) { .pdp-specs { margin-top: 40px; padding: 20px 16px; border-radius: 18px; } }
+.pdp-specs-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; margin-bottom: 24px; }
 .pdp-specs-head .eyebrow { color: var(--cwf-ink-strong); display: inline-flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; }
 .pdp-specs-head .eyebrow::before { content: ""; width: 24px; height: 1px; background: var(--cwf-accent); }
 .pdp-specs-title { margin-top: 10px; }
@@ -3205,7 +3208,7 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .pdp-spec-card { background: #fff; border: .5px solid var(--cwf-line); border-radius: 14px; padding: 22px; }
 .pdp-spec-icon { width: 22px; height: 22px; color: var(--cwf-accent); margin-bottom: 14px; display: block; }
 .pdp-spec-label { font-size: 11px; color: var(--cwf-ink-strong); letter-spacing: .12em; text-transform: uppercase; font-weight: 600; }
-.pdp-spec-val { font-family: 'Mark Bold', 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 22px; letter-spacing: -.025em; color: var(--cwf-primary); margin-top: 6px; line-height: 1.1; }
+.pdp-spec-val { font-family: 'Mark Bold', 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; letter-spacing: -.025em; color: var(--cwf-primary); margin-top: 6px; line-height: 1.1; }
 .pdp-spec-sub { font-size: 12px; color: color-mix(in srgb, var(--cwf-ink-strong) 55%, transparent); margin-top: 4px; }
 .pdp-related { margin-top: 80px; margin-bottom: 80px; max-width: 1400px; margin-left: auto; margin-right: auto; padding: 0 40px; }
 @media (max-width: 767px) { .pdp-related { padding: 0 20px; } }

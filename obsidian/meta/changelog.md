@@ -1,7 +1,29 @@
 ---
 tags: [meta, changelog]
-updated: 2026-10-26
+updated: 2026-10-27
 ---
+
+## 2026-10-27 — PDP: no option preselected on load
+
+`ProductForm.tsx` no longer shows size/length/oil colour as selected until the
+shopper picks it (or the URL names the options). Hydrogen still resolves the
+first available variant underneath, so price/stock stay correct. Dropdowns show a
+"Select …" placeholder; the Order button (all viewports) scrolls to the first
+unpicked option instead of adding to cart.
+
+The PDP price (main and sticky bar) reads "From <lowest variant price>" until
+the shopper picks any option (then the selected variant's real price), matching the product card (`ProductPrice` `from` prop;
+`ProductForm` reports `onNoneChosenChange`; `priceRange` added to `PRODUCT_FRAGMENT`).
+
+PDP dropdown options (e.g. Beam Size) now list "· from £X" per value, taken from
+`optionValue.firstSelectableVariant.price` (no new GraphQL), via
+`formatOptionPrice` in `ProductForm.tsx`. "from" because that variant's price also
+depends on the other options (length etc.).
+
+PDP specs block ("The honest specifications.") outer padding 48px → 32px (mobile
+28/20 → 20/16, head gap 32 → 24) so it sits closer to its 22px inner cards. The
+sticky bar's "From" eyebrow was dark-on-dark; now a translucent surface colour.
+Spec card headings (`.pdp-spec-val`, e.g. "Solid European Oak") 22px → 18px.
 
 ## 2026-10-26 — Merchant Center misrepresentation: remove contradicting claims
 

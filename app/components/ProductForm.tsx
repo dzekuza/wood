@@ -34,6 +34,7 @@ export function ProductForm({
   quantity,
   onQuantityChange,
   sliderOptionOverrides,
+  onNoneChosenChange,
 }: {
   productOptions: MappedProductOptions[];
   selectedVariant: ProductFragment['selectedOrFirstAvailableVariant'];
@@ -48,6 +49,8 @@ export function ProductForm({
   onQuantityChange: (quantity: number) => void;
   /** From the product's `custom.slider_options` metafield — see [[productOptionDisplay]]. */
   sliderOptionOverrides?: string[] | null;
+  /** Fires with true while the shopper hasn't picked any option yet, false once they pick one. */
+  onNoneChosenChange?: (noneChosen: boolean) => void;
 }) {
   const navigate = useNavigate();
   const {open} = useAside();
@@ -57,10 +60,11 @@ export function ProductForm({
   const formRef = useRef<HTMLDivElement>(null);
   const [searchParams] = useSearchParams();
 
-  // Hydrogen pre-selects the first available variant, so "selected" can't be
-  // read from the variant. An option counts as chosen once the shopper picks a
-  // value, or when the page was opened on a link that already names the
-  // options (the first render, before useSelectedOptionInUrlParam fills them).
+  // Hydrogen pre-selects the first available variant (so price and stock still
+  // resolve), but nothing is *shown* as selected until the shopper picks it.
+  // An option counts as chosen once the shopper picks a value, or when the
+  // page was opened on a link that already names the options (the first
+  // render, before useSelectedOptionInUrlParam fills them).
   const openedWithOptions = useRef(
     productOptions.some((o) => searchParams.has(o.name)),
   ).current;
@@ -79,6 +83,8 @@ export function ProductForm({
   const markTouched = (name: string) =>
     setTouched((prev) => (prev.has(name) ? prev : new Set(prev).add(name)));
 
+  const isChosen = (name: string) => openedWithOptions || touched.has(name);
+
   const pendingOption = openedWithOptions
     ? undefined
     : productOptions.find(
@@ -88,9 +94,14 @@ export function ProductForm({
           !(o.name === 'Title' && o.optionValues.length === 1),
       );
 
-  /** Mobile CTA dock only: send the shopper to the first unpicked option. */
+  const noneChosen = !openedWithOptions && touched.size === 0;
+  useEffect(() => {
+    onNoneChosenChange?.(noneChosen);
+  }, [noneChosen, onNoneChosenChange]);
+
+  /** Send the shopper to the first unpicked option instead of ordering. */
   const handleOrderClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    if (!pendingOption || !window.matchMedia('(max-width: 768px)').matches) {
+    if (!pendingOption) {
       open('cart');
       return;
     }
@@ -136,7 +147,10 @@ export function ProductForm({
         </div>
       </div>
       {productOptions.map((option) => {
-        const selectedValue = option.optionValues.find((v) => v.selected);
+        const chosen = isChosen(option.name);
+        const selectedValue = chosen
+          ? option.optionValues.find((v) => v.selected)
+          : undefined;
 
         // A product with no variants still has one placeholder option,
         // "Title", whose single value is "Default Title" — or whatever it was
@@ -181,9 +195,11 @@ export function ProductForm({
         // dropdown below.
         if (!hasSwatches && isSliderOption(option.name, sliderOptionOverrides)) {
           const values = option.optionValues;
-          const selectedIndex = values.findIndex((v) => v.selected);
+          const selectedIndex = selectedValue ? values.indexOf(selectedValue) : -1;
           const percent =
-            values.length > 1 ? (Math.max(selectedIndex, 0) / (values.length - 1)) * 100 : 0;
+            values.length > 1 && selectedIndex >= 0
+              ? (selectedIndex / (values.length - 1)) * 100
+              : 0;
 
           const selectValue = (value: (typeof values)[number]) => {
             if (!value.exists) return;
@@ -216,7 +232,7 @@ export function ProductForm({
                       <button
                         key={option.name + value.name}
                         type="button"
-                        className={`product-opt-progress-step${value.selected ? ' is-selected' : ''}${!value.exists ? ' is-unavailable' : ''}`}
+                        className={`product-opt-progress-step${selectedValue === value ? ' is-selected' : ''}${!value.exists ? ' is-unavailable' : ''}`}
                         style={{left: `${stepPercent}%`}}
                         disabled={!value.exists}
                         aria-label={value.name}
@@ -230,7 +246,7 @@ export function ProductForm({
                     <button
                       key={option.name + value.name}
                       type="button"
-                      className={`product-opt-progress-label${value.selected ? ' is-selected' : ''}`}
+                      className={`product-opt-progress-label${selectedValue === value ? ' is-selected' : ''}`}
                       disabled={!value.exists}
                       onClick={() => selectValue(value)}
                     >
@@ -256,20 +272,26 @@ export function ProductForm({
               <select
                 className="product-opt-select"
                 value={selectedValue?.name ?? ''}
-                onFocus={() => markTouched(option.name)}
                 onChange={(e) => {
                   const value = option.optionValues.find((v) => v.name === e.target.value);
-                  if (!value || value.selected) return;
+                  if (!value) return;
                   markTouched(option.name);
+                  if (value.selected) return;
                   const to = value.isDifferentProduct
                     ? `/products/${value.handle}?${value.variantUriQuery}`
                     : `?${value.variantUriQuery}`;
                   void navigate(to, {replace: true, preventScrollReset: true});
                 }}
               >
+                {!selectedValue && (
+                  <option value="" disabled>
+                    Select {option.name.toLowerCase()}
+                  </option>
+                )}
                 {option.optionValues.map((value) => (
                   <option key={option.name + value.name} value={value.name} disabled={!value.exists}>
-                    {formatMeasurement(value.name, unit, option.name)}{value.available ? '' : ' (unavailable)'}
+                    {formatMeasurement(value.name, unit, option.name)}
+                    {value.available ? formatOptionPrice(value.firstSelectableVariant?.price) : ' (unavailable)'}
                   </option>
                 ))}
               </select>
@@ -291,12 +313,12 @@ export function ProductForm({
                   name,
                   handle,
                   variantUriQuery,
-                  selected,
                   available,
                   exists,
                   isDifferentProduct,
                   swatch,
                 } = value;
+                const selected = selectedValue === value;
 
                 if (isDifferentProduct) {
                   return (
@@ -328,7 +350,7 @@ export function ProductForm({
                       disabled={!exists}
                       onClick={() => {
                         markTouched(option.name);
-                        if (!selected) {
+                        if (!value.selected) {
                           void navigate(`?${variantUriQuery}`, {
                             replace: true,
                             preventScrollReset: true,
@@ -513,6 +535,16 @@ export function ProductForm({
     );
     return dockTarget ? createPortal(row, dockTarget) : row;
   }
+}
+
+/** " · from £99.00" suffix for a dropdown entry (price of the value's first variant, which also varies with other options); empty when unpriced. */
+function formatOptionPrice(price?: {amount: string; currencyCode: string} | null) {
+  if (!price) return '';
+  const formatted = new Intl.NumberFormat('en-GB', {
+    style: 'currency',
+    currency: price.currencyCode,
+  }).format(parseFloat(price.amount));
+  return ` · from ${formatted}`;
 }
 
 function ProductOptionSwatch({

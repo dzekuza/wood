@@ -1,12 +1,26 @@
 ---
 tags: [meta, decision]
-updated: 2026-10-26
+updated: 2026-10-27
 ---
 
 # Decisions Log (ADRs)
 
 Architecture Decision Records. Each entry captures a choice, its context, and its
 consequences. Use [[templates/adr-note]] for new entries. Newest first.
+
+---
+
+## PDP shows no preselected option; price reads "From" until all picked (2026-10-27)
+
+**Decision.** Hydrogen still resolves the first available variant (price/stock
+work), but `ProductForm` only *displays* an option as selected once the shopper
+picks it or the URL names it. Until then the PDP price is `priceRange.minVariantPrice`
+prefixed "From", matching the product card — until any option is picked, then the
+selected variant's real price.
+
+**Consequences.** Order now is blocked (scroll + pulse) until every multi-value
+option is picked. The "none chosen" flag is lifted to the route via `onNoneChosenChange`;
+its initial value is computed identically on server and client to avoid a flash.
 
 ---
 

@@ -1,5 +1,5 @@
 import {useState, useEffect, useMemo, useRef} from 'react';
-import {useLoaderData, Link} from 'react-router';
+import {useLoaderData, useSearchParams, Link} from 'react-router';
 import type {Route} from './+types/products.$handle';
 import {motion} from 'motion/react';
 import {
@@ -202,6 +202,17 @@ export default function Product() {
     ...product,
     selectedOrFirstAvailableVariant: selectedVariant,
   });
+
+  // Until the shopper picks any option, show the product card's
+  // "From <lowest price>"; once they pick one, show the selected variant's real
+  // price. Starts true on server and client alike unless the link already names
+  // the options (mirrors ProductForm's `noneChosen`).
+  const [searchParams] = useSearchParams();
+  const [priceIsFrom, setPriceIsFrom] = useState(
+    () =>
+      productOptions.some((o) => o.optionValues.length > 1) &&
+      !productOptions.some((o) => searchParams.has(o.name)),
+  );
 
   const {title, descriptionHtml} = product;
   const descriptionSummary = getDescriptionSummary(descriptionHtml);
@@ -582,8 +593,9 @@ export default function Product() {
                 </StaggerItem>
                 <StaggerItem className="pdp-price-big">
                   <ProductPrice
-                    price={selectedVariant?.price}
+                    price={priceIsFrom ? product.priceRange.minVariantPrice : selectedVariant?.price}
                     compareAtPrice={selectedVariant?.compareAtPrice}
+                    from={priceIsFrom}
                   />
                 </StaggerItem>
                 {descriptionSummary && (
@@ -610,6 +622,7 @@ export default function Product() {
                       quantity={quantity}
                       onQuantityChange={setQuantity}
                       sliderOptionOverrides={sliderOptionOverrides}
+                      onNoneChosenChange={setPriceIsFrom}
                     />
                   </div>
                 </StaggerItem>
@@ -730,7 +743,11 @@ export default function Product() {
             <div className="pdp-sticky-info">
               <span className="pdp-sticky-title">{title}</span>
               <span className="pdp-sticky-price">
-                <ProductPrice price={selectedVariant?.price} compareAtPrice={selectedVariant?.compareAtPrice} />
+                <ProductPrice
+                  price={priceIsFrom ? product.priceRange.minVariantPrice : selectedVariant?.price}
+                  compareAtPrice={selectedVariant?.compareAtPrice}
+                  from={priceIsFrom}
+                />
               </span>
             </div>
             <div className="pdp-atc-wrap">
@@ -819,6 +836,9 @@ const PRODUCT_FRAGMENT = `#graphql
     handle
     descriptionHtml
     description
+    priceRange {
+      minVariantPrice { amount currencyCode }
+    }
     encodedVariantExistence
     encodedVariantAvailability
     options {
