@@ -125,6 +125,12 @@ export function productJsonLd({
               '@type': 'OfferShippingDetails',
               shippingRate: {'@type': 'MonetaryAmount', value: '0', currency: 'GBP'},
               shippingDestination: {'@type': 'DefinedRegion', addressCountry: 'GB'},
+              // Dispatch within up to 5 days, then 2 to 3 working days in transit.
+              deliveryTime: {
+                '@type': 'ShippingDeliveryTime',
+                handlingTime: {'@type': 'QuantitativeValue', minValue: 0, maxValue: 5, unitCode: 'DAY'},
+                transitTime: {'@type': 'QuantitativeValue', minValue: 2, maxValue: 3, unitCode: 'DAY'},
+              },
             },
             // Mirrors /policies/refund-policy: 30 days to request a return.
             hasMerchantReturnPolicy: {

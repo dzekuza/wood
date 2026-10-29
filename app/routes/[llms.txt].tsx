@@ -8,7 +8,7 @@ export function loader() {
 
 > Handmade solid oak furniture, made to order in our own workshop and delivered free across the UK.
 
-We make mantel beams, fireplace surrounds, floating shelves, console tables, coat racks, block side tables and door stops from solid European oak. Most pieces can be ordered in a choice of sizes and six oil colours. Every piece is made to order and normally dispatches within 5 to 10 working days.
+We make mantel beams, fireplace surrounds, floating shelves, console tables, coat racks, block side tables and door stops from solid European oak. Most pieces can be ordered in a choice of sizes and six oil colours. Every piece is made to order and dispatches within up to 5 days, and delivery takes 2 to 3 working days.
 
 ## Shop
 - [All products](${getCanonicalUrl('/collections/all')}): every piece in one list
@@ -30,7 +30,7 @@ We make mantel beams, fireplace surrounds, floating shelves, console tables, coa
 ## Common questions
 - Is it solid oak? Yes. Every piece is solid European oak, not veneer or oak-effect board.
 - Where do you deliver? Delivery is free across the UK, with no minimum spend.
-- How long does it take? Each piece is made to order and normally dispatches within 5 to 10 working days. Transit time is additional.
+- How long does it take? Each piece is made to order and dispatches within up to 5 days, and delivery takes 2 to 3 working days.
 - Can I order a custom size? Yes. Custom sizes are available on request before ordering: email ${CONTACT_EMAIL}.
 - What finishes are there? Most pieces come in a choice of six oil colours.
 - Can I fit a mantel beam above a stove? It depends on the stove and the distance. Follow the stove manufacturer's clearance guidance for timber.

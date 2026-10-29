@@ -3,7 +3,7 @@
  * a short buying guide and FAQs. Only facts the shop already publishes in
  * `llms.txt` are stated here — solid European oak, made to order, a choice of
  * sizes and six oil colours, custom sizes on request, free UK delivery,
- * dispatch in 5 to 10 working days (the same figure as the product page's
+ * dispatch within up to 5 days and delivery in 2 to 3 working days (the same figures as the product page's
  * default lead time). Sizes and options in `specs` come from the product pages' option lists; re-check them when
  * the Shopify options change. Anything the merchant sets in Shopify
  * (`collection.seo`, `collection.description`) still wins over this copy.
@@ -30,7 +30,7 @@ const SHARED_FAQS: CollectionFaq[] = [
   {
     question: 'How long does delivery take and what does it cost?',
     answer:
-      'Delivery is free across the UK. Every piece is made to order in our workshop, and it normally dispatches within 5 to 10 working days. Transit time is additional.',
+      'Delivery is free across the UK. Every piece is made to order in our workshop, and it dispatches within up to 5 days. Delivery then takes 2 to 3 working days.',
   },
   {
     question: 'Can I order a custom size?',
@@ -63,7 +63,7 @@ export const COLLECTION_CONTENT: Record<string, CollectionContent> = {
       {label: 'Surface styles', value: 'Sanded, Lightly Worked or Heavily Worked'},
       {label: 'Fixings', value: 'Pre-drilled mounting holes and concealed fixings for solid walls'},
       {label: 'Size tolerance', value: 'Finished dimensions can vary by about ⅓ inch'},
-      {label: 'Dispatch', value: '5 to 10 working days, free UK delivery'},
+      {label: 'Dispatch', value: 'Up to 5 days, then 2 to 3 working days delivery. Free UK delivery'},
     ],
     links: [
       {label: 'Solid oak mantel beam', to: '/products/solid-oak-mantel-beam'},
@@ -103,7 +103,7 @@ export const COLLECTION_CONTENT: Record<string, CollectionContent> = {
       {label: 'Oil colours', value: 'White, Light Grey, Grey, Dark, Old Oak and Clear'},
       {label: 'Surface styles', value: 'Sanded, Lightly Worked or Heavily Worked'},
       {label: 'Custom sizes', value: 'Contact us before ordering'},
-      {label: 'Dispatch', value: '5 to 10 working days, free UK delivery'},
+      {label: 'Dispatch', value: 'Up to 5 days, then 2 to 3 working days delivery. Free UK delivery'},
     ],
     links: [
       {label: 'Solid oak fireplace surround', to: '/products/solid-oak-fireplace-surround'},
@@ -141,7 +141,7 @@ export const COLLECTION_CONTENT: Record<string, CollectionContent> = {
       {label: 'Length', value: '30cm to 150cm'},
       {label: 'Fixings', value: 'Hidden fixings (arrives pre-drilled) or black brackets'},
       {label: 'Oil colours', value: 'White, Light Grey, Grey, Dark, Old Oak and Clear'},
-      {label: 'Dispatch', value: '5 to 10 working days, free UK delivery'},
+      {label: 'Dispatch', value: 'Up to 5 days, then 2 to 3 working days delivery. Free UK delivery'},
     ],
     links: [
       {label: 'Solid oak floating shelf', to: '/products/solid-oak-floating-shelf'},
@@ -181,7 +181,7 @@ export const COLLECTION_CONTENT: Record<string, CollectionContent> = {
       {label: 'Hook colours', value: 'Black, Chrome, Gold, Old Brass or Old Copper'},
       {label: 'Oil colours', value: 'White, Light Grey, Grey, Dark, Old Oak and Clear'},
       {label: 'Fixings', value: 'Supplied assembled, with fixings for a solid wall'},
-      {label: 'Dispatch', value: '5 to 10 working days, free UK delivery'},
+      {label: 'Dispatch', value: 'Up to 5 days, then 2 to 3 working days delivery. Free UK delivery'},
     ],
     links: [
       {label: 'Coat rack with shelf', to: '/products/coat-rack-with-shelf'},
@@ -221,7 +221,7 @@ export const COLLECTION_CONTENT: Record<string, CollectionContent> = {
       {label: 'Legs', value: 'Black steel three-rod hairpin legs, 71cm to 102cm high'},
       {label: 'Overall height', value: 'Leg height plus about 4cm for the top'},
       {label: 'Oil colours', value: 'White, Light Grey, Grey, Dark, Old Oak and Clear'},
-      {label: 'Dispatch', value: '5 to 10 working days, free UK delivery'},
+      {label: 'Dispatch', value: 'Up to 5 days, then 2 to 3 working days delivery. Free UK delivery'},
     ],
     links: [
       {label: 'Solid oak console table with black hairpin legs', to: '/products/solid-oak-console-table-with-black-hairpin-legs'},

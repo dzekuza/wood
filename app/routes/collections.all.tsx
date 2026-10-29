@@ -89,7 +89,7 @@ const FAQ_ITEMS = [
   },
   {
     question: 'How long does delivery take?',
-    answer: 'Most orders ship within 5–10 business days. Larger made-to-order pieces can take up to 4 weeks — exact estimates are shown at checkout.',
+    answer: 'Orders dispatch within up to 5 days, and delivery then takes 2–3 working days. Larger made-to-order pieces can take a little longer — we will confirm a timeline when you order.',
   },
   {
     question: 'Do you offer a warranty?',

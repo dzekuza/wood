@@ -1,7 +1,21 @@
 ---
 tags: [meta, changelog]
-updated: 2026-10-27
+updated: 2026-10-29
 ---
+
+## 2026-10-29 — Dispatch and delivery timing corrected sitewide
+
+Every page now says orders dispatch within up to 5 days and delivery takes 2 to 3
+working days (was "5 to 10 working days" production plus 1 to 5 days transit).
+Updated: PDP lead-time default, assurance tiles and delivery accordion, category
+copy/FAQs/specs (`collectionContent.ts`), home, About, FAQ accordions,
+`llms.txt`, and `policy-drafts.md`. Product JSON-LD `shippingDetails` now carries
+`deliveryTime` (handling 0-5 days, transit 2-3 days). A product or shop
+`custom.lead_time` metafield in Shopify still overrides the PDP tile, so it must
+hold the new wording too.
+
+The PDP urgency line "3 workshop slots left this month" (an unverifiable scarcity
+claim) is now "Made to order · Dispatched within up to 5 days".
 
 ## 2026-10-27 — PDP: no option preselected on load
 

@@ -26,7 +26,7 @@ const ABOUT_PILLARS = [
 ];
 
 const ABOUT_FACTS = [
-  {value: '5–10', label: 'working days to make your order'},
+  {value: '≤5', label: 'days to dispatch your order'},
   {value: '6', label: 'oak oil finishes to choose from'},
   {value: '£0', label: 'UK delivery, on every order'},
 ];

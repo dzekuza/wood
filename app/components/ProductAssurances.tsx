@@ -45,7 +45,7 @@ const ICONS = {
 const ASSURANCES: Assurance[] = [
   {icon: ICONS.truck, title: '', detail: 'Made to order'},
   {icon: ICONS.hammer, title: 'Crafted Solid Oak', detail: 'Shaped, sanded and finished'},
-  {icon: ICONS.package, title: 'Free UK delivery', detail: 'Carefully packed for transit'},
+  {icon: ICONS.package, title: 'Free UK delivery', detail: 'Delivered in 2–3 working days'},
   {icon: ICONS.leaf, title: 'Solid European Oak', detail: 'Natural grain, unique character'},
 ];
 
