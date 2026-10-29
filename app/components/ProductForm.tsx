@@ -106,6 +106,10 @@ export function ProductForm({
     return sum + amount;
   }, 0);
 
+  // Add-on groups (Working Type, Supercharge, ...) show nothing selected until
+  // the shopper picks, so the order stays blocked until each has been chosen.
+  const pendingGroup = upsellGroupsData.find(({group}) => !isChosen(group.id))?.group;
+
   const stockLimit = getStockLimit(selectedVariant);
   const atStockLimit = stockLimit !== null && quantity >= stockLimit;
 
@@ -483,11 +487,13 @@ export function ProductForm({
         <div className="pdp-atc-wrap">
           <AddToCartButton
             className="btn btn-primary btn-pill pdp-atc-btn"
-            disabled={!selectedVariant || !selectedVariant.availableForSale || quantity > (stockLimit ?? Infinity)}
+            disabled={!selectedVariant || !selectedVariant.availableForSale || Boolean(pendingGroup) || quantity > (stockLimit ?? Infinity)}
             onClick={handleOrderClick}
             lines={lines}
           >
-            {selectedVariant?.availableForSale ? (
+            {selectedVariant?.availableForSale && pendingGroup ? (
+              <span>Select {pendingGroup.label.toLowerCase()}</span>
+            ) : selectedVariant?.availableForSale ? (
               <>
                 <span>Order now</span>
                 {totalPrice && (

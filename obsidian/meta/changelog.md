@@ -3,6 +3,14 @@ tags: [meta, changelog]
 updated: 2026-10-29
 ---
 
+## 2026-10-29 — Order blocked until every add-on group is picked
+
+On the PDP, `ProductForm` now disables the add-to-cart button while any upsell
+group (Working Type, Supercharge, ...) is still unpicked, and the button reads
+"Select working type" (the group's label) instead of "Order now · price". It
+follows the same `isChosen` rule that decides what is shown as selected, so a
+link that already names the options still orders straight away.
+
 ## 2026-10-29 — Live audit: stale dispatch time, stat label, menu link
 
 Audited https://www.craftwoodfurniture.co.uk (12 product URLs: all 200, correct
