@@ -3,6 +3,66 @@ tags: [meta, changelog]
 updated: 2026-10-29
 ---
 
+## 2026-10-29 — About page story heading missing its bottom gap
+
+`<h2 class="title">` inside `.story-copy` ("Furniture should feel honest…")
+sat flush against its following paragraph. The global `h1, h2, h3` rule in
+`app.css` sets no margin, which silently beats `reset.css`'s `h2 { margin-bottom:
+1rem }` since app.css loads after it at equal specificity — the same
+`.title` class gets its gap for free inside `.shead` only because `.shead`
+itself carries `margin-bottom: 16px`; `.story-copy` had no equivalent. Added
+`.story-copy .title { margin-bottom: 16px }` to match.
+
+## 2026-10-29 — About page pillar-card body text sized down
+
+`.story-card p` had no explicit `font-size`, so it inherited the global 17px
+`<p>` default (`reset.css`) and read too large against the card's `h3`. Set
+`font-size: 15px; line-height: 1.5`, at the user's request.
+
+## 2026-10-29 — About page stat label line-height tightened
+
+`.story-stat-label` had no explicit `line-height`, so its two-line labels
+("DAYS TO DISPATCH" / "YOUR ORDER") inherited the body's loose default and
+looked over-spaced at 11px. Set `line-height: 1.45`, at the user's request.
+
+## 2026-10-29 — About page stat headings sized down
+
+`.story-stat-value` (the "up to 5" / "2017" / "£0" tile headings) went from
+`clamp(26px, 6vw, 42px)` to `clamp(20px, 4vw, 32px)` at the user's request —
+smaller, quieter stat numbers that still fit one line at every width.
+
+## 2026-10-29 — About page stat/CTA layout bugs fixed
+
+Three real layout bugs on `/about`, found by screenshotting the live page:
+
+- `.story-panel` (the ≤5 / 2017 / £0 stat row) had no `align-items`, so a
+  longer stat value ("up to 5") wrapped to 2-3 lines while its siblings
+  stayed single-line, knocking the three `UPPERCASE` labels out of
+  horizontal alignment. Fixed with `align-items: end` on `.story-panel` so
+  labels always sit on the row's bottom edge regardless of value height.
+- `.story-stat-value` was a fixed `42px` Mark Bold — too wide for a 3-column
+  stat row on a 375px phone (~94px per column), so "up to 5" wrapped onto
+  three lines. Changed to `clamp(26px, 6vw, 42px)`; `.story-panel` also gets
+  tighter `padding`/`gap` at `≤480px`.
+- `.btn-pill` (used for every pill CTA site-wide, e.g. "Browse the
+  collection") had a fixed `height: 50px` and no `white-space: nowrap`, so
+  wrapped two-line button text overflowed the pill and the rounded border
+  visibly cut across the second line. Added `white-space: nowrap` to the
+  base class. `.story-cta` (the "Questions about a size or finish?" CTA row)
+  also had no mobile breakpoint and stayed a cramped flex row at phone
+  width — added `flex-direction: column` at `≤767px`.
+
+## 2026-10-29 — About page CTA relabelled
+
+The About page's primary CTA button (`app/routes/about.tsx`) now reads "Get in
+touch" instead of "Plan a visit" — still links to `/contact`, copy-only change.
+
+## 2026-10-29 — Dev preview renders inside Ship Studio's iframe
+
+Hydrogen's CSP sets `frame-ancestors 'none'`, so the dev server rendered blank in
+the embedded preview. `entry.server.tsx` now swaps it for `frame-ancestors *`
+on localhost only; deployed hosts keep `'none'`.
+
 ## 2026-10-29 — Dispatch and delivery timing corrected sitewide
 
 Every page now says orders dispatch within up to 5 days and delivery takes 2 to 3

@@ -64,7 +64,16 @@ export default async function handleRequest(
   }
 
   responseHeaders.set('Content-Type', 'text/html');
-  responseHeaders.set('Content-Security-Policy', header);
+  // Hydrogen's default `frame-ancestors 'none'` blocks the local dev server
+  // inside Ship Studio's preview iframe. Relax it on localhost only; every
+  // deployed host keeps the clickjacking protection.
+  const {hostname} = new URL(request.url);
+  const isLocalhost =
+    hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]';
+  responseHeaders.set(
+    'Content-Security-Policy',
+    isLocalhost ? header.replace("frame-ancestors 'none'", 'frame-ancestors *') : header,
+  );
   // Header, not robots.txt Disallow: Google must be able to crawl a page to see noindex.
   if (!isPublicHost(new URL(request.url).hostname)) {
     responseHeaders.set('X-Robots-Tag', 'noindex, nofollow');
