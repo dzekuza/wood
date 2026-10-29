@@ -12,6 +12,8 @@ consequences. Use [[templates/adr-note]] for new entries. Newest first.
 
 ## PDP shows no preselected option; price reads "From" until all picked (2026-10-27)
 
+> **Superseded 2026-10-29** by ADR-0021: Merchant Center needs the page, button and JSON-LD to show one price, so the PDP now opens on the cheapest available variant.
+
 **Decision.** Hydrogen still resolves the first available variant (price/stock
 work), but `ProductForm` only *displays* an option as selected once the shopper
 picks it or the URL names it. Until then the PDP price is `priceRange.minVariantPrice`
@@ -709,3 +711,13 @@ under-count. `purchase` is not sent: checkout runs on
 `checkout.craftwoodfurniture.co.uk`, so revenue needs a Shopify checkout pixel
 or the Google & YouTube channel's GA4 link. Revisit with Consent Mode v2 if
 modelled conversions are wanted.
+
+---
+
+## ADR-0021 — PDP opens on a real variant (link's variant, else cheapest available)
+
+**Context.** Google's Merchant Center review compares the feed price with the landing page. The PDP headline said "From £99.00" but opened on the 3"x4" at £109.00 with a JSON-LD `offers.price` of 109, and links in cm ("40cm - 2 Hooks") did not match the inch option names, so they opened with nothing selected.
+
+**Decision.** The product loader first fetches every variant's options, price and availability (`PRODUCT_VARIANTS_QUERY`, `variantSelection.ts`), then queries the product with the resolved options: the variant named by `?variant=<id>`, else the one named by option params (cm or inches, rounded-number match), else the cheapest available. The "From" prefix shows only while the default is untouched; the price, order button and JSON-LD all read the selected variant's price. `aggregateRating` is dropped from the Product JSON-LD (Etsy reviews are third-party), and the fake "N viewing now" counter and the "N left in stock" note are removed as fake/unverified urgency.
+
+**Consequences.** One extra (light) Storefront query per PDP load. Variants are read in one page of 250; a product with more would need pagination. Reviews are labelled "Review from Etsy"; carousel repeats are aria-hidden filler so each review is listed once.

@@ -36,7 +36,7 @@ the image is the route's own, else `DEFAULT_SHARE_IMAGE`), a `noindex, follow`
 robots tag when `noindex: true`, and JSON-LD blocks passed as `jsonLd`
 (`{'script:ld+json': …}`). The builders live in `app/lib/structuredData.ts`:
 `organizationJsonLd` and `websiteJsonLd` (homepage), `productJsonLd` (offer for
-the selected variant, plus `aggregateRating` from the reviews metafield),
+the selected variant — the cheapest available by default; **no `aggregateRating`**: Google disallows marking up reviews collected on another site such as Etsy),
 `articleJsonLd`, `breadcrumbJsonLd` (products, articles, collections). Every
 route with a `meta` export now goes through `seoMeta`; `/pages/favourites` and
 `/landing-oak` are `noindex`. `/llms.txt` is `app/routes/[llms.txt].tsx`.

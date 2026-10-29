@@ -46,6 +46,7 @@ function ReviewCard({
       <div className="demo-review-author">
         <span className="demo-review-author-text">
           <span className="demo-review-name">{review.author}</span>
+          <span className="demo-review-source">Review from Etsy</span>
           {review.product && (
             <span className="demo-review-product">{review.product}</span>
           )}
@@ -67,6 +68,9 @@ function ReviewCard({
   );
 }
 
+/** Cards a half-track needs so the loop never shows a gap. */
+const MIN_ROW_CARDS = 6;
+
 function MarqueeRow({
   reviews,
   reverse,
@@ -79,23 +83,28 @@ function MarqueeRow({
   // The loop length grows with the card count, so the duration has to as well
   // or a long row (a PDP with 40 reviews) races past. CSS turns the count into
   // a per-card duration — see `--demo-review-cards` in demo.css.
+  // Short rows (a product with two reviews) repeat their set until the track
+  // overflows the viewport. The repeats are animation filler only: they are
+  // hidden from screen readers, so each review is still listed exactly once.
+  const sets = 2 * Math.ceil(MIN_ROW_CARDS / reviews.length / 2) || 2;
+  const half = reviews.length * (sets / 2);
+
   useEffect(() => {
-    trackRef.current?.style.setProperty(
-      '--demo-review-cards',
-      String(reviews.length),
-    );
-  }, [reviews.length]);
+    trackRef.current?.style.setProperty('--demo-review-cards', String(half));
+  }, [half]);
 
   return (
     <div className={`demo-review-row${reverse ? ' is-reverse' : ''}`}>
       <div className="demo-review-track" ref={trackRef}>
-        {[...reviews, ...reviews].map((review, i) => (
-          <ReviewCard
-            review={review}
-            ariaHidden={i >= reviews.length}
-            key={`${review.author}-${i}`}
-          />
-        ))}
+        {Array.from({length: sets}).flatMap((_, set) =>
+          reviews.map((review, i) => (
+            <ReviewCard
+              review={review}
+              ariaHidden={set > 0}
+              key={`${review.author}-${set}-${i}`}
+            />
+          )),
+        )}
       </div>
     </div>
   );
@@ -140,7 +149,7 @@ export function TestimonialsMarquee({
           </span>
           <span>
             {summary.average.toFixed(1)} · {formatReviewCount(summary.count)}{' '}
-            reviews
+            reviews on Etsy
           </span>
         </div>
         <EditableText as="h2" field="testimonials.heading">

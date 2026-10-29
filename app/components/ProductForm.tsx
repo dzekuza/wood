@@ -49,7 +49,7 @@ export function ProductForm({
   onQuantityChange: (quantity: number) => void;
   /** From the product's `custom.slider_options` metafield — see [[productOptionDisplay]]. */
   sliderOptionOverrides?: string[] | null;
-  /** Fires with true while the shopper hasn't picked any option yet, false once they pick one. */
+  /** Fires with true while the page is still on its default variant (no pick, no variant in the link), false once they pick one. */
   onNoneChosenChange?: (noneChosen: boolean) => void;
 }) {
   const navigate = useNavigate();
@@ -66,7 +66,8 @@ export function ProductForm({
   // page was opened on a link that already names the options (the first
   // render, before useSelectedOptionInUrlParam fills them).
   const openedWithOptions = useRef(
-    productOptions.some((o) => searchParams.has(o.name)),
+    searchParams.has('variant') ||
+      productOptions.some((o) => searchParams.has(o.name)),
   ).current;
   // On mobile the CTA row docks to the viewport. It is portalled to <body>
   // because the PDP's reveal animations leave transformed ancestors, which
@@ -83,43 +84,20 @@ export function ProductForm({
   const markTouched = (name: string) =>
     setTouched((prev) => (prev.has(name) ? prev : new Set(prev).add(name)));
 
-  const isChosen = (name: string) => openedWithOptions || touched.has(name);
-
-  const pendingOption = openedWithOptions
-    ? undefined
-    : productOptions.find(
-        (o) =>
-          o.optionValues.length > 1 &&
-          !touched.has(o.name) &&
-          !(o.name === 'Title' && o.optionValues.length === 1),
-      );
+  // The page always opens on a real variant (the one the link names, else the
+  // cheapest available), so every product option is shown as selected. Only
+  // add-on groups still wait for the shopper's pick.
+  const isChosen = (name: string) =>
+    productOptions.some((o) => o.name === name) ||
+    openedWithOptions ||
+    touched.has(name);
 
   const noneChosen = !openedWithOptions && touched.size === 0;
   useEffect(() => {
     onNoneChosenChange?.(noneChosen);
   }, [noneChosen, onNoneChosenChange]);
 
-  /** Send the shopper to the first unpicked option instead of ordering. */
-  const handleOrderClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    if (!pendingOption) {
-      open('cart');
-      return;
-    }
-    event.preventDefault();
-    const group = Array.from(
-      formRef.current?.querySelectorAll<HTMLElement>('[data-option]') ?? [],
-    ).find((el) => el.dataset.option === pendingOption.name);
-    if (!group) return;
-    group.scrollIntoView({
-      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
-        ? 'auto'
-        : 'smooth',
-      block: 'center',
-    });
-    group.classList.remove('is-prompted');
-    void group.offsetWidth;
-    group.classList.add('is-prompted');
-  };
+  const handleOrderClick = () => open('cart');
 
   const upsellSurcharge = upsellGroupsData.reduce((sum, {group, options}) => {
     const selectedKey = selectedUpsells[group.id];
@@ -373,11 +351,16 @@ export function ProductForm({
         );
       })}
       {upsellGroupsData.map(({group, options}) => {
-        const selectedUpsellOption = options.find(
-          (o) => o.option.key === selectedUpsells[group.id],
-        )?.option;
+        // Same "nothing shown as selected until picked" treatment as the
+        // Shopify variant options above — `selectedUpsells[group.id]` still
+        // defaults to `group.defaultOptionKey` for pricing/cart purposes, it
+        // just isn't highlighted or labelled until the shopper touches it.
+        const groupChosen = isChosen(group.id);
+        const selectedUpsellOption = groupChosen
+          ? options.find((o) => o.option.key === selectedUpsells[group.id])?.option
+          : undefined;
         return (
-        <div className="product-opts" key={group.id}>
+        <div className="product-opts" data-option={group.id} key={group.id}>
           <div className="product-opt-label">
             {group.label}
             <span className="product-opt-picked">
@@ -403,10 +386,13 @@ export function ProductForm({
                     type="button"
                     className="product-optn"
                     data-selected={
-                      selectedUpsells[group.id] === option.key ? 'true' : 'false'
+                      groupChosen && selectedUpsells[group.id] === option.key ? 'true' : 'false'
                     }
                     disabled={Boolean(option.variantTitle) && !variant}
-                    onClick={() => onUpsellChange(group.id, option.key)}
+                    onClick={() => {
+                      markTouched(group.id);
+                      onUpsellChange(group.id, option.key);
+                    }}
                   >
                     <span className="product-swatch-wrap">
                       <span className="product-swatch product-swatch-has-image">
@@ -432,10 +418,13 @@ export function ProductForm({
                   type="button"
                   className="product-optn"
                   data-selected={
-                    selectedUpsells[group.id] === option.key ? 'true' : 'false'
+                    groupChosen && selectedUpsells[group.id] === option.key ? 'true' : 'false'
                   }
                   disabled={Boolean(option.variantTitle) && !variant}
-                  onClick={() => onUpsellChange(group.id, option.key)}
+                  onClick={() => {
+                    markTouched(group.id);
+                    onUpsellChange(group.id, option.key);
+                  }}
                 >
                   {formatMeasurement(option.label, unit, group.label)}
                   {option.variantTitle ? (
@@ -460,11 +449,6 @@ export function ProductForm({
       <div className="pdp-cta-dock">
       {renderCtaRow()}
       </div>
-      {stockLimit !== null && stockLimit > 0 && stockLimit <= 5 && (
-        <p className="pdp-stock-note">
-          {atStockLimit ? `Only ${stockLimit} in stock` : `${stockLimit} left in stock`}
-        </p>
-      )}
     </div>
   );
 

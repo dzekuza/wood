@@ -3,6 +3,22 @@ tags: [meta, changelog]
 updated: 2026-10-29
 ---
 
+## 2026-10-29 — Merchant Center brief: variants, ratings, urgency
+
+Brief: "Merchant Center Fixes – Developer Brief" (28 Oct). See ADR-0021.
+
+- **Scarcity removed:** the "N left in stock" note (`ProductForm`), the invented
+  "N viewing now" counter, and the "slots left" pill (now just "Made to order").
+- **Variants:** PDP opens on the cheapest available variant; `?variant=<id>` and
+  option params in cm or inches select the named variant (`variantSelection.ts`);
+  unknown/sold-out falls back to the cheapest. "From" price, Order button and
+  JSON-LD price are the same figure.
+- **Ratings:** `aggregateRating` removed from Product JSON-LD; PDP rating reads
+  "(n on Etsy)"; the reviews headline reads "… reviews on Etsy".
+- **Reviews:** each card says "Review from Etsy"; marquee repeats are
+  aria-hidden filler (the PDP no longer pads short lists with visible
+  duplicates). Review *text/names* still need the Etsy export to verify.
+
 ## 2026-10-29 — About page story heading missing its bottom gap
 
 `<h2 class="title">` inside `.story-copy` ("Furniture should feel honest…")
@@ -30,6 +46,43 @@ looked over-spaced at 11px. Set `line-height: 1.45`, at the user's request.
 `.story-stat-value` (the "up to 5" / "2017" / "£0" tile headings) went from
 `clamp(26px, 6vw, 42px)` to `clamp(20px, 4vw, 32px)` at the user's request —
 smaller, quieter stat numbers that still fit one line at every width.
+
+## 2026-10-29 — PDP upsell/add-on groups (Working Type etc.) also start unselected
+
+The 2026-10-27 "no option preselected on load" change only covered real
+Shopify variant options (`productOptions` in `ProductForm.tsx`) — add-on
+groups built by `buildUpsellGroups` (e.g. "Working Type": Sanded / Lightly
+Worked / Heavily Worked, or any other `custom.addon_products` surcharge
+group) went through a separate `selectedUpsells` state that was initialised
+straight to `group.defaultOptionKey` and rendered as selected immediately,
+with no equivalent "touched" gate.
+
+`ProductForm.tsx` now reuses the same `isChosen`/`markTouched` mechanism,
+keyed by `group.id`, for upsell groups: `selectedUpsells[group.id]` still
+defaults to `group.defaultOptionKey` under the hood (so price/cart-line
+behaviour is unchanged), but no option pill is shown `data-selected` and no
+value appears in the row's label until the shopper actually clicks one —
+matching every other PDP option. Both the image-swatch and plain-button
+upsell option branches were updated.
+
+## 2026-10-29 — Header search bar collapsed to a sliver at laptop widths
+
+At common laptop widths (~1000–1240px, below the inline search bar's old
+960px hide-breakpoint) `.header-search` was being crushed to ~80px wide.
+`.header-logo`, `.header-menu-desktop` and `.header-topbar-ctas` are all
+`flex-shrink: 0`, so `.header-search` (`flex: 1 0 0; min-width: 0`) was the
+only item absorbing the row's squeeze once the nav menu + logo + CTAs
+already filled most of the available width. `.header-search-results`
+(the dropdown) matches its parent's width, so it collapsed too — rendering
+as a near-unusable sliver with clipped suggestion text and no backdrop,
+floating over the page content.
+
+Fixed in `app/styles/app.css`: `.header-search` now has `min-width: 180px`
+as a floor, and the swap-to-icon breakpoint (both `.header-search`'s
+`display: none` and `.header-icon-link`'s `display: inline-flex`) moved
+from `960px` to `1240px` so the inline bar never renders without enough
+room for it. Below 1240px the header now shows the compact search icon,
+which opens the full-width `Aside` drawer instead.
 
 ## 2026-10-29 — About page stat/CTA layout bugs fixed
 

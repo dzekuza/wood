@@ -1886,3 +1886,9 @@ button.demo-review-photo:hover {
 @media (max-width: 780px) {
   .demo-brand-mark { padding: 48px 20px; }
 }
+
+.demo-review-source {
+  display: block;
+  font-size: 11px;
+  color: var(--cwf-accent-deep);
+}

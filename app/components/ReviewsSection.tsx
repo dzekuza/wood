@@ -16,16 +16,6 @@ export type ProductReview = {
  *  same figure the homepage shows. */
 const SHOP_RATING = {average: 4.9, count: STORE_REVIEW_COUNT};
 
-/** A marquee row needs enough cards to overflow the viewport, or the loop
- *  shows a gap; a product with two reviews repeats them until it does. */
-const MIN_CARDS = 6;
-
-function fillMarquee(reviews: ProductReview[]): ProductReview[] {
-  const result = [...reviews];
-  while (result.length < MIN_CARDS) result.push(...reviews);
-  return result;
-}
-
 /**
  * PDP reviews — the homepage `TestimonialsMarquee`, fed this product's own
  * reviews when it has any, otherwise the curated shop reviews.
@@ -46,7 +36,7 @@ export function ReviewsSection({reviews}: {reviews?: ProductReview[]}) {
 
   return (
     <div id="reviews">
-      <TestimonialsMarquee reviews={fillMarquee(reviews)} rating={rating} />
+      <TestimonialsMarquee reviews={reviews} rating={rating} />
     </div>
   );
 }

@@ -24,6 +24,8 @@ import {ProductItem} from '~/components/ProductItem';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {ReviewsSection, type ProductReview} from '~/components/ReviewsSection';
 import {getRatingSummary} from '~/lib/reviewStats';
+import {resolveSelectedOptions, unitFromSearchParams} from '~/lib/variantSelection';
+import {useUnitSystem} from '~/hooks/useUnitSystem';
 import {Lightbox} from '~/components/Lightbox';
 import {ADDON_TAG, buildUpsellGroups} from '~/lib/upsells';
 import {Reveal} from '~/components/animate-ui/Reveal';
@@ -79,7 +81,6 @@ export const meta: Route.MetaFunction = ({data, params}) => {
               gtin: variant?.barcode,
               price: variant?.price,
               availableForSale: variant?.availableForSale,
-              rating: getRatingSummary(product.metafield?.value),
             }),
             breadcrumbJsonLd([
               {name: 'Categories', path: '/collections/all'},
@@ -115,13 +116,29 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
 
   // Add-on groups arrive with the product itself — they are Shopify product
   // references on `custom.addon_products`, so no second round trip is needed.
-  const [{product, shop}, pageContent] = await Promise.all([
-    storefront.query(PRODUCT_QUERY, {
-      variables: {handle, selectedOptions: getSelectedProductOptions(request)},
+  // The page opens on the variant the link names (`?variant=<id>` or option
+  // parameters, in cm or inches), otherwise on the cheapest available one, so
+  // the "From" price, the order button and the JSON-LD price always agree.
+  const [{product: variantProduct}, pageContent] = await Promise.all([
+    storefront.query(PRODUCT_VARIANTS_QUERY, {
+      variables: {handle},
       cache: storefront.CacheNone(),
     }),
     loadPageContentState(context, request, PRODUCT_SLUG),
   ]);
+
+  const selectedOptions = variantProduct
+    ? resolveSelectedOptions({
+        variants: variantProduct.variants.nodes,
+        options: variantProduct.options,
+        searchParams: new URL(request.url).searchParams,
+      })
+    : getSelectedProductOptions(request);
+
+  const {product, shop} = await storefront.query(PRODUCT_QUERY, {
+    variables: {handle, selectedOptions},
+    cache: storefront.CacheNone(),
+  });
 
   if (!product?.id) {
     throw new Response(null, {status: 404});
@@ -211,8 +228,19 @@ export default function Product() {
   const [priceIsFrom, setPriceIsFrom] = useState(
     () =>
       productOptions.some((o) => o.optionValues.length > 1) &&
+      !searchParams.has('variant') &&
       !productOptions.some((o) => searchParams.has(o.name)),
   );
+
+  // A link written in cm (or inches) flips the unit toggle to match, so the
+  // option it names is shown as selected without any clicks.
+  const {unit, setUnit} = useUnitSystem();
+  useEffect(() => {
+    const linkUnit = unitFromSearchParams(searchParams);
+    if (linkUnit && linkUnit !== unit) setUnit(linkUnit);
+    // Only on arrival: later toggling by the shopper must not be undone.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const {title, descriptionHtml} = product;
   const descriptionSummary = getDescriptionSummary(descriptionHtml);
@@ -332,7 +360,6 @@ export default function Product() {
     if (index !== -1) setLightboxIndex(index);
   }
   const [showSticky, setShowSticky] = useState(false);
-  const [viewingCount, setViewingCount] = useState<number | null>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
 
@@ -342,10 +369,6 @@ export default function Product() {
       setActiveItem({type: 'image', key: image.id ?? image.url, image});
     }
   }, [selectedVariant?.id, selectedVariant?.image]);
-
-  useEffect(() => {
-    setViewingCount(Math.floor(Math.random() * 14) + 8);
-  }, []);
 
   useEffect(() => {
     const el = ctaRef.current;
@@ -554,7 +577,7 @@ export default function Product() {
                     <>
                       <span className="pdp-rating-stars">★★★★★</span>
                       <span>
-                        {rating.average.toFixed(1)} / 5 ({rating.count})
+                        {rating.average.toFixed(1)} / 5 ({rating.count} on Etsy)
                       </span>
                     </>
                   ) : (
@@ -564,15 +587,6 @@ export default function Product() {
                   <a href="#reviews" className="pdp-rating-link">
                     {rating ? 'See reviews' : 'See shop reviews'}
                   </a>
-                  {viewingCount !== null && (
-                    <>
-                      <span className="pdp-rating-sep">·</span>
-                      <span className="pdp-viewing">
-                        <span className="pdp-viewing-dot" />
-                        {viewingCount} viewing now
-                      </span>
-                    </>
-                  )}
                 </StaggerItem>
                 <StaggerItem>
                   <h1>{title}</h1>
@@ -593,7 +607,7 @@ export default function Product() {
                 </StaggerItem>
                 <StaggerItem className="pdp-price-big">
                   <ProductPrice
-                    price={priceIsFrom ? product.priceRange.minVariantPrice : selectedVariant?.price}
+                    price={selectedVariant?.price}
                     compareAtPrice={selectedVariant?.compareAtPrice}
                     from={priceIsFrom}
                   />
@@ -606,7 +620,7 @@ export default function Product() {
 
                 <StaggerItem className="pdp-urgency">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                  Made to order · Dispatched within up to 5 days
+                  Made to order
                 </StaggerItem>
 
                 <StaggerItem>
@@ -744,7 +758,7 @@ export default function Product() {
               <span className="pdp-sticky-title">{title}</span>
               <span className="pdp-sticky-price">
                 <ProductPrice
-                  price={priceIsFrom ? product.priceRange.minVariantPrice : selectedVariant?.price}
+                  price={selectedVariant?.price}
                   compareAtPrice={selectedVariant?.compareAtPrice}
                   from={priceIsFrom}
                 />
@@ -970,6 +984,38 @@ const PRODUCT_RECOMMENDATIONS_QUERY = `#graphql
 
 /** Shown when neither the product nor the shop sets `custom.lead_time`. */
 const DEFAULT_LEAD_TIME = 'Dispatch up to 5 days';
+
+/** Every variant's options, price and availability — enough to pick the page's
+ *  opening variant before the full product query runs. */
+const PRODUCT_VARIANTS_QUERY = `#graphql
+  query ProductVariants(
+    $country: CountryCode
+    $handle: String!
+    $language: LanguageCode
+  ) @inContext(country: $country, language: $language) {
+    product(handle: $handle) {
+      options {
+        name
+        optionValues {
+          name
+        }
+      }
+      variants(first: 250) {
+        nodes {
+          id
+          availableForSale
+          price {
+            amount
+          }
+          selectedOptions {
+            name
+            value
+          }
+        }
+      }
+    }
+  }
+` as const;
 
 const PRODUCT_QUERY = `#graphql
   query Product(

@@ -83,7 +83,6 @@ export function productJsonLd({
   gtin,
   price,
   availableForSale,
-  rating,
 }: {
   name: string;
   description?: string;
@@ -94,7 +93,6 @@ export function productJsonLd({
   gtin?: string | null;
   price?: {amount: string; currencyCode: string} | null;
   availableForSale?: boolean;
-  rating?: {average: number; count: number} | null;
 }) {
   const url = getCanonicalUrl(path);
 
@@ -140,15 +138,6 @@ export function productJsonLd({
               merchantReturnDays: 30,
               merchantReturnLink: getCanonicalUrl('/policies/refund-policy'),
             },
-          },
-        }
-      : {}),
-    ...(rating
-      ? {
-          aggregateRating: {
-            '@type': 'AggregateRating',
-            ratingValue: rating.average.toFixed(1),
-            reviewCount: rating.count,
           },
         }
       : {}),
