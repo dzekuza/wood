@@ -11,6 +11,15 @@ group (Working Type, Supercharge, ...) is still unpicked, and the button reads
 follows the same `isChosen` rule that decides what is shown as selected, so a
 link that already names the options still orders straight away.
 
+## 2026-10-29 — Street address published
+
+The company record (`COMPANY` in `site.ts`) now carries the street: "17 Sherwood
+Street, Tonypandy CF40 2TB, United Kingdom" (`COMPANY_ADDRESS_LINE`). It appears
+on the contact page, in the footer legal line, in `llms.txt` and as
+`streetAddress` in the Organization JSON-LD. Previously only town and postcode
+were published. The policy pages (e.g. contact information) live in Shopify and
+need the same address there.
+
 ## 2026-10-29 — Live audit: stale dispatch time, stat label, menu link
 
 Audited https://www.craftwoodfurniture.co.uk (12 product URLs: all 200, correct

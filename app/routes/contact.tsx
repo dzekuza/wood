@@ -6,7 +6,7 @@ import {EditToolbar} from '~/components/EditToolbar';
 import {EditToolbarProvider} from '~/components/EditToolbarProvider';
 import {CONTACT_SLUG} from '~/lib/pageContent';
 import {loadPageContentState} from '~/lib/pageContent.server';
-import {COMPANY, CONTACT_EMAIL, SITE_NAME} from '~/lib/site';
+import {COMPANY, COMPANY_ADDRESS_LINE, CONTACT_EMAIL, SITE_NAME} from '~/lib/site';
 import {seoMeta} from '~/lib/seo';
 
 export const meta: Route.MetaFunction = () =>
@@ -72,9 +72,7 @@ export default function ContactPage() {
             </a>
             <address className="contact-company">
               <strong>{COMPANY.legalName}</strong>
-              <span>
-                {COMPANY.address.locality} {COMPANY.address.postcode}
-              </span>
+              <span>{COMPANY_ADDRESS_LINE}</span>
               <span>
                 Company no. {COMPANY.companyNumber} · VAT no. {COMPANY.vatNumber}
               </span>

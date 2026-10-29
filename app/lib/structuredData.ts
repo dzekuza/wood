@@ -16,6 +16,7 @@ export function organizationJsonLd() {
     identifier: COMPANY.companyNumber,
     address: {
       '@type': 'PostalAddress',
+      streetAddress: COMPANY.address.street,
       addressLocality: COMPANY.address.locality,
       addressRegion: 'Rhondda Cynon Taf',
       postalCode: COMPANY.address.postcode,

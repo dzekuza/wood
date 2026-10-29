@@ -15,21 +15,27 @@ export function isPublicHost(hostname: string): boolean {
 }
 
 /** The trading company, from its public business details. Shown in the footer
- *  and on the contact page, and published as `Organization` schema. Only town
- *  and postcode are published — the street address is deliberately omitted. */
+ *  and on the contact page, and published as `Organization` schema. */
 export const COMPANY = {
   legalName: 'CRAFTWOOD FURNITURE LTD',
   companyNumber: '11805480',
   vatNumber: 'GB 367201410',
   address: {
+    street: '17 Sherwood Street',
     locality: 'Tonypandy',
     postcode: 'CF40 2TB',
     country: 'GB',
+    countryName: 'United Kingdom',
   },
 } as const;
 
+/** "17 Sherwood Street, Tonypandy CF40 2TB, United Kingdom" — the one place
+ *  the postal address is spelled out, so the footer, contact page and plain-text
+ *  files can never disagree. */
+export const COMPANY_ADDRESS_LINE = `${COMPANY.address.street}, ${COMPANY.address.locality} ${COMPANY.address.postcode}, ${COMPANY.address.countryName}`;
+
 /** One-line form for the footer and plain-text files. */
-export const COMPANY_LEGAL_LINE = `${COMPANY.legalName} · Company no. ${COMPANY.companyNumber} · VAT no. ${COMPANY.vatNumber} · ${COMPANY.address.locality} ${COMPANY.address.postcode}`;
+export const COMPANY_LEGAL_LINE = `${COMPANY.legalName} · Company no. ${COMPANY.companyNumber} · VAT no. ${COMPANY.vatNumber} · ${COMPANY_ADDRESS_LINE}`;
 
 /** Email is the shop's only contact channel — there is no phone line. Do not
  *  reintroduce a `tel:` link without a real, answered number. */
