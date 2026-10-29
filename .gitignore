@@ -11,3 +11,6 @@ node_modules
 .playwright-mcp
 tsconfig.tsbuildinfo
 .superpowers/
+
+# ShipStudio metadata
+.shipstudio/
