@@ -9,7 +9,7 @@ import type {
 import {useVariantUrl} from '~/lib/variants';
 import {HeartFilledIcon, StarFilledIcon} from '~/components/Icons';
 import {getSwatchTone} from '~/lib/swatches';
-import {getRatingSummary} from '~/lib/reviewStats';
+import {ETSY_RATINGS_BY_HANDLE} from '~/data/etsy-ratings';
 
 type ProductCardFragment =
   | CollectionItemFragment
@@ -70,7 +70,9 @@ export function ProductItem({
     .filter((node): node is NonNullable<typeof node> => Boolean(node))
     .slice(0, 5);
   const price = product.priceRange.minVariantPrice;
-  const rating = getRatingSummary(('metafield' in product && product.metafield?.value) || null);
+  // This product's own Etsy reviews; a product Etsy has no matching listing
+  // for shows no stars at all rather than someone else's rating.
+  const rating = ETSY_RATINGS_BY_HANDLE[product.handle] ?? null;
   const swatches = getSwatches(product);
   const [isSaved, setIsSaved] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
@@ -165,8 +167,6 @@ export function ProductItem({
         <div className="pcard-heading">
           <p className="pcard-name">{product.title}</p>
 
-          {/* A product with no reviews yet is labelled "New product" rather
-              than showing a discouraging 0.0 (0 reviews). */}
           {rating?.count ? (
             <div className="pcard-rating">
               <span>{rating.average.toFixed(1)}</span>
@@ -175,9 +175,7 @@ export function ProductItem({
                 ({rating.count} {rating.count === 1 ? 'review' : 'reviews'})
               </span>
             </div>
-          ) : (
-            <div className="pcard-rating is-new">New product</div>
-          )}
+          ) : null}
         </div>
 
         <div className="pcard-bottom-row">

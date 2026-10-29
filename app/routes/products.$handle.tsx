@@ -22,8 +22,9 @@ import {seoMeta, toMetaDescription} from '~/lib/seo';
 import {breadcrumbJsonLd, productJsonLd} from '~/lib/structuredData';
 import {ProductItem} from '~/components/ProductItem';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
-import {ReviewsSection, type ProductReview} from '~/components/ReviewsSection';
-import {getRatingSummary} from '~/lib/reviewStats';
+import {ReviewsSection} from '~/components/ReviewsSection';
+import {ETSY_RATINGS_BY_HANDLE} from '~/data/etsy-ratings';
+import {ETSY_PRODUCT_REVIEWS} from '~/data/etsy-product-reviews.server';
 import {resolveSelectedOptions, unitFromSearchParams} from '~/lib/variantSelection';
 import {useUnitSystem} from '~/hooks/useUnitSystem';
 import {Lightbox} from '~/components/Lightbox';
@@ -164,6 +165,11 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
 
   return {
     product,
+    // This product's own Etsy reviews and rating, matched by Etsy listing —
+    // not the shared `reviews.product_reviews` metafield, which repeated the
+    // same reviews across products.
+    reviews: ETSY_PRODUCT_REVIEWS[handle] ?? [],
+    rating: ETSY_RATINGS_BY_HANDLE[handle] ?? null,
     leadTime,
     pageContent,
     recommendations: productRecommendations?.slice(0, 4) ?? [],
@@ -184,16 +190,8 @@ function loadDeferredData({context, params}: Route.LoaderArgs) {
 }
 
 export default function Product() {
-  const {product, leadTime, pageContent, recommendations, upsellGroupsData} =
+  const {product, reviews, rating, leadTime, pageContent, recommendations, upsellGroupsData} =
     useLoaderData<typeof loader>();
-
-  const productReviews: ProductReview[] = (() => {
-    try {
-      return JSON.parse(product.metafield?.value ?? '[]') as ProductReview[];
-    } catch {
-      return [];
-    }
-  })();
 
   const sliderOptionOverrides: string[] | null = (() => {
     try {
@@ -244,7 +242,6 @@ export default function Product() {
 
   const {title, descriptionHtml} = product;
   const descriptionSummary = getDescriptionSummary(descriptionHtml);
-  const rating = getRatingSummary(product.metafield?.value);
 
   const [requestedQuantity, setQuantity] = useState(1);
   // Never exceed stock — also re-clamps when a variant with less stock is picked.
@@ -571,19 +568,17 @@ export default function Product() {
               {/* Info */}
               <StaggerGroup className="pdp-info">
                 <StaggerItem className="pdp-rating-row">
-                  {/* Real per-product rating; a product with none yet is
-                      labelled "New product", matching its listing card. */}
+                  {/* This product's own Etsy rating; a product with no matching
+                      Etsy reviews shows no stars, only a link to the shop's. */}
                   {rating ? (
                     <>
                       <span className="pdp-rating-stars">★★★★★</span>
                       <span>
                         {rating.average.toFixed(1)} / 5 ({rating.count} on Etsy)
                       </span>
+                      <span className="pdp-rating-sep">·</span>
                     </>
-                  ) : (
-                    <span className="pdp-rating-new">New product</span>
-                  )}
-                  <span className="pdp-rating-sep">·</span>
+                  ) : null}
                   <a href="#reviews" className="pdp-rating-link">
                     {rating ? 'See reviews' : 'See shop reviews'}
                   </a>
@@ -729,7 +724,7 @@ export default function Product() {
           </div>
         </section>
 
-        <ReviewsSection reviews={productReviews.length > 0 ? productReviews : undefined} />
+        <ReviewsSection reviews={reviews} rating={rating} />
 
         {/* Related */}
         {recommendations.length > 0 && (
@@ -902,9 +897,6 @@ const PRODUCT_FRAGMENT = `#graphql
         }
       }
     }
-    metafield(namespace: "reviews", key: "product_reviews") {
-      value
-    }
     leadTime: metafield(namespace: "custom", key: "lead_time") {
       value
     }
@@ -977,7 +969,6 @@ const PRODUCT_RECOMMENDATIONS_QUERY = `#graphql
       compareAtPriceRange {
         minVariantPrice { amount currencyCode }
       }
-      metafield(namespace: "reviews", key: "product_reviews") { value }
     }
   }
 ` as const;

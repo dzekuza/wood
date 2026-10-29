@@ -721,3 +721,13 @@ modelled conversions are wanted.
 **Decision.** The product loader first fetches every variant's options, price and availability (`PRODUCT_VARIANTS_QUERY`, `variantSelection.ts`), then queries the product with the resolved options: the variant named by `?variant=<id>`, else the one named by option params (cm or inches, rounded-number match), else the cheapest available. The "From" prefix shows only while the default is untouched; the price, order button and JSON-LD all read the selected variant's price. `aggregateRating` is dropped from the Product JSON-LD (Etsy reviews are third-party), and the fake "N viewing now" counter and the "N left in stock" note are removed as fake/unverified urgency.
 
 **Consequences.** One extra (light) Storefront query per PDP load. Variants are read in one page of 250; a product with more would need pagination. Reviews are labelled "Review from Etsy"; carousel repeats are aria-hidden filler so each review is listed once.
+
+---
+
+## ADR-0022 — Reviews come from the Etsy export, not the Shopify metafield or hand-typed copies
+
+**Context.** Merchant Center needs reviews shown verbatim, with one consistent reviewer name, and ratings that belong to the product. The old homepage list was hand-typed (names swapped between pages — "Sarah" was really Pam, "Tom" was Neil — with edited text), and the per-product `reviews.product_reviews` metafield repeated the same reviews across products (identical counts on two products). The owner supplied the full Etsy export (1,425 reviews, 4.9 average, 34 listings).
+
+**Decision.** `scripts/build-etsy-reviews.py` generates `app/data/etsy-*.ts` from the export: text and names copied verbatim (trimmed only), photos resized to `public/review-images/etsy/`. Etsy listings are mapped to Shopify handles in the script (`LISTINGS`); each product page shows its own listings' average and count ("n on Etsy") and 12 featured 5-star reviews (photo reviews first, no repeated text); the homepage shows 17 across products; the hero and headline show the shop-wide figure. A product with no mapped listing shows no stars. The loader passes one product's reviews (server-only data file); cards read the small ratings file.
+
+**Consequences.** Re-run the script when a new export arrives; never edit `app/data/etsy-*` by hand. Featured reviews are a 5-star selection, but counts and averages cover every review. The listing→product mapping is a judgement call: ambiguous Etsy coat-rack listings are filed under "Coat Rack with Shelf", and "Oak Shelf with Black Metal Brackets" has no matching listing so it shows no stars. The `reviews.product_reviews` metafield is no longer read. Superseded by this: the 2026-10-29 note that reviews still awaited the export.

@@ -3,6 +3,17 @@ tags: [meta, changelog]
 updated: 2026-10-29
 ---
 
+## 2026-10-29 — Reviews rebuilt from the Etsy export
+
+From the owner's export (1,425 reviews): every displayed review is now
+character-for-character the Etsy original with its real name (116 checked, 0
+mismatches). Only 3 of the 17 old homepage reviews had matched. Product pages
+show their own Etsy rating ("4.9 / 5 (677 on Etsy)"), cards and the PDP show no
+stars for a product with no mapped listing, and the homepage/hero show 4.9 · 1.4k
+(the real shop figure). New: `scripts/build-etsy-reviews.py`, `app/data/etsy-*.ts`,
+63 photos in `public/review-images/etsy/`; removed: the old `r*.jpg` photos,
+`aggregateRatings`/`getRatingSummary`, the home `STORE_REVIEWS_QUERY`. See ADR-0022.
+
 ## 2026-10-29 — Merchant Center brief: variants, ratings, urgency
 
 Brief: "Merchant Center Fixes – Developer Brief" (28 Oct). See ADR-0021.

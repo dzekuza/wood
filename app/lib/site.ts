@@ -1,3 +1,4 @@
+import {ETSY_SHOP_RATING} from '~/data/etsy-ratings';
 export const SITE_NAME = 'Craft Wood Furniture';
 export const SITE_DOMAIN = 'craftwoodfurniture.co.uk';
 
@@ -58,14 +59,9 @@ export const ANNOUNCEMENT_MESSAGES = [
 ];
 
 
-/**
- * Total customer reviews behind the homepage headline. The star average is real
- * — it comes from every product's `reviews.product_reviews` metafield — but that
- * metafield only carries the reviews that were synced onto products, a fraction
- * of the shop's Etsy history. The count shown to shoppers is this signed-off
- * store-wide figure instead, so it does not read as 166 lifetime reviews.
- */
-export const STORE_REVIEW_COUNT = 1400;
+/** Total Etsy reviews behind the homepage headline — every review in the
+ *  export (`app/data/etsy-ratings.ts`), not a rounded or signed-off figure. */
+export const STORE_REVIEW_COUNT = ETSY_SHOP_RATING.count;
 
 /** The shop's Etsy reviews — linked from the homepage testimonials as proof the
  *  reviews (and the 1.4k count) are real, independently hosted feedback. */

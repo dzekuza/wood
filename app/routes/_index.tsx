@@ -16,7 +16,7 @@ import {TestimonialsMarquee} from '~/components/TestimonialsMarquee';
 import {CraftmanshipProcess} from '~/components/CraftmanshipProcess';
 import {ContactBanner} from '~/components/ContactBanner';
 import {HOMEPAGE_REVIEWS} from '~/lib/reviews';
-import {aggregateRatings} from '~/lib/reviewStats';
+import {ETSY_SHOP_RATING} from '~/data/etsy-ratings';
 import {
   buildHomeContent,
   HOME_CONTENT_DEFAULTS,
@@ -27,7 +27,6 @@ import {
   compareCategories,
   shouldHideCollection,
   SITE_NAME,
-  STORE_REVIEW_COUNT,
 } from '~/lib/site';
 import {seoMeta} from '~/lib/seo';
 import {organizationJsonLd, websiteJsonLd} from '~/lib/structuredData';
@@ -85,13 +84,11 @@ export async function loader(args: Route.LoaderArgs) {
     heroShowcase,
     popularProducts,
     homeContent,
-    storeReviews,
     pageContent,
   ] = await Promise.all([
     context.storefront.query(HERO_SHOWCASE_QUERY),
     context.storefront.query(POPULAR_PRODUCTS_QUERY),
     context.storefront.query(HOME_CONTENT_QUERY),
-    context.storefront.query(STORE_REVIEWS_QUERY),
     // Inline copy overrides, read here rather than client-side so the copy a
     // shopper sees is server-rendered and the toolbar does not flash in.
     loadPageContentState(context, request, LANDING_SLUG),
@@ -101,16 +98,8 @@ export async function loader(args: Route.LoaderArgs) {
     NonNullable<PopularProductsQuery['collection']>['products']['nodes'][number]
   >(popularProducts.collection?.products.nodes ?? []).slice(0, 8);
 
-  // Headline rating covers the whole catalogue, not the curated marquee cards —
-  // hidden products are excluded so the number matches what is actually for sale.
-  const ratings = aggregateRatings(
-    filterHiddenProducts(storeReviews.products?.nodes ?? []),
-  );
-  // The average is the metafield's; the count is the store-wide Etsy figure —
-  // see `STORE_REVIEW_COUNT` for why the two come from different places.
-  const reviewStats = ratings
-    ? {average: ratings.average, count: STORE_REVIEW_COUNT}
-    : null;
+  // Headline rating: every review in the Etsy export (shop-wide).
+  const reviewStats = ETSY_SHOP_RATING;
 
   return {
     isShopLinked: Boolean(context.env.PUBLIC_STORE_DOMAIN),
@@ -307,24 +296,6 @@ const POPULAR_PRODUCT_ITEM_FRAGMENT = `#graphql
     }
     metafield(namespace: "reviews", key: "product_reviews") {
       value
-    }
-  }
-` as const;
-
-/** Ratings only — no images, prices or options, so this stays a light request
- *  even though it walks the whole catalogue. */
-const STORE_REVIEWS_QUERY = `#graphql
-  query StoreReviews($country: CountryCode, $language: LanguageCode)
-    @inContext(country: $country, language: $language) {
-    products(first: 250) {
-      nodes {
-        id
-        handle
-        tags
-        metafield(namespace: "reviews", key: "product_reviews") {
-          value
-        }
-      }
     }
   }
 ` as const;

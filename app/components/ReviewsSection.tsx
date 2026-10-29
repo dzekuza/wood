@@ -1,6 +1,7 @@
 import {TestimonialsMarquee} from '~/components/TestimonialsMarquee';
 import {HOMEPAGE_REVIEWS} from '~/lib/reviews';
-import {STORE_REVIEW_COUNT} from '~/lib/site';
+import {ETSY_SHOP_RATING} from '~/data/etsy-ratings';
+import type {RatingSummary} from '~/lib/reviewStats';
 
 export type ProductReview = {
   author: string;
@@ -12,27 +13,25 @@ export type ProductReview = {
   productHandle?: string;
 };
 
-/** Shop-wide headline used when a product has no reviews of its own — the
- *  same figure the homepage shows. */
-const SHOP_RATING = {average: 4.9, count: STORE_REVIEW_COUNT};
-
 /**
  * PDP reviews — the homepage `TestimonialsMarquee`, fed this product's own
- * reviews when it has any, otherwise the curated shop reviews.
+ * Etsy reviews and rating when it has any, otherwise the shop's Etsy reviews
+ * (headlined as the shop-wide rating, never as this product's).
  */
-export function ReviewsSection({reviews}: {reviews?: ProductReview[]}) {
-  if (!reviews?.length) {
+export function ReviewsSection({
+  reviews,
+  rating,
+}: {
+  reviews?: ProductReview[];
+  rating?: RatingSummary | null;
+}) {
+  if (!reviews?.length || !rating) {
     return (
       <div id="reviews">
-        <TestimonialsMarquee reviews={HOMEPAGE_REVIEWS} rating={SHOP_RATING} />
+        <TestimonialsMarquee reviews={HOMEPAGE_REVIEWS} rating={ETSY_SHOP_RATING} />
       </div>
     );
   }
-
-  const rating = {
-    average: reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length,
-    count: reviews.length,
-  };
 
   return (
     <div id="reviews">

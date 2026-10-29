@@ -1008,6 +1008,7 @@ button.demo-cat-dot.is-active {
 .demo-review-stars svg { width: 13px; height: 13px; }
 
 .demo-review-quote {
+  white-space: pre-line;
   font-family: var(--demo-font-body);
   font-size: 15px;
   line-height: 1.6;
