@@ -1,6 +1,6 @@
 ---
 tags: [frontend, shopify, merchant-editable, stable]
-updated: 2026-10-12
+updated: 2026-10-29
 ---
 
 # Product add-ons (Working type, Height allowance, …)
@@ -85,6 +85,19 @@ the one whose `{group label: option}` attribute matches) so it renders as a
 Remove and quantity buttons on the product act on its add-on lines too, so an
 add-on can never be orphaned in the cart. Labels come from `group.label` /
 `option.label`, so renaming an add-on in Shopify flows through automatically.
+
+## Display: nothing shown as selected until touched
+
+Same rule as the Shopify variant options above it on the PDP (size, colour,
+etc. — see the 2026-10-27 entry in [[../meta/changelog|changelog]]):
+`selectedUpsells[group.id]` in `products.$handle.tsx` still initialises to
+`group.defaultOptionKey` so price and the cart-line attribute resolve
+correctly with no interaction, but `ProductForm.tsx` doesn't render any
+add-on option as `data-selected` or show it in the row's label until the
+shopper clicks one — it's gated by the same `isChosen`/`markTouched`
+mechanism (keyed by `group.id`) used for ordinary options. Fixed 2026-10-29;
+before that, add-on rows like "Working Type" showed their default choice
+pre-highlighted on load, inconsistent with every other option on the page.
 
 ## Gotchas
 

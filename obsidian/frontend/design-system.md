@@ -127,6 +127,60 @@ the paragraphs inside it** — give the paragraph its own rule. This silently ma
 the announcement bar 17px where it declared 12px (see
 [[../meta/changelog|changelog]] 2026-08-26).
 
+### Headings carry no bottom margin by default — the section wrapper must add it
+
+The global `h1, h2, h3 { font-family: Outfit; font-size: 56px; … }` rule in
+`app.css` (the "one flat size" rule described above) sets no `margin`. Since
+it loads after `reset.css`'s `h2 { margin-bottom: 1rem }` at equal
+specificity, it silently wins and every bare heading sits flush against
+whatever follows it. `.shead .title` only looks fine because `.shead` itself
+carries `margin-bottom: 16px` — the heading isn't adding the gap, the
+flex/grid wrapper is. A heading used outside `.shead` (e.g. `.story-copy
+.title`) needs that same wrapper- or class-level margin added explicitly, or
+it will read as missing spacing. See [[../meta/changelog|changelog]]
+2026-10-29.
+
+### Header search bar: the one `flex:1` item in a row of `flex-shrink:0` siblings
+
+`.header-topbar` lays out logo, nav menu, the inline search bar, and the CTA
+row as flex siblings. Logo/menu/CTAs are all `flex-shrink: 0` — intentional,
+so they never wrap or truncate — which means `.header-search` (the only
+`flex: 1 0 0` item) absorbs 100% of the row's squeeze as the viewport
+narrows. With `min-width: 0` it could be crushed to near-zero well before
+its own "hide at this width" breakpoint kicked in, and since
+`.header-search-results` (the dropdown) sizes itself off `.header-search`,
+the dropdown collapsed too. Fixed 2026-10-29: `.header-search` now carries
+`min-width: 180px` as a floor, and its hide breakpoint and `.header-icon-link`'s
+(the icon that opens the `Aside` search drawer in its place) show breakpoint
+were raised from `960px` to `1240px` in lockstep — **these two breakpoints
+must always match**, or there's a width range with neither the inline bar
+nor the icon toggle visible (or both). See [[../meta/changelog|changelog]]
+2026-10-29.
+
+### `.btn-pill` needs `white-space: nowrap`
+
+`.btn-pill` (every pill-shaped CTA site-wide) has a fixed `height: 50px`. If
+its label text wraps to two lines — long copy on a narrow mobile column —
+the second line overflows past that fixed height and the pill's rounded
+border visibly cuts across the text. Fixed 2026-10-29 by adding
+`white-space: nowrap` to the base class; don't remove it, and give the
+*container* a mobile breakpoint (stack to `flex-direction: column`) instead
+of letting pill text wrap. See [[../meta/changelog|changelog]] 2026-10-29.
+
+### A stat row needs `align-items: end`, not default stretch
+
+A fixed-size display number (`.story-stat-value`, Mark Bold) next to shorter
+siblings in the same grid row can wrap onto extra lines when its copy is
+longer ("up to 5" vs "2017"). Default grid `align-items: stretch` then
+misaligns the labels below each number. Anchor the row with
+`align-items: end` on the grid parent so labels always sit on the same
+baseline regardless of value height, and prefer `clamp()` over a fixed
+`font-size` for any big display number that appears in a multi-column row at
+mobile widths — see `.story-stat-value` for the pattern. Current size
+(2026-10-29): `clamp(20px, 4vw, 32px)` — deliberately smaller than a typical
+hero stat number so a three-word value ("up to 5") still fits one line at
+32px without forcing the `.story-panel` tile taller.
+
 ### `.reset` beats your class
 
 `app.css` has `button.reset { background: inherit; font-size: inherit }`. That
