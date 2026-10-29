@@ -84,13 +84,30 @@ export function ProductForm({
   const markTouched = (name: string) =>
     setTouched((prev) => (prev.has(name) ? prev : new Set(prev).add(name)));
 
-  // The page always opens on a real variant (the one the link names, else the
-  // cheapest available), so every product option is shown as selected. Only
-  // add-on groups still wait for the shopper's pick.
+  // Every option (size, length, colour, add-ons) can be unselected by clicking
+  // the chosen value again, and the order stays blocked until all are chosen.
+  // The page still opens on a real variant (the link's, else the cheapest
+  // available) so price and stock resolve; only the *display* is cleared.
+  const [cleared, setCleared] = useState<ReadonlySet<string>>(new Set());
+  const clearOption = (name: string) => {
+    markTouched(name);
+    setCleared((prev) => new Set(prev).add(name));
+  };
+  const pickOption = (name: string) => {
+    markTouched(name);
+    setCleared((prev) => {
+      if (!prev.has(name)) return prev;
+      const next = new Set(prev);
+      next.delete(name);
+      return next;
+    });
+  };
+
   const isChosen = (name: string) =>
-    productOptions.some((o) => o.name === name) ||
-    openedWithOptions ||
-    touched.has(name);
+    !cleared.has(name) &&
+    (productOptions.some((o) => o.name === name) ||
+      openedWithOptions ||
+      touched.has(name));
 
   const noneChosen = !openedWithOptions && touched.size === 0;
   useEffect(() => {
@@ -99,16 +116,35 @@ export function ProductForm({
 
   const handleOrderClick = () => open('cart');
 
+  /** Clicking the chosen add-on again clears it; any other click picks it. */
+  const toggleUpsell = (groupId: string, optionKey: string, groupChosen: boolean) => {
+    if (groupChosen && selectedUpsells[groupId] === optionKey) {
+      clearOption(groupId);
+      return;
+    }
+    pickOption(groupId);
+    onUpsellChange(groupId, optionKey);
+  };
+
   const upsellSurcharge = upsellGroupsData.reduce((sum, {group, options}) => {
+    if (!isChosen(group.id)) return sum;
     const selectedKey = selectedUpsells[group.id];
     const selectedOption = options.find((o) => o.option.key === selectedKey);
     const amount = selectedOption?.variant ? parseFloat(selectedOption.variant.price.amount) : 0;
     return sum + amount;
   }, 0);
 
-  // Add-on groups (Working Type, Supercharge, ...) show nothing selected until
-  // the shopper picks, so the order stays blocked until each has been chosen.
-  const pendingGroup = upsellGroupsData.find(({group}) => !isChosen(group.id))?.group;
+  // The first option still to choose (variant options first, then add-on
+  // groups), named in the disabled order button. Parentheses are dropped so
+  // "Beam Size (Front Side x Top Side)" reads "Select beam size".
+  const pendingName = (
+    productOptions.find(
+      (o) => o.optionValues.length > 1 && o.name !== 'Title' && !isChosen(o.name),
+    )?.name ??
+    upsellGroupsData.find(({group}) => !isChosen(group.id))?.group.label
+  )
+    ?.replace(/\s*\(.*?\)/g, '')
+    .trim();
 
   const stockLimit = getStockLimit(selectedVariant);
   const atStockLimit = stockLimit !== null && quantity >= stockLimit;
@@ -185,8 +221,12 @@ export function ProductForm({
 
           const selectValue = (value: (typeof values)[number]) => {
             if (!value.exists) return;
-            markTouched(option.name);
-            if (value.selected) return;
+            if (value.selected) {
+              if (chosen) clearOption(option.name);
+              else pickOption(option.name);
+              return;
+            }
+            pickOption(option.name);
             const to = value.isDifferentProduct
               ? `/products/${value.handle}?${value.variantUriQuery}`
               : `?${value.variantUriQuery}`;
@@ -256,8 +296,11 @@ export function ProductForm({
                 value={selectedValue?.name ?? ''}
                 onChange={(e) => {
                   const value = option.optionValues.find((v) => v.name === e.target.value);
-                  if (!value) return;
-                  markTouched(option.name);
+                  if (!value) {
+                    clearOption(option.name);
+                    return;
+                  }
+                  pickOption(option.name);
                   if (value.selected) return;
                   const to = value.isDifferentProduct
                     ? `/products/${value.handle}?${value.variantUriQuery}`
@@ -265,11 +308,7 @@ export function ProductForm({
                   void navigate(to, {replace: true, preventScrollReset: true});
                 }}
               >
-                {!selectedValue && (
-                  <option value="" disabled>
-                    Select {option.name.toLowerCase()}
-                  </option>
-                )}
+                <option value="">Select {option.name.replace(/\s*\(.*?\)/g, '').trim().toLowerCase()}</option>
                 {option.optionValues.map((value) => (
                   <option key={option.name + value.name} value={value.name} disabled={!value.exists}>
                     {formatMeasurement(value.name, unit, option.name)}
@@ -309,7 +348,7 @@ export function ProductForm({
                       prefetch="intent"
                       preventScrollReset
                       replace
-                      onClick={() => markTouched(option.name)}
+                      onClick={() => pickOption(option.name)}
                       to={`/products/${handle}?${variantUriQuery}`}
                       data-selected={selected ? 'true' : 'false'}
                       className={`product-optn${available ? '' : ' is-unavailable'}`}
@@ -331,13 +370,16 @@ export function ProductForm({
                       data-selected={selected ? 'true' : 'false'}
                       disabled={!exists}
                       onClick={() => {
-                        markTouched(option.name);
-                        if (!value.selected) {
-                          void navigate(`?${variantUriQuery}`, {
-                            replace: true,
-                            preventScrollReset: true,
-                          });
+                        if (value.selected) {
+                          if (chosen) clearOption(option.name);
+                          else pickOption(option.name);
+                          return;
                         }
+                        pickOption(option.name);
+                        void navigate(`?${variantUriQuery}`, {
+                          replace: true,
+                          preventScrollReset: true,
+                        });
                       }}
                     >
                       <ProductOptionSwatch
@@ -393,10 +435,7 @@ export function ProductForm({
                       groupChosen && selectedUpsells[group.id] === option.key ? 'true' : 'false'
                     }
                     disabled={Boolean(option.variantTitle) && !variant}
-                    onClick={() => {
-                      markTouched(group.id);
-                      onUpsellChange(group.id, option.key);
-                    }}
+                    onClick={() => toggleUpsell(group.id, option.key, groupChosen)}
                   >
                     <span className="product-swatch-wrap">
                       <span className="product-swatch product-swatch-has-image">
@@ -425,10 +464,7 @@ export function ProductForm({
                     groupChosen && selectedUpsells[group.id] === option.key ? 'true' : 'false'
                   }
                   disabled={Boolean(option.variantTitle) && !variant}
-                  onClick={() => {
-                    markTouched(group.id);
-                    onUpsellChange(group.id, option.key);
-                  }}
+                  onClick={() => toggleUpsell(group.id, option.key, groupChosen)}
                 >
                   {formatMeasurement(option.label, unit, group.label)}
                   {option.variantTitle ? (
@@ -487,12 +523,12 @@ export function ProductForm({
         <div className="pdp-atc-wrap">
           <AddToCartButton
             className="btn btn-primary btn-pill pdp-atc-btn"
-            disabled={!selectedVariant || !selectedVariant.availableForSale || Boolean(pendingGroup) || quantity > (stockLimit ?? Infinity)}
+            disabled={!selectedVariant || !selectedVariant.availableForSale || Boolean(pendingName) || quantity > (stockLimit ?? Infinity)}
             onClick={handleOrderClick}
             lines={lines}
           >
-            {selectedVariant?.availableForSale && pendingGroup ? (
-              <span>Select {pendingGroup.label.toLowerCase()}</span>
+            {selectedVariant?.availableForSale && pendingName ? (
+              <span>Select {pendingName.toLowerCase()}</span>
             ) : selectedVariant?.availableForSale ? (
               <>
                 <span>Order now</span>

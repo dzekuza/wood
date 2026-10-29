@@ -11,6 +11,16 @@ group (Working Type, Supercharge, ...) is still unpicked, and the button reads
 follows the same `isChosen` rule that decides what is shown as selected, so a
 link that already names the options still orders straight away.
 
+## 2026-10-29 — Options and add-ons can be unselected; all required to order
+
+On the PDP, clicking a chosen swatch, slider step or add-on button clears it, and
+a dropdown has an enabled "Select …" entry that does the same. The Order button is
+disabled and says "Select <option>" (variant options first, then add-on groups)
+until everything is chosen again. Tested in a browser on the Mantel Beam (size,
+length, colour, Working type) and the Floating Shelf (no add-ons): each clear
+blocks, each re-pick unblocks, price stays £109 / £59. Cleared add-ons no longer
+count toward the displayed surcharge. See ADR-0024.
+
 ## 2026-10-29 — Street address published
 
 The company record (`COMPANY` in `site.ts`) now carries the street: "17 Sherwood

@@ -86,18 +86,21 @@ Remove and quantity buttons on the product act on its add-on lines too, so an
 add-on can never be orphaned in the cart. Labels come from `group.label` /
 `option.label`, so renaming an add-on in Shopify flows through automatically.
 
-## Display: nothing shown as selected until touched
+## Display: unselectable, and all required to order
 
-Same rule as the Shopify variant options above it on the PDP (size, colour,
-etc. — see the 2026-10-27 entry in [[../meta/changelog|changelog]]):
-`selectedUpsells[group.id]` in `products.$handle.tsx` still initialises to
-`group.defaultOptionKey` so price and the cart-line attribute resolve
-correctly with no interaction, but `ProductForm.tsx` doesn't render any
-add-on option as `data-selected` or show it in the row's label until the
-shopper clicks one — it's gated by the same `isChosen`/`markTouched`
-mechanism (keyed by `group.id`) used for ordinary options. Fixed 2026-10-29;
-before that, add-on rows like "Working Type" showed their default choice
-pre-highlighted on load, inconsistent with every other option on the page.
+Every choice on the PDP — Shopify options (size, length, colour) **and** add-on
+rows (Working type, Supercharge, …) — can be **unselected by clicking the chosen
+value again** (dropdowns have an enabled "Select …" first entry). The order
+button stays disabled, labelled "Select <option>", until every option and every
+add-on group is chosen (2026-10-29, ADR-0024).
+
+`ProductForm` keeps a `cleared` set next to `touched`: `isChosen(name)` is false
+when the name is cleared. Variant options start chosen (the page opens on the
+cheapest/linked variant); add-on groups start unchosen, or chosen when the page
+was opened from a link that names options. `selectedUpsells[group.id]` still
+holds a value (default `group.defaultOptionKey`) so cart lines resolve; a
+cleared group is simply left out of the displayed surcharge and blocks the
+order. Clearing never changes the underlying variant, price or URL.
 
 ## Gotchas
 

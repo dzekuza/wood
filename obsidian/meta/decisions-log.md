@@ -741,3 +741,13 @@ modelled conversions are wanted.
 **Decision.** `products.$handle.tsx` uses one constant (`LEAD_TIME`) and no longer queries the metafield.
 
 **Consequences.** Changing the dispatch time is a code change, in step with the shipping policy, `collectionContent.ts`, `llms.txt` and the JSON-LD `deliveryTime`. The Shopify metafield is now unused and can be cleared. Supersedes the merchant-editable lead time described in earlier changelog notes.
+
+---
+
+## ADR-0024 — Every PDP option is unselectable, and every option is required to order
+
+**Context.** The owner wants to be able to unselect colour, working type and surcharge add-ons, but not add a half-configured product to the cart. Shopify variant options always resolve to a real variant, so "no colour" is not a variant.
+
+**Decision.** Selection stays URL/variant-driven underneath (the page always has a real variant, which keeps price, stock, JSON-LD and feed links correct). `ProductForm` adds a display-level `cleared` set: clicking the chosen value (or the dropdown's "Select …" entry) clears it, and the Order button is disabled with "Select <name>" while anything is cleared or an add-on group is unpicked.
+
+**Consequences.** A cleared option still leaves a variant in the URL and in Hydrogen's state; only the highlight, the picked label, the displayed surcharge and the order button change. Supersedes the 2026-10-29 "add-on groups wait for a pick" note, which is now the same rule applied to every option. Landing from a feed link still shows the variant selected, as the Merchant Center brief requires.
