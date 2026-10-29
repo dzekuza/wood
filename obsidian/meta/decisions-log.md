@@ -731,3 +731,13 @@ modelled conversions are wanted.
 **Decision.** `scripts/build-etsy-reviews.py` generates `app/data/etsy-*.ts` from the export: text and names copied verbatim (trimmed only), photos resized to `public/review-images/etsy/`. Etsy listings are mapped to Shopify handles in the script (`LISTINGS`); each product page shows its own listings' average and count ("n on Etsy") and 12 featured 5-star reviews (photo reviews first, no repeated text); the homepage shows 17 across products; the hero and headline show the shop-wide figure. A product with no mapped listing shows no stars. The loader passes one product's reviews (server-only data file); cards read the small ratings file.
 
 **Consequences.** Re-run the script when a new export arrives; never edit `app/data/etsy-*` by hand. Featured reviews are a 5-star selection, but counts and averages cover every review. The listing→product mapping is a judgement call: ambiguous Etsy coat-rack listings are filed under "Coat Rack with Shelf", and "Oak Shelf with Black Metal Brackets" has no matching listing so it shows no stars. The `reviews.product_reviews` metafield is no longer read. Superseded by this: the 2026-10-29 note that reviews still awaited the export.
+
+---
+
+## ADR-0023 — The PDP dispatch time is coded, not read from `custom.lead_time`
+
+**Context.** The product page tile read a product's `custom.lead_time` metafield, then the shop's, then a coded default. After the delivery wording changed to "up to 5 days", 11 live products still said "5–10 working days" because the metafield still held the old value — a mismatch with the shipping policy that Merchant Center reviews look for.
+
+**Decision.** `products.$handle.tsx` uses one constant (`LEAD_TIME`) and no longer queries the metafield.
+
+**Consequences.** Changing the dispatch time is a code change, in step with the shipping policy, `collectionContent.ts`, `llms.txt` and the JSON-LD `deliveryTime`. The Shopify metafield is now unused and can be cleared. Supersedes the merchant-editable lead time described in earlier changelog notes.

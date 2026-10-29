@@ -136,7 +136,7 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
       })
     : getSelectedProductOptions(request);
 
-  const {product, shop} = await storefront.query(PRODUCT_QUERY, {
+  const {product} = await storefront.query(PRODUCT_QUERY, {
     variables: {handle, selectedOptions},
     cache: storefront.CacheNone(),
   });
@@ -156,13 +156,6 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
     product.addonProducts?.references?.nodes,
   );
 
-  // Merchant-editable production lead time: a product's own `custom.lead_time`
-  // wins, then the shop-wide `custom.lead_time`, then the coded default.
-  const leadTime =
-    product.leadTime?.value?.trim() ||
-    shop.leadTime?.value?.trim() ||
-    DEFAULT_LEAD_TIME;
-
   return {
     product,
     // This product's own Etsy reviews and rating, matched by Etsy listing —
@@ -170,7 +163,6 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
     // same reviews across products.
     reviews: ETSY_PRODUCT_REVIEWS[handle] ?? [],
     rating: ETSY_RATINGS_BY_HANDLE[handle] ?? null,
-    leadTime,
     pageContent,
     recommendations: productRecommendations?.slice(0, 4) ?? [],
     upsellGroupsData,
@@ -190,7 +182,7 @@ function loadDeferredData({context, params}: Route.LoaderArgs) {
 }
 
 export default function Product() {
-  const {product, reviews, rating, leadTime, pageContent, recommendations, upsellGroupsData} =
+  const {product, reviews, rating, pageContent, recommendations, upsellGroupsData} =
     useLoaderData<typeof loader>();
 
   const sliderOptionOverrides: string[] | null = (() => {
@@ -637,7 +629,7 @@ export default function Product() {
                 </StaggerItem>
 
                 <ProductGuarantees />
-                <ProductAssurances leadTime={leadTime} />
+                <ProductAssurances leadTime={LEAD_TIME} />
 
                 {/* Accordion */}
                 <div className="pdp-accordion">
@@ -897,9 +889,6 @@ const PRODUCT_FRAGMENT = `#graphql
         }
       }
     }
-    leadTime: metafield(namespace: "custom", key: "lead_time") {
-      value
-    }
     sliderOptions: metafield(namespace: "custom", key: "slider_options") {
       value
     }
@@ -973,8 +962,10 @@ const PRODUCT_RECOMMENDATIONS_QUERY = `#graphql
   }
 ` as const;
 
-/** Shown when neither the product nor the shop sets `custom.lead_time`. */
-const DEFAULT_LEAD_TIME = 'Dispatch up to 5 days';
+/** The dispatch time shown on every product page. Coded, not read from a
+ *  `custom.lead_time` metafield: a stale Shopify value ("5–10 working days")
+ *  once contradicted the shipping policy on 11 live products. */
+const LEAD_TIME = 'Dispatch up to 5 days';
 
 /** Every variant's options, price and availability — enough to pick the page's
  *  opening variant before the full product query runs. */
@@ -1017,11 +1008,6 @@ const PRODUCT_QUERY = `#graphql
   ) @inContext(country: $country, language: $language) {
     product(handle: $handle) {
       ...Product
-    }
-    shop {
-      leadTime: metafield(namespace: "custom", key: "lead_time") {
-        value
-      }
     }
   }
   ${PRODUCT_FRAGMENT}

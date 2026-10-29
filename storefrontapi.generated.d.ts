@@ -2000,7 +2000,6 @@ export type ProductFragment = Pick<
           })
     >;
   };
-  leadTime?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
   sliderOptions?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
   addonProducts?: StorefrontAPI.Maybe<{
     references?: StorefrontAPI.Maybe<{
@@ -2320,7 +2319,6 @@ export type ProductQuery = {
               })
         >;
       };
-      leadTime?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
       sliderOptions?: StorefrontAPI.Maybe<
         Pick<StorefrontAPI.Metafield, 'value'>
       >;
@@ -2394,9 +2392,6 @@ export type ProductQuery = {
       seo: Pick<StorefrontAPI.Seo, 'description' | 'title'>;
     }
   >;
-  shop: {
-    leadTime?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
-  };
 };
 
 export type SearchProductFragment = {__typename: 'Product'} & Pick<
@@ -2710,7 +2705,7 @@ interface GeneratedQueryTypes {
     return: ProductVariantsQuery;
     variables: ProductVariantsQueryVariables;
   };
-  '#graphql\n  query Product(\n    $country: CountryCode\n    $handle: String!\n    $language: LanguageCode\n    $selectedOptions: [SelectedOptionInput!]!\n  ) @inContext(country: $country, language: $language) {\n    product(handle: $handle) {\n      ...Product\n    }\n    shop {\n      leadTime: metafield(namespace: "custom", key: "lead_time") {\n        value\n      }\n    }\n  }\n  #graphql\n  fragment Product on Product {\n    id\n    title\n    tags\n    vendor\n    handle\n    descriptionHtml\n    description\n    priceRange {\n      minVariantPrice { amount currencyCode }\n    }\n    encodedVariantExistence\n    encodedVariantAvailability\n    options {\n      name\n      optionValues {\n        name\n        firstSelectableVariant {\n          ...ProductVariant\n        }\n        swatch {\n          color\n          image {\n            previewImage {\n              url\n            }\n          }\n        }\n      }\n    }\n    selectedOrFirstAvailableVariant(selectedOptions: $selectedOptions, ignoreUnknownOptions: true, caseInsensitiveMatch: true) {\n      ...ProductVariant\n    }\n    adjacentVariants (selectedOptions: $selectedOptions) {\n      ...ProductVariant\n    }\n    media(first: 25) {\n      nodes {\n        __typename\n        ... on MediaImage {\n          id\n          image {\n            url\n            altText\n            width\n            height\n          }\n        }\n        ... on Model3d {\n          id\n          alt\n          sources {\n            url\n            format\n            mimeType\n            filesize\n          }\n        }\n      }\n    }\n    leadTime: metafield(namespace: "custom", key: "lead_time") {\n      value\n    }\n    sliderOptions: metafield(namespace: "custom", key: "slider_options") {\n      value\n    }\n    addonProducts: metafield(namespace: "custom", key: "addon_products") {\n      references(first: 10) {\n        nodes {\n          __typename\n          ... on Product {\n            id\n            title\n            addonLabel: metafield(namespace: "custom", key: "addon_label") {\n              value\n            }\n            addonFreeOption: metafield(namespace: "custom", key: "addon_free_option") {\n              value\n            }\n            variants(first: 20) {\n              nodes {\n                ...ProductVariant\n              }\n            }\n          }\n        }\n      }\n    }\n    seo {\n      description\n      title\n    }\n  }\n  #graphql\n  fragment ProductVariant on ProductVariant {\n    availableForSale\n    quantityAvailable\n    currentlyNotInStock\n    compareAtPrice {\n      amount\n      currencyCode\n    }\n    id\n    image {\n      __typename\n      id\n      url\n      altText\n      width\n      height\n    }\n    price {\n      amount\n      currencyCode\n    }\n    product {\n      title\n      handle\n    }\n    selectedOptions {\n      name\n      value\n    }\n    sku\n    barcode\n    title\n    unitPrice {\n      amount\n      currencyCode\n    }\n  }\n\n\n': {
+  '#graphql\n  query Product(\n    $country: CountryCode\n    $handle: String!\n    $language: LanguageCode\n    $selectedOptions: [SelectedOptionInput!]!\n  ) @inContext(country: $country, language: $language) {\n    product(handle: $handle) {\n      ...Product\n    }\n  }\n  #graphql\n  fragment Product on Product {\n    id\n    title\n    tags\n    vendor\n    handle\n    descriptionHtml\n    description\n    priceRange {\n      minVariantPrice { amount currencyCode }\n    }\n    encodedVariantExistence\n    encodedVariantAvailability\n    options {\n      name\n      optionValues {\n        name\n        firstSelectableVariant {\n          ...ProductVariant\n        }\n        swatch {\n          color\n          image {\n            previewImage {\n              url\n            }\n          }\n        }\n      }\n    }\n    selectedOrFirstAvailableVariant(selectedOptions: $selectedOptions, ignoreUnknownOptions: true, caseInsensitiveMatch: true) {\n      ...ProductVariant\n    }\n    adjacentVariants (selectedOptions: $selectedOptions) {\n      ...ProductVariant\n    }\n    media(first: 25) {\n      nodes {\n        __typename\n        ... on MediaImage {\n          id\n          image {\n            url\n            altText\n            width\n            height\n          }\n        }\n        ... on Model3d {\n          id\n          alt\n          sources {\n            url\n            format\n            mimeType\n            filesize\n          }\n        }\n      }\n    }\n    sliderOptions: metafield(namespace: "custom", key: "slider_options") {\n      value\n    }\n    addonProducts: metafield(namespace: "custom", key: "addon_products") {\n      references(first: 10) {\n        nodes {\n          __typename\n          ... on Product {\n            id\n            title\n            addonLabel: metafield(namespace: "custom", key: "addon_label") {\n              value\n            }\n            addonFreeOption: metafield(namespace: "custom", key: "addon_free_option") {\n              value\n            }\n            variants(first: 20) {\n              nodes {\n                ...ProductVariant\n              }\n            }\n          }\n        }\n      }\n    }\n    seo {\n      description\n      title\n    }\n  }\n  #graphql\n  fragment ProductVariant on ProductVariant {\n    availableForSale\n    quantityAvailable\n    currentlyNotInStock\n    compareAtPrice {\n      amount\n      currencyCode\n    }\n    id\n    image {\n      __typename\n      id\n      url\n      altText\n      width\n      height\n    }\n    price {\n      amount\n      currencyCode\n    }\n    product {\n      title\n      handle\n    }\n    selectedOptions {\n      name\n      value\n    }\n    sku\n    barcode\n    title\n    unitPrice {\n      amount\n      currencyCode\n    }\n  }\n\n\n': {
     return: ProductQuery;
     variables: ProductQueryVariables;
   };

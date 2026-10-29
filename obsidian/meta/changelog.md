@@ -3,6 +3,17 @@ tags: [meta, changelog]
 updated: 2026-10-29
 ---
 
+## 2026-10-29 — Live audit: stale dispatch time, stat label, menu link
+
+Audited https://www.craftwoodfurniture.co.uk (12 product URLs: all 200, correct
+canonical, page = button = JSON-LD price, no `aggregateRating`, `deliveryTime`
+present; shipping policy already says 5 / 2–3 working days). Found: 11 product
+pages still showed "5–10 working days" in the lead-time tile because the Shopify
+`custom.lead_time` metafield overrode the coded default. The tile is now always
+`LEAD_TIME` ("Dispatch up to 5 days") and the metafield is no longer queried.
+Also: the landing-page stat reads "4.9★ Average rating on Etsy" (`CraftStats`),
+and the header menu's `/pages/contact` (a 302) now links straight to `/contact`.
+
 ## 2026-10-29 — Reviews rebuilt from the Etsy export
 
 From the owner's export (1,425 reviews): every displayed review is now

@@ -15,7 +15,11 @@ import {useAside} from '~/components/Aside';
 import {AnnouncementBar} from '~/components/AnnouncementBar';
 import {CurrencySwitcher} from '~/components/CurrencySwitcher';
 import {HeaderSearch} from '~/components/HeaderSearch';
-import {shouldHideCollection} from '~/lib/site';
+import {
+  FLAGSHIP_PAGE_ROUTES,
+  shouldHideCollection,
+  type FlagshipPageHandle,
+} from '~/lib/site';
 
 /**
  * Shopify menu item `url` fields come back as fully-qualified URLs (the
@@ -36,12 +40,21 @@ function resolveMenuItemUrl(
     url.includes(primaryDomainUrl)
   ) {
     try {
-      return new URL(url).pathname;
+      return toFlagshipRoute(new URL(url).pathname);
     } catch {
       return url;
     }
   }
-  return url;
+  return toFlagshipRoute(url);
+}
+
+/** Shopify's menu still says `/pages/contact`, which only redirects to
+ *  `/contact` — link straight to the real route so crawlers skip the hop. */
+function toFlagshipRoute(path: string) {
+  const handle = path.replace(/^\/pages\//, '');
+  return path.startsWith('/pages/') && handle in FLAGSHIP_PAGE_ROUTES
+    ? FLAGSHIP_PAGE_ROUTES[handle as FlagshipPageHandle]
+    : path;
 }
 
 interface HeaderProps {

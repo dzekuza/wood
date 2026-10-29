@@ -4,7 +4,7 @@ import {EditableText} from '~/components/EditableText';
 const STATS = [
   {value: '27+', label: 'Years of craft', theme: 'sand'},
   {value: '4', label: 'Person workshop', theme: 'cream'},
-  {value: '4.9★', label: 'Average rating', theme: 'sage'},
+  {value: '4.9★', label: 'Average rating on Etsy', theme: 'sage'},
   {value: '100%', label: 'Solid oak, no veneer', theme: 'peach'},
 ] as const;
 

@@ -79,8 +79,7 @@ export function ProductGuarantees() {
 
 /**
  * The four assurance tiles on the PDP. Copy is shared by every product (slug
- * `product`), except tile 0's title — the lead time, which stays per-product
- * via the `custom.lead_time` metafield.
+ * `product`), except tile 0's title — the dispatch time, passed in by the route.
  */
 export function ProductAssurances({leadTime}: {leadTime: string}) {
   return (
