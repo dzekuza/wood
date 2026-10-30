@@ -3,6 +3,10 @@ tags: [meta, changelog]
 updated: 2026-10-30
 ---
 
+## 2026-10-30 — Phone number also appended to the footer's legal line
+
+Client selected `.footer-legal` directly and asked for the number there too. `app/components/Footer.tsx` now renders `{COMPANY_LEGAL_LINE} · {CONTACT_PHONE_DISPLAY}` rather than folding the phone number into the shared `COMPANY_LEGAL_LINE` constant — that constant is also used verbatim in `[llms.txt].tsx`, which doesn't need a phone number appended. The `.footer-phone` link added earlier (brand column, under the tagline) is unchanged; this is a second, plain-text appearance lower in the footer.
+
 ## 2026-10-30 — PDP: clean URL on arrival; size/length pre-selected, colour and add-ons not
 
 Client report: a plain `/products/<handle>` link from a collection card showed nothing selected (as intended), but the address bar silently gained `?Beam+Size=...&Beam+Length=...&Oil+Colour=...` a moment later (Hydrogen's `useSelectedOptionInUrlParam`, see ADR-0026), and reloading that now-decorated URL flipped everything to "selected" — a bare page refresh changing what's displayed with no shopper action. Removed that hook call from `products.$handle.tsx`; the URL now only gains option params from `ProductForm`'s own picks.

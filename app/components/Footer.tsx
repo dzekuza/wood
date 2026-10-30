@@ -106,7 +106,9 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}: Foote
                   ))}
                 </nav>
               </div>
-                <p className="footer-legal">{COMPANY_LEGAL_LINE}</p>
+                <p className="footer-legal">
+                  {COMPANY_LEGAL_LINE} · {CONTACT_PHONE_DISPLAY}
+                </p>
             </div>
           </footer>
         )}
