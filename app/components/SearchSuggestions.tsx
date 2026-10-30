@@ -26,7 +26,7 @@ export function SearchSuggestions({
     <div className="search-suggestions">
       {tags.length > 0 && (
         <div className="search-suggestions-section">
-          <h3>Popular Search</h3>
+          <p className="search-suggestions-label">Popular Search</p>
           <div className="search-suggestions-tags">
             {tags.map((category) => (
               <Link
@@ -50,7 +50,7 @@ export function SearchSuggestions({
 
             return (
               <div className="search-suggestions-section">
-                <h3>Featured Products</h3>
+                <p className="search-suggestions-label">Featured Products</p>
                 <div className="search-suggestions-products">
                   {products.map((product) => {
                     const price = product.priceRange.minVariantPrice;

@@ -771,9 +771,9 @@ button.reset > * {
    handful of best sellers, so the panel is never empty on focus. */
 .search-suggestions { display: flex; flex-direction: column; gap: 24px; }
 
-/* An h3 under the search drawer's h2 title, styled as a small label.
- * `margin-top` and `line-height` match the h5 it replaced. */
-.search-suggestions-section h3 {
+/* Small label above each suggestion group. A paragraph, not a heading, so the
+ * drawer markup does not add out-of-order h3s to every page. */
+.search-suggestions-section .search-suggestions-label {
   margin-top: 0;
   line-height: inherit;
   text-transform: uppercase;

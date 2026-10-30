@@ -23,6 +23,17 @@ function removeProductUrls(xml: string, handles: string[]) {
   });
 }
 
+/** Curated lists that are noindex on the storefront, so they stay out of the sitemap. */
+const NOINDEX_COLLECTION_HANDLES = ['most-popular'];
+
+/** Drops the `<url>` entries whose path ends with one of `suffixes`. */
+function removeUrlsBySuffix(xml: string, suffixes: string[]) {
+  return xml.replace(/<url>[\s\S]*?<\/url>\s*/g, (entry) => {
+    const loc = entry.match(/<loc>([^<]+)<\/loc>/)?.[1] ?? '';
+    return suffixes.some((suffix) => loc.endsWith(suffix)) ? '' : entry;
+  });
+}
+
 /** Real pages that Shopify's resource sitemap never lists: the homepage and the
  *  listing routes this storefront builds itself. Served in the `pages` sitemap. */
 const STATIC_PATHS = [
@@ -78,6 +89,14 @@ export async function loader({
 
   if (params.type === 'pages') {
     const xml = addStaticUrls(await response.text(), new URL(request.url).origin);
+    return new Response(xml, {status: response.status, headers: cacheHeaders});
+  }
+
+  if (params.type === 'collections') {
+    const xml = removeUrlsBySuffix(
+      await response.text(),
+      NOINDEX_COLLECTION_HANDLES.map((handle) => `/collections/${handle}`),
+    );
     return new Response(xml, {status: response.status, headers: cacheHeaders});
   }
 

@@ -17,7 +17,7 @@ import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {SITE_NAME} from '~/lib/site';
 import {getStockLimit} from '~/lib/inventory';
 import {getDescriptionSummary} from '~/lib/description';
-import {seoMeta, toMetaDescription} from '~/lib/seo';
+import {seoMeta, toMetaDescription, toPageTitle} from '~/lib/seo';
 import {breadcrumbJsonLd, productJsonLd} from '~/lib/structuredData';
 import {ProductItem} from '~/components/ProductItem';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
@@ -65,7 +65,7 @@ export const meta: Route.MetaFunction = ({data, params}) => {
     // Add-on (surcharge) products are checkout plumbing, not catalogue items.
     ...(isAddon ? [{name: 'robots', content: 'noindex, nofollow'}] : []),
     ...seoMeta({
-      title: `${title} | ${SITE_NAME}`,
+      title: toPageTitle(title),
       description,
       path,
       type: 'product',

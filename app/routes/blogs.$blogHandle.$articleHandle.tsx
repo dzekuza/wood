@@ -4,8 +4,8 @@ import {Image} from '@shopify/hydrogen';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {ArticleCard} from '~/components/ArticleCard';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
-import {BLOG_LABEL, SITE_NAME} from '~/lib/site';
-import {seoMeta, toMetaDescription} from '~/lib/seo';
+import {BLOG_LABEL} from '~/lib/site';
+import {seoMeta, toMetaDescription, toPageTitle} from '~/lib/seo';
 import {articleJsonLd, breadcrumbJsonLd} from '~/lib/structuredData';
 
 export const meta: Route.MetaFunction = ({data, params}) => {
@@ -18,7 +18,7 @@ export const meta: Route.MetaFunction = ({data, params}) => {
   );
 
   return seoMeta({
-    title: `${title} | ${SITE_NAME}`,
+    title: toPageTitle(title),
     description,
     path,
     type: 'article',

@@ -17,7 +17,7 @@ import {CollectionGuide} from '~/components/CollectionGuide';
 import {COLLECTION_CONTENT} from '~/lib/collectionContent';
 import {SITE_NAME, shouldHideCollection} from '~/lib/site';
 import {breadcrumbJsonLd, faqJsonLd} from '~/lib/structuredData';
-import {seoMeta, toMetaDescription} from '~/lib/seo';
+import {seoMeta, toMetaDescription, toPageTitle} from '~/lib/seo';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 import type {SortValue} from '~/components/SortDropdown';
 
@@ -28,7 +28,7 @@ export const meta: Route.MetaFunction = ({data, params}) => {
     collection?.seo.title || content?.seoTitle || collection?.title || 'Category';
 
   return seoMeta({
-    title: `${title} | ${SITE_NAME}`,
+    title: toPageTitle(title),
     description: toMetaDescription(
       collection?.seo.description,
       content?.seoDescription,

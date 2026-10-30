@@ -28,7 +28,7 @@ import {
   shouldHideCollection,
   SITE_NAME,
 } from '~/lib/site';
-import {seoMeta} from '~/lib/seo';
+import {seoMeta, toMetaDescription} from '~/lib/seo';
 import {organizationJsonLd, websiteJsonLd} from '~/lib/structuredData';
 import {filterHiddenProducts} from '~/lib/upsells';
 import {LANDING_SLUG} from '~/lib/pageContent';
@@ -39,7 +39,7 @@ export const meta: Route.MetaFunction = ({data}) => {
   const seo = data?.content.seo ?? HOME_CONTENT_DEFAULTS.seo;
   return seoMeta({
     title: `${seo.title} | ${SITE_NAME}`,
-    description: seo.description,
+    description: toMetaDescription(seo.description),
     path: '/',
     jsonLd: [organizationJsonLd(), websiteJsonLd()],
   });

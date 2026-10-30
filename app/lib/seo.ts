@@ -27,6 +27,15 @@ export function toMetaDescription(...candidates: Array<string | null | undefined
   return `${(lastSpace > 0 ? cut.slice(0, lastSpace) : cut).replace(/[\s,.;:–—-]+$/, '')}…`;
 }
 
+/** Search results cut titles at about 60 characters. Appends the site name
+ *  only when the whole title still fits, so long page titles keep their
+ *  keywords instead of losing them to the suffix. */
+const TITLE_MAX = 60;
+export function toPageTitle(title: string) {
+  const withSite = `${title} | ${SITE_NAME}`;
+  return withSite.length <= TITLE_MAX ? withSite : title;
+}
+
 export type SeoImage = {
   url: string;
   altText?: string | null;
