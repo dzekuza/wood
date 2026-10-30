@@ -3,6 +3,10 @@ tags: [meta, changelog]
 updated: 2026-10-30
 ---
 
+## 2026-10-30 — Contact page: phone and address demoted back to quiet text
+
+Client selected the 3-card `.contact-channels` grid and asked for phone and address to be less visible — the workshop wants email used, not calls or visits. Reverted to a single prominent `.contact-email-card` (capped at 880px, icon tile, bold value, CTA button — same markup as before the 3-up grid) and replaced the Phone/Visit-us cards with two small `.contact-secondary-line` paragraphs underneath: "Prefer to call? <tel: link>" and the company/address line, both at 13px and ~50%-opacity ink, no icon, no button, no card background. `contact.channels.1.*` `EditableText` fields are now unused (same pattern as the retired `contact.primary.*`/`contact.steps.*` fields noted in `edit-toolbar.md`) — not removed from the CMS schema, just no longer rendered.
+
 ## 2026-10-30 — Phone number also appended to the footer's legal line
 
 Client selected `.footer-legal` directly and asked for the number there too. `app/components/Footer.tsx` now renders `{COMPANY_LEGAL_LINE} · {CONTACT_PHONE_DISPLAY}` rather than folding the phone number into the shared `COMPANY_LEGAL_LINE` constant — that constant is also used verbatim in `[llms.txt].tsx`, which doesn't need a phone number appended. The `.footer-phone` link added earlier (brand column, under the tagline) is unchanged; this is a second, plain-text appearance lower in the footer.

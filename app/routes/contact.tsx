@@ -51,66 +51,40 @@ export default function ContactPage() {
           </div>
         </div>
 
-        {/* Three equal-weight ways to reach the workshop — email and phone are
-            links, the address card is static. A grid, not a stacked column,
-            so the row fills the page width instead of leaving half of it
-            blank next to one narrow card. */}
+        {/* Email is the channel the workshop wants used, so it is the one
+            prominent card; phone and the address are a quiet line underneath
+            for whoever needs them, not a second and third card competing
+            with it for attention. */}
         <section className="section-white">
           <div className="archive-wrap">
-            <div className="contact-channels">
-              <a href={`mailto:${CONTACT_EMAIL}`} className="contact-channel-card">
-                <span className="contact-channel-icon">
-                  <i className="ti ti-mail" aria-hidden="true" />
-                </span>
-                <EditableText
-                  as="span"
-                  className="contact-channel-label"
-                  field="contact.channels.0.label"
-                >
-                  Email
-                </EditableText>
-                <strong className="contact-channel-value">{CONTACT_EMAIL}</strong>
-                <EditableText as="p" className="contact-channel-copy" field="contact.channels.0.copy">
-                  We reply to every message from the workshop, usually within
-                  one working day.
-                </EditableText>
-                <span className="btn btn-primary btn-pill contact-channel-cta">
-                  Email the workshop <i className="ti ti-arrow-right" aria-hidden="true" />
-                </span>
-              </a>
+            <a href={`mailto:${CONTACT_EMAIL}`} className="contact-email-card">
+              <span className="contact-channel-icon">
+                <i className="ti ti-mail" aria-hidden="true" />
+              </span>
+              <EditableText
+                as="span"
+                className="contact-channel-label"
+                field="contact.channels.0.label"
+              >
+                Email
+              </EditableText>
+              <strong className="contact-channel-value">{CONTACT_EMAIL}</strong>
+              <EditableText as="p" className="contact-channel-copy" field="contact.channels.0.copy">
+                We reply to every message from the workshop, usually within
+                one working day.
+              </EditableText>
+              <span className="btn btn-primary btn-pill contact-channel-cta">
+                Email the workshop <i className="ti ti-arrow-right" aria-hidden="true" />
+              </span>
+            </a>
 
-              <a href={`tel:${CONTACT_PHONE_HREF}`} className="contact-channel-card">
-                <span className="contact-channel-icon">
-                  <i className="ti ti-phone" aria-hidden="true" />
-                </span>
-                <EditableText
-                  as="span"
-                  className="contact-channel-label"
-                  field="contact.channels.1.label"
-                >
-                  Phone
-                </EditableText>
-                <strong className="contact-channel-value">{CONTACT_PHONE_DISPLAY}</strong>
-                <EditableText as="p" className="contact-channel-copy" field="contact.channels.1.copy">
-                  Call the workshop directly for quick questions.
-                </EditableText>
-                <span className="btn btn-line btn-pill contact-channel-cta">
-                  Call {CONTACT_PHONE_DISPLAY}
-                </span>
-              </a>
-
-              <address className="contact-channel-card contact-channel-card-static">
-                <span className="contact-channel-icon">
-                  <i className="ti ti-map-pin" aria-hidden="true" />
-                </span>
-                <span className="contact-channel-label">Visit us</span>
-                <strong className="contact-channel-value">{COMPANY.legalName}</strong>
-                <p className="contact-channel-copy">{COMPANY_ADDRESS_LINE}</p>
-                <p className="contact-channel-meta">
-                  Company no. {COMPANY.companyNumber} · VAT no. {COMPANY.vatNumber}
-                </p>
-              </address>
-            </div>
+            <p className="contact-secondary-line">
+              Prefer to call? <a href={`tel:${CONTACT_PHONE_HREF}`}>{CONTACT_PHONE_DISPLAY}</a>
+            </p>
+            <address className="contact-secondary-line">
+              {COMPANY.legalName}, {COMPANY_ADDRESS_LINE} · Company no. {COMPANY.companyNumber} ·
+              VAT no. {COMPANY.vatNumber}
+            </address>
           </div>
         </section>
       </div>

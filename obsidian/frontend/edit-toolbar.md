@@ -75,7 +75,7 @@ either side needed.
 | Page | Route | Slug | Field id prefix |
 |---|---|---|---|
 | About | `about.tsx` | `about` | `about.hero.*`, `about.story.*`, `about.facts.i.*`, `about.pillars.i.*`, `about.pillars.heading`, `about.cta.*` |
-| Contact | `contact.tsx` | `contact` | `contact.hero.*`, `contact.channels.0.label`/`.copy` (Email), `contact.channels.1.label`/`.copy` (Phone, added 2026-10-30 alongside the restored `CONTACT_PHONE_DISPLAY`) (2026-10-12: `contact.primary.*` and `contact.steps.*` retired with the page simplification — any saved overrides for them are simply unused) |
+| Contact | `contact.tsx` | `contact` | `contact.hero.*`, `contact.channels.0.label`/`.copy` (Email, the one rendered card) (2026-10-12: `contact.primary.*` and `contact.steps.*` retired with the page simplification; 2026-10-30, later: `contact.channels.1.label`/`.copy` (Phone) retired the same day they were added, once the Phone/Visit-us cards were demoted to plain `.contact-secondary-line` text with no editable label/copy — any saved overrides for them are simply unused) |
 | Categories | `collections._index.tsx` | `collections` | `collections.hero.*` |
 | All Products | `collections.all.tsx` | `collections-all` | `all-products.hero.heading`, `all-products.faq.heading`, `all-products.faq.i.question`/`.answer` |
 | Favourites | `pages.favourites.tsx` | `favourites` | `favourites.hero.*`, `favourites.empty.*` |
