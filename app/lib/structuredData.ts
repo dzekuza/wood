@@ -11,6 +11,8 @@ export function organizationJsonLd() {
     '@type': 'Organization',
     name: SITE_NAME,
     legalName: COMPANY.legalName,
+    // The shop is also written "CraftWood Furniture" in copy and by customers.
+    alternateName: 'CraftWood Furniture',
     url: getCanonicalUrl('/'),
     vatID: COMPANY.vatNumber,
     identifier: COMPANY.companyNumber,
