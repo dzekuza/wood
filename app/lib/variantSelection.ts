@@ -94,6 +94,16 @@ export function resolveSelectedOptions({
   }
   if (!wanted.length) return fallback;
 
+  // A product can have more variant combinations than this query's 250-item
+  // cap (`variants(first: 250)`), so a pick outside that first page would
+  // find no match below and silently fall back to the cheapest of the 250 —
+  // bouncing the shopper's choice back to (usually) the smallest size a few
+  // seconds later, once this loader's result lands. Every option is already
+  // named here, so there's nothing left to search for: hand it straight to
+  // the product query's own `selectedOptions` resolution, which checks the
+  // full catalog server-side, not just this page's 250.
+  if (wanted.length === options.length) return wanted;
+
   const matching = variants.filter((variant) =>
     wanted.every((pick) =>
       variant.selectedOptions.some(

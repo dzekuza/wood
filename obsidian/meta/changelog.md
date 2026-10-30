@@ -1,7 +1,49 @@
 ---
 tags: [meta, changelog]
-updated: 2026-10-29
+updated: 2026-10-30
 ---
+
+## 2026-10-30 — Five PDP bugs from client review (Komentarai 2026-10-30.pdf)
+
+- **Size reverting after a couple seconds, on most products**:
+  `resolveSelectedOptions` (`app/lib/variantSelection.ts`) resolved the URL's
+  option params by matching against this route's own 250-variant query
+  (`variants(first: 250)` in `PRODUCT_VARIANTS_QUERY`). Any product with more
+  combinations than that (size × length × colour × working type easily tops
+  1000) could have the just-picked combination fall outside the first 250, so
+  the match failed and it silently fell back to the cheapest variant — which
+  landed once the revalidated loader data overwrote the instant optimistic
+  pick a moment later. Fix: when every option is already named in the URL
+  (the normal case after any pick), skip the local 250-item cross-check
+  entirely and hand the picked options straight to `PRODUCT_QUERY`'s
+  `selectedOrFirstAvailableVariant`, which resolves against Shopify's full
+  catalog server-side. The local-variant matching path is kept only for a
+  partial/legacy link that names fewer options than the product has.
+- **Oil Colour (and every other option) pre-selected on load**: `isChosen` in
+  `ProductForm.tsx` had `productOptions.some((o) => o.name === name)`, which
+  is true for every real variant option by construction — a leftover from
+  before the "all required to add to cart" pass in `[[2026-10-29 — Options and
+  add-ons can be unselected; all required to add to cart]]` that never got
+  removed. Dropped that branch; an option now only shows as chosen once the
+  shopper touches it or the page was opened on a link that already names it.
+- **Console "Depth x Length" dropdown sort order broken**: option values
+  render in whatever order Shopify Admin has them in, not size order. Added
+  `compareBySize()` to `app/lib/productOptionDisplay.ts` — sorts a size-like
+  option's values by every number in the string, left to right — and applied
+  it to both the dropdown and slider value lists in `ProductForm.tsx`.
+- **"Leg Height" showing a price that doesn't apply to it**: the dropdown
+  priced every value off `value.firstSelectableVariant.price`, which is that
+  value's own cheapest combination of *other* options, not the price with the
+  current selection held fixed — so a leg-height value could show a different
+  figure than its neighbours even though leg height itself never changes the
+  price. Switched to `value.variant.price` (Hydrogen's selection-aware
+  variant) and now only render the price suffix when it actually varies
+  across the option's values.
+- **Mobile beam-length slider: cm labels overlapping**: `.product-opt-progress-labels`
+  had no mobile rule — a fixed 13px, no-wrap flex row fits short imperial
+  labels ("3ft") but not longer metric ones ("91.4cm"...), which ran together
+  with no visible gap. Added a `max-width: 767px` rule: `flex-wrap: wrap`,
+  explicit gaps, smaller font.
 
 ## 2026-10-29 — Order blocked until every add-on group is picked
 

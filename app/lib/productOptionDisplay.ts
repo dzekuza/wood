@@ -33,3 +33,22 @@ export function isSliderOption(optionName: string, overrides?: string[] | null):
   const normalized = normalizeOptionName(optionName);
   return list.some((name) => normalizeOptionName(name) === normalized);
 }
+
+/**
+ * Smallest-to-largest order for a size-like option value, e.g. "15cm x 60cm"
+ * or `4"x4"`: every number in the string, compared left to right (depth
+ * before length, so "20cm x 60cm" still sorts before "15cm x 70cm"). Shopify
+ * Admin's option-value order is otherwise whatever they were created in,
+ * which is not necessarily smallest-first — see the "depth x length"
+ * dropdown on console products.
+ */
+export function compareBySize(a: string, b: string): number {
+  const numsA = a.match(/\d+(?:\.\d+)?/g)?.map(Number) ?? [];
+  const numsB = b.match(/\d+(?:\.\d+)?/g)?.map(Number) ?? [];
+  if (!numsA.length || !numsB.length) return 0;
+  for (let i = 0; i < Math.max(numsA.length, numsB.length); i++) {
+    const diff = (numsA[i] ?? 0) - (numsB[i] ?? 0);
+    if (diff !== 0) return diff;
+  }
+  return 0;
+}
