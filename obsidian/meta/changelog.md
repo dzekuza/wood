@@ -3,6 +3,10 @@ tags: [meta, changelog]
 updated: 2026-10-30
 ---
 
+## 2026-10-30 — Footer brand-column phone link removed
+
+Client selected the `tel:` link under the tagline and asked for it gone — same de-emphasis intent as the contact page change above. Removed the `.footer-phone` link and its CSS from `app/components/Footer.tsx`/`app.css`; the phone number's only remaining footer appearance is the small, muted `.footer-legal` line at the very bottom. `CONTACT_PHONE_HREF` is now unused in `Footer.tsx` (dropped from the import); `CONTACT_PHONE_DISPLAY` stays, for the legal line.
+
 ## 2026-10-30 — Contact page: phone and address demoted back to quiet text
 
 Client selected the 3-card `.contact-channels` grid and asked for phone and address to be less visible — the workshop wants email used, not calls or visits. Reverted to a single prominent `.contact-email-card` (capped at 880px, icon tile, bold value, CTA button — same markup as before the 3-up grid) and replaced the Phone/Visit-us cards with two small `.contact-secondary-line` paragraphs underneath: "Prefer to call? <tel: link>" and the company/address line, both at 13px and ~50%-opacity ink, no icon, no button, no card background. `contact.channels.1.*` `EditableText` fields are now unused (same pattern as the retired `contact.primary.*`/`contact.steps.*` fields noted in `edit-toolbar.md`) — not removed from the CMS schema, just no longer rendered.

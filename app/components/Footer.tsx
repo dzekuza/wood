@@ -7,7 +7,6 @@ import {
   COMPANY,
   COMPANY_LEGAL_LINE,
   CONTACT_PHONE_DISPLAY,
-  CONTACT_PHONE_HREF,
   FLAGSHIP_PAGE_ROUTES,
 } from '~/lib/site';
 
@@ -71,9 +70,6 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}: Foote
                 <p className="footer-tagline">
                   Solid-timber furniture, cut, joined and finished by hand in our own workshop. No flat-pack, no veneers — just timber, time and patience.
                 </p>
-                <a href={`tel:${CONTACT_PHONE_HREF}`} className="footer-phone">
-                  {CONTACT_PHONE_DISPLAY}
-                </a>
                 <div className="footer-socials">
                   <SocialLinks linkClassName="footer-social-btn" />
                 </div>
