@@ -13,7 +13,7 @@ import {useFavourites} from '~/hooks/useFavourites';
 import {useUnitSystem} from '~/hooks/useUnitSystem';
 import {UnitToggle} from '~/components/UnitToggle';
 import {formatMeasurement} from '~/lib/units';
-import {isSliderOption} from '~/lib/productOptionDisplay';
+import {isSliderOption, compareBySize} from '~/lib/productOptionDisplay';
 import type {UpsellGroupData} from '~/lib/upsells';
 import {
   getSwatchTexture,
@@ -104,10 +104,7 @@ export function ProductForm({
   };
 
   const isChosen = (name: string) =>
-    !cleared.has(name) &&
-    (productOptions.some((o) => o.name === name) ||
-      openedWithOptions ||
-      touched.has(name));
+    !cleared.has(name) && (openedWithOptions || touched.has(name));
 
   const noneChosen = !openedWithOptions && touched.size === 0;
   useEffect(() => {
@@ -212,7 +209,9 @@ export function ProductForm({
         // slider/progress bar; every other non-swatch option renders as a
         // dropdown below.
         if (!hasSwatches && isSliderOption(option.name, sliderOptionOverrides)) {
-          const values = option.optionValues;
+          const values = [...option.optionValues].sort((a, b) =>
+            compareBySize(a.name, b.name),
+          );
           const selectedIndex = selectedValue ? values.indexOf(selectedValue) : -1;
           const percent =
             values.length > 1 && selectedIndex >= 0
@@ -283,6 +282,18 @@ export function ProductForm({
 
         // Other size-like options (no swatches, e.g. Height x Depth, Width) render as a dropdown
         if (!hasSwatches) {
+          const sortedValues = [...option.optionValues].sort((a, b) =>
+            compareBySize(a.name, b.name),
+          );
+          // An option only gets a price suffix when picking a different value
+          // actually changes the price (with the rest of the current
+          // selection held fixed) — e.g. "Leg height" never changes price, so
+          // it shows none, rather than the misleading price of whichever
+          // other-options combination happens to be each value's cheapest.
+          const pricesVary =
+            new Set(
+              sortedValues.map((v) => v.variant?.price.amount ?? v.firstSelectableVariant?.price?.amount ?? null),
+            ).size > 1;
           return (
             <div className="product-opts" data-option={option.name} key={option.name}>
               <div className="product-opt-label">
@@ -309,10 +320,14 @@ export function ProductForm({
                 }}
               >
                 <option value="">Select {option.name.replace(/\s*\(.*?\)/g, '').trim().toLowerCase()}</option>
-                {option.optionValues.map((value) => (
+                {sortedValues.map((value) => (
                   <option key={option.name + value.name} value={value.name} disabled={!value.exists}>
                     {formatMeasurement(value.name, unit, option.name)}
-                    {value.available ? formatOptionPrice(value.firstSelectableVariant?.price) : ' (unavailable)'}
+                    {value.available
+                      ? pricesVary
+                        ? formatOptionPrice(value.variant?.price ?? value.firstSelectableVariant?.price)
+                        : ''
+                      : ' (unavailable)'}
                   </option>
                 ))}
               </select>

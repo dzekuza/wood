@@ -3022,6 +3022,11 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
   .product-optn:has(.product-swatch-has-image) { width: 88px; }
   .pdp-cta-row { margin-top: 22px; }
   .pdp-assure { grid-template-columns: 1fr; gap: 8px; margin-top: 20px; }
+  /* Metric labels ("91.4cm", "106.7cm", ...) are wider than imperial ones
+     ("3ft"), so the same fixed-13px, no-wrap flex row that fits inches
+     crowds cm labels into each other with no visible gap. */
+  .product-opt-progress-labels { flex-wrap: wrap; row-gap: 6px; column-gap: 10px; justify-content: flex-start; }
+  .product-opt-progress-label { font-size: 11px; }
 }
 
 .pdp-gallery { display: grid; grid-template-columns: 88px 1fr; gap: 14px; position: sticky; top: calc(var(--cwf-header-h) + 16px); }
