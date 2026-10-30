@@ -37,9 +37,13 @@ export const COMPANY_ADDRESS_LINE = `${COMPANY.address.street}, ${COMPANY.addres
 /** One-line form for the footer and plain-text files. */
 export const COMPANY_LEGAL_LINE = `${COMPANY.legalName} · Company no. ${COMPANY.companyNumber} · VAT no. ${COMPANY.vatNumber} · ${COMPANY_ADDRESS_LINE}`;
 
-/** Email is the shop's only contact channel — there is no phone line. Do not
- *  reintroduce a `tel:` link without a real, answered number. */
 export const CONTACT_EMAIL = 'hello@craftwoodfurniture.co.uk';
+
+/** Real, answered number — shown on the contact page and in the footer.
+ *  `CONTACT_PHONE_HREF` is the `tel:` value (digits and leading `+` only, no
+ *  spaces); `CONTACT_PHONE_DISPLAY` is how it reads on the page. */
+export const CONTACT_PHONE_DISPLAY = '+44 7904 497890';
+export const CONTACT_PHONE_HREF = '+447904497890';
 
 /** Display name for the blog section (`/blogs`). The header link's label comes
  *  from the Shopify main menu, so rename it there too if this changes. */

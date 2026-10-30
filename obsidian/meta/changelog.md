@@ -3,6 +3,26 @@ tags: [meta, changelog]
 updated: 2026-10-30
 ---
 
+## 2026-10-30 — PDP: clean URL on arrival; size/length pre-selected, colour and add-ons not
+
+Client report: a plain `/products/<handle>` link from a collection card showed nothing selected (as intended), but the address bar silently gained `?Beam+Size=...&Beam+Length=...&Oil+Colour=...` a moment later (Hydrogen's `useSelectedOptionInUrlParam`, see ADR-0026), and reloading that now-decorated URL flipped everything to "selected" — a bare page refresh changing what's displayed with no shopper action. Removed that hook call from `products.$handle.tsx`; the URL now only gains option params from `ProductForm`'s own picks.
+
+Same conversation, the owner then narrowed the "nothing pre-selected" rule from ADR-0024/the earlier `isChosen` fix: a dimension option (Beam Size, Beam Length, Depth x Length, Leg Height) should show the page's real variant immediately; only Oil Colour and the add-on groups (Working Type, surcharges) should wait for an explicit pick. Added `isDefaultChosenOption` to `ProductForm.tsx` — see ADR-0024's second correction — so a non-colour `productOptions` entry defaults to shown-chosen while colour options and upsell groups still require a touch. The Order button correspondingly no longer blocks on size/length, only on colour and add-ons.
+
+## 2026-10-30 — Contact page: Email/Phone cards redesigned as a 3-up grid with the address
+
+The client selected the Email/Phone section and asked to fix its UI and layout (`/design-taste-frontend`). Problem: `.contact-email-card` capped at `max-width: 880px` inside the 1400px-wide `.archive-wrap`, so on desktop the two stacked cards left roughly a third of the page blank on the right — the house-rule failure "a section huddled on one side with the other half of the screen empty".
+
+Replaced the stacked single-column cards (plus a separate plain-text `<address>` beneath them) with `.contact-channels`, a `repeat(auto-fit, minmax(260px, 1fr))` grid of three equal cards — Email, Phone, and a new "Visit us" card carrying the company name/address/numbers, all sharing one `.contact-channel-card` treatment (icon tile, uppercase label, bold value, copy line). The grid collapses to 2 then 1 column as the viewport narrows with no explicit breakpoint. `app/routes/contact.tsx` and the `.contact-email-card`/`.contact-company`/`.contact-channel-*`/`.contact-note*` rules in `app.css` (the `.contact-note*` ones were already dead — no JSX referenced them) were replaced accordingly; `EditableText` field keys (`contact.channels.0.*`, `contact.channels.1.*`) are unchanged, so no saved page-content override is orphaned.
+
+## 2026-10-30 — Footer bottom bar flush to the edge
+
+Dropped the `padding: 0 32px` on `.footer-bottom-inner` (the "© CRAFTWOOD FURNITURE LTD" / policy-links row) and `.footer-legal` (the company/VAT line) in `app.css` — the client selected the row directly and asked for the side padding gone. Both still center via `max-width: 1320px; margin: 0 auto`, so this only removes the inset from the row's own edges, not its horizontal position.
+
+## 2026-10-30 — Phone number restored on the contact page and footer
+
+The shop now has a real, answered number: `+44 7904 497890`. Restored `CONTACT_PHONE_DISPLAY` / `CONTACT_PHONE_HREF` in `app/lib/site.ts` (removed 2026-09-01 as an unverifiable claim — see the `0a7a708` commit — when there was genuinely no phone line). Added a second `.contact-email-card` to `app/routes/contact.tsx` ("Phone" / "Call +44 7904 497890", `tel:` link, new `contact.channels.1.*` `EditableText` fields) and a `tel:` link in the footer's brand column (`app/components/Footer.tsx`, new `.footer-phone` style in `app.css`). Scoped to just the contact page and footer, as asked — not added to the announcement bar, Organization JSON-LD, or anywhere else that names a contact channel.
+
 ## 2026-10-30 — Five PDP bugs from client review (Komentarai 2026-10-30.pdf)
 
 - **Size reverting after a couple seconds, on most products**:

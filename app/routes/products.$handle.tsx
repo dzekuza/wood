@@ -8,7 +8,6 @@ import {
   useOptimisticVariant,
   getProductOptions,
   getAdjacentAndFirstAvailableVariants,
-  useSelectedOptionInUrlParam,
 } from '@shopify/hydrogen';
 import {ProductPrice} from '~/components/ProductPrice';
 import {ProductImage} from '~/components/ProductImage';
@@ -200,9 +199,16 @@ export default function Product() {
     getAdjacentAndFirstAvailableVariants(product),
   );
 
-  // Sets the search param to the selected variant without navigation
-  // only when no search params are set in the url
-  useSelectedOptionInUrlParam(selectedVariant.selectedOptions);
+  // Deliberately NOT calling Hydrogen's `useSelectedOptionInUrlParam` here —
+  // it `history.replaceState`s the default variant's full option set into
+  // the URL on every mount, silently, with no navigation or loader re-run.
+  // That fights `ProductForm`'s "nothing shown as selected until the shopper
+  // picks" rule (ADR-0024): a shopper landing on a plain `/products/<handle>`
+  // link saw nothing selected, but the address bar had already gained every
+  // option param behind their back — so an immediate page refresh (with no
+  // pick made) flipped the page to "every option selected", which read as a
+  // bug. The URL only gains option params from `ProductForm`'s own
+  // `navigate(...)` calls now, which happen exactly when the shopper picks.
 
   // Get the product options array
   const productOptions = getProductOptions({

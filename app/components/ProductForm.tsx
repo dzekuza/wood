@@ -103,8 +103,20 @@ export function ProductForm({
     });
   };
 
+  // Size/length-style options (any real Shopify variant option that isn't a
+  // colour) start shown as the page's default variant, matching the
+  // merchant's request: the shopper sees a real size/length straight away
+  // and only has to actively choose colour, working type and the surcharge
+  // add-ons. `name` is a `productOptions[].name`, never an upsell group's
+  // `group.id`, so this never affects upsell groups below.
+  const isDefaultChosenOption = (name: string) => {
+    const option = productOptions.find((o) => o.name === name);
+    return !!option && !/colou?r/i.test(option.name);
+  };
+
   const isChosen = (name: string) =>
-    !cleared.has(name) && (openedWithOptions || touched.has(name));
+    !cleared.has(name) &&
+    (isDefaultChosenOption(name) || openedWithOptions || touched.has(name));
 
   const noneChosen = !openedWithOptions && touched.size === 0;
   useEffect(() => {
