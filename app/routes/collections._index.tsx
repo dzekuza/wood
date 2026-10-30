@@ -1,4 +1,4 @@
-import {useLoaderData} from 'react-router';
+import {Link, useLoaderData} from 'react-router';
 import type {Route} from './+types/collections._index';
 import {getPaginationVariables} from '@shopify/hydrogen';
 import type {CollectionFragment} from 'storefrontapi.generated';
@@ -12,6 +12,7 @@ import {COLLECTIONS_INDEX_SLUG} from '~/lib/pageContent';
 import {loadPageContentState} from '~/lib/pageContent.server';
 import {compareCategories, shouldHideCollection, SITE_NAME} from '~/lib/site';
 import {seoMeta} from '~/lib/seo';
+import {breadcrumbJsonLd, collectionPageJsonLd} from '~/lib/structuredData';
 import demoStyles from '~/styles/demo.css?url';
 
 /** The cards are `.demo-cat-card`, which lives in `demo.css` — the homepage's
@@ -21,12 +22,22 @@ export function links() {
   return [{rel: 'stylesheet', href: demoStyles}];
 }
 
+const COLLECTIONS_DESCRIPTION =
+  'Browse every Craft Wood Furniture category: solid oak mantel beams, shelves, fireplace surrounds, console tables, coat racks and door stops, all handmade.';
+
 export const meta: Route.MetaFunction = () =>
   seoMeta({
     title: `Shop by Category | ${SITE_NAME}`,
-    description:
-      'Browse every Craft Wood Furniture category: solid oak mantel beams, shelves, fireplace surrounds, console tables, coat racks and door stops, all handmade.',
+    description: COLLECTIONS_DESCRIPTION,
     path: '/collections',
+    jsonLd: [
+      collectionPageJsonLd({
+        name: 'Shop by Category',
+        description: COLLECTIONS_DESCRIPTION,
+        path: '/collections',
+      }),
+      breadcrumbJsonLd([{name: 'Categories', path: '/collections'}]),
+    ],
   });
 
 export async function loader(args: Route.LoaderArgs) {
@@ -128,6 +139,26 @@ export default function Collections() {
                 />
               )}
             </PaginatedResourceSection>
+            <section className="collections-index-intro">
+              <h2>Solid oak furniture, made by hand</h2>
+              <p>
+                Every piece in the shop is made from solid oak by our workshop team, not
+                veneer or board. Start with{' '}
+                <Link to="/collections/solid-oak-mantel-beams">oak mantel beams</Link> and{' '}
+                <Link to="/collections/solid-oak-fireplace-surrounds">fireplace surrounds</Link>{' '}
+                for the chimney breast, add{' '}
+                <Link to="/collections/solid-oak-shelves">floating shelves</Link> for the
+                walls, or tidy the hallway with a{' '}
+                <Link to="/collections/solid-oak-coat-racks">solid oak coat rack</Link> and a{' '}
+                <Link to="/collections/console-tables">console table</Link>.
+              </p>
+              <p>
+                Most pieces can be made to your own size and finished in your choice of
+                oil colour. Read{' '}
+                <Link to="/about">more about the workshop</Link> or{' '}
+                <Link to="/contact">get in touch</Link> if you need help choosing.
+              </p>
+            </section>
           </div>
         </div>
       </div>

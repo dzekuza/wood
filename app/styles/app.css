@@ -4932,3 +4932,9 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
   background: #b4472e;
   border-color: #b4472e;
 }
+
+/* /collections intro copy below the category grid (SEO body text) */
+.collections-index-intro { max-width: 720px; margin: 64px auto 0; }
+.collections-index-intro h2 { font-size: 28px; line-height: 1.2; color: var(--primary); margin-bottom: 16px; }
+.collections-index-intro p { font-size: 16px; line-height: 1.7; color: rgba(53, 47, 42, .75); margin-bottom: 16px; }
+.collections-index-intro a { color: var(--accent-deep); text-decoration: underline; text-underline-offset: 3px; }

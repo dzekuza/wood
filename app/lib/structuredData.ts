@@ -63,6 +63,25 @@ export function breadcrumbJsonLd(items: Array<{name: string; path: string}>) {
   };
 }
 
+export function collectionPageJsonLd({
+  name,
+  description,
+  path,
+}: {
+  name: string;
+  description: string;
+  path: string;
+}) {
+  return {
+    '@context': CONTEXT,
+    '@type': 'CollectionPage',
+    name,
+    description,
+    url: getCanonicalUrl(path),
+    isPartOf: {'@type': 'WebSite', name: SITE_NAME, url: getCanonicalUrl('/')},
+  };
+}
+
 export function faqJsonLd(faqs: Array<{question: string; answer: string}>) {
   return {
     '@context': CONTEXT,
