@@ -1,7 +1,17 @@
 ---
 tags: [meta, changelog]
-updated: 2026-10-30
+updated: 2026-10-31
 ---
+
+## 2026-10-31 — Investigated GSC "SEO decline"; fixed invalid `og:type`
+
+Investigated a GSC average-position drop (-49 over 28 days). Root cause: the
+homepage getting served for a much wider, largely irrelevant/junk query set
+at deep positions, not an actual ranking loss on money pages — see
+[[../frontend/seo-metadata#GSC decline investigation (2026-10-31)]]. Found
+and fixed one real bug along the way: `seoMeta()` emitted `og:type` as the
+literal string `og:product` for product pages instead of `product`
+(`app/lib/seo.ts`).
 
 ## 2026-10-30 — Footer brand-column phone link removed
 

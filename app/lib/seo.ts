@@ -85,7 +85,7 @@ export function seoMeta({
     ...(noindex ? [{name: 'robots', content: 'noindex, follow'}] : []),
     {property: 'og:site_name', content: SITE_NAME},
     {property: 'og:locale', content: 'en_GB'},
-    {property: 'og:type', content: type === 'product' ? 'og:product' : type},
+    {property: 'og:type', content: type},
     {property: 'og:title', content: title},
     ...(description ? [{property: 'og:description', content: description}] : []),
     {property: 'og:url', content: url},
