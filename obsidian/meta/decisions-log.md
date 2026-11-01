@@ -10,6 +10,16 @@ consequences. Use [[templates/adr-note]] for new entries. Newest first.
 
 ---
 
+## ADR-0027 — Guides are written as local Markdown and published to Shopify by hand; no safety numbers in how-to copy (2026-11-01)
+
+**Context.** The blog is Shopify's own (blog `news`); there is no code route per post. Writing to Shopify Admin is a production write, and fixing guides touch safety (stove clearances, wall fixings) where an invented figure could cause harm or breach the ADR-0020 rule that claims must match what we can support.
+
+**Decision.** New articles live as Markdown plus front matter in `content/blog/`, are mirrored as seo-audits drafts, and are pasted into Shopify Admin by the merchant. How-to guides give no clearance distances, load ratings or lead times: they point to the appliance manual, the installer and the fixing instructions, and only repeat facts that appear on the live product pages (pre-drilled holes, concealed fixings suitable for solid walls, 4cm thickness, six oil colours).
+
+**Consequences.** `llms.txt` links to a guide only once it is published. The existing shelves post still says "five to ten working days for dispatch", which conflicts with the sitewide "up to 5 days"; fix it in Shopify Admin.
+
+---
+
 ## PDP shows no preselected option; price reads "From" until all picked (2026-10-27)
 
 > **Superseded 2026-10-29** by ADR-0021: Merchant Center needs the page, button and JSON-LD to show one price, so the PDP now opens on the cheapest available variant.

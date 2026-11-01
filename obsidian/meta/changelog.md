@@ -3,6 +3,15 @@ tags: [meta, changelog]
 updated: 2026-11-01
 ---
 
+## 2026-11-01 — Two new how-to guides drafted; `content/blog/` added; llms.txt links them
+
+- Drafted two buyer guides from Search Console and OpenSEO keyword data:
+  `how-to-install-floating-shelves` (OpenSEO 2026-11-01, UK: "how to install floating shelves" 880 searches/month, "put up floating shelves" 390, "without brackets" 140) and
+  `how-to-fit-an-oak-mantel-beam` (direct demand is small, 10 to 30 a month; written because the plan lists it as Guide 1 and it is the backlink and AI-citation hook, and it answers the wall-type and stove-clearance questions before an order).
+- Sources are Markdown with front matter in `content/blog/<handle>.md`, with a rendered `.html` beside each for pasting into the Shopify article body. They are **not live**: articles live in Shopify Admin (Online Store, Blogs, News), so publishing is a manual step. Mirrored as drafts in seo-audits (client `craftedwood`).
+- `app/routes/[llms.txt].tsx` links both guides. Do not deploy that change until both articles are published, or the links 404.
+- No route or schema change: `blogs.$blogHandle.$articleHandle.tsx` already emits Article and BreadcrumbList JSON-LD, and `sitemap.articles` reads handles from Shopify, so publishing is enough.
+
 ## 2026-11-01 — Removed the "Availability" filter from `/collections/all`
 
 Client asked for the sidebar's Availability block (In stock / Out of stock)
