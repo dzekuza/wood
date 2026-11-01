@@ -26,6 +26,8 @@ We make mantel beams, fireplace surrounds, floating shelves, console tables, coa
 - [Advice and inspiration](${getCanonicalUrl('/blogs')}): care and buying guides
 - [Oak mantel beam sizes](${getCanonicalUrl('/blogs/news/oak-mantel-beam-sizes')}): length, depth and height guide
 - [Oak floating shelf sizes](${getCanonicalUrl('/blogs/news/oak-floating-shelves-thickness-depth-length')}): thickness, depth and length guide
+- [How to fit an oak mantel beam](${getCanonicalUrl('/blogs/news/how-to-fit-an-oak-mantel-beam')}): wall types, fixings and stove clearances
+- [How to install floating shelves](${getCanonicalUrl('/blogs/news/how-to-install-floating-shelves')}): checking the wall, marking level and fixing an oak shelf
 - [Oak oil colours compared](${getCanonicalUrl('/blogs/news/oak-oil-colours-compared')}): the six finishes, clear to white
 - [Contact](${getCanonicalUrl('/contact')}): ${CONTACT_EMAIL}
 - [Delivery, returns and terms](${getCanonicalUrl('/policies')})
