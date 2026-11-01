@@ -1,7 +1,20 @@
 ---
 tags: [meta, changelog]
-updated: 2026-10-31
+updated: 2026-11-01
 ---
+
+## 2026-11-01 — Removed the "Availability" filter from `/collections/all`
+
+Client asked for the sidebar's Availability block (In stock / Out of stock)
+gone. Everything is made to order, so that distinction was never meaningful
+for the shopper — `buildLocalFilters` (`app/lib/collectionFilters.ts`) now
+only returns the Price facet; dropped the now-unused `available` branch from
+`applyLocalFilters` and the `selectedOrFirstAvailableVariant` field from
+`LocalFilterableProduct`. `collections.$handle.tsx` (real per-collection
+pages) isn't affected — its filters come straight from Shopify's native
+`Collection.products(filters:)`, untouched by this change. `ProductItem`'s
+own sold-out badge still reads `availableForSale` from the GraphQL query, so
+that field stays in `collections.all.tsx`'s `CollectionItem` fragment.
 
 ## 2026-10-31 — Investigated GSC "SEO decline"; fixed invalid `og:type`
 

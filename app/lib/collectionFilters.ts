@@ -131,32 +131,22 @@ export function getPriceBounds(priceFilter: Filter | undefined) {
 }
 
 type LocalFilterableProduct = {
-  selectedOrFirstAvailableVariant?: {availableForSale?: boolean} | null;
   priceRange: {minVariantPrice: {amount: string}};
 };
 
 /**
  * The Storefront API's top-level `products` field has no `filters` argument
  * (only `Collection.products` does), so the all-products page computes its own
- * Availability/Price facets from the fetched product set and filters locally.
+ * Price facet from the fetched product set and filters locally. No
+ * Availability facet: everything here is made to order, so "out of stock"
+ * is never a meaningful distinction for the shopper.
  */
 export function buildLocalFilters<T extends LocalFilterableProduct>(products: T[]): Filter[] {
-  const inStock = products.filter((p) => p.selectedOrFirstAvailableVariant?.availableForSale).length;
-  const outOfStock = products.length - inStock;
   const prices = products.map((p) => Number(p.priceRange.minVariantPrice.amount));
   const min = prices.length ? Math.floor(Math.min(...prices)) : 0;
   const max = prices.length ? Math.ceil(Math.max(...prices)) : 1000;
 
   return [
-    {
-      id: 'availability',
-      label: 'Availability',
-      type: 'LIST',
-      values: [
-        {id: 'in-stock', label: 'In stock', count: inStock, input: JSON.stringify({available: true})},
-        {id: 'out-of-stock', label: 'Out of stock', count: outOfStock, input: JSON.stringify({available: false})},
-      ],
-    },
     {
       id: 'price',
       label: 'Price',
@@ -177,10 +167,8 @@ export function applyLocalFilters<T extends LocalFilterableProduct>(
 
   return products.filter((product) => {
     const price = Number(product.priceRange.minVariantPrice.amount);
-    const available = Boolean(product.selectedOrFirstAvailableVariant?.availableForSale);
 
     return filters.every((filter) => {
-      if (filter.available !== undefined) return available === filter.available;
       if (filter.price) {
         const {min: priceMin, max: priceMax} = filter.price;
         if (priceMin != null && price < priceMin) return false;
