@@ -1,7 +1,25 @@
 ---
 tags: [meta, changelog]
-updated: 2026-11-01
+updated: 2026-11-05
 ---
+
+## 2026-11-05 — OpenSEO audit fixes: faceted-URL crawl waste, `/policies` description
+
+Ran an OpenSEO site audit (79 pages, project "CraftedWood"): 0 critical,
+0 warnings. Fixed the code-side info items:
+
+- `[robots.txt].tsx` only had the locale-prefixed
+  `Disallow: /*/collections/*filter*&*filter*` (from Shopify's template).
+  This store has no locale prefix, so stacked `?filter=…&filter=…` URLs were
+  crawlable. Added the unprefixed `/collections/*filter*&*filter*` rule.
+- Facet links in `CollectionFilters` (`FilterValueRow`) now carry
+  `rel="nofollow"`. Their URLs already canonicalise to the clean listing; this
+  stops crawlers spending budget on every combination (28 crawled in the audit).
+- `/policies` meta description lengthened (62 → 133 chars).
+
+Left alone: PDP server response ~1.6–1.8 s, because `PRODUCT_QUERY` runs with
+`CacheNone` on purpose so price edits show up straight away. One blog article
+title is 64 chars; it needs a shorter SEO title in Shopify Admin.
 
 ## 2026-11-01 — Removed the "Availability" filter from `/collections/all`
 

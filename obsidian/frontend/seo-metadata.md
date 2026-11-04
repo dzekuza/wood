@@ -1,6 +1,6 @@
 ---
 tags: [frontend]
-updated: 2026-10-18
+updated: 2026-11-05
 ---
 
 # SEO & Metadata
@@ -26,6 +26,10 @@ updated: 2026-10-18
   `direction`. `?direction=previous` with no cursor 404s, so
   `collections.$handle` 301s any such URL to the same listing without
   `direction`.
+- Facet (filter) links carry `rel="nofollow"`, and `robots.txt` disallows
+  stacked filters with an **unprefixed** `/collections/*filter*&*filter*`
+  rule. Shopify's template only ships the `/*/collections/…` locale-prefixed
+  form, which never matches here (2026-11-05).
 - `robots.txt` and the sitemaps are the `[robots.txt].tsx`, `[sitemap.xml].tsx`
   and `sitemap.$type.$page[.xml].tsx` routes.
 
