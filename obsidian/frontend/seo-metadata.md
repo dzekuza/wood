@@ -30,6 +30,10 @@ updated: 2026-11-05
   stacked filters with an **unprefixed** `/collections/*filter*&*filter*`
   rule. Shopify's template only ships the `/*/collections/…` locale-prefixed
   form, which never matches here (2026-11-05).
+- Category H1s come from `COLLECTION_CONTENT[handle].heading`
+  (keyword-led, e.g. "Solid Oak Floating Shelves"), falling back to the
+  Shopify collection title. Keep guide copy aligned with the queries GSC
+  reports for each page (2026-11-05).
 - `robots.txt` and the sitemaps are the `[robots.txt].tsx`, `[sitemap.xml].tsx`
   and `sitemap.$type.$page[.xml].tsx` routes.
 
