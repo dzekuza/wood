@@ -3,6 +3,13 @@ tags: [meta, changelog]
 updated: 2026-11-16
 ---
 
+## 2026-11-16 — Second Google Search Console verification file
+
+Added `public/googlefac1a0cf53097d92.html`, alongside the earlier
+`google40dbce897c805d36.html`. Google issues a fresh token per
+verification attempt; keeping both is harmless and avoids re-doing this
+if the first method/token doesn't take.
+
 ## 2026-11-16 — CSP allows Google remarketing hosts
 
 `app/entry.server.tsx`: added `stats.g.doubleclick.net`, `*.doubleclick.net`, `www.google.com`, `www.google.lt` to `connectSrc` and `imgSrc`. The CSP was blocking the GA4/Ads audience pixel (2 console errors on every page), so remarketing audiences and some GA4 hits were lost. Review found that the guides are live (sitemap) and `llms.txt` already links them with the lead time aligned to site policy (5 days dispatch + 2-3 days delivery); no change needed there.

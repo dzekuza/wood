@@ -24,6 +24,12 @@ Entry format:
 - **Next:** the first thing to do next session
 ```
 
+## 2026-11-16 16:10 — Second GSC verification file + OpenSEO crawler-signature research
+
+- **Changed:** added `public/googlefac1a0cf53097d92.html` (second GSC site-verification token, alongside the earlier `google40dbce897c805d36.html`); updated `obsidian/meta/status.md`.
+- **Status:** new file confirmed serving at `/googlefac1a0cf53097d92.html` in dev. Separately, looked into OpenSEO's "Shopify signature" crawl-permission form — it's Shopify's Web Bot Auth / storefront crawler signature feature (`storefrontCrawlerSignatureGenerate` Admin mutation). Tried to use the connected Shopify dev-MCP connector to generate one, but it was authenticated to the wrong store ("Ohubo", not CraftWoodFurniture) and calling `switch-shop` revoked it entirely instead of switching — connector now needs reconnecting.
+- **Next:** reconnect the Shopify connector to `wood-123252.myshopify.com`, then generate/refresh the storefront crawler signature for OpenSEO via `storefrontCrawlerSignatureGenerate` (or have the user generate it manually in Shopify Admin under "crawler signature"). Also commit + push the new GSC file.
+
 ## 2026-11-16 15:40 — Availability filter fix + GSC verification file
 
 - **Changed:** `app/lib/collectionFilters.ts` (`getListAndBooleanFilters` now also drops Shopify's native `filter.v.availability` facet, not just `PRICE_RANGE`), `obsidian/meta/changelog.md`; merged two unrelated commits that landed on `main` meanwhile (nofollow facet links + robots fix, keyword-led category H1s); added `public/google40dbce897c805d36.html` (Google Search Console site verification, static file served at root).
