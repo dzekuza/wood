@@ -13,6 +13,11 @@ snapshot lives in [[status]].
 Entry format:
 
 ```
+## 2026-11-16 — SEO review since 11-09, CSP fix
+- **Changed:** `app/entry.server.tsx` CSP (doubleclick/google hosts); vault changelog/status.
+- **Status:** typecheck clean. GSC returns 0 rows until domain ownership is verified. Guides live, llms.txt OK.
+- **Next:** finish GSC verification, re-pull data, sync craftedwood kanban.
+
 ## YYYY-MM-DD HH:MM — one-line summary
 - **Changed:** files / areas touched and why
 - **Status:** what works now, what is half-done

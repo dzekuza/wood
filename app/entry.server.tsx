@@ -31,6 +31,10 @@ export default async function handleRequest(
       'https://www.googletagmanager.com',
       'https://*.google-analytics.com',
       'https://*.analytics.google.com',
+      'https://stats.g.doubleclick.net', // GA4 remarketing / Ads audiences
+      'https://*.doubleclick.net',
+      'https://www.google.com',
+      'https://www.google.lt',
     ],
     workerSrc: [
       "'self'",
@@ -38,7 +42,7 @@ export default async function handleRequest(
     ],
     styleSrc: ["'self'", "'unsafe-inline'", 'https://cdn.shopify.com', 'https://fonts.googleapis.com', 'http://localhost:*'],
     fontSrc: ["'self'", 'https://fonts.gstatic.com', 'https://cdn.shopify.com'],
-    imgSrc: ["'self'", 'data:', 'https://cdn.shopify.com', 'https://shopify.com', 'http://localhost:*', 'https://*.google-analytics.com', 'https://www.googletagmanager.com'],
+    imgSrc: ["'self'", 'data:', 'https://cdn.shopify.com', 'https://shopify.com', 'http://localhost:*', 'https://*.google-analytics.com', 'https://www.googletagmanager.com', 'https://*.doubleclick.net', 'https://www.google.com', 'https://www.google.lt'],
   });
 
   const body = await renderToReadableStream(

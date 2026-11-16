@@ -3,6 +3,10 @@ tags: [meta, changelog]
 updated: 2026-11-16
 ---
 
+## 2026-11-16 — CSP allows Google remarketing hosts
+
+`app/entry.server.tsx`: added `stats.g.doubleclick.net`, `*.doubleclick.net`, `www.google.com`, `www.google.lt` to `connectSrc` and `imgSrc`. The CSP was blocking the GA4/Ads audience pixel (2 console errors on every page), so remarketing audiences and some GA4 hits were lost. Review found that the guides are live (sitemap) and `llms.txt` already links them with the lead time aligned to site policy (5 days dispatch + 2-3 days delivery); no change needed there.
+
 ## 2026-11-16 — Google Search Console site-verification file
 
 Added `public/google40dbce897c805d36.html` (Google's HTML-file verification
