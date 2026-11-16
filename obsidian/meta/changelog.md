@@ -3,6 +3,13 @@ tags: [meta, changelog]
 updated: 2026-11-16
 ---
 
+## 2026-11-16 — Google Search Console site-verification file
+
+Added `public/google40dbce897c805d36.html` (Google's HTML-file verification
+method) — a one-line static file served at the site root, required to
+verify domain ownership in Google Search Console. No app code involved;
+Vite's static `public/` passthrough serves it as-is.
+
 ## 2026-11-16 — Availability filter also removed from real collection pages
 
 The 2026-11-01 fix only covered `/collections/all` (locally-built filters).
