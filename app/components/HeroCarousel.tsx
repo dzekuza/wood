@@ -4,6 +4,9 @@ import {StarFilledIcon} from '~/components/Icons';
 import {EditableText} from '~/components/EditableText';
 import {HOME_CONTENT_DEFAULTS, type HomeHeroSlide} from '~/lib/homeContent';
 import {formatReviewCount} from '~/lib/reviewStats';
+import {shopifyImageUrl, shopifySrcSet} from '~/lib/shopifyImage';
+
+const HERO_WIDTHS = [640, 1024, 1600, 2200] as const;
 
 export type HeroSlide = HomeHeroSlide;
 
@@ -54,9 +57,21 @@ export function HeroCarousel({
           <div
             key={index}
             className={`demo-hero-slide${index === active ? ' is-active' : ''}`}
-            style={{backgroundImage: `url(${slide.image})`}}
             aria-hidden={index !== active}
           >
+            {/* A real <img>, not a CSS background: the browser finds it while
+                parsing the HTML and the first slide is fetched at high
+                priority, which is what sets the home page's LCP. */}
+            <img
+              className="demo-hero-img"
+              src={shopifyImageUrl(slide.image, 1600)}
+              srcSet={shopifySrcSet(slide.image, HERO_WIDTHS)}
+              sizes="100vw"
+              alt=""
+              fetchPriority={index === 0 ? 'high' : 'low'}
+              loading={index === 0 ? 'eager' : 'lazy'}
+              decoding={index === 0 ? 'sync' : 'async'}
+            />
             <div className="demo-hero-content">
               {/* Rating, heading and blurb are one block so the 24px rhythm
                   between them is independent of the 48px gap to the CTAs. */}

@@ -18,6 +18,9 @@ Small storefront fixes and Google Search Console verification, no active feature
 
 ## Done recently
 
+- Mobile LCP fix written (hero `<img>` + resized category images, `shopifyImage.ts`), typechecked, **not yet committed/pushed** (commit command was blocked by the permission check; needs user go-ahead).
+- OpenSEO audit + Lighthouse run 2026-11-16: SEO 100 everywhere, desktop perf 80-97, mobile perf 55-89 (home LCP 11.8s).
+
 - Added a second GSC verification file, `public/googlefac1a0cf53097d92.html` (alongside the earlier `google40dbce897c805d36.html` — both kept; Google issues a new token per verification attempt/method and re-checks whichever is live).
 - CSP now allows Google doubleclick/ads-audience hosts (fixes a blocked GA4 remarketing pixel).
 - Added `public/google40dbce897c805d36.html` — first GSC site-verification file, served statically at the site root.
@@ -26,13 +29,15 @@ Small storefront fixes and Google Search Console verification, no active feature
 
 ## In progress
 
-- _Nothing in flight._
+- Commit and push the mobile LCP change, then re-run mobile Lighthouse on home to compare against 11.8s.
 
 ## Next up
 
+- Fix mobile CLS 0.34 on `/blogs` and `/blogs/news`; slow TTFB (1.4-1.9s) on product pages.
+
 - Waiting on Google Search Console domain ownership verification (both HTML files deployed; DNS TXT method was blocked client-side). Once verified: confirm OpenSEO/gsc-mcp return rows, request indexing for 5 collection URLs + homepage.
 - OpenSEO's audit crawler needs a Shopify **Web Bot Auth / storefront crawler signature** (Domain + Signature-Input + Signature) to get through Shopify's bot protection — generate one in Shopify Admin (search "crawler signature") for the real storefront domain and paste it into OpenSEO's Shopify integration form. The connected `shopify-dev-mcp`/`multi-account-connectors` Shopify tool was pointed at the wrong store ("Ohubo", `ohubudemo.myshopify.com`) and got disconnected while trying to switch it — needs reconnecting to `wood-123252.myshopify.com` before I can generate/refresh this signature via the `storefrontCrawlerSignatureGenerate` Admin mutation instead of the Admin UI.
-- Re-check rendered `rel=nofollow` on facet links with the filter panel open.
+- (Closed) facet `rel=nofollow`: no facet links remain, the filter panel only holds category links.
 
 ## Blockers & open questions
 

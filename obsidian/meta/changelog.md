@@ -3,6 +3,10 @@ tags: [meta, changelog]
 updated: 2026-11-16
 ---
 
+## 2026-11-16 — Mobile LCP: hero and category images (uncommitted, pending push)
+
+OpenSEO Lighthouse (2026-11-16) showed mobile LCP of 6-12s on home, `/collections` and others, desktop 1-3s. Cause: the hero was a CSS `background-image` (found late, never prioritised) on the full-size Shopify PNG, and category cards loaded full-size PNGs. New `app/lib/shopifyImage.ts` (CDN `width` + `srcset` helpers). `HeroCarousel` now renders real `<img>` tags with `srcset`, `fetchPriority=high` on slide 1 (also removes the inline background style; `.demo-hero-img` in `demo.css`). `CategoryCard` images are resized with `srcset` and explicit dimensions. Blog CLS (0.34 mobile on `/blogs`, `/blogs/news`) not yet addressed.
+
 ## 2026-11-16 — Second Google Search Console verification file
 
 Added `public/googlefac1a0cf53097d92.html`, alongside the earlier

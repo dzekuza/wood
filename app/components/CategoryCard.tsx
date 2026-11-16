@@ -1,4 +1,7 @@
 import {Link} from 'react-router';
+import {shopifyImageUrl, shopifySrcSet} from '~/lib/shopifyImage';
+
+const CARD_WIDTHS = [240, 360, 480, 720] as const;
 
 export interface Category {
   title: string;
@@ -23,7 +26,16 @@ export function CategoryCard({category}: {category: Category}) {
     <Link to={category.to} className="demo-cat-card" prefetch="intent">
       <span className="demo-cat-image">
         {category.image && (
-          <img src={category.image} alt={category.title} loading="lazy" />
+          <img
+            src={shopifyImageUrl(category.image, 480)}
+            srcSet={shopifySrcSet(category.image, CARD_WIDTHS)}
+            sizes="(min-width: 1024px) 25vw, 60vw"
+            alt={category.title}
+            width={480}
+            height={480}
+            loading="lazy"
+            decoding="async"
+          />
         )}
         <span className="demo-cat-arrow" aria-hidden>
           <i className="ti ti-arrow-up-right" />
