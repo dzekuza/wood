@@ -26,7 +26,15 @@ function FilterValueRow({
 
   return (
     <li key={value.id}>
-      <Link to={getFilterValueUrl(searchParams, input)} prefetch="intent" replace preventScrollReset>
+      {/* Facet URLs canonicalise to the clean listing, so `nofollow` keeps
+          crawlers from spending budget on every filter combination. */}
+      <Link
+        to={getFilterValueUrl(searchParams, input)}
+        rel="nofollow"
+        prefetch="intent"
+        replace
+        preventScrollReset
+      >
         <span className={`check${active ? ' on' : ''}`} aria-hidden>
           {active && (
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">

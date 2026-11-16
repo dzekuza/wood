@@ -23,6 +23,61 @@ stock/out of stock is never a meaningful distinction here.
 - `app/routes/[llms.txt].tsx` links both guides. Do not deploy that change until both articles are published, or the links 404.
 - No route or schema change: `blogs.$blogHandle.$articleHandle.tsx` already emits Article and BreadcrumbList JSON-LD, and `sitemap.articles` reads handles from Shopify, so publishing is enough.
 
+## 2026-11-05 — Keyword-led category H1s and GSC-matched guide copy
+
+From 3 months of Search Console data (OpenSEO, project "CraftedWood"):
+category pages sit at positions 44–75, with zero non-brand clicks. Changes:
+
+- `CollectionContent` (`app/lib/collectionContent.ts`) has a new `heading`
+  field. `collections.$handle` renders it as the H1 and falls back to
+  `collection.title`. H1s went from "Shelves" / "Mantel Beams" to
+  "Solid Oak Floating Shelves" etc. Breadcrumbs still use the Shopify title.
+- The second guide paragraph on each category used to repeat the first. It
+  now carries the query wording people actually search: "oak mantel /
+  mantelpiece / oak beam for the fireplace / rustic", "oak fire surround",
+  "solid wood floating shelves", "wooden coat rack / coat hooks",
+  "hallway table / solid wood console table".
+
+Collection SEO titles updated in Shopify Admin (`collectionUpdate`, through
+the project's `SHOPIFY_ADMIN_TOKEN`; descriptions sent back unchanged). The
+code fallbacks (`seoTitle`) now match, so the title stays the same if the
+Admin field is ever cleared:
+
+| Collection | New title |
+|---|---|
+| solid-oak-mantel-beams | Oak Mantel Beams & Mantelpieces \| Handmade UK |
+| solid-oak-fireplace-surrounds | Oak Fire Surrounds & Fireplace Surrounds \| UK Made |
+| solid-oak-shelves | Solid Oak Floating Shelves \| Solid Wood, UK Made |
+| solid-oak-coat-racks | Oak Coat Racks \| Wall Mounted Wooden Coat Hooks |
+| console-tables | Oak Console Tables \| Solid Wood Hallway Tables UK |
+
+Previous Admin titles were "Solid Oak … | Handmade UK" (coat racks: "Solid
+Oak Coat Racks | Handmade, Wall Mounted"). Door stops and cube blocks still
+have no guide entry (~340 words each).
+
+The blog post `blogs/news/handcrafted-solid-oak-furniture-welcome-to-craft-wood-furniture`
+had a 64-character `<title>`. Its SEO title (`global.title_tag` metafield,
+set with `articleUpdate`) is now "Handcrafted Solid Oak Furniture | Craft Wood
+Furniture" (54 characters). The visible title, H1 and URL are unchanged.
+
+## 2026-11-05 — OpenSEO audit fixes: faceted-URL crawl waste, `/policies` description
+
+Ran an OpenSEO site audit (79 pages, project "CraftedWood"): 0 critical,
+0 warnings. Fixed the code-side info items:
+
+- `[robots.txt].tsx` only had the locale-prefixed
+  `Disallow: /*/collections/*filter*&*filter*` (from Shopify's template).
+  This store has no locale prefix, so stacked `?filter=…&filter=…` URLs were
+  crawlable. Added the unprefixed `/collections/*filter*&*filter*` rule.
+- Facet links in `CollectionFilters` (`FilterValueRow`) now carry
+  `rel="nofollow"`. Their URLs already canonicalise to the clean listing; this
+  stops crawlers spending budget on every combination (28 crawled in the audit).
+- `/policies` meta description lengthened (62 → 133 chars).
+
+Left alone: PDP server response ~1.6–1.8 s, because `PRODUCT_QUERY` runs with
+`CacheNone` on purpose so price edits show up straight away. One blog article
+title is 64 chars; it needs a shorter SEO title in Shopify Admin.
+
 ## 2026-11-01 — Removed the "Availability" filter from `/collections/all`
 
 Client asked for the sidebar's Availability block (In stock / Out of stock)

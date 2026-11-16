@@ -15,6 +15,9 @@ export type CollectionSpec = {label: string; value: string};
 export type CollectionLink = {label: string; to: string};
 
 export type CollectionContent = {
+  /** On-page H1. Shopify collection titles are short labels ("Shelves"), so
+   *  this carries the page's main keyword instead. */
+  heading: string;
   seoTitle: string;
   seoDescription: string;
   guideHeading: string;
@@ -46,13 +49,14 @@ const SHARED_FAQS: CollectionFaq[] = [
 
 export const COLLECTION_CONTENT: Record<string, CollectionContent> = {
   'solid-oak-mantel-beams': {
-    seoTitle: 'Solid Oak Mantel Beams UK',
+    heading: 'Solid Oak Mantel Beams',
+    seoTitle: 'Oak Mantel Beams & Mantelpieces | Handmade UK',
     seoDescription:
       'Handmade solid oak mantel beams, made to order in our UK workshop. Choice of sizes and six oil colours, with free UK delivery.',
     guideHeading: 'Choosing an oak mantel beam',
     guide: [
       'A solid oak mantel beam is a single length of European oak fixed above a fireplace or stove. Ours come in beam sizes from 3" x 4" to 10" x 6" and lengths from 3ft to 6.5ft, made to order and delivered free across the UK.',
-      'An oak mantel beam gives a fireplace a solid, natural focal point. Ours are made from solid European oak, cut, joined and finished in our own workshop, so the grain you see is the grain all the way through.',
+      'An oak mantel beam, also called an oak mantel or mantelpiece, gives a fireplace a solid, natural focal point. Each oak beam for the fireplace is cut, joined and finished in our own workshop from solid European oak, so the grain you see is the grain all the way through. Choose a Sanded surface for a clean look, or Lightly or Heavily Worked for a more rustic oak mantel piece.',
       'Pick the length to suit the chimney breast and the depth to suit what you want to display. If your fireplace has a stove or open fire, check the stove maker’s guidance on the clearance needed above the appliance before you fix a beam in place.',
       'Oak is a natural material, so grain, knots and small cracks vary from beam to beam. That variation is part of the look of a handmade piece.',
     ],
@@ -87,13 +91,14 @@ export const COLLECTION_CONTENT: Record<string, CollectionContent> = {
     ],
   },
   'solid-oak-fireplace-surrounds': {
-    seoTitle: 'Solid Oak Fireplace Surrounds UK',
+    heading: 'Oak Fireplace Surrounds',
+    seoTitle: 'Oak Fire Surrounds & Fireplace Surrounds | UK Made',
     seoDescription:
       'Handmade solid oak fireplace surrounds, made to order in our UK workshop. Choice of sizes and six oil colours, with free UK delivery.',
     guideHeading: 'Choosing an oak fireplace surround',
     guide: [
       'A solid oak fireplace surround is a mantel beam with two matching uprights that frame the opening. Ours are made to order from European oak, with the beam and upright sizes chosen to suit your fireplace.',
-      'A solid oak fireplace surround frames the fire opening and sets the tone for the room. Each one is made to order from solid European oak in our own workshop.',
+      'An oak fire surround frames the fire opening and sets the tone for the room. Each one is made to order from solid European oak in our own workshop, and a Lightly or Heavily Worked surface gives it a rustic oak finish that suits a cottage or period fireplace.',
       'Measure the width and height of your fireplace opening and the space around it before you choose a size. If you are fitting a stove or open fire, follow the manufacturer’s clearance guidance for timber near the heat.',
       'Choose from six oil colours, from light and natural to deeper tones. Oak varies naturally in grain and knots, so no two surrounds look exactly alike.',
     ],
@@ -125,13 +130,14 @@ export const COLLECTION_CONTENT: Record<string, CollectionContent> = {
     ],
   },
   'solid-oak-shelves': {
-    seoTitle: 'Solid Oak Floating Shelves UK',
+    heading: 'Solid Oak Floating Shelves',
+    seoTitle: 'Solid Oak Floating Shelves | Solid Wood, UK Made',
     seoDescription:
       'Handmade solid oak floating shelves, made to order in our UK workshop. Choice of sizes and six oil colours, with free UK delivery.',
     guideHeading: 'Choosing solid oak shelves',
     guide: [
       'Our solid oak floating shelves are 4cm thick, 15 to 30cm deep and 30 to 150cm long, with hidden fixings or black brackets. Each is made to order and delivered free across the UK.',
-      'Solid oak floating shelves are a simple way to add storage and display space without visible brackets. Ours are made to order from solid European oak, so they are strong, repairable and age well.',
+      'Solid wood floating shelves are a simple way to add storage and display space without visible brackets. Ours are made to order from solid European oak, not veneer or oak-effect board, so each solid oak floating shelf is strong, repairable and ages well.',
       'Choose the length to suit your wall and the depth to suit what you will put on it. Fix into a suitable wall for the load, using fixings that match the wall type, whether that is masonry, stud or plasterboard.',
       'Oil leaves the oak grain visible and is easy to refresh. Expect natural differences in grain, knots and small cracks between shelves.',
     ],
@@ -164,13 +170,14 @@ export const COLLECTION_CONTENT: Record<string, CollectionContent> = {
     ],
   },
   'solid-oak-coat-racks': {
-    seoTitle: 'Solid Oak Coat Racks UK',
+    heading: 'Solid Oak Coat Racks',
+    seoTitle: 'Oak Coat Racks | Wall Mounted Wooden Coat Hooks',
     seoDescription:
       'Handmade solid oak coat racks, made to order in our UK workshop. Choice of sizes and six oil colours, with free UK delivery.',
     guideHeading: 'Choosing an oak coat rack',
     guide: [
       'Our solid oak coat racks come with 2 to 12 hooks, from 40cm to 150cm long, in five hook colours. Each is made to order, supplied assembled with fixings for a solid wall.',
-      'A wall-mounted oak coat rack makes a hallway tidier and warmer. Ours are made to order from solid European oak in our own workshop.',
+      'A wall-mounted wooden coat rack makes a hallway tidier and warmer. Ours are made to order from solid European oak in our own workshop, with metal coat hooks fixed to a solid oak board.',
       'Pick the width by how many coats and bags you need to hang, and fix the rack into a solid fixing point because coats pull outwards and downwards more than you expect.',
       'Choose from six oil colours to match your hallway. Natural grain and knots mean each rack is slightly different.',
     ],
@@ -204,13 +211,14 @@ export const COLLECTION_CONTENT: Record<string, CollectionContent> = {
     ],
   },
   'console-tables': {
-    seoTitle: 'Solid Oak Console Tables UK',
+    heading: 'Solid Oak Console Tables',
+    seoTitle: 'Oak Console Tables | Solid Wood Hallway Tables UK',
     seoDescription:
       'Handmade solid oak console tables, made to order in our UK workshop. Choice of sizes and six oil colours, with free UK delivery.',
     guideHeading: 'Choosing an oak console table',
     guide: [
       'Our solid oak console tables have a 4cm thick oak top on black steel hairpin legs, in depths from 15 to 30cm and lengths from 60 to 150cm. Each is made to order and delivered free across the UK.',
-      'A solid oak console table suits a hallway, landing or the wall behind a sofa. Ours are made to order from solid European oak in our own workshop.',
+      'A solid oak console table, or narrow hallway table, suits a hallway, landing or the wall behind a sofa. Ours are made to order from solid European oak in our own workshop, so it is a solid wood console table rather than veneered board.',
       'Measure the wall space and how far the table can project before it blocks a doorway or walkway. A narrower depth often suits a hallway best.',
       'Pick from six oil colours. Oak varies naturally in grain and knots, so each table has its own character.',
     ],

@@ -8,7 +8,7 @@ import type {PoliciesQuery, PolicyItemFragment} from 'storefrontapi.generated';
 export const meta: Route.MetaFunction = () =>
   seoMeta({
     title: `Policies | ${SITE_NAME}`,
-    description: `Delivery, returns, privacy and terms for ${SITE_NAME}.`,
+    description: `Delivery, returns, refunds, privacy and terms of service for ${SITE_NAME}: free UK delivery on every handmade solid oak order.`,
     path: '/policies',
   });
 

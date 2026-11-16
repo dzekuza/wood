@@ -154,7 +154,7 @@ export default function Collection() {
       <div className="archive-hero">
         <div className="archive-wrap">
           <div className="archive-hero-inner">
-            <h1 className="archive-hero-title">{collection.title}</h1>
+            <h1 className="archive-hero-title">{content?.heading ?? collection.title}</h1>
           </div>
           {collection.description && (
             <p className="archive-hero-blurb">{collection.description}</p>
