@@ -1,7 +1,18 @@
 ---
 tags: [meta, changelog]
-updated: 2026-11-01
+updated: 2026-11-16
 ---
+
+## 2026-11-16 — Availability filter also removed from real collection pages
+
+The 2026-11-01 fix only covered `/collections/all` (locally-built filters).
+Native per-collection pages (`collections.$handle.tsx`) still showed
+Shopify's built-in Availability facet in the sidebar, sourced straight from
+`Collection.products(filters:)`. `getListAndBooleanFilters`
+(`app/lib/collectionFilters.ts`) now also drops any filter with
+`id === 'filter.v.availability'`, alongside the existing `PRICE_RANGE` drop —
+same rationale as before: everything is made to order, so in
+stock/out of stock is never a meaningful distinction here.
 
 ## 2026-11-01 — Two new how-to guides drafted; `content/blog/` added; llms.txt links them
 

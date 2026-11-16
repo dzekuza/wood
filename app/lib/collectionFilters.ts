@@ -105,9 +105,16 @@ export function getCurrentPriceRange(searchParams: URLSearchParams) {
   };
 }
 
-/** Drop the built-in price filter Shopify always returns — we render it as its own block. */
+/**
+ * Drop the built-in Price and Availability filters Shopify always returns.
+ * Price is rendered as its own block. Availability is never meaningful here —
+ * everything is made to order, so "out of stock" doesn't apply (see
+ * buildLocalFilters below).
+ */
 export function getListAndBooleanFilters(filters: Filter[] | undefined) {
-  return (filters ?? []).filter((filter) => filter.type !== 'PRICE_RANGE');
+  return (filters ?? []).filter(
+    (filter) => filter.type !== 'PRICE_RANGE' && filter.id !== 'filter.v.availability',
+  );
 }
 
 export function getPriceFilter(filters: Filter[] | undefined) {
