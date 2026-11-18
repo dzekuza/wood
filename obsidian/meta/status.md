@@ -10,7 +10,7 @@ updated: 2026-11-16
 > it (don't append) whenever the state changes. History belongs in [[session-log]]
 > and [[changelog]], not here.
 
-**Last updated:** 2026-11-16
+**Last updated:** 2026-11-18
 
 ## Current focus
 
@@ -18,6 +18,7 @@ Small storefront fixes and Google Search Console verification, no active feature
 
 ## Done recently
 
+- Fixed swapped Oil Colour swatch images on the PDP (`app/lib/swatches.ts`): "Light Grey Oil" and "White Oil" were pointing at each other's texture crop (`texture-coat-racks.jpg` / `texture-surround-mantels.jpg`), inconsistent with the same crops' labels in `TexturesGrid.tsx`. Swapped the two image assignments so they match; verified in browser on `/products/solid-oak-floating-shelf`. Not yet committed.
 - Mobile LCP fix written (hero `<img>` + resized category images, `shopifyImage.ts`), typechecked, **not yet committed/pushed** (commit command was blocked by the permission check; needs user go-ahead).
 - OpenSEO audit + Lighthouse run 2026-11-16: SEO 100 everywhere, desktop perf 80-97, mobile perf 55-89 (home LCP 11.8s).
 

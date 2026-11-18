@@ -4,13 +4,24 @@
  * (elsewhere) matching a Shopify oil-colour value back to a base finish.
  * Longest names first so "Light Grey" isn't swallowed by the "Grey" check.
  */
-const FINISH_MATCH_ORDER = ['Light Grey', 'Old Oak', 'Clear', 'Dark', 'Grey', 'White'];
+const FINISH_MATCH_ORDER = [
+  'Light Grey',
+  'Old Oak',
+  'Clear',
+  'Dark',
+  'Grey',
+  'White',
+];
 
 function matchFinish(rawValue: string): string | null {
   const value = rawValue.trim().toLowerCase();
   for (const finish of FINISH_MATCH_ORDER) {
     const needle = finish.toLowerCase();
-    if (value === needle || value.startsWith(`${needle} `) || value.startsWith(`${needle}+`)) {
+    if (
+      value === needle ||
+      value.startsWith(`${needle} `) ||
+      value.startsWith(`${needle}+`)
+    ) {
       return finish;
     }
   }
@@ -25,12 +36,12 @@ function matchFinish(rawValue: string): string | null {
  * ADR-0012 — ProductOptionValue.swatch doesn't reliably resolve).
  */
 const FINISH_TEXTURE_IMAGES: Record<string, string> = {
-  'Clear': '/demo/texture-cube-blocks.jpg',
+  Clear: '/demo/texture-cube-blocks.jpg',
   'Old Oak': '/demo/texture-door-stops.jpg',
-  'Dark': '/demo/texture-mantel-beams.jpg',
-  'Grey': '/demo/texture-shelves.jpg',
-  'Light Grey': '/demo/texture-coat-racks.jpg',
-  'White': '/demo/texture-surround-mantels.jpg',
+  Dark: '/demo/texture-mantel-beams.jpg',
+  Grey: '/demo/texture-shelves.jpg',
+  'Light Grey': '/demo/texture-surround-mantels.jpg',
+  White: '/demo/texture-coat-racks.jpg',
 };
 
 export function getSwatchTexture(name: string): string | undefined {
@@ -47,7 +58,9 @@ export function getSwatchTexture(name: string): string | undefined {
  * Chrome, Old Brass) — the timber colour on those products is "Oil Colour".
  */
 export function isHardwareColourOption(optionName: string): boolean {
-  return /hook|handle|hardware|bracket|fixing|knob|hinge|rack/i.test(optionName);
+  return /hook|handle|hardware|bracket|fixing|knob|hinge|rack/i.test(
+    optionName,
+  );
 }
 
 /**
@@ -61,17 +74,43 @@ export function getSwatchTone(name: string, color?: string | null) {
 
   // Metal finishes first — a "Black" or "White" hook is a painted metal chip,
   // not the ebonised/whitewash timber tone those words mean on a wood option.
-  if (value.includes('antique brass') || value.includes('aged brass') || value.includes('old brass')) return 'product-swatch-tone-antique-brass';
-  if (value.includes('brass') || value.includes('gold')) return 'product-swatch-tone-brass';
-  if (value.includes('copper') || value.includes('bronze')) return 'product-swatch-tone-copper';
-  if (value.includes('chrome') || value.includes('nickel') || value.includes('stainless') || value.includes('silver') || value.includes('polished')) return 'product-swatch-tone-chrome';
-  if (value.includes('pewter') || value.includes('graphite') || value.includes('gunmetal') || value.includes('anthracite')) return 'product-swatch-tone-pewter';
+  if (
+    value.includes('antique brass') ||
+    value.includes('aged brass') ||
+    value.includes('old brass')
+  )
+    return 'product-swatch-tone-antique-brass';
+  if (value.includes('brass') || value.includes('gold'))
+    return 'product-swatch-tone-brass';
+  if (value.includes('copper') || value.includes('bronze'))
+    return 'product-swatch-tone-copper';
+  if (
+    value.includes('chrome') ||
+    value.includes('nickel') ||
+    value.includes('stainless') ||
+    value.includes('silver') ||
+    value.includes('polished')
+  )
+    return 'product-swatch-tone-chrome';
+  if (
+    value.includes('pewter') ||
+    value.includes('graphite') ||
+    value.includes('gunmetal') ||
+    value.includes('anthracite')
+  )
+    return 'product-swatch-tone-pewter';
 
   if (value.includes('dark walnut')) return 'product-swatch-tone-dark-walnut';
   if (value.includes('walnut')) return 'product-swatch-tone-walnut';
   if (value.includes('oak')) return 'product-swatch-tone-oak';
-  if (value.includes('white') || value.includes('wash')) return 'product-swatch-tone-whitewash';
-  if (value.includes('ebon') || value.includes('#2a2a2a') || value.includes('black')) return 'product-swatch-tone-ebonised';
+  if (value.includes('white') || value.includes('wash'))
+    return 'product-swatch-tone-whitewash';
+  if (
+    value.includes('ebon') ||
+    value.includes('#2a2a2a') ||
+    value.includes('black')
+  )
+    return 'product-swatch-tone-ebonised';
   if (value.includes('ash')) return 'product-swatch-tone-ash';
   if (value.includes('reclaimed')) return 'product-swatch-tone-reclaimed';
 

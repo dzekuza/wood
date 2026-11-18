@@ -18,6 +18,11 @@ Entry format:
 - **Status:** audit done (mobile LCP 6-12s is the main issue). LCP change typechecks but is not committed/pushed.
 - **Next:** commit + push LCP change, re-measure home on mobile, then blog CLS and product TTFB.
 
+## 2026-11-18 — Fix swapped PDP oil colour swatch images
+- **Changed:** `app/lib/swatches.ts` — swapped the `FINISH_TEXTURE_IMAGES` entries for `Light Grey` and `White` so each points at the texture crop matching its own label in `TexturesGrid.tsx` (user reported the two were showing each other's swatch).
+- **Status:** fixed and verified live on `/products/solid-oak-floating-shelf` in the browser preview. Not committed/pushed.
+- **Next:** commit this fix (and the still-pending mobile LCP change) together or separately per user go-ahead.
+
 ## 2026-11-16 — SEO review since 11-09, CSP fix
 - **Changed:** `app/entry.server.tsx` CSP (doubleclick/google hosts); vault changelog/status.
 - **Status:** typecheck clean. GSC returns 0 rows until domain ownership is verified. Guides live, llms.txt OK.
