@@ -2069,7 +2069,7 @@ export type ProductFragment = Pick<
 };
 
 export type ProductRecommendationsQueryVariables = StorefrontAPI.Exact<{
-  productId: StorefrontAPI.Scalars['ID']['input'];
+  handle: StorefrontAPI.Scalars['String']['input'];
   country?: StorefrontAPI.InputMaybe<StorefrontAPI.CountryCode>;
   language?: StorefrontAPI.InputMaybe<StorefrontAPI.LanguageCode>;
 }>;
@@ -2697,7 +2697,7 @@ interface GeneratedQueryTypes {
     return: PoliciesQuery;
     variables: PoliciesQueryVariables;
   };
-  '#graphql\n  query ProductRecommendations($productId: ID!, $country: CountryCode, $language: LanguageCode)\n  @inContext(country: $country, language: $language) {\n    productRecommendations(productId: $productId) {\n      id\n      title\n      handle\n      options {\n        name\n        optionValues {\n          name\n          swatch {\n            color\n            image {\n              previewImage {\n                url\n              }\n            }\n          }\n        }\n      }\n      selectedOrFirstAvailableVariant(selectedOptions: [], ignoreUnknownOptions: true) {\n        id\n        availableForSale\n      }\n      featuredImage { id altText url width height }\n      images(first: 4) {\n        nodes { id url altText width height }\n      }\n      priceRange {\n        minVariantPrice { amount currencyCode }\n        maxVariantPrice { amount currencyCode }\n      }\n      compareAtPriceRange {\n        minVariantPrice { amount currencyCode }\n      }\n    }\n  }\n': {
+  '#graphql\n  query ProductRecommendations($handle: String!, $country: CountryCode, $language: LanguageCode)\n  @inContext(country: $country, language: $language) {\n    productRecommendations(productHandle: $handle) {\n      id\n      title\n      handle\n      options {\n        name\n        optionValues {\n          name\n          swatch {\n            color\n            image {\n              previewImage {\n                url\n              }\n            }\n          }\n        }\n      }\n      selectedOrFirstAvailableVariant(selectedOptions: [], ignoreUnknownOptions: true) {\n        id\n        availableForSale\n      }\n      featuredImage { id altText url width height }\n      images(first: 4) {\n        nodes { id url altText width height }\n      }\n      priceRange {\n        minVariantPrice { amount currencyCode }\n        maxVariantPrice { amount currencyCode }\n      }\n      compareAtPriceRange {\n        minVariantPrice { amount currencyCode }\n      }\n    }\n  }\n': {
     return: ProductRecommendationsQuery;
     variables: ProductRecommendationsQueryVariables;
   };

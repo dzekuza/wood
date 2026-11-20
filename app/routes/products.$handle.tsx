@@ -1,5 +1,5 @@
-import {useState, useEffect, useMemo, useRef} from 'react';
-import {useLoaderData, useSearchParams, Link} from 'react-router';
+import {Suspense, useState, useEffect, useMemo, useRef} from 'react';
+import {Await, useLoaderData, useSearchParams, Link} from 'react-router';
 import type {Route} from './+types/products.$handle';
 import {motion} from 'motion/react';
 import {
@@ -122,7 +122,7 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   const [{product: variantProduct}, pageContent] = await Promise.all([
     storefront.query(PRODUCT_VARIANTS_QUERY, {
       variables: {handle},
-      cache: storefront.CacheNone(),
+      cache: storefront.CacheShort(),
     }),
     loadPageContentState(context, request, PRODUCT_SLUG),
   ]);
@@ -137,7 +137,7 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
 
   const {product} = await storefront.query(PRODUCT_QUERY, {
     variables: {handle, selectedOptions},
-    cache: storefront.CacheNone(),
+    cache: storefront.CacheShort(),
   });
 
   if (!product?.id) {
@@ -145,11 +145,6 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   }
 
   redirectIfHandleIsLocalized(request, {handle, data: product});
-
-  const {productRecommendations} = await storefront.query(PRODUCT_RECOMMENDATIONS_QUERY, {
-    variables: {productId: product.id},
-    cache: storefront.CacheShort(),
-  });
 
   const upsellGroupsData = buildUpsellGroups(
     product.addonProducts?.references?.nodes,
@@ -163,7 +158,6 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
     reviews: ETSY_PRODUCT_REVIEWS[handle] ?? [],
     rating: ETSY_RATINGS_BY_HANDLE[handle] ?? null,
     pageContent,
-    recommendations: productRecommendations?.slice(0, 4) ?? [],
     upsellGroupsData,
   };
 }
@@ -174,10 +168,30 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
  * Make sure to not throw any errors here, as it will cause the page to 500.
  */
 function loadDeferredData({context, params}: Route.LoaderArgs) {
-  // Put any API calls that is not critical to be available on first page render
-  // For example: product reviews, product recommendations, social feeds.
+  const {handle} = params;
 
-  return {};
+  // Recommendations sit below the reviews, so they never block the first byte.
+  // They are keyed by handle rather than product id, which lets the request
+  // start now, in parallel with the product queries, instead of after them.
+  // Bots still get them in the HTML: entry.server waits for `allReady`.
+  const recommendations = handle
+    ? context.storefront
+        .query(PRODUCT_RECOMMENDATIONS_QUERY, {
+          variables: {handle},
+          cache: context.storefront.CacheCustom({
+            mode: 'public',
+            maxAge: 300,
+            staleWhileRevalidate: 3600,
+          }),
+        })
+        .then(({productRecommendations}) => productRecommendations?.slice(0, 4) ?? [])
+        .catch((error: Error) => {
+          console.error(error);
+          return [];
+        })
+    : Promise.resolve([]);
+
+  return {recommendations};
 }
 
 export default function Product() {
@@ -440,7 +454,10 @@ export default function Product() {
             <motion.div
               key={product.id}
               className="pdp-grid"
-              initial={{opacity: 0, transform: 'translateY(16px)'}}
+              // No fade-in: the server HTML would carry `opacity: 0` until the
+              // client hydrates, and the gallery image (the LCP element) does
+              // not count as painted while invisible.
+              initial={false}
               animate={{opacity: 1, transform: 'translateY(0px)'}}
               transition={{duration: DURATION, ease: EASE_OUT}}
             >
@@ -452,7 +469,7 @@ export default function Product() {
                   ref={carouselRef}
                   onScroll={handleCarouselScroll}
                 >
-                  {galleryItems.map((item) => (
+                  {galleryItems.map((item, index) => (
                     <div key={item.key} className="pdp-carousel-slide">
                       {item.type === 'model' ? (
                         <ProductModel3D sources={item.sources} alt={item.alt ?? title} />
@@ -463,7 +480,7 @@ export default function Product() {
                           onClick={() => openLightboxFor(item)}
                           aria-label="View full image"
                         >
-                          <ProductImage image={item.image} />
+                          <ProductImage image={item.image} priority={index === 0} />
                         </button>
                       )}
                       {selectedVariant?.availableForSale === false && (
@@ -545,7 +562,10 @@ export default function Product() {
                       onClick={() => openLightboxFor(activeItem)}
                       aria-label="View full image"
                     >
-                      <ProductImage image={activeItem?.image ?? selectedVariant?.image} />
+                      <ProductImage
+                        image={activeItem?.image ?? selectedVariant?.image}
+                        priority
+                      />
                     </button>
                   )}
                   {selectedVariant?.availableForSale === false && (
@@ -725,25 +745,31 @@ export default function Product() {
         <ReviewsSection reviews={reviews} rating={rating} />
 
         {/* Related */}
-        {recommendations.length > 0 && (
-          <div className="pdp-related">
-            <Reveal className="related-head">
-              <div>
-                <h2>Recommended for you.</h2>
+        <Suspense fallback={null}>
+          <Await resolve={recommendations}>
+            {(items) =>
+              items.length > 0 && (
+              <div className="pdp-related">
+                <Reveal className="related-head">
+                  <div>
+                    <h2>Recommended for you.</h2>
+                  </div>
+                  <Link to="/collections/all">
+                    Browse all pieces <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                  </Link>
+                </Reveal>
+                <StaggerGroup className="pgrid">
+                  {items.map((rec) => (
+                    <StaggerItem key={rec.id}>
+                      <ProductItem product={rec} loading="lazy" />
+                    </StaggerItem>
+                  ))}
+                </StaggerGroup>
               </div>
-              <Link to="/collections/all">
-                Browse all pieces <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-              </Link>
-            </Reveal>
-            <StaggerGroup className="pgrid">
-              {recommendations.map((rec) => (
-                <StaggerItem key={rec.id}>
-                  <ProductItem product={rec} loading="lazy" />
-                </StaggerItem>
-              ))}
-            </StaggerGroup>
-          </div>
-        )}
+              )
+            }
+          </Await>
+        </Suspense>
 
         <div className={`pdp-sticky-bar${showSticky ? ' visible' : ''}`} aria-hidden={!showSticky}>
           <div className="pdp-sticky-inner">
@@ -929,9 +955,9 @@ const PRODUCT_FRAGMENT = `#graphql
 ` as const;
 
 const PRODUCT_RECOMMENDATIONS_QUERY = `#graphql
-  query ProductRecommendations($productId: ID!, $country: CountryCode, $language: LanguageCode)
+  query ProductRecommendations($handle: String!, $country: CountryCode, $language: LanguageCode)
   @inContext(country: $country, language: $language) {
-    productRecommendations(productId: $productId) {
+    productRecommendations(productHandle: $handle) {
       id
       title
       handle
