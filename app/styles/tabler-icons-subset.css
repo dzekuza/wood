@@ -1,0 +1,56 @@
+/*
+ * Tabler Icons — subset. The full @tabler/icons-webfont file is 460 KB for
+ * ~5,000 glyphs; the storefront uses 22. This font (public/fonts/
+ * tabler-icons-subset.woff2, ~4 KB) carries only those.
+ *
+ * Adding an icon: add its `.ti-<name>:before` rule from
+ * node_modules/@tabler/icons-webfont/dist/tabler-icons.min.css below, then
+ * rebuild the subset with its codepoint included, e.g.
+ *   pyftsubset node_modules/@tabler/icons-webfont/dist/fonts/tabler-icons.ttf \
+ *     --unicodes=U+ea1f,... --flavor=woff2 --layout-features='' \
+ *     --output-file=public/fonts/tabler-icons-subset.woff2
+ * (needs `pip install fonttools brotli`). Icons from the Tabler package are
+ * MIT licensed.
+ */
+@font-face {
+  font-family: 'tabler-icons';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/tabler-icons-subset.woff2') format('woff2');
+}
+
+.ti {
+  font-family: 'tabler-icons' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.ti-arrow-right:before{content:"\ea1f"}
+.ti-arrow-up-right:before{content:"\ea24"}
+.ti-augmented-reality:before{content:"\f023"}
+.ti-certificate:before{content:"\ed76"}
+.ti-chevron-left:before{content:"\ea60"}
+.ti-chevron-right:before{content:"\ea61"}
+.ti-cube:before{content:"\fa97"}
+.ti-droplet-off:before{content:"\ee83"}
+.ti-hammer:before{content:"\ef91"}
+.ti-heart:before{content:"\eabe"}
+.ti-hourglass-empty:before{content:"\f146"}
+.ti-mail:before{content:"\eae5"}
+.ti-minus:before{content:"\eaf2"}
+.ti-package:before{content:"\eaff"}
+.ti-pencil:before{content:"\eb04"}
+.ti-plus:before{content:"\eb0b"}
+.ti-search:before{content:"\eb1c"}
+.ti-shield-check:before{content:"\eb22"}
+.ti-shopping-cart:before{content:"\eb25"}
+.ti-tree:before{content:"\ef01"}
+.ti-user:before{content:"\eb4d"}
+.ti-x:before{content:"\eb55"}

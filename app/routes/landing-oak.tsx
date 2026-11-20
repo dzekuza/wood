@@ -33,10 +33,6 @@ export const meta: Route.MetaFunction = () =>
 export function links() {
   return [
     {rel: 'stylesheet', href: demoStyles},
-    {
-      rel: 'stylesheet',
-      href: 'https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&family=DM+Sans:wght@400;500&display=swap',
-    },
   ];
 }
 

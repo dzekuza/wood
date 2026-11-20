@@ -34,6 +34,7 @@ import {filterHiddenProducts} from '~/lib/upsells';
 import {LANDING_SLUG} from '~/lib/pageContent';
 import {loadPageContentState} from '~/lib/pageContent.server';
 import demoStyles from '~/styles/demo.css?url';
+import {editorialCache} from '~/lib/cache';
 
 export const meta: Route.MetaFunction = ({data}) => {
   const seo = data?.content.seo ?? HOME_CONTENT_DEFAULTS.seo;
@@ -48,10 +49,6 @@ export const meta: Route.MetaFunction = ({data}) => {
 export function links() {
   return [
     {rel: 'stylesheet', href: demoStyles},
-    {
-      rel: 'stylesheet',
-      href: 'https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&family=DM+Sans:wght@400;500&display=swap',
-    },
   ];
 }
 
@@ -86,9 +83,15 @@ export async function loader(args: Route.LoaderArgs) {
     homeContent,
     pageContent,
   ] = await Promise.all([
-    context.storefront.query(HERO_SHOWCASE_QUERY),
-    context.storefront.query(POPULAR_PRODUCTS_QUERY),
-    context.storefront.query(HOME_CONTENT_QUERY),
+    context.storefront.query(HERO_SHOWCASE_QUERY, {
+      cache: editorialCache(context.storefront),
+    }),
+    context.storefront.query(POPULAR_PRODUCTS_QUERY, {
+      cache: editorialCache(context.storefront),
+    }),
+    context.storefront.query(HOME_CONTENT_QUERY, {
+      cache: editorialCache(context.storefront),
+    }),
     // Inline copy overrides, read here rather than client-side so the copy a
     // shopper sees is server-rendered and the toolbar does not flash in.
     loadPageContentState(context, request, LANDING_SLUG),
@@ -175,11 +178,11 @@ function PopularProductsSection({
         </EditableText>
 
         <div className="pgrid">
-          {products.map((product, index) => (
+          {products.map((product) => (
             <ProductItem
               key={product.id}
               product={product}
-              loading={index < 4 ? 'eager' : undefined}
+              loading="lazy"
             />
           ))}
         </div>

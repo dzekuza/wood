@@ -14,13 +14,18 @@ import type {Route} from './+types/root';
 import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
 import {SEARCH_SUGGESTIONS_QUERY} from '~/lib/searchSuggestions';
 import {EXCLUDE_HIDDEN_PRODUCTS_QUERY} from '~/lib/upsells';
-import tablerStyles from '@tabler/icons-webfont/dist/tabler-icons.min.css?url';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
 import {GoogleAnalytics} from './components/GoogleAnalytics';
 import {PageLayout} from './components/PageLayout';
 
 export type RootLoader = typeof loader;
+
+const FONT_PRELOADS = [
+  '/fonts/plus-jakarta-sans-latin.woff2',
+  '/fonts/outfit-latin.woff2',
+  '/fonts/tabler-icons-subset.woff2',
+] as const;
 
 /**
  * This is important to avoid re-fetching root queries on sub-navigations
@@ -58,18 +63,17 @@ export function links() {
   return [
     {rel: 'preconnect', href: 'https://cdn.shopify.com'},
     {rel: 'preconnect', href: 'https://shop.app'},
-    {rel: 'preconnect', href: 'https://fonts.googleapis.com'},
-    {
-      rel: 'preconnect',
-      href: 'https://fonts.gstatic.com',
-      crossOrigin: 'anonymous',
-    },
-    {
-      rel: 'stylesheet',
-      href: 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap',
-    },
-
-    {rel: 'stylesheet', href: tablerStyles},
+    // Fonts are self-hosted (see "Brand Fonts" in app.css). Preload only the
+    // faces used above the fold, so they start downloading with the HTML
+    // instead of waiting for the stylesheet to be parsed. `crossOrigin` is
+    // required for font preloads even on the same origin.
+    ...FONT_PRELOADS.map((href) => ({
+      rel: 'preload',
+      href,
+      as: 'font',
+      type: 'font/woff2',
+      crossOrigin: 'anonymous' as const,
+    })),
     {rel: 'icon', href: '/favicon.ico', sizes: '48x48'},
     {rel: 'icon', type: 'image/png', href: '/favicon-48.png', sizes: '48x48'},
     {rel: 'icon', type: 'image/png', href: '/favicon-192.png', sizes: '192x192'},
