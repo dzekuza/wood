@@ -7,6 +7,9 @@ import {
   type HomeContent,
   type ProcessIconKey,
 } from '~/lib/homeContent';
+import {shopifyImageUrl, shopifySrcSet} from '~/lib/shopifyImage';
+
+const PHOTO_WIDTHS = [600, 900, 1200, 1800] as const;
 
 /** The illustrations are hand-drawn SVGs, so the metaobject stores a key and
  *  the component resolves it here. Adding an icon means adding it to this map
@@ -43,7 +46,17 @@ export function CraftmanshipProcess({
 
       <div className="demo-process-body">
         <div className="demo-process-photo">
-          <img src={content.image.url} alt={content.image.altText ?? ''} />
+          {/* Below the fold: lazy, and sized through the Shopify CDN. The
+              source was being fetched at full resolution (~170 KB). The photo
+              box has a min-height in CSS, so nothing shifts when it arrives. */}
+          <img
+            src={shopifyImageUrl(content.image.url, 1200)}
+            srcSet={shopifySrcSet(content.image.url, PHOTO_WIDTHS)}
+            sizes="(min-width: 1080px) 50vw, 100vw"
+            alt={content.image.altText ?? ''}
+            loading="lazy"
+            decoding="async"
+          />
         </div>
 
         <div className="demo-process-grid">

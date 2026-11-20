@@ -21,7 +21,15 @@ export interface Category {
  * `flex-basis` lives on `.demo-cat-card` in `demo.css` and is simply ignored
  * when the card is a grid item.
  */
-export function CategoryCard({category}: {category: Category}) {
+export function CategoryCard({
+  category,
+  priority = false,
+}: {
+  category: Category;
+  /** Above-the-fold tile (the first row on /collections): fetched eagerly at
+   *  high priority — it is the page's LCP — instead of lazily. */
+  priority?: boolean;
+}) {
   return (
     <Link to={category.to} className="demo-cat-card" prefetch="intent">
       <span className="demo-cat-image">
@@ -33,7 +41,8 @@ export function CategoryCard({category}: {category: Category}) {
             alt={category.title}
             width={480}
             height={480}
-            loading="lazy"
+            loading={priority ? 'eager' : 'lazy'}
+            fetchPriority={priority ? 'high' : undefined}
             decoding="async"
           />
         )}
