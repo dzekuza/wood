@@ -9,6 +9,7 @@ import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {ArticleCard} from '~/components/ArticleCard';
 import {BlogIntro} from '~/components/BlogIntro';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
+import {editorialCache} from '~/lib/cache';
 
 export const meta: Route.MetaFunction = ({data, params}) => {
   const blog = data?.blog;
@@ -52,6 +53,7 @@ async function loadCriticalData({context, request, params}: Route.LoaderArgs) {
         blogHandle: params.blogHandle,
         ...paginationVariables,
       },
+      cache: editorialCache(context.storefront),
     }),
     // Add other queries here, so that they are loaded in parallel
   ]);
@@ -103,7 +105,7 @@ export default function Blog() {
             <ArticleCard
               article={article}
               key={article.id}
-              loading={index < 3 ? 'eager' : 'lazy'}
+              loading={index === 0 ? 'eager' : 'lazy'}
               headingLevel="h2"
             />
           )}

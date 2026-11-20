@@ -7,6 +7,7 @@ import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {BLOG_LABEL} from '~/lib/site';
 import {seoMeta, toMetaDescription, toPageTitle} from '~/lib/seo';
 import {articleJsonLd, breadcrumbJsonLd} from '~/lib/structuredData';
+import {editorialCache} from '~/lib/cache';
 
 export const meta: Route.MetaFunction = ({data, params}) => {
   const article = data?.article;
@@ -66,6 +67,7 @@ async function loadCriticalData({context, request, params}: Route.LoaderArgs) {
   const [{blog}] = await Promise.all([
     context.storefront.query(ARTICLE_QUERY, {
       variables: {blogHandle, articleHandle},
+      cache: editorialCache(context.storefront),
     }),
     // Add other queries here, so that they are loaded in parallel
   ]);

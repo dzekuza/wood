@@ -21,6 +21,7 @@ import {seoMeta} from '~/lib/seo';
 import type {SortValue} from '~/components/SortDropdown';
 import type {CollectionItemFragment} from 'storefrontapi.generated';
 import {EXCLUDE_HIDDEN_PRODUCTS_QUERY, filterHiddenProducts} from '~/lib/upsells';
+import {editorialCache} from '~/lib/cache';
 
 export const meta: Route.MetaFunction = () =>
   seoMeta({
@@ -63,8 +64,8 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
   const {sortKey, reverse} = SORT_MAP[sortParam] ?? SORT_MAP.featured;
 
   const [{products}, {collections}] = await Promise.all([
-    storefront.query(CATALOG_QUERY, {variables: {...paginationVariables, sortKey, reverse, query: EXCLUDE_HIDDEN_PRODUCTS_QUERY}, cache: storefront.CacheNone()}),
-    storefront.query(ALL_COLLECTIONS_QUERY, {cache: storefront.CacheShort()}),
+    storefront.query(CATALOG_QUERY, {variables: {...paginationVariables, sortKey, reverse, query: EXCLUDE_HIDDEN_PRODUCTS_QUERY}, cache: storefront.CacheShort()}),
+    storefront.query(ALL_COLLECTIONS_QUERY, {cache: editorialCache(storefront)}),
   ]);
   // The Storefront API silently ignores the `-handle:` search-query negation
   // above whenever a sortKey is also passed, so filter hidden products here too.
@@ -166,7 +167,7 @@ export default function AllProducts() {
                     <ProductItem
                       key={product.id}
                       product={product}
-                      loading={index < 12 ? 'eager' : undefined}
+                      loading={index < 4 ? 'eager' : 'lazy'}
                     />
                   ))}
                 </div>

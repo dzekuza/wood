@@ -20,6 +20,7 @@ import {breadcrumbJsonLd, faqJsonLd} from '~/lib/structuredData';
 import {seoMeta, toMetaDescription, toPageTitle} from '~/lib/seo';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 import type {SortValue} from '~/components/SortDropdown';
+import {editorialCache} from '~/lib/cache';
 
 export const meta: Route.MetaFunction = ({data, params}) => {
   const collection = data?.collection;
@@ -104,9 +105,9 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   const [{collection}, {collections}] = await Promise.all([
     storefront.query(COLLECTION_QUERY, {
       variables: {handle, ...paginationVariables, sortKey, reverse, filters},
-      cache: storefront.CacheNone(),
+      cache: storefront.CacheShort(),
     }),
-    storefront.query(SIDEBAR_CATEGORIES_QUERY, {cache: storefront.CacheShort()}),
+    storefront.query(SIDEBAR_CATEGORIES_QUERY, {cache: editorialCache(storefront)}),
   ]);
 
   if (!collection) {
@@ -209,7 +210,7 @@ export default function Collection() {
                   <ProductItem
                     key={product.id}
                     product={product}
-                    loading={index < 8 ? 'eager' : undefined}
+                    loading={index < 4 ? 'eager' : 'lazy'}
                   />
                 )}
               </PaginatedResourceSection>

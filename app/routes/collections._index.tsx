@@ -14,6 +14,7 @@ import {compareCategories, shouldHideCollection, SITE_NAME} from '~/lib/site';
 import {seoMeta} from '~/lib/seo';
 import {breadcrumbJsonLd, collectionPageJsonLd} from '~/lib/structuredData';
 import demoStyles from '~/styles/demo.css?url';
+import {editorialCache} from '~/lib/cache';
 
 /** The cards are `.demo-cat-card`, which lives in `demo.css` — the homepage's
  *  stylesheet, route-scoped rather than global, so this route has to ask for it
@@ -69,6 +70,7 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
   const [{collections}] = await Promise.all([
     context.storefront.query(COLLECTIONS_QUERY, {
       variables: paginationVariables,
+      cache: editorialCache(context.storefront),
     }),
     // Add other queries here, so that they are loaded in parallel
   ]);
@@ -132,10 +134,11 @@ export default function Collections() {
               connection={collections}
               resourcesClassName="category-grid-4"
             >
-              {({node: collection}) => (
+              {({node: collection, index}) => (
                 <CategoryCard
                   key={collection.id}
                   category={toCategory(collection)}
+                  priority={index < 2}
                 />
               )}
             </PaginatedResourceSection>

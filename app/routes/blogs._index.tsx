@@ -6,6 +6,7 @@ import {BlogIntro} from '~/components/BlogIntro';
 import {BLOG_LABEL, SITE_NAME} from '~/lib/site';
 import {seoMeta} from '~/lib/seo';
 import {breadcrumbJsonLd} from '~/lib/structuredData';
+import {editorialCache} from '~/lib/cache';
 
 export const meta: Route.MetaFunction = () => {
   return seoMeta({
@@ -29,7 +30,9 @@ export async function loader(args: Route.LoaderArgs) {
  * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
  */
 async function loadCriticalData({context}: Route.LoaderArgs) {
-  const {blogs} = await context.storefront.query(BLOGS_QUERY);
+  const {blogs} = await context.storefront.query(BLOGS_QUERY, {
+    cache: editorialCache(context.storefront),
+  });
 
   // Flatten every blog's articles into one feed, newest first — the store
   // only has one editorial blog ("News") today, but this holds up if a
@@ -65,7 +68,7 @@ export default function Blogs() {
               <ArticleCard
                 key={article.id}
                 article={article}
-                loading={index < 3 ? 'eager' : 'lazy'}
+                loading={index === 0 ? 'eager' : 'lazy'}
                 headingLevel="h2"
               />
             ))}
