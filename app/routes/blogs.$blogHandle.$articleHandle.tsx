@@ -2,6 +2,8 @@ import {useLoaderData} from 'react-router';
 import type {Route} from './+types/blogs.$blogHandle.$articleHandle';
 import {Image} from '@shopify/hydrogen';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
+import {RelatedLinks} from '~/components/RelatedLinks';
+import {ARTICLE_RELATED_LINKS} from '~/lib/internalLinks';
 import {ArticleCard} from '~/components/ArticleCard';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {BLOG_LABEL} from '~/lib/site';
@@ -111,6 +113,7 @@ function loadDeferredData({context}: Route.LoaderArgs) {
 export default function Article() {
   const {article, relatedArticles} = useLoaderData<typeof loader>();
   const {title, image, contentHtml, author} = article;
+  const related = ARTICLE_RELATED_LINKS[article.handle];
 
   const publishedDate = new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
@@ -143,6 +146,12 @@ export default function Article() {
             dangerouslySetInnerHTML={{__html: contentHtml}}
             className="cms-page-body article-body"
           />
+          {related && (
+            <>
+              <RelatedLinks title="Shop the range" label="Shop the range" links={related.shop} />
+              <RelatedLinks title="More guides" label="More guides" links={related.guides} />
+            </>
+          )}
         </div>
       </article>
 

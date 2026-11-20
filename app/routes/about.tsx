@@ -8,7 +8,7 @@ import {ABOUT_SLUG} from '~/lib/pageContent';
 import {loadPageContentState} from '~/lib/pageContent.server';
 import {SITE_NAME} from '~/lib/site';
 import {seoMeta} from '~/lib/seo';
-import {breadcrumbJsonLd} from '~/lib/structuredData';
+import {aboutPageJsonLd, breadcrumbJsonLd, organizationJsonLd} from '~/lib/structuredData';
 
 const ABOUT_PILLARS = [
   {
@@ -31,13 +31,20 @@ const ABOUT_FACTS = [
   {value: '£0', label: 'UK delivery, on every order'},
 ];
 
+const ABOUT_TITLE = `About the Workshop | ${SITE_NAME}`;
+const ABOUT_DESCRIPTION =
+  'Meet the workshop behind Craft Wood Furniture and learn how each solid-timber piece is joined, finished, and built for long ownership.';
+
 export const meta: Route.MetaFunction = () =>
   seoMeta({
-    title: `About the Workshop | ${SITE_NAME}`,
-    description:
-      'Meet the workshop behind Craft Wood Furniture and learn how each solid-timber piece is joined, finished, and built for long ownership.',
+    title: ABOUT_TITLE,
+    description: ABOUT_DESCRIPTION,
     path: '/about',
-    jsonLd: [breadcrumbJsonLd([{name: 'About', path: '/about'}])],
+    jsonLd: [
+      aboutPageJsonLd({name: ABOUT_TITLE, description: ABOUT_DESCRIPTION, path: '/about'}),
+      organizationJsonLd(),
+      breadcrumbJsonLd([{name: 'About', path: '/about'}]),
+    ],
   });
 
 export async function loader({context, request}: Route.LoaderArgs) {

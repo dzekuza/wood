@@ -3852,6 +3852,9 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .archive-related ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 20px; }
 .archive-related a { color: var(--cwf-accent-deep); text-decoration: underline; text-underline-offset: 3px; font-size: 15px; }
 @media (max-width: 560px) { .archive-spec { grid-template-columns: 1fr; gap: 4px; } }
+.demo-category-links { max-width: 1400px; margin: 0 auto; padding: 0 40px 40px; }
+.demo-category-links .archive-related { max-width: none; margin-bottom: 0; }
+@media (max-width: 780px) { .demo-category-links { padding: 0 20px 32px; } }
 .demo-popular-note { margin: 24px 0 0; font-size: 15px; line-height: 1.6; color: rgba(53, 47, 42, .7); }
 .demo-popular-note a { color: var(--cwf-accent-deep); text-decoration: underline; text-underline-offset: 3px; }
 

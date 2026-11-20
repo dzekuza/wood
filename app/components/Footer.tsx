@@ -9,6 +9,7 @@ import {
   CONTACT_PHONE_DISPLAY,
   FLAGSHIP_PAGE_ROUTES,
 } from '~/lib/site';
+import {ALL_COLLECTION_LINKS} from '~/lib/internalLinks';
 
 interface FooterProps {
   footer: Promise<FooterQuery | null>;
@@ -29,6 +30,7 @@ const FOOTER_COLS = [
     links: [
       {title: 'All products', url: '/collections/all'},
       {title: 'By category', url: '/collections'},
+      ...ALL_COLLECTION_LINKS.map((link) => ({title: link.label, url: link.to})),
     ],
   },
   {

@@ -15,6 +15,8 @@ import {TexturesGrid} from '~/components/TexturesGrid';
 import {TestimonialsMarquee} from '~/components/TestimonialsMarquee';
 import {CraftmanshipProcess} from '~/components/CraftmanshipProcess';
 import {ContactBanner} from '~/components/ContactBanner';
+import {RelatedLinks} from '~/components/RelatedLinks';
+import {ALL_COLLECTION_LINKS} from '~/lib/internalLinks';
 import {HOMEPAGE_REVIEWS} from '~/lib/reviews';
 import {ETSY_SHOP_RATING} from '~/data/etsy-ratings';
 import {
@@ -131,6 +133,9 @@ export default function Homepage() {
           categories={data.categories}
           content={content.categories}
         />
+        <div className="demo-category-links">
+          <RelatedLinks title="Shop solid oak furniture" label="Shop by category" links={ALL_COLLECTION_LINKS} />
+        </div>
         <PopularProductsSection
           products={data.popularProducts}
           content={content.popular}
