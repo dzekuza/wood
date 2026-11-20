@@ -13,6 +13,27 @@ declare global {
 const GTAG_SRC = 'https://www.googletagmanager.com/gtag/js';
 const CONSENT_EVENT = 'visitorConsentCollected';
 
+/** Runs `callback` once the window `load` event has fired and the browser is
+ *  idle (or after a 2s ceiling where `requestIdleCallback` is missing). */
+function whenIdleAfterLoad(callback: () => void) {
+  const schedule = () => {
+    // Safari has no requestIdleCallback; the DOM typings say it always does.
+    const idle = window.requestIdleCallback as
+      | typeof window.requestIdleCallback
+      | undefined;
+    if (idle) {
+      idle.call(window, callback, {timeout: 4000});
+    } else {
+      window.setTimeout(callback, 2000);
+    }
+  };
+  if (document.readyState === 'complete') {
+    schedule();
+  } else {
+    window.addEventListener('load', schedule, {once: true});
+  }
+}
+
 /**
  * GA4, loaded only once the visitor has accepted analytics in Shopify's
  * privacy banner (`analytics_processing`). Renders nothing. It rides on
@@ -44,10 +65,16 @@ export function GoogleAnalytics({measurementId}: {measurementId: string}) {
       };
       window.gtag('js', new Date());
       window.gtag('config', measurementId, {send_page_view: false});
-      const script = document.createElement('script');
-      script.async = true;
-      script.src = `${GTAG_SRC}?id=${encodeURIComponent(measurementId)}`;
-      document.head.appendChild(script);
+      // The dataLayer/gtag queue above is enough for events to be recorded;
+      // the 198 KB gtag.js itself is not needed until the page is idle. It was
+      // being fetched during hydration, competing with the LCP image and
+      // adding main-thread work to the load.
+      whenIdleAfterLoad(() => {
+        const script = document.createElement('script');
+        script.async = true;
+        script.src = `${GTAG_SRC}?id=${encodeURIComponent(measurementId)}`;
+        document.head.appendChild(script);
+      });
     };
 
     const send = (...args: GtagArgs) => {

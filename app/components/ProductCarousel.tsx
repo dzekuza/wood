@@ -74,11 +74,11 @@ export function ProductCarousel({
 
       <div className="demo-popular-carousel">
         <div className="demo-popular-track" ref={trackRef} onScroll={handleScroll}>
-          {products.map((product, index) => (
+          {products.map((product) => (
             <ProductItem
               key={product.id}
               product={product}
-              loading={index < PER_PAGE ? 'eager' : undefined}
+              loading="lazy"
             />
           ))}
         </div>

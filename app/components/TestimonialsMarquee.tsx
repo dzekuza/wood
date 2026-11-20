@@ -7,6 +7,15 @@ import {HOME_CONTENT_DEFAULTS} from '~/lib/homeContent';
 import {formatReviewCount, type RatingSummary} from '~/lib/reviewStats';
 import {ETSY_REVIEWS_URL, STORE_REVIEW_COUNT} from '~/lib/site';
 
+/** The review photos are served full-size (up to 150 KB) but shown as 78x72
+ *  tiles. `public/review-images/thumbs/` mirrors the folder at 240px wide; the
+ *  lightbox keeps using the original. Anything outside the folder is left as is. */
+function reviewThumbnail(src: string): string {
+  return src.startsWith('/review-images/')
+    ? src.replace('/review-images/', '/review-images/thumbs/')
+    : src;
+}
+
 function ReviewCard({
   review,
   ariaHidden,
@@ -38,7 +47,14 @@ function ReviewCard({
               tabIndex={ariaHidden ? -1 : 0}
               aria-label={`View photo ${i + 1} of ${photos.length} from ${review.author}'s review`}
             >
-              <img src={photo} alt="" loading="lazy" />
+              <img
+                src={reviewThumbnail(photo)}
+                alt=""
+                width={78}
+                height={72}
+                loading="lazy"
+                decoding="async"
+              />
             </button>
           ))}
         </div>

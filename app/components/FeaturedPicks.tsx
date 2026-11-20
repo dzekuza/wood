@@ -1,6 +1,9 @@
 import {Link} from 'react-router';
 import type {PopularProductItemLandingOakFragment} from 'storefrontapi.generated';
 import {EditableText} from '~/components/EditableText';
+import {shopifyImageUrl, shopifySrcSet} from '~/lib/shopifyImage';
+
+const CARD_WIDTHS = [240, 360, 480, 720] as const;
 
 const THEMES = ['sage', 'oak', 'walnut'] as const;
 
@@ -29,7 +32,9 @@ export function FeaturedPicks({
               <div className="demo-featured-image">
                 {product.featuredImage && (
                   <img
-                    src={product.featuredImage.url}
+                    src={shopifyImageUrl(product.featuredImage.url, 480)}
+                    srcSet={shopifySrcSet(product.featuredImage.url, CARD_WIDTHS)}
+                    sizes="(min-width: 1080px) 25vw, 50vw"
                     alt={product.featuredImage.altText || product.title}
                     loading="lazy"
                   />

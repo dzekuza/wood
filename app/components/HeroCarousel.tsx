@@ -6,7 +6,7 @@ import {HOME_CONTENT_DEFAULTS, type HomeHeroSlide} from '~/lib/homeContent';
 import {formatReviewCount} from '~/lib/reviewStats';
 import {shopifyImageUrl, shopifySrcSet} from '~/lib/shopifyImage';
 
-const HERO_WIDTHS = [640, 1024, 1600, 2200] as const;
+const HERO_WIDTHS = [480, 750, 1080, 1600, 2200] as const;
 
 export type HeroSlide = HomeHeroSlide;
 

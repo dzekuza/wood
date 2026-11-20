@@ -76,12 +76,20 @@ export function ProductItem({
   const swatches = getSwatches(product);
   const [isSaved, setIsSaved] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
+  // Only the featured image is in the HTML until the shopper shows interest.
+  // The other gallery frames are stacked at opacity 0, which does not stop
+  // `loading="lazy"` — they were all fetched on load (up to 5 images per card,
+  // 25+ cards on a collection page). They are mounted on first hover, focus or
+  // touch instead, in time for the arrows.
+  const [galleryWarm, setGalleryWarm] = useState(false);
+  const warmGallery = () => setGalleryWarm(true);
   const isSoldOut = product.selectedOrFirstAvailableVariant?.availableForSale === false;
   const saveAmount = isSoldOut ? null : getSaveAmount(product);
 
   function goToImage(event: React.MouseEvent, index: number) {
     event.preventDefault();
     event.stopPropagation();
+    warmGallery();
     setActiveImage((index + galleryImages.length) % galleryImages.length);
   }
 
@@ -91,6 +99,9 @@ export function ProductItem({
       key={product.id}
       prefetch="intent"
       to={variantUrl}
+      onPointerEnter={warmGallery}
+      onFocus={warmGallery}
+      onTouchStart={warmGallery}
     >
       <div className="pcard-img">
         {isSoldOut ? (
@@ -98,7 +109,8 @@ export function ProductItem({
         ) : (
           saveAmount && <span className="pbadge pbadge-sale">Save {saveAmount}</span>
         )}
-        {galleryImages.map((node, index) => (
+        {galleryImages.map((node, index) =>
+          index > 0 && !galleryWarm ? null : (
           <Image
             key={node.id}
             data={node}
@@ -107,9 +119,11 @@ export function ProductItem({
             aspectRatio="1/1"
             sizes="(min-width: 980px) 25vw, (min-width: 640px) 33vw, 50vw"
             loading={index === 0 ? loading : 'lazy'}
+            fetchPriority={index === 0 && loading === 'eager' ? 'high' : undefined}
             className={`pcard-img-frame${index === activeImage ? ' is-active' : ''}`}
           />
-        ))}
+          ),
+        )}
         {galleryImages.length > 1 && (
           <div className="pcard-img-nav">
             <button

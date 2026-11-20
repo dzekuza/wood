@@ -1,27 +1,124 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
+@import "./tabler-icons-subset.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* -------------------------------------------------------
  * Brand Fonts
+ *
+ * Self-hosted (latin + latin-ext only) instead of the Google Fonts stylesheet:
+ * that was two render-blocking requests to third-party origins before first
+ * paint. The woff2 files are Google's own variable builds, so the weight
+ * ranges match what the old <link> requested.
  * ------------------------------------------------------- */
 @font-face {
   font-family: 'Mark Bold';
-  src: url('/fonts/mark-bold.ttf') format('truetype');
+  src: url('/fonts/mark-bold.woff2') format('woff2'), url('/fonts/mark-bold.ttf') format('truetype');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
 
+/* latin-ext */
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/dm-sans-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* latin */
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/dm-sans-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* latin-ext */
 @font-face {
   font-family: 'Outfit';
-  src: url('/fonts/outfit-medium.ttf') format('truetype');
-  font-weight: 500;
   font-style: normal;
+  font-weight: 400 600;
   font-display: swap;
+  src: url('/fonts/outfit-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* latin */
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url('/fonts/outfit-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* latin-ext */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url('/fonts/plus-jakarta-sans-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* latin */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url('/fonts/plus-jakarta-sans-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Metric-matched fallbacks. Each is local Arial scaled to the web font's
+   average glyph width and vertical metrics, so the swap from fallback to web
+   font moves text by a pixel or two instead of reflowing the page (CLS). */
+@font-face {
+  font-family: 'Plus Jakarta Sans Fallback';
+  src: local('Arial');
+  size-adjust: 106.78%;
+  ascent-override: 97.21%;
+  descent-override: 20.79%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Outfit Fallback';
+  src: local('Arial');
+  size-adjust: 99.59%;
+  ascent-override: 100.41%;
+  descent-override: 26.11%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'DM Sans Fallback';
+  src: local('Arial');
+  size-adjust: 105.98%;
+  ascent-override: 93.6%;
+  descent-override: 29.25%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Mark Bold Fallback';
+  src: local('Arial');
+  size-adjust: 110.35%;
+  ascent-override: 91.89%;
+  descent-override: 22.97%;
+  line-gap-override: 0%;
 }
 
 /* -------------------------------------------------------
@@ -80,7 +177,7 @@ html,
 body {
   background-color: var(--cwf-surface);
   color: var(--cwf-dark);
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-size: 17px;
   line-height: 22px;
 }
@@ -88,7 +185,7 @@ body {
 h1,
 h2,
 h3 {
-  font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Outfit', 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-weight: 500;
   letter-spacing: -0.03em;
   font-size: 56px;
@@ -97,7 +194,7 @@ h3 {
 
 h4,
 h5 {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   letter-spacing: -0.02em;
   font-weight: 600;
 }
@@ -142,7 +239,7 @@ a:focus {
   justify-content: center;
   padding: 0.75rem 1.75rem;
   border-radius: 8px;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
@@ -229,7 +326,7 @@ select {
   padding: 0.6rem 0.875rem;
   border: 1.5px solid rgba(201, 162, 122, 0.55);
   border-radius: 6px;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-size: 0.875rem;
   background: var(--cwf-surface);
   color: var(--cwf-dark);
@@ -279,7 +376,7 @@ select:focus {
 
 .overlay aside header .aside-heading {
   margin: 0;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-size: 13px;
   line-height: 1;
   font-weight: 600;
@@ -396,7 +493,7 @@ button.reset > * {
 .announcement-bar {
   background: var(--cwf-ink);
   color: rgba(243, 239, 234, 0.85);
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-size: 14px;
   letter-spacing: 0.02em;
 }
@@ -554,7 +651,7 @@ button.reset > * {
 }
 
 .header-logo-text {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -608,7 +705,7 @@ button.reset > * {
 
 .header-menu-item {
   cursor: pointer;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-size: 0.8125rem;
   font-weight: 500;
   color: color-mix(in srgb, var(--cwf-ink-strong) 65%, transparent);
@@ -738,7 +835,7 @@ button.reset > * {
      threshold only because this bar is desktop-only — it is hidden under
      960px, where the search aside takes over. */
   font-size: 15px;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   color: var(--cwf-ink-strong);
   outline: none;
   -webkit-appearance: none;
@@ -782,7 +879,7 @@ button.reset > * {
   font-weight: 600;
   color: rgba(53,47,42,.4);
   margin-bottom: 12px;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
 }
 
 .search-suggestions-tags { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -793,7 +890,7 @@ button.reset > * {
   padding: 8px 16px;
   border-radius: 999px;
   background: var(--cwf-sand, #E8DFD1);
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-size: 13px;
   font-weight: 500;
   color: var(--cwf-ink-strong);
@@ -844,7 +941,7 @@ button.reset > * {
   border-radius: 5px;
   background: #c0392b;
   color: #fff;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-size: 9px;
   font-weight: 700;
   letter-spacing: .02em;
@@ -852,7 +949,7 @@ button.reset > * {
 }
 
 .search-suggestion-product-title {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-size: 12px;
   font-weight: 600;
   color: var(--cwf-ink-strong);
@@ -865,7 +962,7 @@ button.reset > * {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-size: 12px;
   font-weight: 600;
   color: var(--cwf-primary);
@@ -889,7 +986,7 @@ button.reset > * {
   padding: 0;
   border: 1px solid var(--cwf-line);
   border-radius: 999px;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-size: 15px;
   font-weight: 500;
   color: color-mix(in srgb, var(--cwf-ink-strong) 60%, transparent);
@@ -921,7 +1018,7 @@ button.reset > * {
   border: 1px solid transparent;
   border-radius: 999px;
   background: transparent;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-size: 15px;
   font-weight: 500;
   line-height: 38px;
@@ -978,7 +1075,7 @@ button.reset > * {
   border: 1px solid var(--cwf-ink-strong);
   border-radius: 999px;
   background: var(--cwf-ink-strong);
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-size: 14px;
   font-weight: 500;
   color: var(--cwf-surface);
@@ -1079,7 +1176,7 @@ button.reset > * {
  * ------------------------------------------------------- */
 .site-footer {
   background: var(--cwf-ink);
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
 }
 
 .footer-inner {
@@ -1395,7 +1492,7 @@ button.reset > * {
 .cart-line-name:hover { color: var(--cwf-primary); }
 
 .cart-line-price {
-  font-family: 'Mark Bold', serif;
+  font-family: 'Mark Bold', 'Mark Bold Fallback', serif;
   font-size: 15px;
   font-weight: 700;
   color: var(--cwf-accent);
@@ -1515,7 +1612,7 @@ button.reset > * {
 }
 
 .cart-subtotal-amount {
-  font-family: 'Mark Bold', serif;
+  font-family: 'Mark Bold', 'Mark Bold Fallback', serif;
   font-size: 22px;
   font-weight: 700;
   color: var(--cwf-primary);
@@ -1539,7 +1636,7 @@ button.reset > * {
   color: var(--cwf-primary);
   font-size: 14px;
   font-weight: 600;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   letter-spacing: .03em;
   border-radius: 8px;
   text-decoration: none;
@@ -1579,7 +1676,7 @@ button.reset > * {
   padding: 10px 14px;
   font-size: 13px;
   color: rgba(53,47,42,.85);
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   outline: none;
   transition: border-color 150ms;
 }
@@ -1593,7 +1690,7 @@ button.reset > * {
   color: var(--cwf-accent-deep);
   font-size: 12px;
   font-weight: 600;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   cursor: pointer;
   transition: background 150ms;
   white-space: nowrap;
@@ -1636,7 +1733,7 @@ button.reset > * {
   padding: 10px 14px;
   font-size: 13px;
   color: rgba(53,47,42,.85);
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   outline: none;
   transition: border-color 150ms;
 }
@@ -1654,7 +1751,7 @@ button.reset > * {
   color: var(--cwf-accent-deep);
   font-size: 12px;
   font-weight: 600;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   cursor: pointer;
   transition: background 150ms;
   white-space: nowrap;
@@ -1666,7 +1763,7 @@ button.reset > * {
 .cart-subtotal {
   align-items: center;
   display: flex;
-  font-family: 'Mark Bold', serif;
+  font-family: 'Mark Bold', 'Mark Bold Fallback', serif;
   font-size: 1.1rem;
 }
 
@@ -1716,7 +1813,7 @@ input.search-input {
   padding: 0;
   font-size: 14px;
   color: var(--cwf-primary);
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   outline: none;
   -webkit-appearance: none;
   appearance: none;
@@ -1765,7 +1862,7 @@ input.search-input:focus { border: none; box-shadow: none; }
   font-weight: 600;
   color: rgba(53,47,42,.4);
   margin-bottom: 12px;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
 }
 
 .predictive-search-result-item {
@@ -1967,7 +2064,7 @@ input.search-input:focus { border: none; box-shadow: none; }
   font-size: clamp(21px, 2vw, 28px);
   line-height: 1.08;
   letter-spacing: -.03em;
-  font-family: 'Mark Bold', 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Mark Bold', 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   margin: 0;
   text-wrap: balance;
 }
@@ -2038,7 +2135,7 @@ input.search-input:focus { border: none; box-shadow: none; }
 }
 
 .product-price-from { display: flex; align-items: baseline; gap: 8px; }
-.product-price-eyebrow { font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--cwf-ink-strong); }
+.product-price-eyebrow { font-family: 'Outfit', 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif; font-weight: 600; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--cwf-ink-strong); }
 .product-price-on-sale {
   display: flex;
   gap: 0.5rem;
@@ -2094,8 +2191,10 @@ input.search-input:focus { border: none; box-shadow: none; }
 }
 
 .art-card-img img {
+  display: block;
   width: 100%;
   height: 100%;
+  aspect-ratio: 16/9;
   object-fit: cover;
   transition: transform 0.4s ease;
 }
@@ -2111,7 +2210,7 @@ input.search-input:focus { border: none; box-shadow: none; }
 }
 
 .art-card-date {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.1em;
@@ -2120,7 +2219,7 @@ input.search-input:focus { border: none; box-shadow: none; }
 }
 
 .art-card-title {
-  font-family: 'Mark Bold', serif;
+  font-family: 'Mark Bold', 'Mark Bold Fallback', serif;
   font-size: 1.15rem;
   color: var(--cwf-primary);
   line-height: 1.25;
@@ -2128,7 +2227,7 @@ input.search-input:focus { border: none; box-shadow: none; }
 }
 
 .art-card-excerpt {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-size: 0.88rem;
   color: #666;
   line-height: 1.6;
@@ -2140,7 +2239,7 @@ input.search-input:focus { border: none; box-shadow: none; }
 }
 
 .art-card-cta {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-size: 0.82rem;
   font-weight: 700;
   color: var(--cwf-ink-strong);
@@ -2156,7 +2255,7 @@ input.search-input:focus { border: none; box-shadow: none; }
 .blog-page-header { background: var(--dark); padding: 4rem 0 3rem; }
 .blog-page-header .eyebrow { color: var(--accent); margin-bottom: 0.5rem; }
 .blog-page-header h1 {
-  font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Outfit', 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-weight: 500;
   color: var(--cwf-accent);
   letter-spacing: -0.04em;
@@ -2217,7 +2316,7 @@ input.search-input:focus { border: none; box-shadow: none; }
 }
 
 .section-title {
-  font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Outfit', 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-weight: 500;
   font-size: clamp(2rem, 4vw, 3.5rem);
   color: var(--cwf-primary);
@@ -2245,7 +2344,7 @@ input.search-input:focus { border: none; box-shadow: none; }
   border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 500;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
 }
 
 .tag-primary {
@@ -2343,7 +2442,7 @@ input.search-input:focus { border: none; box-shadow: none; }
 }
 
 .hero-stat-value {
-  font-family: 'Mark Bold', serif;
+  font-family: 'Mark Bold', 'Mark Bold Fallback', serif;
   font-size: 2.5rem;
   color: var(--cwf-primary);
   letter-spacing: -0.045em;
@@ -2353,7 +2452,7 @@ input.search-input:focus { border: none; box-shadow: none; }
 .hero-stat-label {
   font-size: 0.6875rem;
   color: rgba(42, 42, 42, 0.42);
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.09em;
 }
@@ -2381,7 +2480,7 @@ input.search-input:focus { border: none; box-shadow: none; }
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--cwf-accent);
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   margin-bottom: 0.5rem;
 }
 
@@ -2464,7 +2563,7 @@ input.search-input:focus { border: none; box-shadow: none; }
 }
 
 .feature-title {
-  font-family: 'Mark Bold', serif;
+  font-family: 'Mark Bold', 'Mark Bold Fallback', serif;
   font-size: 1.0625rem;
   font-weight: 700;
   color: var(--cwf-primary);
@@ -2538,7 +2637,7 @@ input.search-input:focus { border: none; box-shadow: none; }
 }
 
 .collection-card-title {
-  font-family: 'Mark Bold', serif;
+  font-family: 'Mark Bold', 'Mark Bold Fallback', serif;
   font-size: 1.4375rem;
   color: #fff;
   letter-spacing: -0.035em;
@@ -2548,7 +2647,7 @@ input.search-input:focus { border: none; box-shadow: none; }
 .collection-card-cta {
   font-size: 0.6875rem;
   color: var(--cwf-accent);
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-weight: 700;
   white-space: nowrap;
   text-transform: uppercase;
@@ -2610,7 +2709,7 @@ input.search-input:focus { border: none; box-shadow: none; }
 }
 
 .craftsmanship-heading {
-  font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Outfit', 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-weight: 500;
   font-size: clamp(2rem, 4.5vw, 3.5rem);
   color: var(--cwf-surface);
@@ -2657,7 +2756,7 @@ input.search-input:focus { border: none; box-shadow: none; }
 }
 
 .craftsmanship-stat-n {
-  font-family: 'Mark Bold', serif;
+  font-family: 'Mark Bold', 'Mark Bold Fallback', serif;
   font-size: 2.75rem;
   color: var(--cwf-accent);
   letter-spacing: -0.045em;
@@ -2667,7 +2766,7 @@ input.search-input:focus { border: none; box-shadow: none; }
 .craftsmanship-stat-label {
   font-size: 0.75rem;
   color: rgba(243, 239, 234, 0.45);
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   line-height: 1.4;
 }
 
@@ -2703,7 +2802,7 @@ input.search-input:focus { border: none; box-shadow: none; }
 
 .process-step-number {
   display: block;
-  font-family: 'Mark Bold', serif;
+  font-family: 'Mark Bold', 'Mark Bold Fallback', serif;
   font-size: 5rem;
   color: var(--cwf-accent);
   letter-spacing: -0.05em;
@@ -2731,7 +2830,7 @@ input.search-input:focus { border: none; box-shadow: none; }
 }
 
 .process-step-title {
-  font-family: 'Mark Bold', serif;
+  font-family: 'Mark Bold', 'Mark Bold Fallback', serif;
   font-size: 1.0625rem;
   font-weight: 700;
   color: var(--cwf-primary);
@@ -2760,7 +2859,7 @@ input.search-input:focus { border: none; box-shadow: none; }
 }
 
 .newsletter-heading {
-  font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Outfit', 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-weight: 500;
   font-size: clamp(1.75rem, 3.5vw, 3.5rem);
   color: var(--cwf-surface);
@@ -2791,7 +2890,7 @@ input.search-input:focus { border: none; box-shadow: none; }
   border-radius: 6px;
   background: rgba(255, 255, 255, 0.06);
   color: var(--cwf-surface);
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-size: 0.875rem;
   outline: none;
 }
@@ -2825,7 +2924,7 @@ section { padding: 0; }
 @media (hover: hover) and (pointer: fine) { .pcard:hover { transform: translateY(-3px); } }
 .pcard-img { position: relative; width: 100%; aspect-ratio: 1 / 1; border-radius: 24px; overflow: hidden; background: var(--cwf-tile); }
 
-.pbadge { position: absolute; top: 12px; left: 12px; z-index: 2; display: inline-flex; align-items: center; padding: 5px 10px; border-radius: 6px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; }
+.pbadge { position: absolute; top: 12px; left: 12px; z-index: 2; display: inline-flex; align-items: center; padding: 5px 10px; border-radius: 6px; font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; }
 .pbadge-sale { background: #c0392b; color: #fff; }
 .pbadge-sold-out { background: rgba(43, 38, 33, 0.75); color: #fff; }
 .pcard.is-sold-out .pcard-img-frame { opacity: 0.55; }
@@ -2914,7 +3013,7 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
    which matches the same frame's 42 → 58 offset. */
 .pcard-heading { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; width: 100%; }
 .pcard-name {
-  font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Outfit', 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-weight: 500;
   font-size: 18px;
   line-height: 1.3;
@@ -2935,7 +3034,7 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
    ~4px of half-leading above the text, which read as an 8px gap under the
    name rather than the intended 4px. min-height is gone with it — it only
    existed to hold space for the old hidden empty state. */
-.pcard-rating { display: flex; align-items: center; gap: 4px; line-height: 1; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: var(--cwf-ink-strong); }
+.pcard-rating { display: flex; align-items: center; gap: 4px; line-height: 1; font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif; font-size: 14px; color: var(--cwf-ink-strong); }
 /* No reviews yet: the score still renders as 0.0 so the row never collapses,
    but muted — a gold star beside a zero reads as a real rating. */
 .pcard-rating.is-new { color: var(--cwf-accent-deep); font-weight: 600; }
@@ -2947,8 +3046,8 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 /* Eyebrow and value share one face — Outfit 600. The self-hosted @font-face
    only covers Outfit 500, so weight 600 comes from the root Google Fonts link;
    without that entry this would render as synthesised faux-bold. */
-.pcard-price-eyebrow { font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--cwf-ink-strong); }
-.pcard-price-value { font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif; font-size: 16px; font-weight: 600; color: var(--cwf-ink-strong); }
+.pcard-price-eyebrow { font-family: 'Outfit', 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif; font-weight: 600; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--cwf-ink-strong); }
+.pcard-price-value { font-family: 'Outfit', 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif; font-size: 16px; font-weight: 600; color: var(--cwf-ink-strong); }
 
 .pcard-swatches { display: flex; align-items: center; gap: 4px; }
 .pcard-swatch { height: 18px; width: 18px; border-radius: 50%; border: 1px solid rgba(53, 47, 42, .15); display: inline-flex; align-items: center; justify-content: center; overflow: hidden; background: var(--cwf-sand); flex-shrink: 0; }
@@ -3062,7 +3161,7 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
   border: .5px solid var(--cwf-line);
   background: #fff;
   color: var(--cwf-primary);
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: .02em;
@@ -3073,12 +3172,12 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .pdp-model3d-ar-btn:hover { background: var(--cwf-surface); }
 .pdp-info .eyebrow { color: var(--cwf-ink-strong); display: inline-flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; }
 .pdp-info .eyebrow::before { content: ""; width: 24px; height: 1px; background: var(--cwf-accent); }
-.pdp-info h1 { margin-top: 14px; color: var(--cwf-ink-strong); font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif; font-weight: 500; letter-spacing: -.035em; text-wrap: balance; font-size: clamp(24px, 3vw, 56px); line-height: 1.125; }
+.pdp-info h1 { margin-top: 14px; color: var(--cwf-ink-strong); font-family: 'Outfit', 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif; font-weight: 500; letter-spacing: -.035em; text-wrap: balance; font-size: clamp(24px, 3vw, 56px); line-height: 1.125; }
 .pdp-info h1 em { font-style: normal; color: inherit; }
 .pdp-sub { margin-top: 14px; font-size: 16px; line-height: 1.65; color: color-mix(in srgb, var(--cwf-ink-strong) 70%, transparent); }
 
 .pdp-priceblock { margin-top: 32px; padding: 24px 0; border-top: .5px solid var(--cwf-line); border-bottom: .5px solid var(--cwf-line); display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; }
-.pdp-price-big { font-family: 'Mark Bold', 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 26px; letter-spacing: -.02em; color: var(--cwf-primary); line-height: 1; margin-top: 10px; }
+.pdp-price-big { font-family: 'Mark Bold', 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif; font-weight: 700; font-size: 26px; letter-spacing: -.02em; color: var(--cwf-primary); line-height: 1; margin-top: 10px; }
 @media (max-width: 767px) { .pdp-price-big { font-size: 16px; letter-spacing: 0; } }
 .pdp-related-price { font-size: 18px; margin-top: 6px; }
 .pdp-price-from { font-size: 11px; font-weight: 600; color: color-mix(in srgb, var(--cwf-ink-strong) 50%, transparent); letter-spacing: .14em; text-transform: uppercase; align-self: center; }
@@ -3109,9 +3208,9 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .pdp-sticky-bar.visible { transform: translateY(0); pointer-events: auto; }
 .pdp-sticky-inner { max-width: 1320px; margin: 0 auto; display: flex; align-items: center; gap: 20px; justify-content: space-between; }
 .pdp-sticky-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.pdp-sticky-title { font-size: 14px; font-weight: 600; color: rgba(243, 239, 234, .7); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Mark Bold', 'Plus Jakarta Sans', sans-serif; }
+.pdp-sticky-title { font-size: 14px; font-weight: 600; color: rgba(243, 239, 234, .7); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Mark Bold', 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif; }
 .pdp-sticky-price .product-price-eyebrow { color: color-mix(in srgb, var(--cwf-surface) 70%, transparent); }
-.pdp-sticky-price { font-size: 18px; font-weight: 700; color: var(--cwf-surface); font-family: 'Mark Bold', 'Plus Jakarta Sans', sans-serif; letter-spacing: -.02em; }
+.pdp-sticky-price { font-size: 18px; font-weight: 700; color: var(--cwf-surface); font-family: 'Mark Bold', 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif; letter-spacing: -.02em; }
 .pdp-sticky-bar .pdp-atc-wrap { width: auto; min-width: 200px; }
 /* Swap to a light pill button on the dark bar — .btn-primary's brown-on-brown reads too low-contrast here. */
 .pdp-sticky-bar .pdp-atc-btn { background: var(--cwf-surface); border-color: var(--cwf-surface); color: var(--cwf-primary); }
@@ -3190,10 +3289,10 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .pdp-maker-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 0; }
 .pdp-maker-ey { color: var(--cwf-accent); font-size: 11px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 10px; }
 .pdp-maker-ey::before { content: ""; width: 24px; height: 1px; background: var(--cwf-accent); }
-.pdp-maker h2 { color: #f3efea; margin-top: 14px; font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif; font-weight: 500; letter-spacing: -.03em; }
+.pdp-maker h2 { color: #f3efea; margin-top: 14px; font-family: 'Outfit', 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif; font-weight: 500; letter-spacing: -.03em; }
 .pdp-maker h2 em { font-style: normal; color: inherit; }
 .pdp-maker p { color: rgba(243, 239, 234, .7); font-size: 15px; line-height: 1.7; margin-top: 18px; }
-.pdp-maker-sig { font-family: 'Mark Bold', 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 24px; letter-spacing: -.04em; color: var(--cwf-accent); margin-top: 24px; font-style: italic; }
+.pdp-maker-sig { font-family: 'Mark Bold', 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif; font-weight: 700; font-size: 24px; letter-spacing: -.04em; color: var(--cwf-accent); margin-top: 24px; font-style: italic; }
 .pdp-maker-by { font-size: 12px; color: rgba(243, 239, 234, .5); letter-spacing: .1em; text-transform: uppercase; margin-top: 4px; }
 .pdp-specs { margin-top: 64px; background: var(--cwf-surface); border-radius: 24px; padding: 32px; }
 @media (max-width: 767px) { .pdp-specs { margin-top: 40px; padding: 20px 16px; border-radius: 18px; } }
@@ -3212,14 +3311,14 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .pdp-spec-card { background: #fff; border: .5px solid var(--cwf-line); border-radius: 14px; padding: 22px; }
 .pdp-spec-icon { width: 22px; height: 22px; color: var(--cwf-accent); margin-bottom: 14px; display: block; }
 .pdp-spec-label { font-size: 11px; color: var(--cwf-ink-strong); letter-spacing: .12em; text-transform: uppercase; font-weight: 600; }
-.pdp-spec-val { font-family: 'Mark Bold', 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; letter-spacing: -.025em; color: var(--cwf-primary); margin-top: 6px; line-height: 1.1; }
+.pdp-spec-val { font-family: 'Mark Bold', 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif; font-weight: 700; font-size: 18px; letter-spacing: -.025em; color: var(--cwf-primary); margin-top: 6px; line-height: 1.1; }
 .pdp-spec-sub { font-size: 12px; color: color-mix(in srgb, var(--cwf-ink-strong) 55%, transparent); margin-top: 4px; }
 .pdp-related { margin-top: 80px; margin-bottom: 80px; max-width: 1400px; margin-left: auto; margin-right: auto; padding: 0 40px; }
 @media (max-width: 767px) { .pdp-related { padding: 0 20px; } }
 .pdp-related-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; margin-bottom: 32px; }
 .pdp-related-head .eyebrow { color: var(--cwf-ink-strong); display: inline-flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; }
 .pdp-related-head .eyebrow::before { content: ""; width: 24px; height: 1px; background: var(--cwf-accent); }
-.pdp-related-head h2 { margin-top: 10px; font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif; font-weight: 500; letter-spacing: -.03em; }
+.pdp-related-head h2 { margin-top: 10px; font-family: 'Outfit', 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif; font-weight: 500; letter-spacing: -.03em; }
 .pdp-related-head a { font-size: 13px; font-weight: 600; color: var(--cwf-primary); display: inline-flex; align-items: center; gap: 6px; border-bottom: 1px solid var(--cwf-accent); padding-bottom: 4px; transition: gap .2s; }
 .pdp-related-head a:hover { gap: 10px; }
 .related-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
@@ -3481,7 +3580,7 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 
 .hero h1 {
   color: var(--cwf-ink-strong);
-  font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Outfit', 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-weight: 500;
   font-size: clamp(40px, 5vw, 56px);
   line-height: 1.15;
@@ -3529,7 +3628,7 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .hero-showcase-image-placeholder { background: rgba(201,162,122,.12); }
 
 .hero-showcase-card p {
-  font-family: 'Mark Bold', 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Mark Bold', 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-weight: 600;
   font-size: 22px;
   letter-spacing: -.02em;
@@ -3588,7 +3687,7 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
   text-align: center;
 }
 .hero-showcase-row-copy p {
-  font-family: 'Mark Bold', 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Mark Bold', 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-weight: 600;
   font-size: 22px;
   letter-spacing: -.02em;
@@ -3629,7 +3728,7 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 }
 
 .sale-showcase-title {
-  font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Outfit', 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-weight: 500;
   font-size: 56px;
   letter-spacing: -.02em;
@@ -3724,7 +3823,7 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .archive-page { background: #fff; display: flow-root; }
 .archive-hero { padding: 64px 0 0; }
 .archive-hero-inner { display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
-.archive-hero-title { font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif; font-weight: 500; font-size: clamp(40px, 5vw, 56px); letter-spacing: -.02em; color: var(--cwf-ink-strong); line-height: 1.05; }
+.archive-hero-title { font-family: 'Outfit', 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif; font-weight: 500; font-size: clamp(40px, 5vw, 56px); letter-spacing: -.02em; color: var(--cwf-ink-strong); line-height: 1.05; }
 .archive-hero-title em { font-style: normal; color: inherit; }
 .archive-hero-blurb { margin-top: 16px; font-size: 16px; line-height: 1.6; color: rgba(53, 47, 42, .55); max-width: 560px; }
 @media (max-width: 780px) {
@@ -3739,7 +3838,7 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 
 /* ---- Archive buying guide ---- */
 .archive-guide { padding: 64px 0; border-top: .5px solid var(--cwf-line); }
-.archive-guide-title { font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif; font-weight: 500; font-size: clamp(24px, 2.8vw, 40px); color: var(--cwf-primary); margin-bottom: 20px; }
+.archive-guide-title { font-family: 'Outfit', 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif; font-weight: 500; font-size: clamp(24px, 2.8vw, 40px); color: var(--cwf-primary); margin-bottom: 20px; }
 .archive-guide-body { max-width: 720px; margin-bottom: 56px; }
 .archive-guide-body p { font-size: 16px; line-height: 1.7; color: rgba(53, 47, 42, .7); margin-bottom: 16px; }
 
@@ -3749,7 +3848,7 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .archive-spec dt { font-weight: 600; color: var(--cwf-primary); }
 .archive-spec dd { margin: 0; color: rgba(53, 47, 42, .7); }
 .archive-related { max-width: 720px; margin-bottom: 56px; }
-.archive-related-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: 15px; color: var(--cwf-primary); margin-bottom: 12px; }
+.archive-related-title { font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif; font-weight: 600; font-size: 15px; color: var(--cwf-primary); margin-bottom: 12px; }
 .archive-related ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 20px; }
 .archive-related a { color: var(--cwf-accent-deep); text-decoration: underline; text-underline-offset: 3px; font-size: 15px; }
 @media (max-width: 560px) { .archive-spec { grid-template-columns: 1fr; gap: 4px; } }
@@ -3758,11 +3857,11 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 
 /* ---- Archive FAQ ---- */
 .archive-faq { padding: 64px 0; border-top: .5px solid var(--cwf-line); }
-.archive-faq-title { font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif; font-weight: 500; font-size: clamp(28px, 3.4vw, 56px); color: var(--cwf-primary); text-align: center; margin-bottom: 40px; }
+.archive-faq-title { font-family: 'Outfit', 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif; font-weight: 500; font-size: clamp(28px, 3.4vw, 56px); color: var(--cwf-primary); text-align: center; margin-bottom: 40px; }
 .faq-list { border: 1px solid var(--cwf-line); border-radius: 24px; overflow: hidden; }
 .faq-item { border-bottom: 1px solid var(--cwf-line); }
 .faq-item:last-child { border-bottom: none; }
-.faq-item summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 16px; padding: 20px 24px; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 500; font-size: 18px; color: var(--cwf-primary); }
+.faq-item summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 16px; padding: 20px 24px; font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif; font-weight: 500; font-size: 18px; color: var(--cwf-primary); }
 .faq-item summary::-webkit-details-marker { display: none; }
 .faq-item summary::before { content: "+"; flex-shrink: 0; width: 14px; font-size: 20px; line-height: 1; color: var(--cwf-accent-deep); }
 .faq-item[open] summary::before { content: "\2212"; }
@@ -3776,7 +3875,7 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .workshop { background: var(--cwf-dark); color: var(--cwf-surface); padding: 96px 0; }
 @media (max-width: 767px) { .workshop { padding: 48px 0; } }
 .workshop-title {
-  font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Outfit', 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-weight: 500;
   font-size: clamp(28px, 3.4vw, 56px);
   line-height: 1.2;
@@ -3812,7 +3911,7 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 }
 .workshop-card .ic { display: inline-flex; color: var(--cwf-accent); }
 .workshop-card h3 {
-  font-family: 'Mark Bold', sans-serif;
+  font-family: 'Mark Bold', 'Mark Bold Fallback', sans-serif;
   font-size: 22px;
   letter-spacing: -.02em;
   color: #fff;
@@ -3824,7 +3923,7 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .spotlight { background: var(--cwf-surface); border-top: 1px solid var(--cwf-line); padding: 96px 0; }
 @media (max-width: 767px) { .spotlight { padding: 48px 0; } }
 .spotlight-title {
-  font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Outfit', 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-weight: 500;
   font-size: clamp(28px, 3.4vw, 56px);
   line-height: 1.2;
@@ -3867,7 +3966,7 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
   gap: 16px;
 }
 .craft-light-copy h2 {
-  font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Outfit', 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   font-weight: 500;
   font-size: clamp(26px, 2.8vw, 56px);
   line-height: 1.2;
@@ -3899,7 +3998,7 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 @media (max-width: 780px) { .craft-light-stats { grid-template-columns: repeat(2, 1fr); } }
 .craft-light-stat { background: #fff; border-radius: 20px; padding: 32px; text-align: center; box-shadow: 0 20px 40px -28px rgba(53,47,42,.22); }
 .craft-light-stat .num {
-  font-family: 'Mark Bold', sans-serif;
+  font-family: 'Mark Bold', 'Mark Bold Fallback', sans-serif;
   font-weight: 700;
   font-size: 40px;
   letter-spacing: -.03em;
@@ -4047,19 +4146,19 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .step { display: flex; flex-direction: column; gap: 14px; }
 .stepnum { font-size: 12px; font-weight: 600; color: var(--cwf-accent); letter-spacing: .12em; }
 .step .ic { width: 48px; height: 48px; border-radius: 14px; background: var(--cwf-sand); display: flex; align-items: center; justify-content: center; color: var(--cwf-accent); font-size: 22px; }
-.step h3 { font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif; font-weight: 500; letter-spacing: -.025em; color: var(--cwf-primary); margin-top: 4px; }
+.step h3 { font-family: 'Outfit', 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif; font-weight: 500; letter-spacing: -.025em; color: var(--cwf-primary); margin-top: 4px; }
 .step p { font-size: 14px; color: rgba(53,47,42,.65); line-height: 1.6; }
 
 /* ---- Newsletter (dark card) ---- */
 .news { background: var(--cwf-dark); color: #f3efea; border-radius: 24px; padding: 64px 56px; display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px; align-items: center; position: relative; overflow: hidden; box-shadow: 0 32px 64px -32px rgba(28,20,14,.35); }
 .news .bg-mark { position: absolute; right: -40px; top: -40px; opacity: .06; color: var(--cwf-accent); }
-.news h2 { font-family: "Mark Bold", sans-serif; font-weight: 700; letter-spacing: -.035em; color: #f3efea; margin-top: 14px; }
+.news h2 { font-family: "Mark Bold", 'Mark Bold Fallback', sans-serif; font-weight: 700; letter-spacing: -.035em; color: #f3efea; margin-top: 14px; }
 .news h2 em { font-style: normal; color: inherit; }
 .news .eyebrow { color: var(--cwf-accent); display: inline-flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; }
 .news .eyebrow::before { content: ""; width: 24px; height: 1px; background: var(--cwf-accent); }
 .news p { color: rgba(243,239,234,.65); margin-top: 16px; font-size: 15px; line-height: 1.6; max-width: 440px; }
 .news-form { position: relative; display: flex; align-items: center; background: rgba(243,239,234,.06); border: .5px solid rgba(201,162,122,.2); border-radius: 99px; padding: 6px; }
-.news-form input { flex: 1; background: transparent; border: none; outline: none; color: #f3efea; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; padding: 10px 18px; }
+.news-form input { flex: 1; background: transparent; border: none; outline: none; color: #f3efea; font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif; font-size: 14px; padding: 10px 18px; }
 .news-form input::placeholder { color: rgba(243,239,234,.4); }
 .news-form button { background: var(--cwf-accent); color: var(--cwf-primary); border-radius: 99px; padding: 10px 22px; font-weight: 600; font-size: 13px; letter-spacing: .04em; border: none; cursor: pointer; transition: background 150ms; }
 .news-form button:hover { background: var(--cwf-accent-hover); }
@@ -4081,7 +4180,7 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
    container it happens to sit in. */
 /* Sidebar section labels are h2s (siblings under the page h1), styled as small
  * eyebrow labels; margin and line-height match the h4s they replaced. */
-.filters-content h2 { margin: 0; line-height: inherit; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--cwf-ink-strong); padding-bottom: 12px; }
+.filters-content h2 { margin: 0; line-height: inherit; font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--cwf-ink-strong); padding-bottom: 12px; }
 .filters-content .fblock { margin-bottom: 32px; }
 .filters-content ul { list-style: none; display: flex; flex-direction: column; gap: 0; }
 .filters-content li { margin: 0; }
@@ -4110,15 +4209,15 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .sidebar-category-img { width: 40px; height: 40px; border-radius: 8px; overflow: hidden; position: relative; flex-shrink: 0; background: var(--cwf-tile); }
 .sidebar-category-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
 .sidebar-category-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
-.sidebar-category-name { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: 13px; color: var(--cwf-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.sidebar-category-count { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; color: rgba(53,47,42,.5); }
+.sidebar-category-name { font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif; font-weight: 600; font-size: 13px; color: var(--cwf-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sidebar-category-count { font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif; font-size: 11px; color: rgba(53,47,42,.5); }
 
 .swatch-row { display: flex; flex-wrap: wrap; gap: 8px; }
 .sw { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid var(--cwf-line); cursor: pointer; transition: transform .15s, border-color .15s; display: inline-block; }
 .sw:hover { transform: scale(1.1); }
 .sw.on { border-color: var(--cwf-primary); outline: 2px solid var(--cwf-primary); outline-offset: 2px; }
 .price-range { display: flex; align-items: center; gap: 8px; }
-.price-range input { width: 100%; padding: 8px 10px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; border: .5px solid var(--cwf-line); border-radius: 8px; background: #fff; color: var(--cwf-primary); outline: none; }
+.price-range input { width: 100%; padding: 8px 10px; font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif; font-size: 13px; border: .5px solid var(--cwf-line); border-radius: 8px; background: #fff; color: var(--cwf-primary); outline: none; }
 .price-range input:focus { border-color: var(--cwf-accent); }
 .price-range span { color: rgba(53,47,42,.4); font-size: 12px; }
 .price-range-apply { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; flex-shrink: 0; border-radius: 8px; border: .5px solid var(--cwf-line); background: #fff; color: var(--cwf-primary); cursor: pointer; transition: background .15s, color .15s; }
@@ -4155,7 +4254,7 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .maker h2 em { font-style: normal; color: inherit; }
 .maker p { color: rgba(243,239,234,.7); font-size: 15px; line-height: 1.7; margin-top: 18px; }
 @media (max-width: 767px) { .maker p { font-size: 16px; } }
-.maker .sig { font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif; font-weight: 500; font-size: 24px; color: var(--cwf-accent); margin-top: 24px; }
+.maker .sig { font-family: 'Outfit', 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif; font-weight: 500; font-size: 24px; color: var(--cwf-accent); margin-top: 24px; }
 .maker .by { font-size: 12px; color: rgba(243,239,234,.5); letter-spacing: .1em; text-transform: uppercase; margin-top: 4px; }
 @media (max-width: 980px) { .maker { grid-template-columns: 1fr; padding: 32px; } }
 
@@ -4168,7 +4267,7 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .pdp-reviews .rev-top { display: grid; grid-template-columns: 1fr; gap: 48px; align-items: start; }
 .rev-score { background: #fff; border: .5px solid var(--cwf-line); border-radius: 18px; padding: 28px; display: flex; gap: 32px; align-items: center; }
 .rev-score-left { flex-shrink: 0; }
-.rev-score .big { font-family: 'Mark Bold', sans-serif; font-weight: 700; font-size: 72px; letter-spacing: -.045em; line-height: 1; color: var(--cwf-primary); }
+.rev-score .big { font-family: 'Mark Bold', 'Mark Bold Fallback', sans-serif; font-weight: 700; font-size: 72px; letter-spacing: -.045em; line-height: 1; color: var(--cwf-primary); }
 .rev-score .stars { color: var(--cwf-star); font-size: 18px; letter-spacing: 3px; margin-top: 8px; }
 .rev-score .count { font-size: 13px; color: color-mix(in srgb, var(--cwf-ink-strong) 60%, transparent); margin-top: 8px; }
 .rev-score .rev-bars { flex: 1; display: flex; flex-direction: column; gap: 8px; }
@@ -4185,7 +4284,7 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 }
 .rev-card { background: #fff; border: .5px solid var(--cwf-line); border-radius: 14px; padding: 22px; }
 .rev-card .stars { color: var(--cwf-star); font-size: 13px; letter-spacing: 2px; }
-.rev-card .headline { display: block; font-family: 'Mark Bold', sans-serif; font-size: 18px; letter-spacing: -.025em; line-height: 1.25; color: var(--cwf-primary); margin-top: 10px; }
+.rev-card .headline { display: block; font-family: 'Mark Bold', 'Mark Bold Fallback', sans-serif; font-size: 18px; letter-spacing: -.025em; line-height: 1.25; color: var(--cwf-primary); margin-top: 10px; }
 .rev-card .body { font-size: 13px; color: color-mix(in srgb, var(--cwf-ink-strong) 70%, transparent); line-height: 1.6; margin-top: 10px; }
 .rev-card .who { margin-top: 14px; padding-top: 14px; border-top: .5px solid var(--cwf-line); font-size: 12px; color: color-mix(in srgb, var(--cwf-ink-strong) 55%, transparent); display: flex; justify-content: space-between; }
 .rev-card .who strong { color: var(--cwf-primary); font-weight: 600; }
@@ -4204,7 +4303,7 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .rcard .body { padding: 14px 16px 16px; }
 .rcard .tg { font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--cwf-accent-deep); }
 .rcard .nm { font-size: 15px; font-weight: 600; color: var(--cwf-primary); margin-top: 4px; line-height: 1.2; }
-.rcard .pr { font-family: 'Mark Bold', sans-serif; font-weight: 700; font-size: 18px; letter-spacing: -.03em; color: var(--cwf-primary); margin-top: 8px; }
+.rcard .pr { font-family: 'Mark Bold', 'Mark Bold Fallback', sans-serif; font-weight: 700; font-size: 18px; letter-spacing: -.03em; color: var(--cwf-primary); margin-top: 8px; }
 
 /* -------------------------------------------------------
  * Landing page section utilities & component classes
@@ -4234,7 +4333,7 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .contact-field input, .contact-field textarea {
   width: 100%; padding: 14px 16px; border: 1px solid var(--cwf-line);
   border-radius: 6px; background: #fff; font-size: 15px; color: var(--cwf-primary);
-  font-family: 'Plus Jakarta Sans', sans-serif; outline: none; transition: border-color .2s;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif; outline: none; transition: border-color .2s;
 }
 .contact-field input::placeholder, .contact-field textarea::placeholder { color: rgba(53,47,42,.35); }
 .contact-field input:focus, .contact-field textarea:focus { border-color: var(--cwf-accent); }
@@ -4255,10 +4354,10 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .filter-bar-count-block { display: block; margin-bottom: 16px; }
 .sort-wrap { position: relative; }
 .sort-backdrop { position: fixed; inset: 0; z-index: 49; background: transparent; border: none; padding: 0; cursor: default; }
-.sort-btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; border: .5px solid var(--cwf-line); border-radius: 99px; background: #fff; cursor: pointer; font-weight: 600; color: var(--cwf-primary); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; transition: border-color .15s, color .15s; }
+.sort-btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; border: .5px solid var(--cwf-line); border-radius: 99px; background: #fff; cursor: pointer; font-weight: 600; color: var(--cwf-primary); font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif; font-size: 13px; transition: border-color .15s, color .15s; }
 .sort-btn:hover { border-color: var(--cwf-accent); color: var(--cwf-accent-deep); }
 .sort-dropdown { z-index: 9999; background: #fff; border: .5px solid var(--cwf-line); border-radius: 12px; box-shadow: 0 8px 24px rgba(53,47,42,.12); overflow: hidden; min-width: 180px; }
-.sort-option { display: block; width: 100%; text-align: left; padding: 11px 16px; background: none; border: none; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--cwf-primary); cursor: pointer; transition: background .12s; }
+.sort-option { display: block; width: 100%; text-align: left; padding: 11px 16px; background: none; border: none; font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif; font-size: 13px; font-weight: 500; color: var(--cwf-primary); cursor: pointer; transition: background .12s; }
 .sort-option:hover { background: var(--cwf-surface); }
 .sort-option.active { font-weight: 700; color: var(--cwf-accent-deep); background: var(--cwf-sand); }
 
@@ -4266,7 +4365,7 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .check-row { display: flex; align-items: center; }
 
 /* ── Sidebar interactive checks ── */
-.filter-check-btn { display: flex; align-items: center; gap: 0; width: 100%; background: none; border: none; cursor: pointer; padding: 4px 0; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: var(--cwf-primary); text-align: left; }
+.filter-check-btn { display: flex; align-items: center; gap: 0; width: 100%; background: none; border: none; cursor: pointer; padding: 4px 0; font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif; font-size: 14px; color: var(--cwf-primary); text-align: left; }
 .filter-check-btn:hover .check { border-color: var(--cwf-accent); }
 .filter-check-label { flex: 1; margin-left: 10px; }
 .filter-clear-btn { display: inline-flex; align-items: center; padding: 6px 12px; border-radius: 99px; border: 1px solid var(--cwf-accent); background: rgba(201,162,122,.1); font-size: 12px; font-weight: 600; color: var(--cwf-accent-deep); cursor: pointer; font-family: inherit; transition: background .15s; }
@@ -4293,21 +4392,21 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .fav-card-img:hover img { transform: scale(1.03); }
 .fav-card-img-placeholder { width: 100%; height: 100%; background: var(--cwf-sand); }
 .fav-card-body { padding: 16px; }
-.fav-card-name { display: block; font-family: 'Mark Bold', sans-serif; font-size: 15px; color: var(--cwf-primary); text-decoration: none; margin-bottom: 10px; }
+.fav-card-name { display: block; font-family: 'Mark Bold', 'Mark Bold Fallback', sans-serif; font-size: 15px; color: var(--cwf-primary); text-decoration: none; margin-bottom: 10px; }
 .fav-card-name:hover { color: var(--cwf-accent-deep); }
 .fav-card-row { display: flex; align-items: center; justify-content: space-between; }
-.fav-card-price { font-family: 'Mark Bold', sans-serif; font-size: 15px; color: var(--cwf-primary); }
+.fav-card-price { font-family: 'Mark Bold', 'Mark Bold Fallback', sans-serif; font-size: 15px; color: var(--cwf-primary); }
 .fav-remove-btn { width: 30px; height: 30px; border-radius: 50%; background: none; border: 1px solid var(--cwf-line); color: var(--cwf-primary); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background .15s, color .15s; }
 .fav-remove-btn:hover { background: var(--cwf-primary); color: #f3efea; border-color: var(--cwf-primary); }
 .fav-empty { padding: 100px 0; text-align: center; display: flex; flex-direction: column; align-items: center; }
-.fav-empty h2 { font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif; font-weight: 500; color: var(--cwf-primary); margin-bottom: 12px; }
+.fav-empty h2 { font-family: 'Outfit', 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif; font-weight: 500; color: var(--cwf-primary); margin-bottom: 12px; }
 .fav-empty p { font-size: 15px; color: rgba(53,47,42,.55); max-width: 380px; }
 .fav-empty-icon { color: var(--cwf-accent); margin-bottom: 20px; }
 .fav-empty-cta { margin-top: 24px; }
 .fav-card-placeholder { width: 100%; aspect-ratio: 1/1; background: var(--cwf-sand); }
 
 /* ── Mobile filter button + drawer ── */
-.filter-mobile-btn { display: none; align-items: center; gap: 6px; background: none; border: 1px solid var(--cwf-line); border-radius: 6px; padding: 6px 12px; font-size: 13px; font-weight: 600; color: var(--cwf-primary); cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; transition: border-color .15s, color .15s; }
+.filter-mobile-btn { display: none; align-items: center; gap: 6px; background: none; border: 1px solid var(--cwf-line); border-radius: 6px; padding: 6px 12px; font-size: 13px; font-weight: 600; color: var(--cwf-primary); cursor: pointer; font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif; transition: border-color .15s, color .15s; }
 .filter-mobile-btn:hover { border-color: var(--cwf-accent); color: var(--cwf-accent-deep); }
 @media (max-width: 980px) { .filter-mobile-btn { display: inline-flex; } }
 
@@ -4551,7 +4650,7 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 .story-copy p + p { margin-top: 16px; }
 .story-panel { background: var(--cwf-surface); border-radius: 18px; padding: 28px; display: grid; grid-template-columns: repeat(3, 1fr); align-items: end; gap: 18px; }
 .story-stat { display: grid; gap: 6px; }
-.story-stat-value { font-family: 'Mark Bold', sans-serif; font-size: clamp(20px, 4vw, 32px); color: var(--cwf-primary); line-height: 1.1; }
+.story-stat-value { font-family: 'Mark Bold', 'Mark Bold Fallback', sans-serif; font-size: clamp(20px, 4vw, 32px); color: var(--cwf-primary); line-height: 1.1; }
 .story-stat-label { font-size: 11px; line-height: 1.45; letter-spacing: .14em; text-transform: uppercase; color: var(--cwf-accent-deep); font-weight: 600; }
 .story-pillars { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
 .story-card { background: var(--cwf-surface); border-radius: 18px; padding: 24px; }
@@ -4786,7 +4885,7 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
   background: rgba(28, 28, 28, 0.92);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
   backdrop-filter: blur(8px);
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
 }
 
 .edit-toolbar-group {
@@ -4903,7 +5002,7 @@ button.pcard-img-dot.is-active { width: 16px; background: #fff; }
 
 .confirm-dialog-title {
   margin: 0;
-  font-family: 'Mark Bold', sans-serif;
+  font-family: 'Mark Bold', 'Mark Bold Fallback', sans-serif;
   font-size: 20px;
   color: var(--cwf-primary);
 }

@@ -7,9 +7,9 @@
 /* Type tokens for this stylesheet — Outfit for display headlines,
    DM Sans for all body/UI text, Mark Bold for prices and stat numbers. */
 :root {
-  --demo-font-display: 'Outfit', sans-serif;
-  --demo-font-body: 'DM Sans', sans-serif;
-  --demo-font-mark: 'Mark Bold', serif;
+  --demo-font-display: 'Outfit', 'Outfit Fallback', sans-serif;
+  --demo-font-body: 'DM Sans', 'DM Sans Fallback', sans-serif;
+  --demo-font-mark: 'Mark Bold', 'Mark Bold Fallback', serif;
 
   /* Hero autoplay dwell — mirrored by SLIDE_DURATION_MS in HeroCarousel.tsx. */
   --demo-hero-slide-duration: 3000ms;
