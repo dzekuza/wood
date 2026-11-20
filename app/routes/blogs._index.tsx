@@ -5,18 +5,24 @@ import {ArticleCard} from '~/components/ArticleCard';
 import {BlogIntro} from '~/components/BlogIntro';
 import {BLOG_LABEL, SITE_NAME} from '~/lib/site';
 import {seoMeta} from '~/lib/seo';
-import {breadcrumbJsonLd} from '~/lib/structuredData';
 import {editorialCache} from '~/lib/cache';
+import {breadcrumbJsonLd, collectionPageJsonLd} from '~/lib/structuredData';
+
+const BLOGS_TITLE = `Stories from the Bench | ${SITE_NAME}`;
+const BLOGS_DESCRIPTION =
+  'Advice and inspiration from the Craft Wood Furniture workshop: caring for solid oak, choosing a mantel beam, and styling handmade timber at home.';
 
 export const meta: Route.MetaFunction = () => {
   return seoMeta({
     // Matches this page's h1 so it doesn't share a title with the blog it
     // lists (/blogs/news is titled BLOG_LABEL).
-    title: `Stories from the Bench | ${SITE_NAME}`,
-    description:
-      'Advice and inspiration from the Craft Wood Furniture workshop: caring for solid oak, choosing a mantel beam, and styling handmade timber at home.',
+    title: BLOGS_TITLE,
+    description: BLOGS_DESCRIPTION,
     path: '/blogs',
-    jsonLd: [breadcrumbJsonLd([{name: 'Blog', path: '/blogs'}])],
+    jsonLd: [
+      collectionPageJsonLd({name: BLOGS_TITLE, description: BLOGS_DESCRIPTION, path: '/blogs'}),
+      breadcrumbJsonLd([{name: 'Blog', path: '/blogs'}]),
+    ],
   });
 };
 

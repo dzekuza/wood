@@ -10,17 +10,40 @@ import {ArticleCard} from '~/components/ArticleCard';
 import {BlogIntro} from '~/components/BlogIntro';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {editorialCache} from '~/lib/cache';
+import {blogJsonLd, breadcrumbJsonLd} from '~/lib/structuredData';
 
 export const meta: Route.MetaFunction = ({data, params}) => {
   const blog = data?.blog;
+  const title = `${blog?.seo?.title || blog?.title || BLOG_LABEL} | ${SITE_NAME}`;
+  const description = toMetaDescription(
+    blog?.seo?.description,
+    `${BLOG_LABEL} from the ${SITE_NAME} workshop: caring for solid oak, choosing the right piece, and styling handmade timber at home.`,
+  );
+  const path = `/blogs/${blog?.handle ?? params.blogHandle}`;
 
   return seoMeta({
-    title: `${blog?.seo?.title || blog?.title || BLOG_LABEL} | ${SITE_NAME}`,
-    description: toMetaDescription(
-      blog?.seo?.description,
-      `${BLOG_LABEL} from the ${SITE_NAME} workshop: caring for solid oak, choosing the right piece, and styling handmade timber at home.`,
-    ),
-    path: `/blogs/${blog?.handle ?? params.blogHandle}`,
+    title,
+    description,
+    path,
+    jsonLd: blog
+      ? [
+          blogJsonLd({
+            name: blog.seo?.title || blog.title,
+            description,
+            path,
+            // Only the articles on this page (paginated, 4 per page).
+            posts: blog.articles.nodes.map((article) => ({
+              headline: article.title,
+              path: `/blogs/${blog.handle}/${article.handle}`,
+              publishedAt: article.publishedAt,
+            })),
+          }),
+          breadcrumbJsonLd([
+            {name: BLOG_LABEL, path: '/blogs'},
+            {name: blog.title, path},
+          ]),
+        ]
+      : [],
   });
 };
 

@@ -5,10 +5,14 @@ import {getCanonicalUrl} from '~/lib/seo';
 
 const CONTEXT = 'https://schema.org';
 
+/** Stable node id so other schema (AboutPage) can reference the Organization. */
+const ORGANIZATION_ID = `${getCanonicalUrl('/')}#organization`;
+
 export function organizationJsonLd() {
   return {
     '@context': CONTEXT,
     '@type': 'Organization',
+    '@id': ORGANIZATION_ID,
     name: SITE_NAME,
     legalName: COMPANY.legalName,
     // The shop is also written "CraftWood Furniture" in copy and by customers.
@@ -81,6 +85,56 @@ export function collectionPageJsonLd({
     description,
     url: getCanonicalUrl(path),
     isPartOf: {'@type': 'WebSite', name: SITE_NAME, url: getCanonicalUrl('/')},
+  };
+}
+
+/** `AboutPage` whose subject is the Organization node published alongside it. */
+export function aboutPageJsonLd({
+  name,
+  description,
+  path,
+}: {
+  name: string;
+  description: string;
+  path: string;
+}) {
+  return {
+    '@context': CONTEXT,
+    '@type': 'AboutPage',
+    name,
+    description,
+    url: getCanonicalUrl(path),
+    isPartOf: {'@type': 'WebSite', name: SITE_NAME, url: getCanonicalUrl('/')},
+    about: {'@id': ORGANIZATION_ID},
+    mainEntity: {'@id': ORGANIZATION_ID},
+  };
+}
+
+/** `Blog` node listing the articles shown on the page. */
+export function blogJsonLd({
+  name,
+  description,
+  path,
+  posts,
+}: {
+  name: string;
+  description?: string;
+  path: string;
+  posts: Array<{headline: string; path: string; publishedAt: string}>;
+}) {
+  return {
+    '@context': CONTEXT,
+    '@type': 'Blog',
+    name,
+    ...(description ? {description} : {}),
+    url: getCanonicalUrl(path),
+    publisher: {'@id': ORGANIZATION_ID},
+    blogPost: posts.map((post) => ({
+      '@type': 'BlogPosting',
+      headline: post.headline,
+      url: getCanonicalUrl(post.path),
+      datePublished: post.publishedAt,
+    })),
   };
 }
 
