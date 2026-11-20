@@ -1,4 +1,5 @@
 import {Link} from 'react-router';
+import {RelatedLinks} from '~/components/RelatedLinks';
 import type {CollectionContent} from '~/lib/collectionContent';
 
 /** Buying guide, key facts, related links and FAQs under a category's grid. */
@@ -36,6 +37,7 @@ export function CollectionGuide({content}: {content: CollectionContent}) {
             </ul>
           </nav>
         )}
+        <RelatedLinks title="Related guides" label="Related guides" links={content.guides} />
         <h2 className="archive-faq-title">Frequently asked questions</h2>
         <div className="faq-list">
           {content.faqs.map((faq) => (

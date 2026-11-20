@@ -1,12 +1,6 @@
 import {Link} from 'react-router';
+import {ALL_COLLECTION_LINKS} from '~/lib/internalLinks';
 
-const SHOP_LINKS = [
-  {label: 'Oak mantel beams', to: '/collections/solid-oak-mantel-beams'},
-  {label: 'Oak fireplace surrounds', to: '/collections/solid-oak-fireplace-surrounds'},
-  {label: 'Oak shelves', to: '/collections/solid-oak-shelves'},
-  {label: 'Oak coat racks', to: '/collections/solid-oak-coat-racks'},
-  {label: 'Oak console tables', to: '/collections/console-tables'},
-] as const;
 
 /** Opening copy for the blog listings, so the pages carry real text before the
  *  article grid and link through to the categories the guides support. */
@@ -27,7 +21,7 @@ export function BlogIntro() {
       </p>
       <p className="blog-intro-links">
         Browse the range:{' '}
-        {SHOP_LINKS.map((link, index) => (
+        {ALL_COLLECTION_LINKS.map((link, index) => (
           <span key={link.to}>
             {index > 0 && ', '}
             <Link to={link.to}>{link.label}</Link>

@@ -9,6 +9,8 @@
  * (`collection.seo`, `collection.description`) still wins over this copy.
  */
 
+import {GUIDE_LINKS} from '~/lib/internalLinks';
+
 export type CollectionFaq = {question: string; answer: string};
 
 export type CollectionSpec = {label: string; value: string};
@@ -26,6 +28,8 @@ export type CollectionContent = {
   specs: CollectionSpec[];
   /** Internal links to related products and categories. */
   links: CollectionLink[];
+  /** Related buying and fitting guides on the blog. */
+  guides: CollectionLink[];
   faqs: CollectionFaq[];
 };
 
@@ -76,6 +80,7 @@ export const COLLECTION_CONTENT: Record<string, CollectionContent> = {
       {label: 'Oak fireplace surrounds', to: '/collections/solid-oak-fireplace-surrounds'},
       {label: 'Oak floating shelves', to: '/collections/solid-oak-shelves'},
     ],
+    guides: [GUIDE_LINKS.fitMantel, GUIDE_LINKS.mantelSizes, GUIDE_LINKS.oilColours],
     faqs: [
       {
         question: 'Are your mantel beams solid oak or hollow?',
@@ -115,6 +120,7 @@ export const COLLECTION_CONTENT: Record<string, CollectionContent> = {
       {label: 'Solid oak mantel beam', to: '/products/solid-oak-mantel-beam'},
       {label: 'Oak mantel beams', to: '/collections/solid-oak-mantel-beams'},
     ],
+    guides: [GUIDE_LINKS.fitMantel, GUIDE_LINKS.mantelSizes, GUIDE_LINKS.oilColours],
     faqs: [
       {
         question: 'Is the surround made from solid oak?',
@@ -155,6 +161,7 @@ export const COLLECTION_CONTENT: Record<string, CollectionContent> = {
       {label: 'Solid oak mantel beam', to: '/products/solid-oak-mantel-beam'},
       {label: 'Oak coat racks', to: '/collections/solid-oak-coat-racks'},
     ],
+    guides: [GUIDE_LINKS.shelfSizes, GUIDE_LINKS.installShelves, GUIDE_LINKS.oilColours],
     faqs: [
       {
         question: 'Are these floating shelves solid oak?',
@@ -196,6 +203,7 @@ export const COLLECTION_CONTENT: Record<string, CollectionContent> = {
       {label: 'Coat rack set of 2', to: '/products/coat-rack-set-of-2'},
       {label: 'Oak console tables', to: '/collections/console-tables'},
     ],
+    guides: [GUIDE_LINKS.oilColours],
     faqs: [
       {
         question: 'Is the coat rack made from solid oak?',
@@ -237,6 +245,7 @@ export const COLLECTION_CONTENT: Record<string, CollectionContent> = {
       {label: 'Oak coat racks', to: '/collections/solid-oak-coat-racks'},
       {label: 'Solid oak mantel beam', to: '/products/solid-oak-mantel-beam'},
     ],
+    guides: [GUIDE_LINKS.oilColours],
     faqs: [
       {
         question: 'Are your console tables solid oak?',
