@@ -145,6 +145,7 @@ export const COLLECTION_CONTENT: Record<string, CollectionContent> = {
       'Our solid oak floating shelves are 4cm thick, 15 to 30cm deep and 30 to 150cm long, with hidden fixings or black brackets. Each is made to order and delivered free across the UK.',
       'Solid wood floating shelves are a simple way to add storage and display space without visible brackets. Ours are made to order from solid European oak, not veneer or oak-effect board, so each solid oak floating shelf is strong, repairable and ages well.',
       'Choose the length to suit your wall and the depth to suit what you will put on it. Fix into a suitable wall for the load, using fixings that match the wall type, whether that is masonry, stud or plasterboard.',
+      'Our shelves come in the same six oil colours as our solid oak mantel beams, so shelves beside a fireplace can match the beam above it. If you need a length or depth outside the listed sizes, message us before you order and we will confirm what we can make.',
       'Oil leaves the oak grain visible and is easy to refresh. Expect natural differences in grain, knots and small cracks between shelves.',
     ],
     specs: [
@@ -159,6 +160,7 @@ export const COLLECTION_CONTENT: Record<string, CollectionContent> = {
       {label: 'Solid oak floating shelf', to: '/products/solid-oak-floating-shelf'},
       {label: 'Solid oak shelf with black metal brackets', to: '/products/solid-oak-shelf-black-metal-brackets-4cm'},
       {label: 'Solid oak mantel beam', to: '/products/solid-oak-mantel-beam'},
+      {label: 'Oak mantel beams', to: '/collections/solid-oak-mantel-beams'},
       {label: 'Oak coat racks', to: '/collections/solid-oak-coat-racks'},
     ],
     guides: [GUIDE_LINKS.shelfSizes, GUIDE_LINKS.installShelves, GUIDE_LINKS.oilColours],
@@ -167,6 +169,16 @@ export const COLLECTION_CONTENT: Record<string, CollectionContent> = {
         question: 'Are these floating shelves solid oak?',
         answer:
           'Yes, they are made from solid European oak rather than oak veneer or oak-effect board.',
+      },
+      {
+        question: 'Do the floating shelves arrive pre-drilled?',
+        answer:
+          'Shelves with hidden fixings arrive pre-drilled. Fix them into a suitable wall for the load, using fixings that match the wall type.',
+      },
+      {
+        question: 'Can I match a shelf to an oak mantel beam?',
+        answer:
+          'Yes. Our shelves and mantel beams come in the same six oil colours: White, Light Grey, Grey, Dark, Old Oak and Clear. Choose the same oil colour for both.',
       },
       {
         question: 'How do I care for an oiled oak shelf?',
