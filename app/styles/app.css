@@ -1303,8 +1303,10 @@ button.reset > * {
   justify-content: space-between;
   gap: 24px;
   flex-wrap: wrap;
-  max-width: 1320px;
+  max-width: 1400px;
   margin: 0 auto;
+  padding: 0 40px;
+  box-sizing: border-box;
 }
 
 .footer-copy {
@@ -1313,8 +1315,10 @@ button.reset > * {
 }
 
 .footer-legal {
-  max-width: 1320px;
+  max-width: 1400px;
   margin: 16px auto 0;
+  padding: 0 40px;
+  box-sizing: border-box;
   font-size: 0.6875rem;
   line-height: 1.6;
   color: rgba(243,239,234,0.3);
@@ -1334,6 +1338,10 @@ button.reset > * {
 }
 
 .footer-bottom-links a:hover { color: rgba(243,239,234,0.7); }
+@media (max-width: 767px) {
+  .footer-bottom-inner,
+  .footer-legal { padding: 0 20px; }
+}
 
 /* Legacy - keep for possible other uses */
 .footer-brand img {
