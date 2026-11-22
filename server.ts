@@ -1,6 +1,7 @@
 import * as serverBuild from 'virtual:react-router/server-build';
 import {createRequestHandler, storefrontRedirect} from '@shopify/hydrogen';
 import {createHydrogenRouterContext} from '~/lib/context';
+import {redirectToCanonicalHost} from '~/lib/canonicalHost';
 
 /**
  * Export a fetch handler in module format.
@@ -12,6 +13,9 @@ export default {
     executionContext: ExecutionContext,
   ): Promise<Response> {
     try {
+      const canonicalRedirect = redirectToCanonicalHost(request);
+      if (canonicalRedirect) return canonicalRedirect;
+
       const hydrogenContext = await createHydrogenRouterContext(
         request,
         env,
