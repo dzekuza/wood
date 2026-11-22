@@ -43,7 +43,7 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
           )}
         </span>
       </div>
-      <p className="cart-subtotal-note">Shipping calculated at checkout</p>
+      <p className="cart-subtotal-note">Free UK delivery on every order</p>
 
       <CartCheckoutActions checkoutUrl={cart?.checkoutUrl} />
     </div>
@@ -214,28 +214,32 @@ function CartGiftCard({
         </dl>
       )}
 
-      <AddGiftCardForm fetcherKey="gift-card-add">
-        <div>
-          <label htmlFor={giftCardInputId} className="sr-only">
-            Gift card code
-          </label>
-          <input
-            id={giftCardInputId}
-            type="text"
-            name="giftCardCode"
-            placeholder="Gift card code"
-            ref={giftCardCodeInput}
-          />
-          &nbsp;
-          <button
-            type="submit"
-            disabled={giftCardAddFetcher.state !== 'idle'}
-            aria-label="Apply gift card code"
-          >
-            Apply
-          </button>
-        </div>
-      </AddGiftCardForm>
+      <details className="cart-discount-section">
+        <summary>Have a gift card?</summary>
+        <AddGiftCardForm fetcherKey="gift-card-add">
+          <div className="cart-discount-input-row">
+            <label htmlFor={giftCardInputId} className="sr-only">
+              Gift card code
+            </label>
+            <input
+              id={giftCardInputId}
+              className="cart-discount-input"
+              type="text"
+              name="giftCardCode"
+              placeholder="Enter gift card code"
+              ref={giftCardCodeInput}
+            />
+            <button
+              type="submit"
+              className="cart-discount-apply"
+              disabled={giftCardAddFetcher.state !== 'idle'}
+              aria-label="Apply gift card code"
+            >
+              Apply
+            </button>
+          </div>
+        </AddGiftCardForm>
+      </details>
     </section>
   );
 }
