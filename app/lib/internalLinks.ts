@@ -27,6 +27,17 @@ export const ALL_COLLECTION_LINKS: InternalLink[] = [
   COLLECTION_LINKS.doorStops,
 ];
 
+/**
+ * The keyword-anchored category link for a product, picked from the Shopify
+ * collections it belongs to. Returns null when it sits in none of ours, so the
+ * caller can fall back to the all-products page.
+ */
+export function collectionLinkForHandles(handles: readonly string[]): InternalLink | null {
+  return (
+    ALL_COLLECTION_LINKS.find((link) => handles.includes(link.to.replace('/collections/', ''))) ?? null
+  );
+}
+
 export const GUIDE_LINKS = {
   fitMantel: {label: 'How to fit an oak mantel beam', to: '/blogs/news/how-to-fit-an-oak-mantel-beam'},
   mantelSizes: {label: 'Oak mantel beam sizes guide', to: '/blogs/news/oak-mantel-beam-sizes'},

@@ -19,6 +19,7 @@ import {getStockLimit} from '~/lib/inventory';
 import {getDescriptionSummary} from '~/lib/description';
 import {seoMeta, toMetaDescription, toPageTitle} from '~/lib/seo';
 import {breadcrumbJsonLd, productJsonLd} from '~/lib/structuredData';
+import {collectionLinkForHandles} from '~/lib/internalLinks';
 import {ProductItem} from '~/components/ProductItem';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {ReviewsSection} from '~/components/ReviewsSection';
@@ -60,6 +61,9 @@ export const meta: Route.MetaFunction = ({data, params}) => {
     node.__typename === 'MediaImage' && node.image ? [node.image] : [],
   );
   const variant = product?.selectedOrFirstAvailableVariant;
+  const category = product
+    ? collectionLinkForHandles(product.collections.nodes.map((node) => node.handle))
+    : null;
 
   return [
     // Add-on (surcharge) products are checkout plumbing, not catalogue items.
@@ -83,7 +87,10 @@ export const meta: Route.MetaFunction = ({data, params}) => {
               availableForSale: variant?.availableForSale,
             }),
             breadcrumbJsonLd([
-              {name: 'Categories', path: '/collections/all'},
+              {
+                name: category?.label ?? 'Categories',
+                path: category?.to ?? '/collections/all',
+              },
               {name: product.title, path},
             ]),
           ]
@@ -197,6 +204,9 @@ function loadDeferredData({context, params}: Route.LoaderArgs) {
 export default function Product() {
   const {product, reviews, rating, pageContent, recommendations, upsellGroupsData} =
     useLoaderData<typeof loader>();
+  const category = collectionLinkForHandles(
+    product.collections.nodes.map((node) => node.handle),
+  );
 
   const sliderOptionOverrides: string[] | null = (() => {
     try {
@@ -443,7 +453,9 @@ export default function Product() {
       <div className="archive-page">
         <Breadcrumbs
           items={[
-            {label: 'Categories', to: '/collections/all'},
+            category
+              ? {label: category.label, to: category.to}
+              : {label: 'Categories', to: '/collections/all'},
             {label: title},
           ]}
         />
@@ -867,6 +879,11 @@ const PRODUCT_FRAGMENT = `#graphql
     tags
     vendor
     handle
+    collections(first: 10) {
+      nodes {
+        handle
+      }
+    }
     descriptionHtml
     description
     priceRange {
