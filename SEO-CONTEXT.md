@@ -11,3 +11,5 @@
 - TODO(Rysard): confirm the true lead time (old posts say 5 to 10 working days).
 - TODO(Rysard): confirm whether a load rating can be published for shelves.
 - TODO(Rysard): original photography of installed beams and shelves for article covers.
+- Etsy shop "CraftWoodFurniture" (https://www.etsy.com/uk/shop/CraftWoodFurniture) is the same business; AI engines (ChatGPT, Gemini, Perplexity, AIO) source brand answers mainly from Etsy (OpenSEO AI visibility run 2026-11-18). Registered office Tonypandy, Wales (per repo site.ts and llms.txt).
+- Brand name variants customers and AI use: "Craft Wood Furniture", "CraftWood Furniture", "CraftWoodFurniture", "CraftWood". The OpenSEO AI tracker brand is "CraftedWood", which does not match them (mention rate 0% is partly a measurement artefact).
