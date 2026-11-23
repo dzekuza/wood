@@ -1,4 +1,4 @@
-import {COMPANY, CONTACT_EMAIL, SITE_NAME, SOCIAL_LINKS} from '~/lib/site';
+import {COMPANY, CONTACT_EMAIL, ETSY_SHOP_URL, SITE_NAME, SOCIAL_LINKS} from '~/lib/site';
 import {getCanonicalUrl} from '~/lib/seo';
 
 /** JSON-LD builders. Each returns one schema.org node for `seoMeta({jsonLd})`. */
@@ -38,7 +38,7 @@ export function organizationJsonLd() {
       areaServed: 'GB',
       availableLanguage: 'en',
     },
-    sameAs: SOCIAL_LINKS.map((link) => link.url),
+    sameAs: [...SOCIAL_LINKS.map((link) => link.url), ETSY_SHOP_URL],
   };
 }
 

@@ -78,6 +78,11 @@ export const STORE_REVIEW_COUNT = ETSY_SHOP_RATING.count;
 export const ETSY_REVIEWS_URL =
   'https://www.etsy.com/uk/shop/CraftWoodFurniture#reviews';
 
+/** The same business's Etsy shop (shop name "CraftWoodFurniture"). Published as
+ *  an Organization `sameAs` and in llms.txt so search and AI engines connect
+ *  the Etsy reviews and listings to this site. */
+export const ETSY_SHOP_URL = 'https://www.etsy.com/uk/shop/CraftWoodFurniture';
+
 /**
  * Fallback display order for category lists (homepage grid, Categories page,
  * shop sidebar). Every list is data-driven — it renders every collection the

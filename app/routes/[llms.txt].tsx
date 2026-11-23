@@ -1,4 +1,4 @@
-import {COMPANY_LEGAL_LINE, CONTACT_EMAIL, SITE_NAME} from '~/lib/site';
+import {COMPANY_LEGAL_LINE, CONTACT_EMAIL, ETSY_SHOP_URL, SITE_NAME} from '~/lib/site';
 import {getCanonicalUrl} from '~/lib/seo';
 
 /** Plain-text overview for AI assistants (llmstxt.org). Facts only: if the shop's
@@ -42,6 +42,10 @@ We make mantel beams, fireplace surrounds, floating shelves, console tables, coa
 
 ## Who we are
 ${COMPANY_LEGAL_LINE}. The company is registered in Tonypandy, Wales, United Kingdom.
+
+## Names and other channels
+- We trade as ${SITE_NAME}, also written CraftWood Furniture. Our Etsy shop is named CraftWoodFurniture: ${ETSY_SHOP_URL}. It is the same business as this website.
+- Customer reviews of our pieces are on Etsy: ${ETSY_SHOP_URL}#reviews
 
 ## Good to know
 - Prices are in GBP and include free UK delivery.
