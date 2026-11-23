@@ -1,4 +1,4 @@
-import {CacheShort, createWithCache} from '@shopify/hydrogen';
+import {CacheCustom, createWithCache} from '@shopify/hydrogen';
 import {
   EMPTY_PAGE_CONTENT,
   type DraftStatus,
@@ -33,6 +33,19 @@ interface PageContentRow {
   draftData: PageContentMap | null;
   draftStatus: DraftStatus;
 }
+
+/**
+ * Same policy as `editorialCache` (fresh 60s, stale up to 1h while it
+ * refreshes). `CacheShort` (1s fresh) almost never hit on a low-traffic store,
+ * so most shopper requests waited on a Shopify Admin API round trip before the
+ * first byte. Admins bypass this cache and always read live, so a Publish is
+ * visible to them immediately; shoppers see it within about a minute.
+ */
+const PAGE_CONTENT_CACHE = CacheCustom({
+  mode: 'public',
+  maxAge: 60,
+  staleWhileRevalidate: 3600,
+});
 
 interface LoaderLikeContext extends AdminCheckContext {
   env: ShopifyAdminEnv & {ADMIN_ALLOWLIST_EMAILS?: string};
@@ -191,7 +204,7 @@ export async function loadPageContentState(
         }).run(
           {
             cacheKey: ['page-content', slug],
-            cacheStrategy: CacheShort(),
+            cacheStrategy: PAGE_CONTENT_CACHE,
             shouldCacheResult: () => true,
           },
           () => readRow(context.env, slug).then((row) => row.publishedData),
