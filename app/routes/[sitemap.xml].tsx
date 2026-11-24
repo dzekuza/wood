@@ -10,7 +10,18 @@ export async function loader({
     request,
   });
 
-  response.headers.set('Cache-Control', `max-age=${60 * 60 * 24}`);
+  // Drop the `blogs` sub-sitemap: `/blogs` is already listed in the `pages`
+  // sitemap, and `/blogs/news` 301-redirects to `/blogs`.
+  const xml = (await response.text()).replace(
+    /<sitemap>\s*<loc>[^<]*\/sitemap\/blogs\/[^<]*<\/loc>\s*<\/sitemap>\s*/g,
+    '',
+  );
 
-  return response;
+  return new Response(xml, {
+    status: response.status,
+    headers: {
+      'Content-Type': 'application/xml',
+      'Cache-Control': `max-age=${60 * 60 * 24}`,
+    },
+  });
 }

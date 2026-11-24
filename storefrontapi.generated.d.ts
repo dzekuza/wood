@@ -597,6 +597,50 @@ export type SearchSuggestionsQuery = {
   };
 };
 
+export type LlmsFullCatalogQueryVariables = StorefrontAPI.Exact<{
+  country?: StorefrontAPI.InputMaybe<StorefrontAPI.CountryCode>;
+  language?: StorefrontAPI.InputMaybe<StorefrontAPI.LanguageCode>;
+}>;
+
+export type LlmsFullCatalogQuery = {
+  products: {
+    nodes: Array<
+      Pick<
+        StorefrontAPI.Product,
+        'id' | 'handle' | 'title' | 'tags' | 'description'
+      > & {
+        seo: Pick<StorefrontAPI.Seo, 'description'>;
+        priceRange: {
+          minVariantPrice: Pick<
+            StorefrontAPI.MoneyV2,
+            'amount' | 'currencyCode'
+          >;
+          maxVariantPrice: Pick<
+            StorefrontAPI.MoneyV2,
+            'amount' | 'currencyCode'
+          >;
+        };
+      }
+    >;
+  };
+  collections: {
+    nodes: Array<
+      Pick<StorefrontAPI.Collection, 'handle' | 'title' | 'description'>
+    >;
+  };
+  blogs: {
+    nodes: Array<
+      Pick<StorefrontAPI.Blog, 'handle'> & {
+        articles: {
+          nodes: Array<
+            Pick<StorefrontAPI.Article, 'handle' | 'title' | 'publishedAt'>
+          >;
+        };
+      }
+    >;
+  };
+};
+
 export type HeroShowcaseCollectionFragment = Pick<
   StorefrontAPI.Collection,
   'id' | 'title' | 'handle'
@@ -2638,6 +2682,10 @@ interface GeneratedQueryTypes {
   '#graphql\n  fragment SearchSuggestionProduct on Product {\n    id\n    handle\n    title\n    tags\n    priceRange {\n      minVariantPrice {\n        amount\n        currencyCode\n      }\n    }\n    compareAtPriceRange {\n      minVariantPrice {\n        amount\n        currencyCode\n      }\n    }\n    featuredImage {\n      id\n      url\n      altText\n      width\n      height\n    }\n  }\n  query SearchSuggestions(\n    $country: CountryCode\n    $language: LanguageCode\n    $query: String\n  ) @inContext(country: $country, language: $language) {\n    products(first: 8, sortKey: BEST_SELLING, query: $query) {\n      nodes {\n        ...SearchSuggestionProduct\n      }\n    }\n  }\n': {
     return: SearchSuggestionsQuery;
     variables: SearchSuggestionsQueryVariables;
+  };
+  '#graphql\n  query LlmsFullCatalog($country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    products(first: 50, sortKey: BEST_SELLING) {\n      nodes {\n        id\n        handle\n        title\n        tags\n        description\n        seo {\n          description\n        }\n        priceRange {\n          minVariantPrice {\n            amount\n            currencyCode\n          }\n          maxVariantPrice {\n            amount\n            currencyCode\n          }\n        }\n      }\n    }\n    collections(first: 30) {\n      nodes {\n        handle\n        title\n        description\n      }\n    }\n    blogs(first: 5) {\n      nodes {\n        handle\n        articles(first: 50, sortKey: PUBLISHED_AT, reverse: true) {\n          nodes {\n            handle\n            title\n            publishedAt\n          }\n        }\n      }\n    }\n  }\n': {
+    return: LlmsFullCatalogQuery;
+    variables: LlmsFullCatalogQueryVariables;
   };
   '#graphql\n  query HeroShowcase($country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    collections(first: 20) {\n      nodes {\n        ...HeroShowcaseCollection\n      }\n    }\n  }\n  #graphql\n  fragment HeroShowcaseCollectionLandingOak on Collection {\n    id\n    title\n    handle\n    image {\n      url\n      altText\n      width\n      height\n    }\n    products(first: 8) {\n      nodes {\n        ...PopularProductItemLandingOak\n      }\n    }\n  }\n  #graphql\n  fragment MoneyPopularProductLandingOak on MoneyV2 {\n    amount\n    currencyCode\n  }\n  fragment PopularProductItemLandingOak on Product {\n    id\n    handle\n    title\n    tags\n    options {\n      name\n      optionValues {\n        name\n        swatch {\n          color\n          image {\n            previewImage {\n              url\n            }\n          }\n        }\n      }\n    }\n    selectedOrFirstAvailableVariant(selectedOptions: [], ignoreUnknownOptions: true) {\n      id\n      availableForSale\n    }\n    featuredImage {\n      id\n      altText\n      url\n      width\n      height\n    }\n    images(first: 4) {\n      nodes {\n        id\n        url\n        altText\n        width\n        height\n      }\n    }\n    priceRange {\n      minVariantPrice { ...MoneyPopularProductLandingOak }\n      maxVariantPrice { ...MoneyPopularProductLandingOak }\n    }\n    compareAtPriceRange {\n      minVariantPrice { ...MoneyPopularProductLandingOak }\n    }\n    metafield(namespace: "reviews", key: "product_reviews") {\n      value\n    }\n  }\n\n\n': {
     return: HeroShowcaseQuery;

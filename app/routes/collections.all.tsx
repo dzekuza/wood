@@ -18,17 +18,34 @@ import {COLLECTIONS_ALL_SLUG} from '~/lib/pageContent';
 import {loadPageContentState} from '~/lib/pageContent.server';
 import {SITE_NAME} from '~/lib/site';
 import {seoMeta} from '~/lib/seo';
+import {breadcrumbJsonLd, collectionPageJsonLd} from '~/lib/structuredData';
 import type {SortValue} from '~/components/SortDropdown';
 import type {CollectionItemFragment} from 'storefrontapi.generated';
 import {EXCLUDE_HIDDEN_PRODUCTS_QUERY, filterHiddenProducts} from '~/lib/upsells';
-import {editorialCache} from '~/lib/cache';
+import {catalogCache, editorialCache} from '~/lib/cache';
 
-export const meta: Route.MetaFunction = () =>
+const ALL_PRODUCTS_TITLE = `All Products | ${SITE_NAME}`;
+const ALL_PRODUCTS_DESCRIPTION =
+  'Every handmade solid oak piece from Craft Wood Furniture in one place: mantel beams, shelves, fireplace surrounds, console tables and more. Free UK delivery.';
+
+export const meta: Route.MetaFunction = ({data}) =>
   seoMeta({
-    title: `All Products | ${SITE_NAME}`,
-    description:
-      'Every handmade solid oak piece from Craft Wood Furniture in one place: mantel beams, shelves, fireplace surrounds, console tables and more. Free UK delivery.',
+    title: ALL_PRODUCTS_TITLE,
+    description: ALL_PRODUCTS_DESCRIPTION,
     path: '/collections/all',
+    jsonLd: [
+      collectionPageJsonLd({
+        name: 'All Solid Oak Furniture',
+        description: ALL_PRODUCTS_DESCRIPTION,
+        path: '/collections/all',
+        items: (data?.products?.nodes ?? []).map((product) => ({
+          name: product.title,
+          path: `/products/${product.handle}`,
+          image: product.featuredImage?.url,
+        })),
+      }),
+      breadcrumbJsonLd([{name: 'All Products', path: '/collections/all'}]),
+    ],
   });
 
 export async function loader(args: Route.LoaderArgs) {
@@ -64,7 +81,7 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
   const {sortKey, reverse} = SORT_MAP[sortParam] ?? SORT_MAP.featured;
 
   const [{products}, {collections}] = await Promise.all([
-    storefront.query(CATALOG_QUERY, {variables: {...paginationVariables, sortKey, reverse, query: EXCLUDE_HIDDEN_PRODUCTS_QUERY}, cache: storefront.CacheShort()}),
+    storefront.query(CATALOG_QUERY, {variables: {...paginationVariables, sortKey, reverse, query: EXCLUDE_HIDDEN_PRODUCTS_QUERY}, cache: catalogCache(storefront)}),
     storefront.query(ALL_COLLECTIONS_QUERY, {cache: editorialCache(storefront)}),
   ]);
   // The Storefront API silently ignores the `-handle:` search-query negation

@@ -1,4 +1,4 @@
-import {useLoaderData} from 'react-router';
+import {redirect, useLoaderData} from 'react-router';
 import {BLOG_LABEL, SITE_NAME} from '~/lib/site';
 import {seoMeta, toMetaDescription} from '~/lib/seo';
 import type {Route} from './+types/blogs.$blogHandle._index';
@@ -48,6 +48,13 @@ export const meta: Route.MetaFunction = ({data, params}) => {
 };
 
 export async function loader(args: Route.LoaderArgs) {
+  // The store has one editorial blog (`news`), whose full archive lives at
+  // `/blogs`. Redirecting `/blogs/news` avoids a duplicate blog-index URL in
+  // Google while leaving `/blogs/news/<articleHandle>` completely unaffected.
+  if (args.params.blogHandle === 'news') {
+    throw redirect('/blogs', 301);
+  }
+
   // Start fetching non-critical data without blocking time to first byte
   const deferredData = loadDeferredData(args);
 

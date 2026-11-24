@@ -78,4 +78,21 @@ export const ARTICLE_RELATED_LINKS: Record<string, ArticleRelatedLinks> = {
     shop: [COLLECTION_LINKS.mantelBeams, COLLECTION_LINKS.shelves, COLLECTION_LINKS.consoleTables],
     guides: [GUIDE_LINKS.mantelSizes, GUIDE_LINKS.shelfSizes],
   },
+  // Pre-wired for the 4 drafted UK SEO/GEO guides in content/blog/ once published in Shopify Admin.
+  'oak-mantel-beam-clearance-above-log-burner': {
+    shop: [COLLECTION_LINKS.mantelBeams, COLLECTION_LINKS.fireplaceSurrounds],
+    guides: [GUIDE_LINKS.fitMantel, GUIDE_LINKS.mantelSizes, GUIDE_LINKS.oilColours],
+  },
+  'how-to-fit-floating-shelves-plasterboard-stud-dot-and-dab': {
+    shop: [COLLECTION_LINKS.shelves],
+    guides: [GUIDE_LINKS.installShelves, GUIDE_LINKS.shelfSizes, GUIDE_LINKS.oilColours],
+  },
+  'solid-oak-vs-oak-veneer-mantel-beams': {
+    shop: [COLLECTION_LINKS.mantelBeams, COLLECTION_LINKS.fireplaceSurrounds, COLLECTION_LINKS.cubeBlocks],
+    guides: [GUIDE_LINKS.mantelSizes, GUIDE_LINKS.fitMantel, GUIDE_LINKS.oilColours],
+  },
+  'alcove-floating-shelves-uk-measuring-spacing-guide': {
+    shop: [COLLECTION_LINKS.shelves, COLLECTION_LINKS.mantelBeams],
+    guides: [GUIDE_LINKS.shelfSizes, GUIDE_LINKS.installShelves, GUIDE_LINKS.oilColours],
+  },
 };

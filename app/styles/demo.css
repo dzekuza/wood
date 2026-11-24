@@ -167,7 +167,8 @@
   height: 15px;
 }
 
-.demo-hero h1 {
+.demo-hero h1,
+.demo-hero .demo-hero-heading {
   font-family: var(--demo-font-display);
   font-weight: 500;
   /* 72px / 78px at desktop; unitless leading so the fluid mobile sizes keep

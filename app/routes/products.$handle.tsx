@@ -19,6 +19,7 @@ import {getStockLimit} from '~/lib/inventory';
 import {getDescriptionSummary} from '~/lib/description';
 import {seoMeta, toMetaDescription, toPageTitle} from '~/lib/seo';
 import {breadcrumbJsonLd, productJsonLd} from '~/lib/structuredData';
+import {catalogCache} from '~/lib/cache';
 import {collectionLinkForHandles} from '~/lib/internalLinks';
 import {ProductItem} from '~/components/ProductItem';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
@@ -84,6 +85,7 @@ export const meta: Route.MetaFunction = ({data, params}) => {
               sku: variant?.sku,
               gtin: variant?.barcode,
               price: variant?.price,
+              priceRange: data?.priceRange,
               availableForSale: variant?.availableForSale,
             }),
             breadcrumbJsonLd([
@@ -129,7 +131,7 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   const [{product: variantProduct}, pageContent] = await Promise.all([
     storefront.query(PRODUCT_VARIANTS_QUERY, {
       variables: {handle},
-      cache: storefront.CacheShort(),
+      cache: catalogCache(storefront),
     }),
     loadPageContentState(context, request, PRODUCT_SLUG),
   ]);
@@ -144,7 +146,7 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
 
   const {product} = await storefront.query(PRODUCT_QUERY, {
     variables: {handle, selectedOptions},
-    cache: storefront.CacheShort(),
+    cache: catalogCache(storefront),
   });
 
   if (!product?.id) {
@@ -157,8 +159,33 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
     product.addonProducts?.references?.nodes,
   );
 
+  // Full variant price range for Product AggregateOffer JSON-LD, derived from
+  // the variant matrix already fetched above (no extra API call).
+  const variantNodes = variantProduct?.variants.nodes ?? [];
+  const availablePrices = variantNodes
+    .filter((node) => node.availableForSale)
+    .map((node) => Number(node.price.amount))
+    .filter((amount) => Number.isFinite(amount) && amount > 0);
+  const pricePool = availablePrices.length
+    ? availablePrices
+    : variantNodes
+        .map((node) => Number(node.price.amount))
+        .filter((amount) => Number.isFinite(amount) && amount > 0);
+  const currencyCode =
+    product.selectedOrFirstAvailableVariant?.price.currencyCode ??
+    product.priceRange.minVariantPrice.currencyCode;
+  const priceRange = pricePool.length
+    ? {
+        lowPrice: Math.min(...pricePool),
+        highPrice: Math.max(...pricePool),
+        currencyCode,
+        offerCount: pricePool.length,
+      }
+    : null;
+
   return {
     product,
+    priceRange,
     // This product's own Etsy reviews and rating, matched by Etsy listing —
     // not the shared `reviews.product_reviews` metafield, which repeated the
     // same reviews across products.

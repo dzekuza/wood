@@ -6,7 +6,16 @@ import {EditToolbar} from '~/components/EditToolbar';
 import {EditToolbarProvider} from '~/components/EditToolbarProvider';
 import {ABOUT_SLUG} from '~/lib/pageContent';
 import {loadPageContentState} from '~/lib/pageContent.server';
-import {SITE_NAME} from '~/lib/site';
+import {
+  COMPANY,
+  COMPANY_ADDRESS_LINE,
+  EBAY_STORE_URL,
+  ETSY_REVIEWS_URL,
+  ETSY_SHOP_URL,
+  SITE_NAME,
+  STORE_REVIEW_COUNT,
+} from '~/lib/site';
+import {ETSY_SHOP_RATING} from '~/data/etsy-ratings';
 import {seoMeta} from '~/lib/seo';
 import {aboutPageJsonLd, breadcrumbJsonLd, organizationJsonLd} from '~/lib/structuredData';
 
@@ -26,7 +35,8 @@ const ABOUT_PILLARS = [
 ];
 
 const ABOUT_FACTS = [
-  {value: '≤5', label: 'days to dispatch your order'},
+  {value: '≤5', label: 'days to dispatch, then 2–3 working days delivery'},
+  {value: STORE_REVIEW_COUNT.toLocaleString('en-GB'), label: `verified Etsy reviews (${ETSY_SHOP_RATING.average.toFixed(1)}★)`},
   {value: '6', label: 'oak oil finishes to choose from'},
   {value: '£0', label: 'UK delivery, on every order'},
 ];
@@ -135,6 +145,50 @@ export default function AboutPage() {
                   </EditableText>
                 </article>
               ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="section-white-cont">
+          <div className="archive-wrap">
+            <div className="shead">
+              <div>
+                <h2 className="title">One workshop, everywhere you find us.</h2>
+              </div>
+            </div>
+            <div className="story-pillars">
+              <article className="story-card">
+                <h3>Registered in Wales</h3>
+                <p>
+                  {SITE_NAME} trades as {COMPANY.legalName} (Company no. {COMPANY.companyNumber}, VAT no.{' '}
+                  {COMPANY.vatNumber}), registered at {COMPANY_ADDRESS_LINE}.
+                </p>
+              </article>
+              <article className="story-card">
+                <h3>Our Etsy shop</h3>
+                <p>
+                  Many customers know us as{' '}
+                  <a href={ETSY_SHOP_URL} target="_blank" rel="noreferrer">
+                    CraftWoodFurniture on Etsy
+                  </a>
+                  , where we hold a {ETSY_SHOP_RATING.average.toFixed(2)}★ rating across{' '}
+                  <a href={ETSY_REVIEWS_URL} target="_blank" rel="noreferrer">
+                    {STORE_REVIEW_COUNT.toLocaleString('en-GB')} verified reviews
+                  </a>
+                  . It is the exact same workshop as this website.
+                </p>
+              </article>
+              <article className="story-card">
+                <h3>Direct &amp; eBay UK</h3>
+                <p>
+                  We also sell through our{' '}
+                  <a href={EBAY_STORE_URL} target="_blank" rel="noreferrer">
+                    official eBay UK store
+                  </a>
+                  . Ordering direct here gives you our full range of sizes, six matching oil finishes,
+                  custom-size enquiries, and free UK delivery on every order.
+                </p>
+              </article>
             </div>
           </div>
         </section>

@@ -18,8 +18,36 @@ function robotsTxtData({url}: {url?: string}) {
   const sitemapUrl = url ? `${url}/sitemap.xml` : undefined;
 
   return `
+# AI assistant overview: ${url ? `${url}/llms.txt` : '/llms.txt'}
+# Full catalogue markdown: ${url ? `${url}/llms-full.txt` : '/llms-full.txt'}
+
 User-agent: *
 ${generalDisallowRules({sitemapUrl})}
+
+# Explicitly welcome AI search and citation crawlers
+User-agent: OAI-SearchBot
+Allow: /
+${aiCrawlerDisallowRules({sitemapUrl})}
+
+User-agent: ChatGPT-User
+Allow: /
+${aiCrawlerDisallowRules({sitemapUrl})}
+
+User-agent: PerplexityBot
+Allow: /
+${aiCrawlerDisallowRules({sitemapUrl})}
+
+User-agent: Claude-SearchBot
+Allow: /
+${aiCrawlerDisallowRules({sitemapUrl})}
+
+User-agent: Applebot-Extended
+Allow: /
+${aiCrawlerDisallowRules({sitemapUrl})}
+
+User-agent: Google-Extended
+Allow: /
+${aiCrawlerDisallowRules({sitemapUrl})}
 
 # Google adsbot ignores robots.txt unless specifically named!
 User-agent: adsbot-google
@@ -46,6 +74,14 @@ Crawl-Delay: 10
 User-agent: Pinterest
 Crawl-delay: 1
 `.trim();
+}
+
+function aiCrawlerDisallowRules({sitemapUrl}: {sitemapUrl?: string}) {
+  return `Disallow: /cart
+Disallow: /account
+Disallow: /search
+Disallow: /search/?*
+${sitemapUrl ? `Sitemap: ${sitemapUrl}` : ''}`;
 }
 
 /**

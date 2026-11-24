@@ -15,13 +15,26 @@ import {
   SITE_NAME,
 } from '~/lib/site';
 import {seoMeta} from '~/lib/seo';
+import {breadcrumbJsonLd, contactPageJsonLd, organizationJsonLd} from '~/lib/structuredData';
+
+const CONTACT_TITLE = `Contact | ${SITE_NAME}`;
+const CONTACT_DESCRIPTION =
+  'Speak with Craft Wood Furniture about custom sizes, oak oil finishes, lead times, and handmade solid oak orders.';
 
 export const meta: Route.MetaFunction = () =>
   seoMeta({
-    title: `Contact | ${SITE_NAME}`,
-    description:
-      'Speak with Craft Wood Furniture about commissions, lead times, and solid-timber pieces currently in production.',
+    title: CONTACT_TITLE,
+    description: CONTACT_DESCRIPTION,
     path: '/contact',
+    jsonLd: [
+      contactPageJsonLd({
+        name: CONTACT_TITLE,
+        description: CONTACT_DESCRIPTION,
+        path: '/contact',
+      }),
+      organizationJsonLd(),
+      breadcrumbJsonLd([{name: 'Contact', path: '/contact'}]),
+    ],
   });
 
 export async function loader({context, request}: Route.LoaderArgs) {

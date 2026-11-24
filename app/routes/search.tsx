@@ -10,14 +10,20 @@ import {
   getEmptyPredictiveSearchResult,
 } from '~/lib/search';
 import {SITE_NAME} from '~/lib/site';
+import {seoMeta} from '~/lib/seo';
 import type {
   RegularSearchQuery,
   PredictiveSearchQuery,
 } from 'storefrontapi.generated';
 
-export const meta: Route.MetaFunction = () => {
-  return [{title: `Search | ${SITE_NAME}`}];
-};
+export const meta: Route.MetaFunction = () =>
+  seoMeta({
+    title: `Search | ${SITE_NAME}`,
+    description:
+      'Search handmade solid oak mantel beams, floating shelves, fireplace surrounds, coat racks, console tables and workshop guides at Craft Wood Furniture.',
+    path: '/search',
+    noindex: true,
+  });
 
 export async function loader({request, context}: Route.LoaderArgs) {
   const url = new URL(request.url);

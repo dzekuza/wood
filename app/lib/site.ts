@@ -90,6 +90,10 @@ export const ETSY_REVIEWS_URL =
  *  the Etsy reviews and listings to this site. */
 export const ETSY_SHOP_URL = 'https://www.etsy.com/uk/shop/CraftWoodFurniture';
 
+/** The same business's eBay UK store. Published alongside Etsy in `sameAs` and
+ *  llms.txt to consolidate brand entity signals across marketplaces. */
+export const EBAY_STORE_URL = 'https://www.ebay.co.uk/str/craftwoodfurniture';
+
 /**
  * Fallback display order for category lists (homepage grid, Categories page,
  * shop sidebar). Every list is data-driven — it renders every collection the

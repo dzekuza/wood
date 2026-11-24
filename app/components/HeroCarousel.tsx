@@ -91,16 +91,39 @@ export function HeroCarousel({
                   </div>
                 )}
 
-                <h1>
-                  {slide.heading.map((line, i) => (
-                    <span key={i}>
-                      <EditableText field={`hero.${index}.heading.${i}`}>
-                        {line}
-                      </EditableText>
-                      {i < slide.heading.length - 1 && <br />}
-                    </span>
-                  ))}
-                </h1>
+                {index === 0 ? (
+                  <h1>
+                    {slide.heading.map((line, i) => (
+                      <span key={i}>
+                        <EditableText field={`hero.${index}.heading.${i}`}>
+                          {line}
+                        </EditableText>
+                        {i < slide.heading.length - 1 && (
+                          <>
+                            {' '}
+                            <br />
+                          </>
+                        )}
+                      </span>
+                    ))}
+                  </h1>
+                ) : (
+                  <p className="demo-hero-heading" role="heading" aria-level={2}>
+                    {slide.heading.map((line, i) => (
+                      <span key={i}>
+                        <EditableText field={`hero.${index}.heading.${i}`}>
+                          {line}
+                        </EditableText>
+                        {i < slide.heading.length - 1 && (
+                          <>
+                            {' '}
+                            <br />
+                          </>
+                        )}
+                      </span>
+                    ))}
+                  </p>
+                )}
 
                 <EditableText
                   as="p"

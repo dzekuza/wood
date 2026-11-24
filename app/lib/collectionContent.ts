@@ -272,4 +272,85 @@ export const COLLECTION_CONTENT: Record<string, CollectionContent> = {
       ...SHARED_FAQS,
     ],
   },
+  'solid-oak-cube-blocks': {
+    heading: 'Solid Oak Cube Blocks & Side Tables',
+    seoTitle: 'Solid Oak Cube Blocks & Side Tables | Handmade UK',
+    seoDescription:
+      'Handmade solid oak cube blocks and block side tables, cut from a single piece of European oak in our UK workshop. Six oil colours, free UK delivery.',
+    guideHeading: 'Choosing a solid oak cube block',
+    guide: [
+      'A solid oak cube block is cut from a single solid section of European oak, hand-planed and sanded to order for use as a side table, lamp table or bedside block. Ours are available with a square top up to 33 x 33cm, in six oil colours, with free UK delivery.',
+      'Because every block is cut from solid timber rather than hollow veneered panels, it carries real weight and shows the end grain, knots and natural splits of the tree. Its clean square form works beside a sofa, in a bedroom, or next to a fireplace with a matching oak mantel beam.',
+      'Large solid oak sections naturally develop splits and fine cracks as the timber settles indoors. That movement is part of the character of solid oak blocks rather than a fault. Because each piece is hand-planed and sanded, finished dimensions can vary by up to approximately half an inch.',
+      'Choose from the same six oil colours used across our mantel beams, floating shelves and console tables so pieces in the same room tie together naturally.',
+    ],
+    specs: [
+      {label: 'Construction', value: 'Single solid European oak block, hand-planed and sanded'},
+      {label: 'Top size', value: 'Square top available up to 33 x 33cm (custom sizes on request)'},
+      {label: 'Size tolerance', value: 'Finished dimensions can vary by up to approximately ½ inch'},
+      {label: 'Oil colours', value: 'White, Light Grey, Grey, Dark, Old Oak and Clear'},
+      {label: 'Care', value: 'Wipe with a soft cloth; re-oil every 18 months'},
+      {label: 'Dispatch', value: 'Up to 5 days, then 2 to 3 working days delivery. Free UK delivery'},
+    ],
+    links: [
+      {label: 'Solid oak block side table', to: '/products/solid-oak-block-side-table'},
+      {label: 'Solid oak mantel beams', to: '/collections/solid-oak-mantel-beams'},
+      {label: 'Solid oak console tables', to: '/collections/console-tables'},
+      {label: 'Solid oak door stops', to: '/collections/solid-oak-door-stops'},
+    ],
+    guides: [GUIDE_LINKS.oilColours],
+    faqs: [
+      {
+        question: 'Are your oak cube blocks solid all the way through?',
+        answer:
+          'Yes. Each block side table is cut from a single solid section of European oak, not hollow boards or veneer.',
+      },
+      {
+        question: 'Will a solid oak cube block crack indoors?',
+        answer:
+          'Natural cracks and splits are a normal characteristic of solid oak sections of this size, and some further movement can happen as the timber settles in a warm room.',
+      },
+      ...SHARED_FAQS,
+    ],
+  },
+  'solid-oak-door-stops': {
+    heading: 'Solid Oak Door Stops',
+    seoTitle: 'Solid Oak Door Stops | Heavy Wooden Doorstop UK',
+    seoDescription:
+      'Handmade heavy solid oak door stops with a twisted jute rope handle, crafted to order in our UK workshop. Six oil colours and free UK delivery.',
+    guideHeading: 'Choosing a solid oak door stop',
+    guide: [
+      'A solid oak door stop is a heavy block of solid European oak fitted with a twisted jute rope handle so it is easy to lift and move from room to room. Each door stop is hand-planed, sanded and oiled to order in our UK workshop, with free UK delivery.',
+      'Unlike light wedges or filled fabric door stops, a solid oak block stays put against draughty internal doors and adds natural warmth to wooden, tiled or carpeted floors. Because we finish them in the same six oil colours as our coat racks, console tables and shelves, a hallway door stop can match the rest of your oak pieces.',
+      'Every block is cut from solid timber, so grain, knots and small cracks vary from one door stop to the next. Hand-finishing means dimensions can vary by up to approximately a third of an inch.',
+    ],
+    specs: [
+      {label: 'Material', value: 'Solid European oak block, hand-planed and sanded'},
+      {label: 'Handle', value: 'Attached twisted jute rope handle'},
+      {label: 'Size tolerance', value: 'Finished dimensions can vary by up to approximately ⅓ inch'},
+      {label: 'Oil colours', value: 'White, Light Grey, Grey, Dark, Old Oak and Clear'},
+      {label: 'Care', value: 'Wipe with a soft cloth; re-oil every 18 months'},
+      {label: 'Dispatch', value: 'Up to 5 days, then 2 to 3 working days delivery. Free UK delivery'},
+    ],
+    links: [
+      {label: 'Solid oak door stop with jute rope handle', to: '/products/solid-oak-door-stop'},
+      {label: 'Solid oak coat racks', to: '/collections/solid-oak-coat-racks'},
+      {label: 'Solid oak console tables', to: '/collections/console-tables'},
+      {label: 'Solid oak cube blocks', to: '/collections/solid-oak-cube-blocks'},
+    ],
+    guides: [GUIDE_LINKS.oilColours],
+    faqs: [
+      {
+        question: 'Is the oak door stop heavy enough for solid wooden doors?',
+        answer:
+          'Yes. Each door stop is cut from a solid block of European oak rather than hollow or composite wood, giving it natural weight to hold doors open.',
+      },
+      {
+        question: 'Does the door stop come with a rope handle fitted?',
+        answer:
+          'Yes. Every solid oak door stop arrives with an attached twisted jute rope handle for easy lifting and repositioning.',
+      },
+      ...SHARED_FAQS,
+    ],
+  },
 };

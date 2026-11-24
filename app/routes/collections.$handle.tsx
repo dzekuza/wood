@@ -16,36 +16,48 @@ import {parseFiltersFromSearchParams} from '~/lib/collectionFilters';
 import {CollectionGuide} from '~/components/CollectionGuide';
 import {COLLECTION_CONTENT} from '~/lib/collectionContent';
 import {SITE_NAME, shouldHideCollection} from '~/lib/site';
-import {breadcrumbJsonLd, faqJsonLd} from '~/lib/structuredData';
+import {breadcrumbJsonLd, collectionPageJsonLd, faqJsonLd} from '~/lib/structuredData';
 import {seoMeta, toMetaDescription, toPageTitle} from '~/lib/seo';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 import type {SortValue} from '~/components/SortDropdown';
-import {editorialCache} from '~/lib/cache';
+import {catalogCache, editorialCache} from '~/lib/cache';
 
 export const meta: Route.MetaFunction = ({data, params}) => {
   const collection = data?.collection;
   const content = collection ? COLLECTION_CONTENT[collection.handle] : undefined;
   const title =
     collection?.seo.title || content?.seoTitle || collection?.title || 'Category';
+  const path = `/collections/${collection?.handle ?? params.handle}`;
+  const description = toMetaDescription(
+    collection?.seo.description,
+    content?.seoDescription,
+    collection?.description,
+    collection &&
+      `Shop handmade solid oak ${collection.title.toLowerCase()} from ${SITE_NAME}. Cut, joined and finished in our own workshop, with free UK delivery.`,
+  );
 
   return seoMeta({
     title: toPageTitle(title),
-    description: toMetaDescription(
-      collection?.seo.description,
-      content?.seoDescription,
-      collection?.description,
-      collection &&
-        `Shop handmade solid oak ${collection.title.toLowerCase()} from ${SITE_NAME}. Cut, joined and finished in our own workshop, with free UK delivery.`,
-    ),
-    path: `/collections/${collection?.handle ?? params.handle}`,
+    description,
+    path,
     // Curated merchandising lists (e.g. "Most popular") duplicate the real
     // categories, so they stay out of search results.
     noindex: collection ? shouldHideCollection(collection) : false,
     jsonLd: collection
       ? [
+          collectionPageJsonLd({
+            name: content?.heading ?? collection.title,
+            description: description ?? collection.title,
+            path,
+            items: collection.products.nodes.map((product) => ({
+              name: product.title,
+              path: `/products/${product.handle}`,
+              image: product.featuredImage?.url,
+            })),
+          }),
           breadcrumbJsonLd([
             {name: 'Categories', path: '/collections'},
-            {name: collection.title, path: `/collections/${collection.handle}`},
+            {name: collection.title, path},
           ]),
           ...(content ? [faqJsonLd(content.faqs)] : []),
         ]
@@ -105,7 +117,7 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   const [{collection}, {collections}] = await Promise.all([
     storefront.query(COLLECTION_QUERY, {
       variables: {handle, ...paginationVariables, sortKey, reverse, filters},
-      cache: storefront.CacheShort(),
+      cache: catalogCache(storefront),
     }),
     storefront.query(SIDEBAR_CATEGORIES_QUERY, {cache: editorialCache(storefront)}),
   ]);

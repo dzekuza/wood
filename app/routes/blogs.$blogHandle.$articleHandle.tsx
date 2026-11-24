@@ -8,7 +8,12 @@ import {ArticleCard} from '~/components/ArticleCard';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {BLOG_LABEL} from '~/lib/site';
 import {seoMeta, toMetaDescription, toPageTitle} from '~/lib/seo';
-import {articleJsonLd, breadcrumbJsonLd} from '~/lib/structuredData';
+import {
+  articleJsonLd,
+  breadcrumbJsonLd,
+  extractFaqsFromArticleHtml,
+  faqJsonLd,
+} from '~/lib/structuredData';
 import {editorialCache} from '~/lib/cache';
 
 export const meta: Route.MetaFunction = ({data, params}) => {
@@ -19,6 +24,7 @@ export const meta: Route.MetaFunction = ({data, params}) => {
     article?.seo?.description,
     article?.contentHtml.replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' '),
   );
+  const articleFaqs = article ? extractFaqsFromArticleHtml(article.contentHtml) : [];
 
   return seoMeta({
     title: toPageTitle(title),
@@ -40,6 +46,7 @@ export const meta: Route.MetaFunction = ({data, params}) => {
             {name: BLOG_LABEL, path: '/blogs'},
             {name: article.title, path},
           ]),
+          ...(articleFaqs.length > 0 ? [faqJsonLd(articleFaqs)] : []),
         ]
       : [],
   });

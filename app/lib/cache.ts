@@ -22,3 +22,17 @@ export function editorialCache(storefront: Storefront) {
     staleWhileRevalidate: 3600,
   });
 }
+
+/**
+ * Cache strategy for catalog queries (product detail, variant matrix,
+ * collection listings). Keeps prices and availability fresh within 30 seconds
+ * while serving stale-while-revalidate for 30 minutes so crawlers and shoppers
+ * avoid paying ~900ms sequential Storefront API round trips on cold cache hits.
+ */
+export function catalogCache(storefront: Storefront) {
+  return storefront.CacheCustom({
+    mode: 'public',
+    maxAge: 30,
+    staleWhileRevalidate: 1800,
+  });
+}
