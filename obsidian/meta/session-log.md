@@ -10,6 +10,12 @@ project**. Newest first. Keep entries short (3–6 lines). Notable user-facing o
 architectural changes also go in [[changelog]] / [[decisions-log]]; the live
 snapshot lives in [[status]].
 
+
+## 2026-11-24 — SEO rankings review + brand schema
+- **Changed:** `organizationJsonLd()` `alternateName` now lists 3 brand variants (uncommitted). Committed locally: docs sync (`3528f59`) and codex hooks/TASKS.md (`3b337c6`); push failed twice with GitHub 500, 2 commits ahead of origin.
+- **Findings:** SEO subagent report (craftedwood): site is new in Google, 1 referring domain, shelves collection 829 impressions/0 clicks, apex/www split still indexed. Backlink target list being written to `obsidian/seo/backlink-targets.md`.
+- **Next:** retry push, commit schema change, link building, shelves/fireplace collection guides, re-measure 2026-11-30.
+
 ## 2026-11-24 — Architecture incremental sync
 - **Changed:** `architecture/codebase-map.md` (site.ts line refs, synced_commit → e74bed1). No structural change: commit e74bed1 was copy-only.
 - **Status:** WhatsApp/CRM chats skipped on this automated run.

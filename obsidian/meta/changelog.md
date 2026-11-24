@@ -3,6 +3,10 @@ tags: [meta, changelog]
 updated: 2026-11-23
 ---
 
+## 2026-11-24 — Brand name variants in Organization schema
+
+`organizationJsonLd()` (`app/lib/structuredData.ts`) now lists `alternateName` as `['CraftWood Furniture', 'CraftWoodFurniture', 'CraftWood']` to help the brand queries (position 5, low CTR) resolve to the homepage. Uncommitted at time of writing. Live Shopify article `oak-mantel-beam-sizes` (blog `news`) got an answer-first "sizes at a glance" section (length and profile tables) on 2026-11-24, edited via Admin API, not in git. Mantel sizes guide link wiring was already in place (`GUIDE_LINKS.mantelSizes`); the answer-first size table is CMS content in the Shopify article, not repo code.
+
 ## 2026-11-24 — Copy fixes + Merchant Center product-visibility cleanup
 
 From Craftwood WhatsApp group requests: fixed "CraftWood Furniture" → "Craft Wood Furniture" in the announcement bar (`app/lib/site.ts`) and the homepage craftsmanship heading (CMS `page_content` metaobject, handle `index`); renamed footer link "Our makers" → "About Us" (`app/components/Footer.tsx`). Confirmed two helper products (coat-racks/Hooks Colours, aaa-types-of-corbels/Types of Corbels) are published everywhere and should be unpublished to satisfy the client's hide request — blocked by the Admin MCP connector's own safety policy on `publishableUnpublish`, so left for manual Admin action. See [[status]] for outstanding Merchant Center flags.

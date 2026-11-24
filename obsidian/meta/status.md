@@ -12,6 +12,10 @@ updated: 2026-11-24
 
 **Last updated:** 2026-11-24
 
+> [!todo] Pending right now
+> - 2 local commits not pushed (GitHub 500); `structuredData.ts` alternateName change uncommitted.
+> - SEO: backlink target list in progress (`obsidian/seo/backlink-targets.md`); next rank check 2026-11-30. Rank-tracker additions (3 shelf keywords) awaiting approval.
+
 ## Current focus
 
 Working through a batch of client (Mindaugas) requests from the Craftwood WhatsApp group: copy fixes, a Google Merchant Center product-visibility cleanup, and Merchant Center "Not approved" flags on variant/helper products.
