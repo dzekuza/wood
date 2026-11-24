@@ -53,8 +53,16 @@ export const BLOG_LABEL = 'Advice & Inspiration';
  *  used by both the announcement bar and the footer, so the two can never drift
  *  apart again. */
 export const SOCIAL_LINKS = [
-  {platform: 'facebook', label: 'Facebook', url: 'https://www.facebook.com/profile.php?id=61567496682291'},
-  {platform: 'pinterest', label: 'Pinterest', url: 'https://uk.pinterest.com/craftwoodfurniture_homedecor/'},
+  {
+    platform: 'facebook',
+    label: 'Facebook',
+    url: 'https://www.facebook.com/profile.php?id=61567496682291',
+  },
+  {
+    platform: 'pinterest',
+    label: 'Pinterest',
+    url: 'https://uk.pinterest.com/craftwoodfurniture_homedecor/',
+  },
 ] as const;
 
 export type SocialPlatform = (typeof SOCIAL_LINKS)[number]['platform'];
@@ -63,11 +71,10 @@ export type SocialPlatform = (typeof SOCIAL_LINKS)[number]['platform'];
  *  the shop: free delivery applies to every order (no threshold), and the first
  *  line names the workshop rather than a location. */
 export const ANNOUNCEMENT_MESSAGES = [
-  'Handcrafted solid oak furniture, made at CraftWood Furniture',
+  'Handcrafted solid oak furniture, made at Craft Wood Furniture',
   'Free UK delivery on all orders',
   'Every piece cut, joined and finished in our own workshop',
 ];
-
 
 /** Total Etsy reviews behind the homepage headline — every review in the
  *  export (`app/data/etsy-ratings.ts`), not a rounded or signed-off figure. */
@@ -160,7 +167,9 @@ const HIDDEN_COLLECTION_TITLES = new Set([
 export type FlagshipPageHandle = keyof typeof FLAGSHIP_PAGE_ROUTES;
 
 export function getPagePath(handle: string) {
-  return FLAGSHIP_PAGE_ROUTES[handle as FlagshipPageHandle] ?? `/pages/${handle}`;
+  return (
+    FLAGSHIP_PAGE_ROUTES[handle as FlagshipPageHandle] ?? `/pages/${handle}`
+  );
 }
 
 export function getFlagshipPagePath(handle: string) {

@@ -30,13 +30,16 @@ const FOOTER_COLS = [
     links: [
       {title: 'All products', url: '/collections/all'},
       {title: 'By category', url: '/collections'},
-      ...ALL_COLLECTION_LINKS.map((link) => ({title: link.label, url: link.to})),
+      ...ALL_COLLECTION_LINKS.map((link) => ({
+        title: link.label,
+        url: link.to,
+      })),
     ],
   },
   {
     heading: 'Workshop',
     links: [
-      {title: 'Our makers', url: FLAGSHIP_PAGE_ROUTES.about},
+      {title: 'About Us', url: FLAGSHIP_PAGE_ROUTES.about},
       {title: BLOG_LABEL, url: '/blogs'},
     ],
   },
@@ -57,7 +60,11 @@ const POLICY_LINKS = [
   {title: 'Contact information', url: '/policies/contact-information'},
 ];
 
-export function Footer({footer: footerPromise, header, publicStoreDomain}: FooterProps) {
+export function Footer({
+  footer: footerPromise,
+  header,
+  publicStoreDomain,
+}: FooterProps) {
   return (
     <Suspense>
       <Await resolve={footerPromise}>
@@ -67,10 +74,16 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}: Foote
               {/* Brand column */}
               <div className="footer-brand-col">
                 <NavLink to="/" className="footer-logo-link">
-                  <img src="/logo.svg" alt={header.shop.name} className="footer-logo-img" />
+                  <img
+                    src="/logo.svg"
+                    alt={header.shop.name}
+                    className="footer-logo-img"
+                  />
                 </NavLink>
                 <p className="footer-tagline">
-                  Solid-timber furniture, cut, joined and finished by hand in our own workshop. No flat-pack, no veneers — just timber, time and patience.
+                  Solid-timber furniture, cut, joined and finished by hand in
+                  our own workshop. No flat-pack, no veneers — just timber, time
+                  and patience.
                 </p>
                 <div className="footer-socials">
                   <SocialLinks linkClassName="footer-social-btn" />
@@ -84,7 +97,9 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}: Foote
                   <ul className="footer-col-links">
                     {col.links.map((link) => (
                       <li key={link.url}>
-                        <NavLink prefetch="intent" to={link.url}>{link.title}</NavLink>
+                        <NavLink prefetch="intent" to={link.url}>
+                          {link.title}
+                        </NavLink>
                       </li>
                     ))}
                   </ul>
@@ -104,9 +119,9 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}: Foote
                   ))}
                 </nav>
               </div>
-                <p className="footer-legal">
-                  {COMPANY_LEGAL_LINE} · {CONTACT_PHONE_DISPLAY}
-                </p>
+              <p className="footer-legal">
+                {COMPANY_LEGAL_LINE} · {CONTACT_PHONE_DISPLAY}
+              </p>
             </div>
           </footer>
         )}

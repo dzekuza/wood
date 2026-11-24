@@ -1,7 +1,55 @@
 ---
 tags: [meta, changelog]
-updated: 2026-11-16
+updated: 2026-11-23
 ---
+
+## 2026-11-24 — Copy fixes + Merchant Center product-visibility cleanup
+
+From Craftwood WhatsApp group requests: fixed "CraftWood Furniture" → "Craft Wood Furniture" in the announcement bar (`app/lib/site.ts`) and the homepage craftsmanship heading (CMS `page_content` metaobject, handle `index`); renamed footer link "Our makers" → "About Us" (`app/components/Footer.tsx`). Confirmed two helper products (coat-racks/Hooks Colours, aaa-types-of-corbels/Types of Corbels) are published everywhere and should be unpublished to satisfy the client's hide request — blocked by the Admin MCP connector's own safety policy on `publishableUnpublish`, so left for manual Admin action. See [[status]] for outstanding Merchant Center flags.
+
+## 2026-11-23 — Architecture map incremental (synced b573b04)
+
+Covered `2f800aa` (page-content published reads cached 60s via `CacheCustom`). Updated page-content-cms note and line refs. Docs only. Chats not read.
+
+## 2026-11-23 — Architecture map incremental (synced 684220b)
+
+Covered `684220b` (PDP breadcrumb + JSON-LD link to keyword-anchored collection; new `collectionLinkForHandles`). Updated product-page note and internalLinks row. Docs only. Chats not read.
+
+## 2026-11-23 — Architecture map incremental (synced 324e699)
+
+Covered `324e699` (`ETSY_SHOP_URL` in `site.ts`, Organization `sameAs`, `/llms.txt` section). Updated seo module row and Etsy integration row. Docs only. Chats not read.
+
+## 2026-11-23 — Architecture map incremental (synced a290904)
+
+Covered `a290904` (`CartSummary.tsx` gift-card `<details>` + free-delivery note; `app.css` container width/padding). UI/copy only; added note under cart section, bumped synced_commit. Docs only. Chats not read.
+
+## 2026-11-22 — Architecture map incremental (synced 8349b01)
+
+Covered `8349b01` (shelves copy in `collectionContent.ts`, content only). Updated `COLLECTION_CONTENT` row. Docs only. Chats not read.
+
+## 2026-11-22 — Architecture map incremental (synced 06269d1)
+
+Covered `06269d1` (bare-domain 301 to www: `app/lib/canonicalHost.ts`, called first in `server.ts`). Updated worker-entry rows. Docs only. Chats not read.
+
+## 2026-11-20 — Architecture map incremental (synced de9658a)
+
+Covered `6916ef8` (AboutPage/Blog/CollectionPage JSON-LD) and `de9658a` (internal links: `internalLinks.ts`, `RelatedLinks`, footer, home, blog routes). Updated `codebase-map` seo/collections rows. Docs only. Chats not read.
+
+## 2026-11-20 — Architecture map incremental (synced 138c599)
+
+Covered `138c599` (review-photo thumbnails, `reviewThumbnail()` in `TestimonialsMarquee.tsx`; recompressed texture swatches). Updated `codebase-map` row and synced_commit. Docs only. Chats not read.
+
+## 2026-11-20 — Architecture map incremental (synced 10414fa)
+
+Covered 5 perf commits (`9d12e7c`..`10414fa`): `lib/cache.ts` `editorialCache`, self-hosted fonts and Tabler subset, deferred GA4 load. Updated `codebase-map` and `integrations`. Docs only. Working tree differs from HEAD (uncommitted); flagged. Chats not read.
+
+## 2026-11-20 — Architecture map incremental (synced eeb4446)
+
+Updated `codebase-map` for `49db18c` (`aboutPageJsonLd`, `blogJsonLd`) and `eeb4446` (`internalLinks.ts`, `RelatedLinks`, `guides` in collection content). Docs only. Working tree on `seo/schema-internal-links` shows those files reverted/deleted (uncommitted); flagged in the map. Chats not read.
+
+## 2026-11-18 — Architecture notes filled (first full run, synced 0ecfd74)
+
+Added `codebase-map`, `integrations`, `deepening-candidates`, `decisions-from-chat`; filled `system-overview`, `folder-structure`, `tech-stack`, `data-flow`, `environment-variables`. Docs only, no code changed. Chats and CRM were not read on this run.
 
 ## 2026-11-16 — Mobile LCP: hero and category images (uncommitted, pending push)
 
@@ -65,13 +113,13 @@ the project's `SHOPIFY_ADMIN_TOKEN`; descriptions sent back unchanged). The
 code fallbacks (`seoTitle`) now match, so the title stays the same if the
 Admin field is ever cleared:
 
-| Collection | New title |
-|---|---|
-| solid-oak-mantel-beams | Oak Mantel Beams & Mantelpieces \| Handmade UK |
+| Collection                    | New title                                           |
+| ----------------------------- | --------------------------------------------------- |
+| solid-oak-mantel-beams        | Oak Mantel Beams & Mantelpieces \| Handmade UK      |
 | solid-oak-fireplace-surrounds | Oak Fire Surrounds & Fireplace Surrounds \| UK Made |
-| solid-oak-shelves | Solid Oak Floating Shelves \| Solid Wood, UK Made |
-| solid-oak-coat-racks | Oak Coat Racks \| Wall Mounted Wooden Coat Hooks |
-| console-tables | Oak Console Tables \| Solid Wood Hallway Tables UK |
+| solid-oak-shelves             | Solid Oak Floating Shelves \| Solid Wood, UK Made   |
+| solid-oak-coat-racks          | Oak Coat Racks \| Wall Mounted Wooden Coat Hooks    |
+| console-tables                | Oak Console Tables \| Solid Wood Hallway Tables UK  |
 
 Previous Admin titles were "Solid Oak … | Handmade UK" (coat racks: "Solid
 Oak Coat Racks | Handmade, Wall Mounted"). Door stops and cube blocks still
@@ -161,8 +209,7 @@ The shop now has a real, answered number: `+44 7904 497890`. Restored `CONTACT_P
   `resolveSelectedOptions` (`app/lib/variantSelection.ts`) resolved the URL's
   option params by matching against this route's own 250-variant query
   (`variants(first: 250)` in `PRODUCT_VARIANTS_QUERY`). Any product with more
-  combinations than that (size × length × colour × working type easily tops
-  1000) could have the just-picked combination fall outside the first 250, so
+  combinations than that (size × length × colour × working type easily tops 1000) could have the just-picked combination fall outside the first 250, so
   the match failed and it silently fell back to the cheapest variant — which
   landed once the revalidated loader data overwrote the instant optimistic
   pick a moment later. Fix: when every option is already named in the URL
@@ -175,7 +222,7 @@ The shop now has a real, answered number: `+44 7904 497890`. Restored `CONTACT_P
   `ProductForm.tsx` had `productOptions.some((o) => o.name === name)`, which
   is true for every real variant option by construction — a leftover from
   before the "all required to add to cart" pass in `[[2026-10-29 — Options and
-  add-ons can be unselected; all required to add to cart]]` that never got
+add-ons can be unselected; all required to add to cart]]` that never got
   removed. Dropped that branch; an option now only shows as chosen once the
   shopper touches it or the page was opened on a link that already names it.
 - **Console "Depth x Length" dropdown sort order broken**: option values
@@ -185,7 +232,7 @@ The shop now has a real, answered number: `+44 7904 497890`. Restored `CONTACT_P
   it to both the dropdown and slider value lists in `ProductForm.tsx`.
 - **"Leg Height" showing a price that doesn't apply to it**: the dropdown
   priced every value off `value.firstSelectableVariant.price`, which is that
-  value's own cheapest combination of *other* options, not the price with the
+  value's own cheapest combination of _other_ options, not the price with the
   current selection held fixed — so a leg-height value could show a different
   figure than its neighbours even though leg height itself never changes the
   price. Switched to `value.variant.price` (Hydrogen's selection-aware
@@ -260,7 +307,7 @@ Brief: "Merchant Center Fixes – Developer Brief" (28 Oct). See ADR-0021.
   "(n on Etsy)"; the reviews headline reads "… reviews on Etsy".
 - **Reviews:** each card says "Review from Etsy"; marquee repeats are
   aria-hidden filler (the PDP no longer pads short lists with visible
-  duplicates). Review *text/names* still need the Etsy export to verify.
+  duplicates). Review _text/names_ still need the Etsy export to verify.
 
 ## 2026-10-29 — About page story heading missing its bottom gap
 
@@ -795,7 +842,7 @@ and links to `ETSY_REVIEWS_URL`, replacing a stale hardcoded "1,310 reviews".
 
 - **Cart add-on bug.** Removing a product left its add-on (surcharge) line in
   the cart, which then popped up as its own row. `CartLineItem` now removes
-  and re-quantities the product line *and* its paired add-on lines together.
+  and re-quantities the product line _and_ its paired add-on lines together.
   Add-ons also render as their own visible row ("+ Working type: Lightly
   Worked · £x") instead of tiny inline text the client couldn't see.
   `CartMain` pairing now prefers the parent whose `{group: option}` attribute
@@ -914,7 +961,7 @@ see [[../frontend/components/common|common components]]):
 - The value name (e.g. "White Oil") was a translucent rounded pill inset 6px
   from the tile edge. It's now a full-width bottom gradient overlay
   (`linear-gradient(to top, color-mix(in srgb, var(--cwf-ink-strong) 88%,
-  transparent), transparent)`) with the text sitting directly on the fade —
+transparent), transparent)`) with the text sitting directly on the fade —
   no pill shape, no `backdrop-filter`. The selected-state pill-solidify
   override is gone with it; the existing box-shadow ring still carries
   selection.
@@ -1169,13 +1216,14 @@ Two follow-ups landed and were reverted same-day before settling here — see
   (Clear/Old Oak/Dark/Grey/Light Grey/White) computed from a whole-catalog
   scan, with images/colours read live from Shopify's `shopify--color-pattern`
   metaobjects.
-- **Rejected:** PDP colour swatches reading the *real* photographed finish
+- **Rejected:** PDP colour swatches reading the _real_ photographed finish
   images live off the product's `custom.oil_colour`/`custom.colour`
   metafields (bypassing the broken `ProductOptionValue.swatch` field) — this
   technically worked (verified real photos rendering for Clear/Old
   Oak/Dark/Grey), but was reverted as "wrong images" per user feedback.
 
 **What actually shipped:**
+
 - `TexturesGrid` is back to its original shape exactly (category title,
   product count, per-tile link to the collection, `texture-*.jpg` close-up
   images) — see the "Colour swatches..." entry above this one, which is now
@@ -1215,7 +1263,7 @@ CSS (`.demo-tex-arrow`, `.demo-tex-title`, `.demo-tex-count` in
 > [!note] Still reusing category data, just for the image only
 > The images are still keyed off the product categories (`TEXTURE_IMAGES` by
 > collection handle) — this only removes the text/link chrome that made it
-> *look* like a nav grid. A future ask for genuine finish/colour swatches
+> _look_ like a nav grid. A future ask for genuine finish/colour swatches
 > (Clear Oil, Old Oak, etc.) here would be a different data source, not this
 > change.
 
@@ -1256,6 +1304,7 @@ same as the 2026-09-02 Oil Colour fix.
 
 Live Shopify Admin changes made via the Admin GraphQL API (`SHOPIFY_ADMIN_TOKEN`
 in `.env`), all confirmed with no `userErrors`:
+
 - Created `custom.colour` (`list.metaobject_reference`, validated to the shared
   `Color` metaobject definition `43664605526`, storefront `PUBLIC_READ`).
 - Created 6 new `shopify--color-pattern` metaobjects with **plain labels**
@@ -1277,14 +1326,14 @@ in `.env`), all confirmed with no `userErrors`:
 
 **Result: swatches still don't render.** After linking, `ProductOptionValue.swatch`
 still returns `null` via the Storefront API for **both** the new Colour option
-*and* the pre-existing Oil Colour option on the beam products — so the
+_and_ the pre-existing Oil Colour option on the beam products — so the
 2026-09-02 entry's claim that Oil Colour swatches would "just work" once linked
 was never actually verified end-to-end and appears to be wrong, or something
 changed since. No API-detectable cause was found (checked: `access.storefront`
 is `PUBLIC_READ` on both the metafield definition and the metaobject
 definition; tried API versions 2024-10 through unstable — all `null`).
 
-Tried switching the link to Shopify's *standard* `shopify.color-pattern`
+Tried switching the link to Shopify's _standard_ `shopify.color-pattern`
 metafield definition (id `492270616918`, same underlying metaobject
 definition) instead of the custom `custom.colour` one, since that's what
 Shopify's own "Add options like size or color" Admin picker uses — this was
@@ -1304,7 +1353,7 @@ open Solid Oak Block → Options and variants → link "Colour" through the
 built-in "Add options like size or color" flow (pick the new plain-labelled
 entries, or reuse the "...Oil" ones) — since the UI evidently does something
 beyond what `productOptionUpdate`/`metafieldDefinitionCreate` expose over the
-API. Worth checking the *existing* Oil Colour option there too, since it has
+API. Worth checking the _existing_ Oil Colour option there too, since it has
 the identical unresolved-swatch symptom.
 
 ---
@@ -1410,13 +1459,13 @@ identity change, so it wants asking first.
 
 Five values on `.maker` were off the comp:
 
-| | was | now |
-|---|---|---|
-| ground | `--cwf-dark` (`#443c35`) | `--cwf-ink` (`#1c1c1c`) |
-| columns | `1fr 1.4fr` | `1fr 1fr` |
-| `.ph` ratio | `5/6` | `1/1` |
-| `.sig` | Mark Bold 700 italic, `-.04em` | Outfit 500, no italic, no tracking |
-| `.maker p` | `max-width: 520px` | none — fills the column |
+|             | was                            | now                                |
+| ----------- | ------------------------------ | ---------------------------------- |
+| ground      | `--cwf-dark` (`#443c35`)       | `--cwf-ink` (`#1c1c1c`)            |
+| columns     | `1fr 1.4fr`                    | `1fr 1fr`                          |
+| `.ph` ratio | `5/6`                          | `1/1`                              |
+| `.sig`      | Mark Bold 700 italic, `-.04em` | Outfit 500, no italic, no tracking |
+| `.maker p`  | `max-width: 520px`             | none — fills the column            |
 
 Everything else already agreed with the comp and was left alone: the global
 `h1,h2,h3` rule is Outfit 500 / 56px / `-.03em` / 1.15, exactly the design's
@@ -1483,7 +1532,7 @@ card title that was asked about.
 
 Every `<em>` inside a page heading was `var(--cwf-accent)` — the pale gold —
 against a walnut or charcoal heading, so `Browse <em>Categories</em>` read as
-two colours and the emphasised word was the *faintest* text in the line. All
+two colours and the emphasised word was the _faintest_ text in the line. All
 eight rules (`.page-header h1 em`, `.pdp-info h1 em`, `.pdp-maker h2 em`,
 `.hero h1 em`, `.archive-hero-title em`, `.news h2 em`, `.maker h2 em`,
 `.coming-soon-title em`) now take `color: inherit`.
@@ -1599,7 +1648,7 @@ var or header can bring it back.
 
 **Codegen was failing with 5 errors.** Its `default` project globs all of
 `app/**` and validates every `#graphql`-tagged document against the
-*Storefront* schema — so the Admin API operations ("Cannot query field
+_Storefront_ schema — so the Admin API operations ("Cannot query field
 `metaobjectByHandle`") and the Customer Account query ("Cannot query field
 `emailAddress` on type Customer") both blew up. The Admin documents are now
 untagged, and the customer query moved to
@@ -1615,7 +1664,7 @@ returns `isAdmin: true` and the stored draft, and `ensure-draft` succeeds.
 `LANDING_SLUG` was exported from `pageContent.server.ts` and read by the
 component tree as well as the loader. React Router only strips server code from
 `loader`/`action`/`middleware`/`headers`, so Vite rejected the route with
-*"Server-only module referenced by client"* — the homepage still server-rendered
+_"Server-only module referenced by client"_ — the homepage still server-rendered
 but never hydrated, and the toolbar never mounted for an admin. The constant
 moved to the client-safe `pageContent.ts`.
 
@@ -1697,12 +1746,12 @@ homepage: the `home_page` metaobject supplies those fields, and the metaobject
 always wins ([[../frontend/homepage-content|homepage-content]]). Four values
 still read "Collections" and were updated in Admin:
 
-| Metaobject | Field | Now |
-|---|---|---|
-| `home_hero_slide/brand-slide` | `secondary_cta_label` | Explore Categories |
-| `home_page/main` | `categories_link_label` | All Categories |
-| `home_page/main` | `popular_cta_label` | Explore Categories |
-| `home_page/main` | `process_cta_label` | Explore Categories |
+| Metaobject                    | Field                   | Now                |
+| ----------------------------- | ----------------------- | ------------------ |
+| `home_hero_slide/brand-slide` | `secondary_cta_label`   | Explore Categories |
+| `home_page/main`              | `categories_link_label` | All Categories     |
+| `home_page/main`              | `popular_cta_label`     | Explore Categories |
+| `home_page/main`              | `process_cta_label`     | Explore Categories |
 
 The lesson generalises: **any copy change to a metaobject-backed field is a
 two-place change** — the coded fallback for an unseeded storefront, and the
@@ -1728,7 +1777,7 @@ mean the whole catalogue, not the nav concept.
 "Jointed by hand" (an operation the shop does not perform) and "Oiled &
 finished" are gone, leaving Rough-cut and Drawn & marked.
 
-The interesting part is *how*. Deleting them from `HOME_CONTENT_DEFAULTS` alone
+The interesting part is _how_. Deleting them from `HOME_CONTENT_DEFAULTS` alone
 would have changed nothing — the `home_process_step` metaobjects still supply
 four entries, and defaults only apply when a reference is absent. Rather than
 leave the site wrong until someone edits Admin, `ProcessIconKey` is now the
@@ -1737,7 +1786,7 @@ any entry whose `icon` names a key not in it. Retiring a step is a code change
 that takes effect on the next load; deleting the Admin entry is cleanup.
 
 A blank icon still means "merchant omission" and borrows the positional
-default — only a *named but unknown* key counts as retired, so a half-filled
+default — only a _named but unknown_ key counts as retired, so a half-filled
 entry is never silently eaten.
 
 - `homeContent.ts` — `ProcessIconKey` narrowed to `'rough-cut' | 'drawn-marked'`;
@@ -1845,7 +1894,7 @@ rest are listed under "Still open" below.
   footer link, the workshop hours + "Visit the workshop" notes on `/contact`,
   `WORKSHOP_LOCATION`/`WORKSHOP_VISIT_NOTE`/`WORKSHOP_HOURS` in `lib/site.ts`,
   and "est. 1998 · Aldsworth, Cotswolds" in the footer copyright. "Made in our
-  own workshop" as a *claim* stays — the client explicitly approved it.
+  own workshop" as a _claim_ stays — the client explicitly approved it.
 - **25-year guarantee removed everywhere** ("labai cia slidi tema"): the
   homepage process step, the PDP highlight pill / assurance tile / Care
   accordion (now "Care & Finish"), the `/landing-oak` FAQ entry, and the
@@ -1982,7 +2031,7 @@ transparent.
 Investigated via Chrome DevTools network + DOM inspection on the PDP and
 `/collections/all`. Three components rendered product images as plain
 `<img src={node.url}>` instead of Hydrogen's `<Image>` component, so the
-browser downloaded Shopify's *full source resolution* file (PNG sources up
+browser downloaded Shopify's _full source resolution_ file (PNG sources up
 to ~2.9MB, ~230–270KB even after Shopify's automatic webp re-encode) for
 every thumbnail-sized slot, with no `srcset`/`sizes` to let the browser
 pick something smaller:
@@ -2031,12 +2080,13 @@ property makes the property it's used in invalid, so `border: 1px solid
 var(--line)` computed to no border at all — combined with the card's `#fff`
 background sitting on the page's near-white `--cwf-surface`, the card read
 as bg-less, which is what the user saw. Fixed:
+
 - `border: 1px solid var(--line)` → `.5px solid var(--cwf-line)` (matching
   the border weight/token every other card in the site uses)
 - `.art-card-img`'s `background: var(--sand)` → `var(--cwf-sand)`
 - `.art-card-title`'s `color: var(--primary)` → `var(--cwf-primary)`
 - `.art-card-date`/`.art-card-cta` were also on `var(--cwf-accent-deep)`
-  (this one *was* a real token, just the wrong one per the dark-not-brown
+  (this one _was_ a real token, just the wrong one per the dark-not-brown
   direction running through today's other entries) → `var(--cwf-ink-strong)`
 
 Also `.blog-articles-grid`: `gap: 2rem` → `1rem`, and dropped
@@ -2059,11 +2109,11 @@ gaps above/below and between cards.
   article and caps at 3, rendered via `ArticleCard` in the same
   `.blog-articles-grid` used elsewhere.
 - **`blogs._index.tsx`** ("Journal") rewritten: it used to list one card per
-  *blog* (a "News" card with an "Open journal" button hiding the actual
+  _blog_ (a "News" card with an "Open journal" button hiding the actual
   articles behind a click) — the user wanted articles themselves visible
   here, since the store only really has one editorial blog. New loader
   fetches `blogs(first: 10) { articles(first: 50, sortKey: PUBLISHED_AT,
-  reverse: true) }`, flattens every blog's articles into one array, sorts
+reverse: true) }`, flattens every blog's articles into one array, sorts
   newest-first client-side, and renders them directly via `ArticleCard` in
   `.blog-articles-grid` — same layout as `blogs.$blogHandle._index.tsx`'s
   per-blog listing. Holds up if a second blog is ever added (articles from
@@ -2088,8 +2138,9 @@ default and won't auto-center) and tightened `.article-body` from 820px to
 `.cms-page-body` (Shopify page/article `dangerouslySetInnerHTML` content —
 `pages.$handle`, `policies.$handle`, and article pages via `.article-body`)
 had three bugs surfaced by a merchant-added blog article and policy page:
+
 - **Bullets were invisible.** `reset.css`'s global `ul { list-style: none;
-  padding: 0 }` (there for nav/UI lists site-wide) also flattened real
+padding: 0 }` (there for nav/UI lists site-wide) also flattened real
   `<ul>/<li>` prose lists from Shopify's rich-text editor. Restored
   `list-style`/`padding-left` scoped to `.cms-page-body ul`/`ol`.
 - **`<p>`/`<li>` text rendered at 17px, not 16px** — same root cause as the
@@ -2099,7 +2150,7 @@ had three bugs surfaced by a merchant-added blog article and policy page:
   Added explicit `.cms-page-body p, .cms-page-body li { font-size: 16px }`.
 - **Body text was brown** — `color: rgba(74,47,31,.78)` hardcoded, same
   pattern as the PDP audit two entries below; switched to `color-mix(in
-  srgb, var(--cwf-ink-strong) 78%, transparent)`.
+srgb, var(--cwf-ink-strong) 78%, transparent)`.
 
 Also added `.cms-page-body h1`/`h2`/`h3` scoped sizing (`clamp()`, same
 approach as the contact-card entry) — merchant content occasionally opens
@@ -2157,7 +2208,7 @@ proportionate to the card.
   text under each channel and the note paragraphs
   (`.contact-channel span:last-child`, `.contact-note p`) went from
   hardcoded `rgba(74,47,31,.7)` to `color-mix(in srgb, var(--cwf-ink-strong)
-  70%, transparent)` (same audit pattern as the PDP entry below) **and**
+70%, transparent)` (same audit pattern as the PDP entry below) **and**
   gained an explicit `font-size: 16px` — they had none before, so they
   inherited `html,body`'s `font-size: 17px` (`app.css` sets the site's rem
   base to 17px, not the browser default 16px) rather than the 16px other
@@ -2187,6 +2238,7 @@ related-products block actually use `.tcard`/`.tgrid-*` and `.pgrid`/
 text, replaced the hardcoded `rgba(74, 47, 31, X)` with
 `color-mix(in srgb, var(--cwf-ink-strong) X%, transparent)` — same opacity,
 now a token instead of a raw triplet:
+
 - `.pdp-sub`, `.pdp-acc-body` (the two the user pointed at directly)
 - `.pdp-price-from`, `.pdp-price-vat`, `.pdp-rating-row`, `.pdp-rating-sep`
 - `.pdp-guarantee`, `.pdp-guarantee-sep`, `.pdp-assure-small`, `.pdp-spec-sub`
@@ -2201,6 +2253,7 @@ now a token instead of a raw triplet:
 
 **Deliberately left alone** (confirmed each is either non-text or
 intentionally not in scope):
+
 - Border-colors and background tints at low opacity
   (`rgba(74,47,31,.2–.25)` borders, `.03` background tints on
   `.pdp-carousel-dot`, `.pdp-wish-btn`, `.pdp-qty`, `.product-opt-select`,
@@ -2209,7 +2262,7 @@ intentionally not in scope):
 - `.pdp-info h1`, `.pdp-price-big`, `.pdp-highlight-item`,
   `.pdp-assure-strong`, `.pdp-acc summary`, `.pdp-spec-val`,
   `.crumb-here`/`.rev-score .big`/`.rev-card .headline`/`.tcard q`/`.tcard
-  .nm` (dead code aside) — all `var(--cwf-primary)` walnut used for
+.nm` (dead code aside) — all `var(--cwf-primary)` walnut used for
   headings/emphasis/price, the brand's intended use of that token, not
   incidental brown body text
 - `.pdp-viewing`/`.pdp-urgency` (hardcoded amber/orange, not
@@ -2249,7 +2302,7 @@ raised against the CTA.
 
 ## 2026-08-31 — PDP option values: dark instead of walnut brown
 
-Follow-up to the entry below: after the eyebrow/label fixes, the *values*
+Follow-up to the entry below: after the eyebrow/label fixes, the _values_
 next to those labels still read brown — `.product-opt-picked` (the "Sanded",
 "Standard", "Clear + Black" text at the right of each option row) and
 `.product-opt-select` (the Size dropdown's own text) were colored
@@ -2272,6 +2325,7 @@ text, so they stay walnut on purpose.
 Same dark-not-brown direction as the two entries below, applied across the
 product page (`products.$handle.tsx` + `ProductForm.tsx`). Changed
 `color: var(--cwf-accent-deep)` → `var(--cwf-ink-strong)` in `app.css` for:
+
 - `.pdp-info .eyebrow`, `.pdp-specs-head .eyebrow`, `.pdp-related-head .eyebrow`,
   `.pdp-reviews .rhead .ey`, `.pdp-related .related-head .ey` — the small
   uppercase eyebrow labels above PDP section headings
@@ -2306,6 +2360,7 @@ Follow-up to the Categories-heading tweak below: the same request now
 applies to every sidebar filter heading, not just Categories. Changed the
 shared `.filters-content h4` rule directly (`app.css`) instead of adding more
 one-off overrides:
+
 - Removed `border-bottom` and `margin-bottom` — `padding-bottom: 12px` alone
   now supplies the gap to the content below, so Price/Categories/Availability
   all look identical to what `.category-nav h4`'s override produced.
@@ -2405,8 +2460,8 @@ Store-side change (no repo code touched), done via the Shopify Admin API.
   ACTIVE — they are checkout add-on line items, not catalog products.
 
 Chronological log of notable changes to the project. Newest first.
-This is a human-curated log — not a mirror of `git log`. Record *why*, not just
-*what*; the diff already covers *what*.
+This is a human-curated log — not a mirror of `git log`. Record _why_, not just
+_what_; the diff already covers _what_.
 
 ## 2026-08-27 — Product card titles clamp to one line
 
@@ -2599,7 +2654,7 @@ in the lint cleanup earlier today). Two things it needed first:
 - `createPortal` to `document.body`. `.demo-review-track` is
   transform-animated, and a transformed ancestor becomes the containing block
   for `position: fixed` — the same trap that had the PDP review lightbox opening
-  ~1600px off-screen. Fixed here *before* wiring it up rather than after.
+  ~1600px off-screen. Fixed here _before_ wiring it up rather than after.
 - `button.demo-review-photo` styling, `button.`-prefixed so it outranks
   `button.reset { background: inherit }`.
 
@@ -2782,7 +2837,7 @@ All five scripts still parse (`node --check`).
 **The bug this turned up:** verifying the reworked overlay showed the review
 lightbox rendering ~1600px off-screen. `.rev-marquee-track` animates with
 `transform`, and a transformed ancestor becomes the containing block for
-`position: fixed` — so the overlay was pinned to the *moving marquee* rather
+`position: fixed` — so the overlay was pinned to the _moving marquee_ rather
 than the viewport. It's now `createPortal`'d to `document.body`. This predates
 today's work; the old wrapper-div click handler masked it, because clicking the
 div closed it wherever the div happened to be.
@@ -2833,7 +2888,7 @@ right — and the message now cycles through `ANNOUNCEMENT_MESSAGES` (site.ts)
 every 4s with a short fade.
 
 The bar is a `grid-template-columns: 1fr auto 1fr`. That's what finally makes the
-message *actually* centred: yesterday's fix made the contact block a flex item to
+message _actually_ centred: yesterday's fix made the contact block a flex item to
 stop it being overlapped, but that only centred the message in the space left
 over. Equal `1fr` side columns center it against the viewport by construction.
 
@@ -2917,7 +2972,7 @@ rules are now `button.`-prefixed. The nav/arrow/dot styles are shared between
 the two carousels via grouped selectors so they can't drift.
 
 One cascade trap worth remembering: `.demo-cat-nav { display: none }` initially
-sat in the 620px media block *above* the shared `.demo-popular-nav,
+sat in the 620px media block _above_ the shared `.demo-popular-nav,
 .demo-cat-nav { display: flex }` rule. Equal specificity, later rule wins — the
 nav stayed visible on mobile until the hide moved below it.
 
@@ -2952,7 +3007,7 @@ declares `font-size: 14px` explicitly (13px on mobile), and the bar itself is
 ~1050px wide the two overlapped by 100px, printing the Cotswolds line straight
 through the phone number. The contact block is now a normal flex item
 (`flex-shrink: 0`) and the message is `flex: 1; text-align: center`. Trade-off:
-the message is now centred in the space *left of* the contacts rather than
+the message is now centred in the space _left of_ the contacts rather than
 dead-centre in the viewport — it can no longer collide, which matters more.
 Below the mobile breakpoint the contacts are `display: none`, so the message is
 genuinely centred there.
@@ -2977,7 +3032,7 @@ Three things, from a UI pass on `HeroCarousel`:
 **The dots were invisible, and had been.** `.demo-hero-dot` set
 `background: #fff`, but `app.css` has `button.reset { background: inherit }` —
 specificity (0,1,1) vs (0,1,0), so `inherit` won and every dot painted
-transparent against a transparent parent. Only the active pill's *width* hinted
+transparent against a transparent parent. Only the active pill's _width_ hinted
 that anything was there. The dot rules are now written as
 `button.demo-hero-dot` so they outweigh the reset. **Any control that carries
 `.reset` and needs a background has this problem** — write the selector with
@@ -2991,7 +3046,7 @@ the page surface now, not on a dark photo.
 
 **Autoplay with a visible dwell.** Slides advance every 3s. The active dot
 stretches into a 40px pill whose `::after` fills left-to-right via
-`scaleX` over the same duration, so the pill *is* the progress indicator. Two
+`scaleX` over the same duration, so the pill _is_ the progress indicator. Two
 details worth keeping:
 
 - The timer effect is keyed on `active`, so a manual arrow/dot click restarts
@@ -3040,7 +3095,7 @@ buttons 18px, every other button 16px.
 - `.demo-btn-solid-dark` lost its own `font-size: 18px` and now inherits the
   16px base.
 - The three mobile `.demo-btn` overrides (780/480/400px) were global selectors
-  living inside hero-only media blocks — so they shrank *every* button on
+  living inside hero-only media blocks — so they shrank _every_ button on
   mobile as a side effect of scaling the hero. They are now scoped to
   `.demo-hero-ctas .demo-btn` and re-based off 18px (16/15/14px). Non-hero
   buttons stay flat at 16px on all widths.
@@ -3096,7 +3151,7 @@ before styling new heading-like text.
 One useful discovery mid-change: the homepage's `demo.css` (a separate
 "distinct type system" for `_index.tsx`/`landing-oak.tsx`, loaded via its
 own Google Fonts `Outfit` link) already used `'Outfit'` as a family name
-for its section heads at 36px, and `.demo-benefits-heading` was *already*
+for its section heads at 36px, and `.demo-benefits-heading` was _already_
 56px — i.e. 56px was already the established "hero-scale" size in that
 system before this change, which is a good sign this size choice fits the
 existing rhythm rather than being arbitrary.
@@ -3130,8 +3185,8 @@ existing rhythm rather than being arbitrary.
   `ProductItem.tsx` only ever rendered `featuredImage`. Added a second
   absolutely-positioned `<img>` (`product.images.nodes` entry that isn't the
   featured image) that crossfades in via `.pcard-img:hover
-  .pcard-img-frame-hover`, guarded by the existing `@media (hover: hover)
-  and (pointer: fine)` pattern already used elsewhere on `.pcard`.
+.pcard-img-frame-hover`, guarded by the existing `@media (hover: hover)
+and (pointer: fine)` pattern already used elsewhere on `.pcard`.
 
 ## 2026-08-25 — Card swatches, category carousel, and object-fit crop fixes
 
@@ -3181,8 +3236,8 @@ label at this width is not a loss of information, just less crowding.
 page load for any product with a tall options form (many variant/upsell rows push
 the CTA below the fold before the user scrolls at all). Root cause: the
 `IntersectionObserver` callback did `setShowSticky(!entry.isIntersecting)` —
-`isIntersecting` is `false` both when the target has scrolled *past* (above the
-viewport) and when it simply hasn't been scrolled *to* yet (below the viewport on
+`isIntersecting` is `false` both when the target has scrolled _past_ (above the
+viewport) and when it simply hasn't been scrolled _to_ yet (below the viewport on
 initial load), and the code treated both as "show the bar." Fixed by also
 requiring `entry.boundingClientRect.top < 0` (target's top edge is above the
 viewport — i.e. actually scrolled past), not just "not currently visible."
@@ -3202,6 +3257,7 @@ where it previously hid the whole price/title block and showed just the button.
 
 Restructured `app/routes/products.$handle.tsx` / `app/components/ProductForm.tsx`
 after reviewing a reference storefront's product page layout:
+
 - Added `.pdp-highlights` — a short icon+text bullet list (material, guarantee,
   delivery) between the title and price, mirroring the reference's benefit list
   above the variant picker. New CSS block next to `.pdp-rating-row` in `app.css`.
@@ -3212,7 +3268,7 @@ after reviewing a reference storefront's product page layout:
   any selected upsell lines in `cartLines`. `.pdp-cta-row` grid changed from
   `1fr auto` to `auto 1fr auto` to fit the new stepper; the wishlist heart button
   hides at `max-width: 480px` to keep the row from cramping on small phones.
-  **Gotcha:** the mobile-hide media query must be declared *after* the base
+  **Gotcha:** the mobile-hide media query must be declared _after_ the base
   `.pdp-wish-btn { display: flex }` rule in the cascade — putting it earlier (same
   specificity) meant the base rule always won and the button never actually
   hid on mobile, even though the query matched.
@@ -3230,6 +3286,7 @@ after reviewing a reference storefront's product page layout:
 
 Follow-ups on the collection-page redesign above, both in `.category-card*`
 (`app/styles/app.css`):
+
 - Mobile cards were `flex: 0 0 42%` (~150px), leaving ~38px for text after
   the 64px image + padding + gap — titles like "Solid Oak Coat Racks"
   rendered as "So…". `.category-card-name` was single-line
@@ -3238,7 +3295,7 @@ Follow-ups on the collection-page redesign above, both in `.category-card*`
   mobile card to `flex: 0 0 78%` / `min-width: 240px` with a smaller
   52px image, so the full title fits.
 - `.category-card-img` had `background: var(--cwf-card)` + `object-fit:
-  cover`, filling the square with a cream box and cropping the photo —
+cover`, filling the square with a cream box and cropping the photo —
   wrong for these Shopify collection images, which are transparent
   product cutouts (same style as the `public/demo/category-*.png` assets
   used elsewhere). Reverted to `object-fit: contain` with no background,
@@ -3333,16 +3390,16 @@ sibling-category row + sidebar filters + product badges).
   default `min-width: auto` on grid items lets a track's content-based
   minimum win over `1fr`'s equal-share intent — one column's `.pcard` had
   wider min-content (a `.pcard-bottom-row` with an unbreakable price string
-  + 6 swatch dots side by side) than the other, so `repeat(2, 1fr)` stopped
-  being equal. This is the classic "1fr isn't always equal" CSS Grid trap;
-  fix is `min-width: 0` on the grid item. Added it to `.pcard`.
-  Fixing the width alone surfaced a second issue: the freed-up-but-still-
-  too-narrow `.pcard-bottom-row` (price + swatches) was overflowing
-  horizontally into the next column since `justify-content: space-between`
-  doesn't wrap by default. Added `flex-wrap: wrap` to `.pcard-bottom-row`
-  and `min-width: 0` to `.pcard-price-row` so swatches drop to their own
-  line on narrow cards instead of overlapping the neighboring card.
-  Verified at the `mobile` (375px) preset — equal columns, no overlap.
+  - 6 swatch dots side by side) than the other, so `repeat(2, 1fr)` stopped
+    being equal. This is the classic "1fr isn't always equal" CSS Grid trap;
+    fix is `min-width: 0` on the grid item. Added it to `.pcard`.
+    Fixing the width alone surfaced a second issue: the freed-up-but-still-
+    too-narrow `.pcard-bottom-row` (price + swatches) was overflowing
+    horizontally into the next column since `justify-content: space-between`
+    doesn't wrap by default. Added `flex-wrap: wrap` to `.pcard-bottom-row`
+    and `min-width: 0` to `.pcard-price-row` so swatches drop to their own
+    line on narrow cards instead of overlapping the neighboring card.
+    Verified at the `mobile` (375px) preset — equal columns, no overlap.
 
 ## 2026-08-25 — Craftsmanship + Textures sections switched to white; category arrow now hover-only
 
@@ -3357,7 +3414,7 @@ sibling-category row + sidebar filters + product badges).
   their own dark brown background — same "dark card on light section"
   pattern already used for testimonial review cards.
   **Note:** `.demo-textures` still carries `max-width: 1400px; margin: 0
-  auto` on the section element itself, so its white background is a
+auto` on the section element itself, so its white background is a
   centered box, not full-bleed — on viewports wider than ~1600px you'll
   see the page's cream background at the edges. `.demo-process` is
   `width: 100%` so it's genuinely edge-to-edge. Restructuring `.demo-textures`
@@ -3389,7 +3446,7 @@ sibling-category row + sidebar filters + product badges).
   next dark one (Craftsmanship). [[../CLAUDE.md|CLAUDE.md]]'s "never two
   consecutive dark sections" rule is still satisfied (it doesn't forbid
   consecutive light ones), but it's a deviation from the alternating-rhythm
-  *intent* — flagging here since it was a direct styling request, not a
+  _intent_ — flagging here since it was a direct styling request, not a
   Figma-audit finding.
 
 ## 2026-08-25 — fixed invisible "filled" star/heart icons; light-section h2 color pass
