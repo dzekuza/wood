@@ -3593,3 +3593,4 @@ auto` on the section element itself, so its white background is a
 - Project brain scaffolded from the shared `.project-brain` template: vault,
   root shims (`AGENTS.md` / `CLAUDE.md` / `.cursorrules`), and the three Claude
   Code hooks that keep this vault in sync.
+- 2026-11-24: architecture incremental sync b573b04 → e74bed1 (copy-only changes in site.ts/Footer.tsx; refreshed site.ts line refs in codebase-map).

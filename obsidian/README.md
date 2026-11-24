@@ -25,6 +25,10 @@ and AI agents (Claude Code, Cursor).
 - [[folder-structure]] — where everything lives and what belongs where
 - [[data-flow]] — how state and data move through the app
 - [[environment-variables]] — config & secrets handling
+- [[codebase-map]] — modules, diagram, exported functions, routes (synced to a commit)
+- [[integrations]] — every external service, env var names, routes
+- [[deepening-candidates]] — architectural friction found, no redesign
+- [[decisions-from-chat]] — decisions and constraints from client chat and CRM tasks
 
 ### 02 — Frontend
 - [[routing]] — App Router conventions, route → view delegation

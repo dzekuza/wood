@@ -1,6 +1,6 @@
 ---
-tags: [architecture, wip]
-updated: 2026-08-25
+tags: [architecture]
+updated: 2026-11-18
 ---
 
 # Folder Structure
@@ -9,27 +9,35 @@ Where everything lives and what belongs where. If a file has no obvious home, th
 answer belongs in this note before the file is written.
 
 ```
-src/
-├── app/            ← routes only; thin, delegate to views
-├── views/          ← page-level composition
-├── components/
-│   ├── ui/         ← design-system primitives (shadcn/ui etc.)
-│   └── common/     ← shared composed components
-├── hooks/          ← custom hooks — catalog: [[hooks]]
-├── lib/            ← clients, config, integrations
-├── utils/          ← pure helpers — catalog: [[utils]]
-├── data/           ← static data & mocks
-└── types/          ← shared types
+wood/
+├── server.ts           ← Worker fetch handler
+├── app/
+│   ├── root.tsx, routes.ts, entry.client.tsx, entry.server.tsx
+│   ├── routes/         ← one file per URL (flat routes): loader, action, meta, view
+│   ├── components/     ← UI; animate-ui/ holds motion primitives and icons
+│   ├── hooks/          ← useFavourites, useUnitSystem, use-is-in-view
+│   ├── lib/            ← pure helpers, GraphQL fragments, *.server.ts (Admin API, page content)
+│   ├── data/           ← static Etsy review/rating data
+│   ├── graphql/        ← Customer Account API queries
+│   ├── styles/         ← app.css (brand tokens), demo.css, reset.css
+│   └── assets/
+├── workers/            ← price-sync Worker (cron) + its wrangler.toml
+├── scripts/            ← one-off catalogue/import tooling (.mjs)
+├── content/blog/       ← guide drafts as local Markdown (published to Shopify by hand)
+├── public/             ← static files incl. Google verification HTML
+├── obsidian/           ← this vault
+└── wrangler.toml, vercel.json, react-router.config.ts, vite.config.ts
 ```
+
+Generated files: `storefrontapi.generated.d.ts`, `customer-accountapi.generated.d.ts` (do not edit). Path alias `~` → `app/`. Root also holds loose screenshots (`*.png`) and design folders (`design-talutti-*`, `woodshopify`); TODO: unknown whether still needed.
 
 ## Rules
 
-- **kebab-case** file names: `event-card.tsx`, `use-auth.ts`.
-- Route groups in parentheses: `(auth)/`, `(dashboard)/`.
-- Feature-specific components live next to the feature, not in `components/ui/`.
-- Co-locate types with the code that uses them; shared types go in `types/`.
-- Assets per section under `public/assets/<section>/`.
+- **kebab-case** is the global rule, but this repo uses PascalCase component files (`ProductForm.tsx`) and Hydrogen route names (`products.$handle.tsx`); follow the existing pattern.
+- Each route file owns its queries; shared fragments go in `lib/fragments.ts`.
+- `*.server.ts` files must never be imported from components.
+- Custom CSS classes in `app/styles/app.css` over utility classes (see CLAUDE.md).
 
 ## Related
 
-[[routing]] · [[component-conventions]]
+[[routing]] · [[component-conventions]] · [[codebase-map]]

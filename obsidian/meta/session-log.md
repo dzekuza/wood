@@ -10,6 +10,10 @@ project**. Newest first. Keep entries short (3–6 lines). Notable user-facing o
 architectural changes also go in [[changelog]] / [[decisions-log]]; the live
 snapshot lives in [[status]].
 
+## 2026-11-24 — Architecture incremental sync
+- **Changed:** `architecture/codebase-map.md` (site.ts line refs, synced_commit → e74bed1). No structural change: commit e74bed1 was copy-only.
+- **Status:** WhatsApp/CRM chats skipped on this automated run.
+
 Entry format:
 
 ```
