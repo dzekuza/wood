@@ -3,6 +3,18 @@ tags: [meta, changelog]
 updated: 2026-11-23
 ---
 
+## 2026-11-25 — Architecture docs incremental sync
+
+`codebase-map.md` synced `8c8428d` → `e387cd5`: added `catalogCache`, `/llms-full.txt`, AI-crawler rules in robots, `contactPageJsonLd`/`extractFaqsFromArticleHtml`, `EBAY_STORE_URL`. No chat reading on this run.
+
+## 2026-11-25 — 4 SEO guides published, www link fix, shelf keywords tracked
+
+Published 4 guides in Shopify blog `news` (Admin API, `isPublished: true`, SEO title/description in `global.title_tag`/`description_tag`): `oak-mantel-beam-clearance-above-log-burner`, `solid-oak-vs-oak-veneer-mantel-beams`, `how-to-fit-floating-shelves-plasterboard-stud-dot-and-dab`, `alcove-floating-shelves-uk-measuring-spacing-guide`. No cover images (none in frontmatter). Also moved non-www internal links to www in 3 live guides and added 3 shelf keywords to the OpenSEO CraftedWood tracker (monthly check, max 366 credits). SKU backfill done and verified: 7,158 variants across the 9 main products got readable SKUs via `productVariantsBulkUpdate` (prefixes FS, FSB, FP, MB, MBF, MBC, CT, BT, DS + size and colour codes, e.g. `MB-10X6-6.5FT-CLR`). Coat racks, surcharge and helper products untouched.
+
+## 2026-11-24 — Architecture docs incremental sync
+
+`codebase-map.md` synced to `8c8428d`: only `structuredData.ts` (alternateName array) changed in code; hooks/TASKS.md are tooling, not architecture. No chat reading on this run.
+
 ## 2026-11-24 — Brand name variants in Organization schema
 
 `organizationJsonLd()` (`app/lib/structuredData.ts`) now lists `alternateName` as `['CraftWood Furniture', 'CraftWoodFurniture', 'CraftWood']` to help the brand queries (position 5, low CTR) resolve to the homepage. Uncommitted at time of writing. Live Shopify article `oak-mantel-beam-sizes` (blog `news`) got an answer-first "sizes at a glance" section (length and profile tables) on 2026-11-24, edited via Admin API, not in git. Mantel sizes guide link wiring was already in place (`GUIDE_LINKS.mantelSizes`); the answer-first size table is CMS content in the Shopify article, not repo code.

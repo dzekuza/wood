@@ -11,6 +11,20 @@ architectural changes also go in [[changelog]] / [[decisions-log]]; the live
 snapshot lives in [[status]].
 
 
+
+## 2026-11-25 — Architecture docs incremental sync
+- **Changed:** `architecture/codebase-map.md` synced_commit `8c8428d` → `e387cd5` (cache, llms-full, robots, structuredData, site rows).
+- **Next:** `deepening-candidates.md`, `integrations.md`, `decisions-from-chat.md` not refreshed; chat/CRM skipped.
+
+## 2026-11-25 — Publish guides, SKU scoping
+- **Changed:** 4 guides published live in Shopify (verified 200 + canonical). www link fix on 3 guides, 3 shelf keywords added to rank tracker (earlier turn).
+- **Status:** SKU backfill applied and read back: 7,158 variants, 0 mismatches, 0 empty. Prefixes FS, FSB, FP, MB, MBF, MBC, CT, BT, DS; colours WHT/LGR/GRY/DRK/OLD/CLR; fixings HID/BLK.
+- **Next:** resolve shelves lead-time wording (5 to 10 working days vs up to 5 days); commit vault notes.
+
+## 2026-11-24 — Architecture docs incremental sync
+- **Changed:** `architecture/codebase-map.md` synced_commit `e74bed1` → `8c8428d`; `organizationJsonLd` row notes alternateName array.
+- **Next:** none; chat/CRM decisions not refreshed this run.
+
 ## 2026-11-24 — SEO rankings review + brand schema
 - **Changed:** `organizationJsonLd()` `alternateName` now lists 3 brand variants (uncommitted). Committed locally: docs sync (`3528f59`) and codex hooks/TASKS.md (`3b337c6`); push failed twice with GitHub 500, 2 commits ahead of origin.
 - **Findings:** SEO subagent report (craftedwood): site is new in Google, 1 referring domain, shelves collection 829 impressions/0 clicks, apex/www split still indexed. Backlink target list being written to `obsidian/seo/backlink-targets.md`.
