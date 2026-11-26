@@ -98,13 +98,40 @@ export function buildUpsellGroups(
 }
 
 /**
- * Add-on products must stay out of customer-facing listings. The Storefront
- * API's `-tag:` search negation is silently ignored whenever a `sortKey` is
- * also passed to `products(...)`, so any listing that sorts must additionally
- * filter them out client-side.
+ * Internal helper products that exist only to feed the option choices of
+ * other products through `custom.addon_products` ("Hooks Colours" for the coat
+ * racks, "Types of Corbels" for the corbel mantel). They must stay published
+ * to the Wood Headless channel, or the Storefront API drops them from those
+ * references and the choices vanish from the PDPs. Their own pages 404 and
+ * they are kept out of every listing, search, sitemap and feed.
  */
-export function filterHiddenProducts<T extends {tags?: string[] | null}>(
+export const INTERNAL_HELPER_HANDLES: readonly string[] = [
+  'coat-racks',
+  'aaa-types-of-corbels',
+];
+
+export function isInternalHelperHandle(handle: string | null | undefined) {
+  return !!handle && INTERNAL_HELPER_HANDLES.includes(handle);
+}
+
+/**
+ * Add-on products and internal helpers must stay out of customer-facing
+ * listings. The Storefront API's `-tag:` search negation is silently ignored
+ * whenever a `sortKey` is also passed to `products(...)`, so any listing that
+ * sorts must additionally filter them out client-side.
+ */
+export function filterHiddenProducts<
+  T extends {tags?: string[] | null; handle?: string | null},
+>(nodes: T[]): T[] {
+  return nodes.filter(
+    (node) =>
+      !node.tags?.includes(ADDON_TAG) && !isInternalHelperHandle(node.handle),
+  );
+}
+
+/** For listings (search, collection grids) whose nodes carry no tags. */
+export function filterInternalHelpers<T extends {handle?: string | null}>(
   nodes: T[],
 ): T[] {
-  return nodes.filter((node) => !node.tags?.includes(ADDON_TAG));
+  return nodes.filter((node) => !isInternalHelperHandle(node.handle));
 }

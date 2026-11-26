@@ -1,5 +1,6 @@
 import type {Route} from './+types/sitemap.$type.$page[.xml]';
 import {getSitemap} from '@shopify/hydrogen';
+import {INTERNAL_HELPER_HANDLES} from '~/lib/upsells';
 
 // Codegen cannot interpolate constants, so this is `ADDON_TAG` from ~/lib/upsells spelled out.
 const ADDON_HANDLES_QUERY = `#graphql
@@ -106,8 +107,11 @@ export async function loader({
   }
 
   const {products} = await storefront.query(ADDON_HANDLES_QUERY);
-  const addonHandles = products.nodes.map((node) => node.handle);
-  const xml = removeProductUrls(await response.text(), addonHandles);
+  const hiddenHandles = [
+    ...products.nodes.map((node) => node.handle),
+    ...INTERNAL_HELPER_HANDLES,
+  ];
+  const xml = removeProductUrls(await response.text(), hiddenHandles);
 
   return new Response(xml, {status: response.status, headers: cacheHeaders});
 }

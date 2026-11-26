@@ -11,6 +11,7 @@ import {
 } from '~/lib/search';
 import {SITE_NAME} from '~/lib/site';
 import {seoMeta} from '~/lib/seo';
+import {filterInternalHelpers} from '~/lib/upsells';
 import type {
   RegularSearchQuery,
   PredictiveSearchQuery,
@@ -290,6 +291,13 @@ async function regularSearch({
     throw new Error('No search data returned from Shopify API');
   }
 
+  // Internal helper products are published to the headless channel (other
+  // PDPs read their option choices) but are never search results.
+  items.products = {
+    ...items.products,
+    nodes: filterInternalHelpers(items.products.nodes),
+  };
+
   const total = Object.values(items).reduce(
     (acc: number, {nodes}: {nodes: Array<unknown>}) => acc + nodes.length,
     0,
@@ -468,6 +476,8 @@ async function predictiveSearch({
   if (!items) {
     throw new Error('No predictive search data returned from Shopify API');
   }
+
+  items.products = filterInternalHelpers(items.products);
 
   const total = Object.values(items).reduce(
     (acc: number, item: Array<unknown>) => acc + item.length,

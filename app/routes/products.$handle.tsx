@@ -29,7 +29,12 @@ import {ETSY_PRODUCT_REVIEWS} from '~/data/etsy-product-reviews.server';
 import {resolveSelectedOptions, unitFromSearchParams} from '~/lib/variantSelection';
 import {useUnitSystem} from '~/hooks/useUnitSystem';
 import {Lightbox} from '~/components/Lightbox';
-import {ADDON_TAG, buildUpsellGroups} from '~/lib/upsells';
+import {
+  ADDON_TAG,
+  buildUpsellGroups,
+  filterHiddenProducts,
+  isInternalHelperHandle,
+} from '~/lib/upsells';
 import {Reveal} from '~/components/animate-ui/Reveal';
 import {StaggerGroup, StaggerItem} from '~/components/animate-ui/StaggerGroup';
 import {DURATION, EASE_OUT} from '~/lib/motion';
@@ -102,6 +107,12 @@ export const meta: Route.MetaFunction = ({data, params}) => {
 };
 
 export async function loader(args: Route.LoaderArgs) {
+  // Internal helper products stay published to the headless channel only so
+  // other PDPs can read their option choices; they have no page of their own.
+  if (isInternalHelperHandle(args.params.handle)) {
+    throw new Response(null, {status: 404});
+  }
+
   // Start fetching non-critical data without blocking time to first byte
   const deferredData = loadDeferredData(args);
 
@@ -218,7 +229,9 @@ function loadDeferredData({context, params}: Route.LoaderArgs) {
             staleWhileRevalidate: 3600,
           }),
         })
-        .then(({productRecommendations}) => productRecommendations?.slice(0, 4) ?? [])
+        .then(({productRecommendations}) =>
+          filterHiddenProducts(productRecommendations ?? []).slice(0, 4),
+        )
         .catch((error: Error) => {
           console.error(error);
           return [];

@@ -21,6 +21,7 @@ import {seoMeta, toMetaDescription, toPageTitle} from '~/lib/seo';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 import type {SortValue} from '~/components/SortDropdown';
 import {catalogCache, editorialCache} from '~/lib/cache';
+import {filterInternalHelpers} from '~/lib/upsells';
 
 export const meta: Route.MetaFunction = ({data, params}) => {
   const collection = data?.collection;
@@ -134,7 +135,15 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   const sidebarCategories = buildSidebarCategories(collections.nodes);
 
   return {
-    collection,
+    // Internal helper products never show in a grid, even if a merchant adds
+    // one to a collection by hand.
+    collection: {
+      ...collection,
+      products: {
+        ...collection.products,
+        nodes: filterInternalHelpers(collection.products.nodes),
+      },
+    },
     sidebarCategories,
     sortParam,
   };
